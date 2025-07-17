@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { BookOpen, Menu, X } from "lucide-react"
-import { Button } from "./ui/Button"
+import { Button } from "./ui/button"
 
 interface NavigationProps {
   language: "en" | "tet"

@@ -5,8 +5,8 @@ import Link from "next/link"
 import Image from "next/image"
 import { Users, BookOpen, Gamepad2, Sparkles, ArrowRight } from "lucide-react"
 import { Navigation } from "@/components/Navigation"
-import { Button } from "@/components/ui/Button"
-import { Card, CardContent } from "@/components/ui/Card"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/Badge"
 
 export default function LafaekKiikCharacterPage() {

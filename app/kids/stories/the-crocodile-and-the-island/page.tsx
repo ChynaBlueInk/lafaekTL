@@ -5,8 +5,8 @@ import Link from "next/link"
 import Image from "next/image"
 import { ArrowLeft, ArrowRight } from "lucide-react"
 import { Navigation } from "@/components/Navigation"
-import { Button } from "@/components/ui/Button"
-import { Card, CardContent } from "@/components/ui/Card"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
 
 export default function CrocodileIslandStoryPage() {
   const [language, setLanguage] = useState<"en" | "tet">("en")

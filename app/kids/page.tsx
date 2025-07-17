@@ -5,8 +5,8 @@ import Link from "next/link"
 import Image from "next/image"
 import { BookOpen, Gamepad2, Users, Paintbrush, ArrowRight } from "lucide-react"
 import { Navigation } from "@/components/Navigation"
-import { Button } from "@/components/ui/Button"
-import { Card, CardContent } from "@/components/ui/Card"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
 
 export default function KidsPage() {
   const [language, setLanguage] = useState<"en" | "tet">("en")

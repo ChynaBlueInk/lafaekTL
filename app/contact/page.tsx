@@ -1,12 +1,13 @@
 "use client"
 
 import type React from "react"
+import Image from "next/image";
 
 import { useState } from "react"
 import { Mail, Phone, MapPin, Send } from "lucide-react"
 import { Navigation } from "@/components/Navigation"
-import { Button } from "@/components/ui/Button"
-import { Card, CardContent } from "@/components/ui/Card"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/Input"
 import { Textarea } from "@/components/ui/Textarea"
 import { Label } from "@/components/ui/Label"
@@ -158,15 +159,16 @@ export default function ContactPage() {
                 <MapPin className="h-6 w-6 text-purple-600" />
                 <span>{t.contactInfo.address}</span>
               </div>
-              <div className="mt-8">
-                <Image
-                  src="/placeholder.svg?height=300&width=500"
-                  alt="Lafaek Learning Media Office"
-                  width={500}
-                  height={300}
-                  className="rounded-lg shadow-lg"
-                />
-              </div>
+             <div className="mt-8">
+  <Image
+    src="/placeholder.svg"
+    alt="Lafaek Learning Media Office"
+    width={500}
+    height={300}
+    className="rounded-lg shadow-lg"
+    priority
+  />
+</div>
             </div>
 
             {/* Contact Form */}

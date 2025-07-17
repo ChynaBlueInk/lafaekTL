@@ -4,8 +4,8 @@ import { useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { Navigation } from "@/components/Navigation"
-import { Button } from "@/components/ui/Button"
-import { Card, CardContent } from "@/components/ui/Card"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
 import { Lightbulb, Users, Globe, Handshake, BookOpen } from "lucide-react"
 
 export default function AboutPage() {
