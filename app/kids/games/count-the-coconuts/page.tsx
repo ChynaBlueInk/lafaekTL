@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/Input"
 import { Label } from "@/components/ui/Label"
-import { Badge } from "@/components/ui/Badge"
+import { Badge } from "@/components/ui/badge"
 
 export default function CountTheCoconutsGamePage() {
   const [language, setLanguage] = useState<"en" | "tet">("en")

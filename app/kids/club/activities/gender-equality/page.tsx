@@ -7,7 +7,7 @@ import { ArrowLeft, Lightbulb, CheckCircle, Sparkles } from "lucide-react"
 import { Navigation } from "@/components/Navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/Badge"
+import { Badge } from "@/components/ui/badge"
 
 export default function GenderEqualityActivityPage() {
   const [language, setLanguage] = useState<"en" | "tet">("en")

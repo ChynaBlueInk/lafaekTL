@@ -7,7 +7,7 @@ import { Users, BookOpen, Gamepad2, Sparkles, ArrowRight } from "lucide-react"
 import { Navigation } from "@/components/Navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/Badge"
+import { Badge } from "@/components/ui/badge"
 
 export default function LafaekKiikCharacterPage() {
   const [language, setLanguage] = useState<"en" | "tet">("en")
