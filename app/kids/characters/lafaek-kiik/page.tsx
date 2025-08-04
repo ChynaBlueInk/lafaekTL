@@ -5,9 +5,9 @@ import Link from "next/link"
 import Image from "next/image"
 import { Users, BookOpen, Gamepad2, Sparkles, ArrowRight } from "lucide-react"
 import { Navigation } from "@/components/Navigation"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/button"
+import { Card } from "@/components/card"
+import { Badge } from "@/components/badge"
 
 export default function LafaekKiikCharacterPage() {
   const [language, setLanguage] = useState<"en" | "tet">("en")
@@ -96,40 +96,38 @@ export default function LafaekKiikCharacterPage() {
       <Navigation language={language} onLanguageChange={setLanguage} />
 
       {/* Hero Section */}
-      <section className="py-20 px-4 bg-gradient-to-r from-yellow-500 to-orange-500 text-white">
-        <div className="container mx-auto text-center">
+      <section className="py-20 px-4 bg-gradient-to-r from-yellow-500 to-orange-500 text-white text-center">
+        <div className="max-w-5xl mx-auto">
           <h1 className="text-4xl md:text-6xl font-bold mb-6">{t.hero.title}</h1>
           <p className="text-xl md:text-2xl opacity-90 max-w-3xl mx-auto">{t.hero.subtitle}</p>
-          <div className="w-full h-4 bg-gradient-to-r from-red-400 via-yellow-400 via-blue-400 to-green-400 rounded-full opacity-60 mt-8"></div>
-        </div>
+          <div className="w-full h-4 bg-gradient-to-r from-red-400 via-yellow-400 to-green-400 rounded-full opacity-60 mt-8"></div>
+</div>
       </section>
 
       {/* Character Profile */}
       <section className="py-16 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div className="relative">
-              <Image
-                src={t.hero.image || "/placeholder.svg"}
-                alt="Lafaek Kiik character"
-                width={400}
-                height={400}
-                className="rounded-full shadow-lg mx-auto"
-              />
-              <div className="absolute -bottom-4 -right-4 w-24 h-24 bg-gradient-to-br from-green-400 to-blue-500 rounded-full flex items-center justify-center">
-                <Sparkles className="h-12 w-12 text-white" />
-              </div>
+        <div className="max-w-7xl mx-auto px-4 grid md:grid-cols-2 gap-12 items-center">
+          <div className="relative">
+            <Image
+              src={t.hero.image || "/placeholder.svg"}
+              alt="Lafaek Kiik character"
+              width={400}
+              height={400}
+              className="rounded-full shadow-lg mx-auto"
+            />
+            <div className="absolute -bottom-4 -right-4 w-24 h-24 bg-gradient-to-br from-green-400 to-blue-500 rounded-full flex items-center justify-center">
+              <Sparkles className="h-12 w-12 text-white" />
             </div>
-            <div>
-              <h2 className="text-4xl font-bold text-blue-700 mb-6">{t.about.title}</h2>
-              <p className="text-lg text-gray-700 leading-relaxed mb-6">{t.about.description}</p>
-              <div className="flex flex-wrap gap-2">
-                {t.about.traits.map((trait, index) => (
-                  <Badge key={index} variant="custom" className="bg-yellow-500 text-white px-4 py-2">
-                    {trait}
-                  </Badge>
-                ))}
-              </div>
+          </div>
+          <div>
+            <h2 className="text-4xl font-bold text-blue-700 mb-6">{t.about.title}</h2>
+            <p className="text-lg text-gray-700 leading-relaxed mb-6">{t.about.description}</p>
+            <div className="flex flex-wrap gap-2">
+              {t.about.traits.map((trait, index) => (
+                <Badge key={index} className="bg-yellow-500 text-white px-4 py-2">
+                  {trait}
+                </Badge>
+              ))}
             </div>
           </div>
         </div>
@@ -137,36 +135,31 @@ export default function LafaekKiikCharacterPage() {
 
       {/* Lafaek Kiik's Role */}
       <section className="py-16 bg-gradient-to-r from-green-100 to-blue-100">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-green-700 mb-4">{t.role.title}</h2>
-            <p className="text-xl text-gray-600">How Lafaek Kiik helps children learn and grow</p>
-          </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {t.role.items.map((item, index) => (
-              <Card key={index} className="bg-white/90 backdrop-blur-sm border-2 border-green-200">
-                <CardContent className="p-6 text-center">
-                  <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <item.icon className="h-8 w-8 text-white" />
-                  </div>
-                  <h3 className="text-xl font-bold text-green-700 mb-2">{item.text}</h3>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+        <div className="max-w-7xl mx-auto px-4 text-center mb-12">
+          <h2 className="text-4xl font-bold text-green-700 mb-4">{t.role.title}</h2>
+          <p className="text-xl text-gray-600">How Lafaek Kiik helps children learn and grow</p>
+        </div>
+        <div className="max-w-7xl mx-auto px-4 grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {t.role.items.map((item, index) => (
+            <Card key={index} className="bg-white/90 backdrop-blur-sm border-2 border-green-200 text-center">
+              <div className="p-6">
+                <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <item.icon className="h-8 w-8 text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-green-700 mb-2">{item.text}</h3>
+              </div>
+            </Card>
+          ))}
         </div>
       </section>
 
-      {/* Lafaek Friends Club CTA */}
-      <section className="py-16 bg-gradient-to-r from-red-100 to-orange-100">
-        <div className="container mx-auto px-4 text-center">
+      {/* Friends Club CTA */}
+      <section className="py-16 bg-gradient-to-r from-red-100 to-orange-100 text-center">
+        <div className="max-w-5xl mx-auto px-4">
           <h2 className="text-4xl font-bold text-red-700 mb-6">{t.club.title}</h2>
           <p className="text-xl text-red-600 max-w-3xl mx-auto mb-8">{t.club.description}</p>
           <Link href="/kids/club">
-            <Button
-              size="lg"
-              className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-bold py-4 px-8 rounded-full text-lg shadow-lg"
-            >
+            <Button className="flex items-center justify-center bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-bold py-4 px-8 rounded-full text-lg shadow-lg">
               <Users className="mr-2 h-5 w-5" />
               {t.club.cta}
             </Button>
@@ -174,44 +167,38 @@ export default function LafaekKiikCharacterPage() {
         </div>
       </section>
 
-      {/* Where to Find Lafaek Kiik */}
+      {/* Appearances */}
       <section className="py-16 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-gray-800 mb-4">{t.appearances.title}</h2>
-            <p className="text-xl text-gray-600">Explore all the places Lafaek Kiik appears!</p>
-          </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {t.appearances.items.map((item, index) => (
-              <Card
-                key={index}
-                className="bg-white/80 backdrop-blur-sm border-2 border-gray-200 hover:border-blue-400 transition-all transform hover:scale-105"
-              >
-                <CardContent className="p-6 text-center">
-                  <BookOpen className="h-12 w-12 text-blue-600 mx-auto mb-4" />
-                  <h3 className="text-xl font-bold text-gray-800 mb-2">{item.label}</h3>
-                  <Link href={item.link}>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="border-blue-500 text-blue-600 hover:bg-blue-500 hover:text-white bg-transparent"
-                    >
-                      Go There
-                      <ArrowRight className="h-4 w-4 ml-2" />
-                    </Button>
-                  </Link>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+        <div className="max-w-7xl mx-auto px-4 text-center mb-12">
+          <h2 className="text-4xl font-bold text-gray-800 mb-4">{t.appearances.title}</h2>
+          <p className="text-xl text-gray-600">Explore all the places Lafaek Kiik appears!</p>
+        </div>
+        <div className="max-w-7xl mx-auto px-4 grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {t.appearances.items.map((item, index) => (
+            <Card
+              key={index}
+              className="bg-white/80 backdrop-blur-sm border-2 border-gray-200 hover:border-blue-400 transform hover:scale-105 transition-all text-center"
+            >
+              <div className="p-6">
+                <BookOpen className="h-12 w-12 text-blue-600 mx-auto mb-4" />
+                <h3 className="text-xl font-bold text-gray-800 mb-2">{item.label}</h3>
+                <Link href={item.link}>
+                  <Button className="mt-2 flex items-center justify-center border border-blue-500 text-blue-600 hover:bg-blue-500 hover:text-white bg-transparent">
+                    Go There
+                    <ArrowRight className="h-4 w-4 ml-2" />
+                  </Button>
+                </Link>
+              </div>
+            </Card>
+          ))}
         </div>
       </section>
 
       {/* Footer */}
       <footer className="bg-gray-800 text-white py-8">
-        <div className="container mx-auto px-4 text-center">
+        <div className="max-w-7xl mx-auto px-4 text-center">
           <Link href="/">
-            <Button variant="outline" className="border-gray-600 text-gray-300 hover:bg-gray-700 mb-4 bg-transparent">
+            <Button className="flex items-center justify-center mb-4 border border-gray-600 text-gray-300 hover:bg-gray-700 bg-transparent">
               ← Back to Home
             </Button>
           </Link>

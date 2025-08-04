@@ -5,9 +5,9 @@ import Link from "next/link"
 import Image from "next/image"
 import { ArrowLeft, Lightbulb, CheckCircle, Sparkles } from "lucide-react"
 import { Navigation } from "@/components/Navigation"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/button"
+import { Card } from "@/components/card"
+import { Badge } from "@/components/badge"
 
 export default function GenderEqualityActivityPage() {
   const [language, setLanguage] = useState<"en" | "tet">("en")
@@ -107,17 +107,14 @@ export default function GenderEqualityActivityPage() {
           <h1 className="text-4xl md:text-6xl font-bold mb-6">{t.hero.title}</h1>
           <p className="text-xl md:text-2xl opacity-90 max-w-3xl mx-auto">{t.hero.subtitle}</p>
           <p className="text-lg opacity-80 max-w-4xl mx-auto mt-4">{t.hero.description}</p>
-          <div className="w-full h-4 bg-gradient-to-r from-red-400 via-yellow-400 via-blue-400 to-green-400 rounded-full opacity-60 mt-8"></div>
+          <div className="w-full h-4 bg-gradient-to-r from-red-400 via-yellow-400 to-green-400 rounded-full opacity-60 mt-8"></div>
         </div>
       </section>
 
       {/* Back to Club Button */}
       <div className="container mx-auto px-4 mt-8">
         <Link href="/kids/club">
-          <Button
-            variant="outline"
-            className="border-purple-500 text-purple-600 hover:bg-purple-500 hover:text-white bg-transparent"
-          >
+          <Button className="border border-purple-500 text-purple-600 hover:bg-purple-500 hover:text-white bg-transparent flex items-center">
             <ArrowLeft className="h-4 w-4 mr-2" />
             {t.backToClub}
           </Button>
@@ -150,11 +147,11 @@ export default function GenderEqualityActivityPage() {
         </section>
       ))}
 
-      {/* Your Challenge Section */}
+      {/* Your Challenge */}
       <section className="py-16 bg-gradient-to-r from-yellow-100 to-orange-100">
         <div className="container mx-auto px-4">
           <Card className="bg-white/90 backdrop-blur-sm border-2 border-orange-200">
-            <CardContent className="p-8 text-center">
+            <div className="p-8 text-center">
               <h2 className="text-4xl font-bold text-orange-700 mb-6">{t.activity.title}</h2>
               <div className="space-y-4 mb-8">
                 {t.activity.instructions.map((instruction, index) => (
@@ -164,16 +161,16 @@ export default function GenderEqualityActivityPage() {
                   </div>
                 ))}
               </div>
-              <Badge variant="custom" className="bg-blue-600 text-white px-4 py-2 text-lg">
+              <Badge className="bg-blue-600 text-white px-4 py-2 text-lg flex items-center justify-center">
                 <Lightbulb className="h-5 w-5 mr-2" />
                 {t.activity.tip}
               </Badge>
-            </CardContent>
+            </div>
           </Card>
         </div>
       </section>
 
-      {/* Learn More Section */}
+      {/* Learn More */}
       <section className="py-16 bg-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
@@ -183,10 +180,10 @@ export default function GenderEqualityActivityPage() {
           <div className="grid md:grid-cols-3 gap-6">
             {t.learnMore.items.map((item, index) => (
               <Card key={index} className="bg-white/80 backdrop-blur-sm border-2 border-gray-200">
-                <CardContent className="p-6 text-center">
+                <div className="p-6 text-center">
                   <Sparkles className="h-12 w-12 text-purple-600 mx-auto mb-4" />
                   <p className="text-lg font-semibold text-gray-700">{item}</p>
-                </CardContent>
+                </div>
               </Card>
             ))}
           </div>
@@ -197,7 +194,7 @@ export default function GenderEqualityActivityPage() {
       <footer className="bg-gray-800 text-white py-8">
         <div className="container mx-auto px-4 text-center">
           <Link href="/">
-            <Button variant="outline" className="border-gray-600 text-gray-300 hover:bg-gray-700 mb-4 bg-transparent">
+            <Button className="border border-gray-600 text-gray-300 hover:bg-gray-700 mb-4 bg-transparent flex items-center justify-center">
               ← Back to Home
             </Button>
           </Link>

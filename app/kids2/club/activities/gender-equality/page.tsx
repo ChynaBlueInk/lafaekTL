@@ -1,9 +1,9 @@
 "use client"
 
 import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/button"
+import { Card } from "@/components/card"
+import { Badge } from "@/components/badge"
 import { Home, UserCheck, Star, Heart, Award, CheckCircle, Users } from "lucide-react"
 import Link from "next/link"
 
@@ -165,8 +165,6 @@ export default function GenderEqualityActivity() {
             <div className="flex items-center space-x-4">
               <Link href="/kids/club">
                 <Button
-                  variant="outline"
-                  size="sm"
                   className="border-white text-white hover:bg-white hover:text-purple-600 bg-transparent"
                 >
                   <Home className="h-4 w-4 mr-2" />
@@ -183,18 +181,14 @@ export default function GenderEqualityActivity() {
             </div>
             <div className="flex items-center space-x-2">
               <Button
-                variant={language === "en" ? "secondary" : "outline"}
-                size="sm"
                 onClick={() => setLanguage("en")}
-                className="text-xs"
+                className={`text-xs ${language === "en" ? "bg-purple-500 text-white" : "bg-white border border-purple-500 text-purple-600"}`}
               >
                 EN
               </Button>
               <Button
-                variant={language === "tet" ? "secondary" : "outline"}
-                size="sm"
                 onClick={() => setLanguage("tet")}
-                className="text-xs"
+                className={`text-xs ${language === "tet" ? "bg-purple-500 text-white" : "bg-white border border-purple-500 text-purple-600"}`}
               >
                 TET
               </Button>
@@ -225,7 +219,7 @@ export default function GenderEqualityActivity() {
 
             {/* Step Content */}
             <Card className="bg-white/95 backdrop-blur-sm border-4 border-purple-200 shadow-2xl">
-              <CardContent className="p-8">
+              <div className="p-8">
                 <div className="text-center mb-8">
                   <h2 className="text-3xl font-bold text-purple-700 mb-4">{currentStepData.title}</h2>
                   <p className="text-xl text-purple-600">{currentStepData.content}</p>
@@ -239,14 +233,14 @@ export default function GenderEqualityActivity() {
                         key={index}
                         className="bg-gradient-to-br from-purple-50 to-pink-50 border-2 border-purple-200"
                       >
-                        <CardContent className="p-6 text-center">
+                        <div className="p-6 text-center">
                           <div className="w-20 h-20 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full mx-auto mb-4 flex items-center justify-center">
                             <Users className="h-10 w-10 text-white" />
                           </div>
                           <h3 className="text-xl font-bold text-purple-700 mb-2">{hero.name}</h3>
                           <Badge className="bg-pink-500 text-white mb-3">{hero.job}</Badge>
                           <p className="text-purple-600">{hero.description}</p>
-                        </CardContent>
+                        </div>
                       </Card>
                     ))}
                   </div>
@@ -260,10 +254,10 @@ export default function GenderEqualityActivity() {
                         key={index}
                         className="bg-gradient-to-r from-purple-50 to-pink-50 border-2 border-purple-200"
                       >
-                        <CardContent className="p-4 flex items-center space-x-4">
+                        <div className="p-4 flex items-center space-x-4">
                           <Star className="h-6 w-6 text-purple-600 flex-shrink-0" />
                           <p className="text-purple-800 font-medium">{fact}</p>
-                        </CardContent>
+                        </div>
                       </Card>
                     ))}
                   </div>
@@ -300,10 +294,10 @@ export default function GenderEqualityActivity() {
                         key={index}
                         className="bg-gradient-to-r from-purple-50 to-pink-50 border-2 border-purple-200"
                       >
-                        <CardContent className="p-4 flex items-center space-x-4">
+                        <div className="p-4 flex items-center space-x-4">
                           <CheckCircle className="h-6 w-6 text-green-600 flex-shrink-0" />
                           <p className="text-purple-800 font-medium">{pledge}</p>
-                        </CardContent>
+                        </div>
                       </Card>
                     ))}
                   </div>
@@ -319,14 +313,14 @@ export default function GenderEqualityActivity() {
                     {currentStep === t.steps.length - 1 ? "Complete Mission!" : "Next Step"}
                   </Button>
                 </div>
-              </CardContent>
+              </div>
             </Card>
           </div>
         ) : (
           /* Completion Screen */
           <div className="max-w-2xl mx-auto">
             <Card className="bg-gradient-to-r from-purple-100 to-pink-100 border-4 border-purple-300">
-              <CardContent className="p-8 text-center">
+              <div className="p-8 text-center">
                 <Award className="h-20 w-20 text-yellow-500 mx-auto mb-6" />
                 <h2 className="text-3xl font-bold text-purple-700 mb-4">{t.completion.title}</h2>
                 <p className="text-xl text-purple-600 mb-6">{t.completion.message}</p>
@@ -346,14 +340,13 @@ export default function GenderEqualityActivity() {
                   </Link>
                   <Link href="/kids/club/activities/climate-action">
                     <Button
-                      variant="outline"
                       className="border-2 border-purple-500 text-purple-600 hover:bg-purple-500 hover:text-white font-bold py-4 px-8 rounded-full text-lg bg-transparent"
                     >
                       Next Mission
                     </Button>
                   </Link>
                 </div>
-              </CardContent>
+              </div>
             </Card>
           </div>
         )}

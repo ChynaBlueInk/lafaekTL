@@ -1,9 +1,9 @@
 "use client"
 
 import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/button"
+import { Card } from "@/components/card"
+import { Badge } from "@/components/badge"
 import { Home, Heart, BookOpen, Play, Star, Smile } from "lucide-react"
 import Link from "next/link"
 
@@ -123,11 +123,7 @@ export default function LafaekKiikPage() {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <Link href="/kids">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="border-white text-white hover:bg-white hover:text-blue-600 bg-transparent"
-                >
+                <Button className="border border-white text-white hover:bg-white hover:text-blue-600 bg-transparent text-sm px-4 py-2 rounded-full">
                   <Home className="h-4 w-4 mr-2" />
                   Kids Zone
                 </Button>
@@ -142,18 +138,22 @@ export default function LafaekKiikPage() {
             </div>
             <div className="flex items-center space-x-2">
               <Button
-                variant={language === "en" ? "secondary" : "outline"}
-                size="sm"
                 onClick={() => setLanguage("en")}
-                className="text-xs"
+                className={`text-xs px-4 py-2 rounded-full font-bold ${
+                  language === "en"
+                    ? "bg-white text-blue-600"
+                    : "border border-white text-white hover:bg-white hover:text-blue-600"
+                }`}
               >
                 EN
               </Button>
               <Button
-                variant={language === "tet" ? "secondary" : "outline"}
-                size="sm"
                 onClick={() => setLanguage("tet")}
-                className="text-xs"
+                className={`text-xs px-4 py-2 rounded-full font-bold ${
+                  language === "tet"
+                    ? "bg-white text-blue-600"
+                    : "border border-white text-white hover:bg-white hover:text-blue-600"
+                }`}
               >
                 TET
               </Button>
@@ -162,6 +162,7 @@ export default function LafaekKiikPage() {
         </div>
       </div>
 
+
       {/* Character Content */}
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-6xl mx-auto">
@@ -169,7 +170,7 @@ export default function LafaekKiikPage() {
             {/* Character Image and Basic Info */}
             <div className="lg:col-span-1">
               <Card className="bg-white/95 backdrop-blur-sm border-4 border-blue-200 shadow-2xl mb-6">
-                <CardContent className="p-6 text-center">
+                <div className="p-6 text-center">
                   {/* Character Illustration */}
                   <div className="w-48 h-48 bg-gradient-to-br from-blue-300 to-green-300 rounded-full mx-auto mb-6 flex items-center justify-center border-4 border-blue-400">
                     <span className="text-8xl">🐊</span>
@@ -200,12 +201,12 @@ export default function LafaekKiikPage() {
                       Rate Character
                     </Button>
                   </div>
-                </CardContent>
+                </div>
               </Card>
 
               {/* Favorites */}
               <Card className="bg-white/90 backdrop-blur-sm border-2 border-green-200">
-                <CardContent className="p-6">
+                <div className="p-6">
                   <h3 className="text-xl font-bold text-green-700 mb-4">{t.favorites.title}</h3>
                   <div className="space-y-3">
                     {t.favorites.items.map((item, index) => (
@@ -218,7 +219,7 @@ export default function LafaekKiikPage() {
                       </div>
                     ))}
                   </div>
-                </CardContent>
+                </div>
               </Card>
             </div>
 
@@ -226,18 +227,18 @@ export default function LafaekKiikPage() {
             <div className="lg:col-span-2 space-y-6">
               {/* Story */}
               <Card className="bg-white/90 backdrop-blur-sm border-2 border-blue-200">
-                <CardContent className="p-8">
+                <div className="p-8">
                   <h3 className="text-2xl font-bold text-blue-700 mb-4 flex items-center">
                     <BookOpen className="h-6 w-6 mr-3" />
                     {t.story.title}
                   </h3>
                   <p className="text-gray-700 leading-relaxed text-lg">{t.story.content}</p>
-                </CardContent>
+                </div>
               </Card>
 
               {/* Adventures */}
               <Card className="bg-white/90 backdrop-blur-sm border-2 border-yellow-200">
-                <CardContent className="p-6">
+                <div className="p-6">
                   <h3 className="text-xl font-bold text-yellow-700 mb-4">{t.adventures.title}</h3>
                   <div className="grid md:grid-cols-2 gap-3">
                     {t.adventures.stories.map((story, index) => (
@@ -252,12 +253,12 @@ export default function LafaekKiikPage() {
                       </div>
                     ))}
                   </div>
-                </CardContent>
+                </div>
               </Card>
 
               {/* Fun Facts */}
               <Card className="bg-white/90 backdrop-blur-sm border-2 border-purple-200">
-                <CardContent className="p-6">
+                <div className="p-6">
                   <h3 className="text-xl font-bold text-purple-700 mb-4 flex items-center">
                     <Smile className="h-5 w-5 mr-2" />
                     {t.funFacts.title}
@@ -270,12 +271,12 @@ export default function LafaekKiikPage() {
                       </div>
                     ))}
                   </div>
-                </CardContent>
+                </div>
               </Card>
 
               {/* Activities */}
               <Card className="bg-gradient-to-r from-green-100 to-blue-100 border-2 border-green-300">
-                <CardContent className="p-6">
+                <div className="p-6">
                   <h3 className="text-xl font-bold text-green-700 mb-4 flex items-center">
                     <Play className="h-5 w-5 mr-2" />
                     {t.activities.title}
@@ -284,15 +285,15 @@ export default function LafaekKiikPage() {
                     {t.activities.items.map((activity, index) => (
                       <Link key={index} href={activity.link}>
                         <Card className="bg-white/80 border-2 border-green-200 hover:border-green-400 transition-all transform hover:scale-105 cursor-pointer">
-                          <CardContent className="p-4 text-center">
+                          <div className="p-4 text-center">
                             <h4 className="font-bold text-green-700 mb-2">{activity.title}</h4>
                             <p className="text-green-600 text-sm">{activity.description}</p>
-                          </CardContent>
+                          </div>
                         </Card>
                       </Link>
                     ))}
                   </div>
-                </CardContent>
+                </div>
               </Card>
             </div>
           </div>
@@ -306,12 +307,12 @@ export default function LafaekKiikPage() {
                 </Button>
               </Link>
               <Link href="/kids/characters">
-                <Button
-                  variant="outline"
-                  className="border-2 border-blue-500 text-blue-600 hover:bg-blue-500 hover:text-white font-bold py-3 px-6 rounded-full bg-transparent"
-                >
-                  All Characters
-                </Button>
+              <Button
+  className="border-2 border-blue-500 text-blue-600 hover:bg-blue-500 hover:text-white font-bold py-3 px-6 rounded-full bg-transparent"
+>
+  All Characters
+</Button>
+
               </Link>
             </div>
           </div>

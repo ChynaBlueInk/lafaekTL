@@ -1,8 +1,8 @@
 "use client"
 
 import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
+import { Button } from "@/components/button"
+import { Card } from "@/components/card"
 import { ChevronLeft, ChevronRight, Home, Volume2, BookOpen } from "lucide-react"
 import Link from "next/link"
 
@@ -109,38 +109,40 @@ export default function CrocodileStoryPage() {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <Link href="/kids">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="border-white text-white hover:bg-white hover:text-blue-600 bg-transparent"
-                >
-                  <Home className="h-4 w-4 mr-2" />
-                  Kids Zone
-                </Button>
+                <Button className="flex items-center gap-2 border border-white text-white hover:bg-white hover:text-blue-600 bg-transparent text-sm px-4 py-2 rounded-md">
+  <Home className="h-4 w-4" />
+  Kids Zone
+</Button>
+
               </Link>
               <div className="flex items-center space-x-2">
                 <BookOpen className="h-6 w-6" />
                 <h1 className="text-2xl font-bold">{t.title}</h1>
               </div>
             </div>
-            <div className="flex items-center space-x-2">
-              <Button
-                variant={language === "en" ? "secondary" : "outline"}
-                size="sm"
-                onClick={() => setLanguage("en")}
-                className="text-xs"
-              >
-                EN
-              </Button>
-              <Button
-                variant={language === "tet" ? "secondary" : "outline"}
-                size="sm"
-                onClick={() => setLanguage("tet")}
-                className="text-xs"
-              >
-                TET
-              </Button>
-            </div>
+            <div className="flex items-center gap-2">
+  <Button
+    onClick={() => setLanguage("en")}
+    className={`text-xs px-4 py-2 rounded-md ${
+      language === "en"
+        ? "bg-white text-blue-600"
+        : "border border-white text-white hover:bg-white hover:text-blue-600 bg-transparent"
+    }`}
+  >
+    EN
+  </Button>
+  <Button
+    onClick={() => setLanguage("tet")}
+    className={`text-xs px-4 py-2 rounded-md ${
+      language === "tet"
+        ? "bg-white text-blue-600"
+        : "border border-white text-white hover:bg-white hover:text-blue-600 bg-transparent"
+    }`}
+  >
+    TET
+  </Button>
+</div>
+
           </div>
         </div>
       </div>
@@ -148,7 +150,7 @@ export default function CrocodileStoryPage() {
       {/* Story Content */}
       <div className="container mx-auto px-4 py-8">
         <Card className="max-w-4xl mx-auto bg-white/95 backdrop-blur-sm border-4 border-blue-200 shadow-2xl">
-          <CardContent className="p-8">
+          <div className="p-8">
             {/* Page Counter */}
             <div className="text-center mb-6">
               <div className="inline-flex items-center space-x-2 bg-blue-100 rounded-full px-4 py-2">
@@ -190,13 +192,11 @@ export default function CrocodileStoryPage() {
               </Button>
 
               <div className="flex space-x-2">
-                <Button
-                  variant="outline"
-                  className="border-2 border-green-500 text-green-600 hover:bg-green-500 hover:text-white bg-transparent"
-                >
-                  <Volume2 className="h-4 w-4 mr-2" />
-                  Listen
-                </Button>
+                <Button className="flex items-center gap-2 border-2 border-green-500 text-green-600 hover:bg-green-500 hover:text-white bg-transparent px-4 py-2 rounded-md">
+  <Volume2 className="h-4 w-4" />
+  Listen
+</Button>
+
                 {currentPage === t.pages.length - 1 && (
                   <Button
                     onClick={resetStory}
@@ -216,14 +216,14 @@ export default function CrocodileStoryPage() {
                 <ChevronRight className="h-5 w-5 ml-2" />
               </Button>
             </div>
-          </CardContent>
+          </div>
         </Card>
 
         {/* Story Complete Actions */}
         {currentPage === t.pages.length - 1 && (
           <div className="max-w-4xl mx-auto mt-8">
             <Card className="bg-gradient-to-r from-green-100 to-blue-100 border-2 border-green-300">
-              <CardContent className="p-6 text-center">
+              <div className="p-6 text-center">
                 <h3 className="text-2xl font-bold text-green-700 mb-4">Great job reading!</h3>
                 <p className="text-green-600 mb-6">You've learned about the legend of how Timor-Leste got its shape!</p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -239,7 +239,7 @@ export default function CrocodileStoryPage() {
                     </Button>
                   </Link>
                 </div>
-              </CardContent>
+              </div>
             </Card>
           </div>
         )}

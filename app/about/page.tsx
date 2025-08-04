@@ -4,8 +4,8 @@ import { useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { Navigation } from "@/components/Navigation"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
+import { Button } from "@/components/button"
+import { Card } from "@/components/card"
 import { Lightbulb, Users, Globe, Handshake, BookOpen } from "lucide-react"
 
 export default function AboutPage() {
@@ -128,9 +128,9 @@ export default function AboutPage() {
           <Image
             src={t.hero.image || "/placeholder.svg"}
             alt="About Lafaek Learning Media"
-            layout="fill"
-            objectFit="cover"
-            className="absolute inset-0 z-0 opacity-30"
+width={600}
+  height={400}
+              className="absolute inset-0 z-0 opacity-30"
           />
           <div className="relative z-10 text-center px-4">
             <h1 className="text-4xl md:text-6xl font-extrabold leading-tight mb-4 drop-shadow-lg">{t.hero.title}</h1>
@@ -173,17 +173,18 @@ export default function AboutPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               {t.values.items.map((value, index) => (
                 <Card
-                  key={index}
-                  className="bg-white/80 backdrop-blur-sm border-2 border-green-200 hover:border-green-400 transition-all transform hover:scale-105"
-                >
-                  <CardContent className="p-6 flex flex-col items-center text-center">
-                    <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-blue-500 rounded-full flex items-center justify-center mb-4 shadow-md">
-                      <value.icon className="h-8 w-8 text-white" />
-                    </div>
-                    <h3 className="text-xl font-semibold text-gray-800 mb-2">{value.title}</h3>
-                    <p className="text-gray-600">{value.description}</p>
-                  </CardContent>
-                </Card>
+  key={index}
+  className="bg-white/80 backdrop-blur-sm border-2 border-green-200 hover:border-green-400 transition-all transform hover:scale-105"
+>
+  <div className="p-6 flex flex-col items-center text-center">
+    <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-blue-500 rounded-full flex items-center justify-center mb-4 shadow-md">
+      <value.icon className="h-8 w-8 text-white" />
+    </div>
+    <h3 className="text-xl font-semibold text-gray-800 mb-2">{value.title}</h3>
+    <p className="text-gray-600">{value.description}</p>
+  </div>
+</Card>
+
               ))}
             </div>
           </div>
@@ -221,12 +222,13 @@ export default function AboutPage() {
             <div className="mt-12">
               <Link href="/get-involved">
                 <Button
-                  size="lg"
-                  className="bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white font-bold py-4 px-8 rounded-full text-lg shadow-lg"
-                >
-                  Join Our Future
-                  <BookOpen className="ml-2 h-5 w-5" />
-                </Button>
+  className="px-8 py-4 text-lg bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white font-bold rounded-full shadow-lg flex items-center justify-center"
+>
+  Join Our Future
+  <BookOpen className="ml-2 h-5 w-5" />
+</Button>
+
+
               </Link>
             </div>
           </div>

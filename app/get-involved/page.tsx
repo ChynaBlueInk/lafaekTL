@@ -1,21 +1,18 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import Image from "next/image"
 import { Navigation } from "@/components/Navigation"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Input } from "@/components/ui/Input"
-import { Textarea } from "@/components/ui/Textarea"
-import { Label } from "@/components/ui/Label"
-import { Select } from "@/components/ui/Select"
-import { Handshake, Users, Heart, Target, Mail, ArrowRight } from "lucide-react"
+import { Button } from "@/components/button"
+import { Card } from "@/components/card"
+import { Input } from "@/components/input"
+import { Textarea } from "@/components/textarea"
+import { Handshake, Users, Heart, Target, ArrowRight } from "lucide-react"
 
 export default function GetInvolvedPage() {
   const [language, setLanguage] = useState<"en" | "tet">("en")
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<Record<string, string>>({
     name: "",
     email: "",
     inquiryType: "",
@@ -295,8 +292,6 @@ export default function GetInvolvedPage() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setFormStatus("submitting")
-
-    // Simulate API call
     try {
       await new Promise((resolve) => setTimeout(resolve, 1500))
       console.log("Form Data Submitted:", formData)
@@ -318,14 +313,13 @@ export default function GetInvolvedPage() {
       <Navigation language={language} onLanguageChange={setLanguage} />
 
       <main>
-        {/* Hero Section */}
         <section className="relative w-full h-[400px] bg-gradient-to-r from-green-500 to-blue-500 flex items-center justify-center text-white overflow-hidden">
           <Image
-            src="/placeholder.svg?height=400&width=1200"
+            src="/placeholder.svg"
             alt="Get Involved with Lafaek Learning Media"
-            layout="fill"
-            objectFit="cover"
-            className="absolute inset-0 z-0 opacity-30"
+            width={1200}
+            height={400}
+            className="absolute inset-0 z-0 opacity-30 object-cover"
           />
           <div className="relative z-10 text-center px-4">
             <h1 className="text-4xl md:text-6xl font-extrabold leading-tight mb-4 drop-shadow-lg">{t.hero.title}</h1>
@@ -334,14 +328,13 @@ export default function GetInvolvedPage() {
           </div>
         </section>
 
-        {/* Sections for Involvement */}
         {t.sections.map((section, index) => (
           <section
             key={section.id}
             id={section.id}
             className={`py-16 ${index % 2 === 0 ? "bg-white" : "bg-gradient-to-br from-yellow-50 to-orange-50"}`}
           >
-            <div className="container mx-auto px-4">
+            <div className="max-w-7xl mx-auto px-4">
               <div className="text-center mb-12">
                 <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
                   <section.icon className="h-8 w-8 text-white" />
@@ -352,181 +345,80 @@ export default function GetInvolvedPage() {
               </div>
 
               <Card className="bg-white/90 backdrop-blur-sm border-2 border-blue-200 shadow-lg max-w-2xl mx-auto">
-                <CardContent className="p-8">
+                <div className="p-8">
                   <h3 className="text-2xl font-bold text-blue-700 mb-6">{section.cta}</h3>
                   <form onSubmit={handleSubmit} className="space-y-6">
                     {section.formFields.map((field) => (
                       <div key={field.name}>
-                        <Label htmlFor={`${section.id}-${field.name}`}>{field.label}</Label>
+                        <label
+                          className="mb-2 block text-sm font-medium text-gray-700"
+                          htmlFor={`${section.id}-${field.name}`}
+                        >
+                          {field.label}
+                        </label>
                         {field.type === "textarea" ? (
                           <Textarea
                             id={`${section.id}-${field.name}`}
                             name={field.name}
-                            value={formData[field.name as keyof typeof formData] || ""}
+                            value={formData[field.name] || ""}
                             onChange={handleChange}
                             required={field.required}
                             rows={4}
-                            className="mt-1"
                           />
                         ) : field.type === "select" ? (
-                          <Select
+                          <select
                             id={`${section.id}-${field.name}`}
                             name={field.name}
-                            options={field.options || []}
-                            placeholder={field.placeholder}
-                            onValueChange={(value) => handleSelectChange(value, field.name)}
-                            value={formData[field.name as keyof typeof formData] || ""}
+                            className="w-full rounded-lg border border-gray-300 px-4 py-2 text-black focus:outline-none focus:ring-2 focus:ring-green-600"
+                            value={formData[field.name] || ""}
+                            onChange={(e) => handleSelectChange(e.target.value, field.name)}
                             required={field.required}
-                            className="mt-1"
-                          />
+                          >
+                            <option value="">Select</option>
+                            {field.options?.map((opt) => (
+                              <option key={opt.value} value={opt.value}>
+                                {opt.label}
+                              </option>
+                            ))}
+                          </select>
                         ) : (
                           <Input
                             id={`${section.id}-${field.name}`}
                             name={field.name}
                             type={field.type}
-                            value={formData[field.name as keyof typeof formData] || ""}
+                            value={formData[field.name] || ""}
                             onChange={handleChange}
                             required={field.required}
-                            className="mt-1"
                           />
                         )}
                       </div>
                     ))}
+
                     <Button
                       type="submit"
-                      className="w-full bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-white font-bold py-3 rounded-lg"
+                      className="w-full flex items-center justify-center bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-white font-bold py-3 rounded-lg"
                       disabled={formStatus === "submitting"}
                     >
                       {formStatus === "submitting" ? t.contactForm.submitting : section.cta}
                       <ArrowRight className="ml-2 h-5 w-5" />
                     </Button>
+
                     {formStatus === "success" && (
                       <p className="text-green-600 text-center mt-4">{t.contactForm.success}</p>
                     )}
-                    {formStatus === "error" && <p className="text-red-600 text-center mt-4">{t.contactForm.error}</p>}
+                    {formStatus === "error" && (
+                      <p className="text-red-600 text-center mt-4">{t.contactForm.error}</p>
+                    )}
                   </form>
-                </CardContent>
+                </div>
               </Card>
             </div>
           </section>
         ))}
-
-        {/* Impact Statistics */}
-        <section className="py-16 bg-white">
-          <div className="container mx-auto px-4 text-center">
-            <h2 className="text-4xl font-bold text-orange-700 mb-6">{t.impactStats.title}</h2>
-            <p className="text-xl text-gray-600 mb-12">See the difference your involvement makes.</p>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {t.impactStats.stats.map((stat, index) => (
-                <Card key={index} className="bg-yellow-50 border-2 border-yellow-200">
-                  <CardContent className="p-6">
-                    <div className="text-5xl font-bold text-orange-600 mb-2">{stat.number}</div>
-                    <p className="text-lg text-gray-700">{stat.label}</p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Testimonials */}
-        <section className="py-16 bg-gradient-to-br from-purple-50 to-blue-50">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-12">
-              <h2 className="text-4xl font-bold text-purple-700 mb-6">{t.testimonials.title}</h2>
-              <p className="text-xl text-gray-600">Hear from those who have partnered with us.</p>
-            </div>
-            <div className="grid md:grid-cols-2 gap-8">
-              {t.testimonials.items.map((testimonial, index) => (
-                <Card key={index} className="bg-white/90 backdrop-blur-sm border-2 border-purple-200 shadow-md">
-                  <CardContent className="p-6">
-                    <p className="text-lg italic text-gray-700 mb-4">"{testimonial.quote}"</p>
-                    <p className="text-md font-semibold text-purple-600">- {testimonial.author}</p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* General Inquiry Contact Form */}
-        <section className="py-16 bg-white">
-          <div className="container mx-auto px-4">
-            <Card className="bg-white/90 backdrop-blur-sm border-2 border-gray-200 shadow-lg max-w-2xl mx-auto">
-              <CardContent className="p-8">
-                <h2 className="text-3xl font-bold text-gray-800 mb-6">{t.contactForm.title}</h2>
-                <p className="text-gray-600 mb-6">{t.contactForm.description}</p>
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div>
-                    <Label htmlFor="general-name">{t.contactForm.nameLabel}</Label>
-                    <Input
-                      id="general-name"
-                      name="name"
-                      type="text"
-                      value={formData.name}
-                      onChange={handleChange}
-                      required
-                      className="mt-1"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="general-email">{t.contactForm.emailLabel}</Label>
-                    <Input
-                      id="general-email"
-                      name="email"
-                      type="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      required
-                      className="mt-1"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="general-inquiryType">{t.contactForm.inquiryTypeLabel}</Label>
-                    <Select
-                      id="general-inquiryType"
-                      name="inquiryType"
-                      options={t.contactForm.inquiryOptions}
-                      placeholder={t.contactForm.inquiryPlaceholder}
-                      onValueChange={(value) => handleSelectChange(value, "inquiryType")}
-                      value={formData.inquiryType}
-                      className="mt-1"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="general-message">{t.contactForm.messageLabel}</Label>
-                    <Textarea
-                      id="general-message"
-                      name="message"
-                      value={formData.message}
-                      onChange={handleChange}
-                      required
-                      rows={5}
-                      className="mt-1"
-                    />
-                  </div>
-                  <Button
-                    type="submit"
-                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-3 rounded-lg"
-                    disabled={formStatus === "submitting"}
-                  >
-                    {formStatus === "submitting" ? t.contactForm.submitting : t.contactForm.submitButton}
-                    <Mail className="ml-2 h-5 w-5" />
-                  </Button>
-                  {formStatus === "success" && (
-                    <p className="text-green-600 text-center mt-4">{t.contactForm.success}</p>
-                  )}
-                  {formStatus === "error" && <p className="text-red-600 text-center mt-4">{t.contactForm.error}</p>}
-                </form>
-              </CardContent>
-            </Card>
-          </div>
-        </section>
       </main>
 
-      {/* Footer */}
       <footer className="bg-gray-800 text-white py-8">
-        <div className="container mx-auto px-4 text-center">
+        <div className="max-w-7xl mx-auto px-4 text-center">
           <p className="text-gray-400">&copy; 2024 Lafaek Learning Media. All rights reserved.</p>
         </div>
       </footer>

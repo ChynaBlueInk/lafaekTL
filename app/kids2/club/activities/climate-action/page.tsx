@@ -1,9 +1,9 @@
 "use client"
 
 import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/button"
+import { Card } from "@/components/card"
+import { Badge } from "@/components/badge"
 import { Home, TreePine, Leaf, Recycle, Droplets, Sun, Award, CheckCircle } from "lucide-react"
 import Link from "next/link"
 
@@ -177,51 +177,54 @@ export default function ClimateActionActivity() {
   const currentStepData = t.steps[currentStep]
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-100 via-blue-100 to-teal-100">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-green-500 to-blue-500 text-white py-6">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <Link href="/kids/club">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="border-white text-white hover:bg-white hover:text-green-600 bg-transparent"
-                >
-                  <Home className="h-4 w-4 mr-2" />
-                  Club
-                </Button>
-              </Link>
-              <div className="flex items-center space-x-2">
-                <TreePine className="h-6 w-6" />
-                <div>
-                  <h1 className="text-2xl font-bold">{t.title}</h1>
-                  <p className="text-green-100">{t.subtitle}</p>
-                </div>
+  <div className="min-h-screen bg-gradient-to-br from-green-100 via-blue-100 to-teal-100">
+    {/* Header */}
+    <div className="bg-gradient-to-r from-green-500 to-blue-500 text-white py-6">
+      <div className="container mx-auto px-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <Link href="/kids/club">
+              <Button
+                className="border-white text-white hover:bg-white hover:text-green-600 bg-transparent"
+              >
+                <Home className="h-4 w-4 mr-2" />
+                Club
+              </Button>
+            </Link>
+            <div className="flex items-center space-x-2">
+              <TreePine className="h-6 w-6" />
+              <div>
+                <h1 className="text-2xl font-bold">{t.title}</h1>
+                <p className="text-green-100">{t.subtitle}</p>
               </div>
             </div>
-            <div className="flex items-center space-x-2">
-              <Button
-                variant={language === "en" ? "secondary" : "outline"}
-                size="sm"
-                onClick={() => setLanguage("en")}
-                className="text-xs"
-              >
-                EN
-              </Button>
-              <Button
-                variant={language === "tet" ? "secondary" : "outline"}
-                size="sm"
-                onClick={() => setLanguage("tet")}
-                className="text-xs"
-              >
-                TET
-              </Button>
-            </div>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Button
+              onClick={() => setLanguage("en")}
+              className={`text-xs ${
+                language === "en"
+                  ? "bg-white text-green-600"
+                  : "border border-white text-white hover:bg-white hover:text-green-600 bg-transparent"
+              }`}
+            >
+              EN
+            </Button>
+            <Button
+              onClick={() => setLanguage("tet")}
+              className={`text-xs ${
+                language === "tet"
+                  ? "bg-white text-green-600"
+                  : "border border-white text-white hover:bg-white hover:text-green-600 bg-transparent"
+              }`}
+            >
+              TET
+            </Button>
           </div>
         </div>
       </div>
+    </div>
+
 
       {/* Activity Content */}
       <div className="container mx-auto px-4 py-8">
@@ -245,7 +248,7 @@ export default function ClimateActionActivity() {
 
             {/* Step Content */}
             <Card className="bg-white/95 backdrop-blur-sm border-4 border-green-200 shadow-2xl">
-              <CardContent className="p-8">
+              <div className="p-8">
                 <div className="text-center mb-8">
                   <h2 className="text-3xl font-bold text-green-700 mb-4">{currentStepData.title}</h2>
                   <p className="text-xl text-green-600">{currentStepData.content}</p>
@@ -256,10 +259,10 @@ export default function ClimateActionActivity() {
                   <div className="space-y-4">
                     {currentStepData.facts?.map((fact, index) => (
                       <Card key={index} className="bg-gradient-to-r from-green-50 to-blue-50 border-2 border-green-200">
-                        <CardContent className="p-4 flex items-center space-x-4">
+                        <div className="p-4 flex items-center space-x-4">
                           <Leaf className="h-6 w-6 text-green-600 flex-shrink-0" />
                           <p className="text-green-800 font-medium">{fact}</p>
-                        </CardContent>
+                        </div>
                       </Card>
                     ))}
                   </div>
@@ -270,13 +273,13 @@ export default function ClimateActionActivity() {
                   <div className="grid md:grid-cols-2 gap-6">
                     {currentStepData.problems?.map((problem, index) => (
                       <Card key={index} className="bg-gradient-to-br from-red-50 to-orange-50 border-2 border-red-200">
-                        <CardContent className="p-6 text-center">
+                        <div className="p-6 text-center">
                           <div className="w-16 h-16 bg-gradient-to-br from-red-400 to-orange-400 rounded-full mx-auto mb-4 flex items-center justify-center">
                             <problem.icon className="h-8 w-8 text-white" />
                           </div>
                           <h3 className="text-xl font-bold text-red-700 mb-2">{problem.title}</h3>
                           <p className="text-red-600">{problem.description}</p>
-                        </CardContent>
+                        </div>
                       </Card>
                     ))}
                   </div>
@@ -321,10 +324,10 @@ export default function ClimateActionActivity() {
                   <div className="space-y-4">
                     {currentStepData.promises?.map((promise, index) => (
                       <Card key={index} className="bg-gradient-to-r from-green-50 to-blue-50 border-2 border-green-200">
-                        <CardContent className="p-4 flex items-center space-x-4">
+                        <div className="p-4 flex items-center space-x-4">
                           <CheckCircle className="h-6 w-6 text-green-600 flex-shrink-0" />
                           <p className="text-green-800 font-medium">{promise}</p>
-                        </CardContent>
+                        </div>
                       </Card>
                     ))}
                   </div>
@@ -343,14 +346,14 @@ export default function ClimateActionActivity() {
                     <p className="text-sm text-gray-500 mt-2">Please select at least 3 actions to continue</p>
                   )}
                 </div>
-              </CardContent>
+              </div>
             </Card>
           </div>
         ) : (
           /* Completion Screen */
           <div className="max-w-2xl mx-auto">
             <Card className="bg-gradient-to-r from-green-100 to-blue-100 border-4 border-green-300">
-              <CardContent className="p-8 text-center">
+              <div className="p-8 text-center">
                 <Award className="h-20 w-20 text-yellow-500 mx-auto mb-6" />
                 <h2 className="text-3xl font-bold text-green-700 mb-4">{t.completion.title}</h2>
                 <p className="text-xl text-green-600 mb-6">{t.completion.message}</p>
@@ -382,14 +385,13 @@ export default function ClimateActionActivity() {
                   </Link>
                   <Link href="/kids/club/activities/community-helper">
                     <Button
-                      variant="outline"
                       className="border-2 border-green-500 text-green-600 hover:bg-green-500 hover:text-white font-bold py-4 px-8 rounded-full text-lg bg-transparent"
                     >
                       Next Mission
                     </Button>
                   </Link>
                 </div>
-              </CardContent>
+              </div>
             </Card>
           </div>
         )}

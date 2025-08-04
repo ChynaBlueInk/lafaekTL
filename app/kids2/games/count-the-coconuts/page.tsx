@@ -1,9 +1,9 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/button"
+import { Card } from "@/components/card"
+import { Badge } from "@/components/badge"
 import { Home, RotateCcw, Trophy, Plus, Minus } from "lucide-react"
 import Link from "next/link"
 
@@ -160,9 +160,7 @@ export default function CountCoconutsPage() {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <Link href="/kids">
-                <Button
-                  variant="outline"
-                  size="sm"
+                  <Button
                   className="border-white text-white hover:bg-white hover:text-yellow-600 bg-transparent"
                 >
                   <Home className="h-4 w-4 mr-2" />
@@ -177,21 +175,18 @@ export default function CountCoconutsPage() {
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2">
                 <Button
-                  variant={language === "en" ? "secondary" : "outline"}
-                  size="sm"
                   onClick={() => setLanguage("en")}
-                  className="text-xs"
+                  className={`text-xs ${language === "en" ? "bg-gray-200 text-black" : "bg-transparent text-white border"}`}
                 >
                   EN
                 </Button>
-                <Button
-                  variant={language === "tet" ? "secondary" : "outline"}
-                  size="sm"
-                  onClick={() => setLanguage("tet")}
-                  className="text-xs"
-                >
-                  TET
-                </Button>
+              <Button
+  onClick={() => setLanguage("tet")}
+  className={`text-xs ${language === "tet" ? "bg-gray-200 text-black" : "bg-transparent text-white border"}`}
+>
+  TET
+</Button>
+
               </div>
             </div>
           </div>
@@ -225,7 +220,7 @@ export default function CountCoconutsPage() {
             {/* Question Card */}
             {currentQ && (
               <Card className="bg-white/95 backdrop-blur-sm border-4 border-yellow-200 shadow-2xl">
-                <CardContent className="p-8">
+                <div className="p-8">
                   <div className="text-center mb-6">
                     <p className="text-lg text-yellow-700 font-medium mb-4">
                       {currentQ.operation ? t.mathInstructions : t.instructions}
@@ -314,7 +309,7 @@ export default function CountCoconutsPage() {
                       )}
                     </div>
                   )}
-                </CardContent>
+                </div>
               </Card>
             )}
           </div>
@@ -322,7 +317,7 @@ export default function CountCoconutsPage() {
           /* Game Complete */
           <div className="max-w-2xl mx-auto">
             <Card className="bg-gradient-to-r from-yellow-100 to-green-100 border-4 border-yellow-300">
-              <CardContent className="p-8 text-center">
+              <div className="p-8 text-center">
                 <div className="mb-6">
                   <div className="text-6xl mb-4">🏆🥥</div>
                   <h2 className="text-3xl font-bold text-green-700 mb-2">{t.gameComplete}</h2>
@@ -345,7 +340,7 @@ export default function CountCoconutsPage() {
                     </Button>
                   </Link>
                 </div>
-              </CardContent>
+              </div>
             </Card>
           </div>
         )}

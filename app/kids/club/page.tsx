@@ -5,8 +5,8 @@ import Link from "next/link"
 import Image from "next/image"
 import { Users, Sparkles, HandHeart, Lightbulb, ArrowRight } from "lucide-react"
 import { Navigation } from "@/components/Navigation"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
+import { Button } from "@/components/button"
+import { Card } from "@/components/card"
 
 export default function KidsClubPage() {
   const [language, setLanguage] = useState<"en" | "tet">("en")
@@ -123,18 +123,18 @@ export default function KidsClubPage() {
       <Navigation language={language} onLanguageChange={setLanguage} />
 
       {/* Hero Section */}
-      <section className="py-20 px-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white">
-        <div className="container mx-auto text-center">
+      <section className="py-20 px-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-center">
+        <div className="max-w-5xl mx-auto">
           <h1 className="text-4xl md:text-6xl font-bold mb-6">{t.hero.title}</h1>
           <p className="text-xl md:text-2xl opacity-90 max-w-3xl mx-auto">{t.hero.subtitle}</p>
           <p className="text-lg opacity-80 max-w-4xl mx-auto mt-4">{t.hero.description}</p>
-          <div className="w-full h-4 bg-gradient-to-r from-red-400 via-yellow-400 via-blue-400 to-green-400 rounded-full opacity-60 mt-8"></div>
+<div className="w-full h-4 rounded-full opacity-60 mt-8 bg-gradient-to-r from-red-400 via-yellow-400 to-green-400"></div>
         </div>
       </section>
 
       {/* Club Mission */}
-      <section className="py-16 bg-white">
-        <div className="container mx-auto px-4 text-center">
+      <section className="py-16 bg-white text-center">
+        <div className="max-w-5xl mx-auto px-4">
           <h2 className="text-4xl font-bold text-purple-700 mb-6">{t.mission.title}</h2>
           <p className="text-lg text-gray-700 leading-relaxed max-w-3xl mx-auto">{t.mission.content}</p>
         </div>
@@ -142,116 +142,100 @@ export default function KidsClubPage() {
 
       {/* Club Values */}
       <section className="py-16 bg-gradient-to-r from-blue-100 to-purple-100">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-blue-700 mb-4">{t.values.title}</h2>
-            <p className="text-xl text-gray-600">The principles that guide our club members</p>
-          </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {t.values.items.map((value, index) => (
-              <Card key={index} className="bg-white/90 backdrop-blur-sm border-2 border-blue-200">
-                <CardContent className="p-6 text-center">
-                  <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <value.icon className="h-8 w-8 text-white" />
-                  </div>
-                  <h3 className="text-xl font-bold text-blue-700 mb-3">{value.title}</h3>
-                  <p className="text-gray-600">{value.description}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+        <div className="max-w-7xl mx-auto px-4 text-center mb-12">
+          <h2 className="text-4xl font-bold text-blue-700 mb-4">{t.values.title}</h2>
+          <p className="text-xl text-gray-600">The principles that guide our club members</p>
+        </div>
+        <div className="max-w-7xl mx-auto px-4 grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {t.values.items.map((value, index) => (
+            <Card key={index} className="bg-white/90 backdrop-blur-sm border-2 border-blue-200 text-center">
+              <div className="p-6">
+                <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <value.icon className="h-8 w-8 text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-blue-700 mb-3">{value.title}</h3>
+                <p className="text-gray-600">{value.description}</p>
+              </div>
+            </Card>
+          ))}
         </div>
       </section>
 
       {/* Club Activities */}
       <section className="py-16 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-green-700 mb-4">{t.activities.title}</h2>
-            <p className="text-xl text-gray-600">{t.activities.subtitle}</p>
-          </div>
-          <div className="grid md:grid-cols-2 gap-8">
-            {t.activities.items.map((activity, index) => (
-              <Card
-                key={index}
-                className="bg-white/80 backdrop-blur-sm border-2 border-green-200 hover:border-green-400 transition-all transform hover:scale-105"
-              >
-                <CardContent className="p-6">
-                  <Image
-                    src={activity.image || "/placeholder.svg"}
-                    alt={activity.title}
-                    width={300}
-                    height={200}
-                    className="w-full h-48 object-cover rounded-lg mb-4"
-                  />
-                  <h3 className="text-xl font-bold text-green-700 mb-2">{activity.title}</h3>
-                  <p className="text-green-600 mb-4">{activity.description}</p>
-                  <Link href={activity.link}>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="border-green-500 text-green-600 hover:bg-green-500 hover:text-white bg-transparent"
-                    >
-                      Explore Activity
-                      <ArrowRight className="h-4 w-4 ml-2" />
-                    </Button>
-                  </Link>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-          <div className="text-center mt-8">
-            <Link href="/kids/club/activities">
-              <Button
-                size="lg"
-                className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white font-bold py-4 px-8 rounded-full text-lg shadow-lg"
-              >
-                {t.activities.viewAll}
-                <ArrowRight className="h-5 w-5 ml-2" />
-              </Button>
-            </Link>
-          </div>
+        <div className="max-w-7xl mx-auto px-4 text-center mb-12">
+          <h2 className="text-4xl font-bold text-green-700 mb-4">{t.activities.title}</h2>
+          <p className="text-xl text-gray-600">{t.activities.subtitle}</p>
+        </div>
+        <div className="max-w-7xl mx-auto px-4 grid md:grid-cols-2 gap-8">
+          {t.activities.items.map((activity, index) => (
+            <Card
+              key={index}
+              className="bg-white/80 backdrop-blur-sm border-2 border-green-200 hover:border-green-400 transform hover:scale-105 transition-all"
+            >
+              <div className="p-6">
+                <Image
+                  src={activity.image || "/placeholder.svg"}
+                  alt={activity.title}
+                  width={300}
+                  height={200}
+                  className="w-full h-48 object-cover rounded-lg mb-4"
+                />
+                <h3 className="text-xl font-bold text-green-700 mb-2">{activity.title}</h3>
+                <p className="text-green-600 mb-4">{activity.description}</p>
+                <Link href={activity.link}>
+                  <Button className="flex items-center justify-center border border-green-500 text-green-600 hover:bg-green-500 hover:text-white bg-transparent px-3 py-2 text-sm">
+                    Explore Activity
+                    <ArrowRight className="h-4 w-4 ml-2" />
+                  </Button>
+                </Link>
+              </div>
+            </Card>
+          ))}
+        </div>
+        <div className="text-center mt-8">
+          <Link href="/kids/club/activities">
+            <Button className="flex items-center justify-center bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white font-bold py-4 px-8 rounded-full text-lg shadow-lg">
+              {t.activities.viewAll}
+              <ArrowRight className="h-5 w-5 ml-2" />
+            </Button>
+          </Link>
         </div>
       </section>
 
-      {/* How to Join */}
+      {/* Join Section */}
       <section className="py-16 bg-gradient-to-r from-yellow-100 to-orange-100">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-orange-700 mb-4">{t.join.title}</h2>
-            <p className="text-xl text-gray-600">It's easy to become a Lafaek Friend!</p>
-          </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {t.join.steps.map((step, index) => (
-              <Card key={index} className="bg-white/90 backdrop-blur-sm border-2 border-orange-200">
-                <CardContent className="p-6 text-center">
-                  <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-500 rounded-full flex items-center justify-center mx-auto mb-4 text-white text-3xl font-bold">
-                    {index + 1}
-                  </div>
-                  <p className="text-lg font-semibold text-orange-700">{step}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-          <div className="text-center mt-8">
-            <Link href="/kids/club/activities">
-              <Button
-                size="lg"
-                className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-bold py-4 px-8 rounded-full text-lg shadow-lg"
-              >
-                <Sparkles className="mr-2 h-5 w-5" />
-                {t.join.cta}
-              </Button>
-            </Link>
-          </div>
+        <div className="max-w-7xl mx-auto px-4 text-center mb-12">
+          <h2 className="text-4xl font-bold text-orange-700 mb-4">{t.join.title}</h2>
+          <p className="text-xl text-gray-600">It's easy to become a Lafaek Friend!</p>
+        </div>
+        <div className="max-w-7xl mx-auto px-4 grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {t.join.steps.map((step, index) => (
+            <Card key={index} className="bg-white/90 backdrop-blur-sm border-2 border-orange-200 text-center">
+              <div className="p-6">
+                <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-500 rounded-full flex items-center justify-center mx-auto mb-4 text-white text-3xl font-bold">
+                  {index + 1}
+                </div>
+                <p className="text-lg font-semibold text-orange-700">{step}</p>
+              </div>
+            </Card>
+          ))}
+        </div>
+        <div className="text-center mt-8">
+          <Link href="/kids/club/activities">
+            <Button className="flex items-center justify-center bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-bold py-4 px-8 rounded-full text-lg shadow-lg">
+              <Sparkles className="mr-2 h-5 w-5" />
+              {t.join.cta}
+            </Button>
+          </Link>
         </div>
       </section>
 
       {/* Footer */}
       <footer className="bg-gray-800 text-white py-8">
-        <div className="container mx-auto px-4 text-center">
+        <div className="max-w-7xl mx-auto px-4 text-center">
           <Link href="/">
-            <Button variant="outline" className="border-gray-600 text-gray-300 hover:bg-gray-700 mb-4 bg-transparent">
+            <Button className="flex items-center justify-center mb-4 border border-gray-600 text-gray-300 hover:bg-gray-700 bg-transparent">
               ← Back to Home
             </Button>
           </Link>

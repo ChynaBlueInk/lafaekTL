@@ -1,9 +1,9 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/button"
+import { Card } from "@/components/card"
+import { Badge } from "@/components/badge"
 import { Home, RotateCcw, Star, Trophy, Heart } from "lucide-react"
 import Link from "next/link"
 
@@ -60,7 +60,6 @@ export default function TetunWordMatchPage() {
 
   const t = content[language]
 
-  // Shuffle and create game cards
   const [gameCards, setGameCards] = useState<
     Array<{ word: string; type: "tetun" | "english"; id: string; matched: boolean }>
   >([])
@@ -70,13 +69,11 @@ export default function TetunWordMatchPage() {
   }, [])
 
   const resetGame = () => {
-    const cards = []
+    const cards: Array<{ word: string; type: "tetun" | "english"; id: string; matched: boolean }> = []
     wordPairs.forEach((pair) => {
-      cards.push({ word: pair.tetun, type: "tetun" as const, id: pair.id, matched: false })
-      cards.push({ word: pair.english, type: "english" as const, id: pair.id, matched: false })
+      cards.push({ word: pair.tetun, type: "tetun", id: pair.id, matched: false })
+      cards.push({ word: pair.english, type: "english", id: pair.id, matched: false })
     })
-
-    // Shuffle cards
     const shuffled = cards.sort(() => Math.random() - 0.5)
     setGameCards(shuffled)
     setScore(0)
@@ -89,33 +86,23 @@ export default function TetunWordMatchPage() {
 
   const handleCardClick = (cardIndex: number) => {
     const card = gameCards[cardIndex]
-
     if (card.matched || selectedCard === `${cardIndex}`) return
-
     if (selectedCard === null) {
       setSelectedCard(`${cardIndex}`)
     } else {
       const selectedIndex = Number.parseInt(selectedCard)
       const selectedCardData = gameCards[selectedIndex]
-
       setAttempts(attempts + 1)
-
       if (selectedCardData.id === card.id && selectedCardData.type !== card.type) {
-        // Match found!
         const newGameCards = [...gameCards]
         newGameCards[selectedIndex].matched = true
         newGameCards[cardIndex].matched = true
         setGameCards(newGameCards)
-
         const newMatchedPairs = [...matchedPairs, card.id]
         setMatchedPairs(newMatchedPairs)
         setScore(score + 10)
-
-        if (newMatchedPairs.length === wordPairs.length) {
-          setGameComplete(true)
-        }
+        if (newMatchedPairs.length === wordPairs.length) setGameComplete(true)
       }
-
       setSelectedCard(null)
     }
   }
@@ -129,142 +116,123 @@ export default function TetunWordMatchPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-100 via-blue-100 to-yellow-100">
-      {/* Header */}
       <div className="bg-gradient-to-r from-green-500 to-blue-500 text-white py-6">
         <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="flex flex-wrap items-center gap-4">
               <Link href="/kids">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="border-white text-white hover:bg-white hover:text-green-600 bg-transparent"
-                >
-                  <Home className="h-4 w-4 mr-2" />
+                <Button className="flex items-center gap-2 border border-white text-white hover:bg-white hover:text-green-600 bg-transparent text-sm px-4 py-2 rounded-md">
+                  <Home className="h-4 w-4" />
                   Kids Zone
                 </Button>
               </Link>
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center gap-2">
                 <Star className="h-6 w-6" />
                 <h1 className="text-2xl font-bold">{t.title}</h1>
               </div>
             </div>
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2">
-                <Button
-                  variant={language === "en" ? "secondary" : "outline"}
-                  size="sm"
-                  onClick={() => setLanguage("en")}
-                  className="text-xs"
-                >
-                  EN
-                </Button>
-                <Button
-                  variant={language === "tet" ? "secondary" : "outline"}
-                  size="sm"
-                  onClick={() => setLanguage("tet")}
-                  className="text-xs"
-                >
-                  TET
-                </Button>
-              </div>
+            <div className="flex gap-2">
+              <Button
+                onClick={() => setLanguage("en")}
+                className={`text-xs px-4 py-2 rounded-md ${
+                  language === "en" ? "bg-white text-green-600" : "border border-white text-white hover:bg-white hover:text-green-600"
+                }`}
+              >
+                EN
+              </Button>
+              <Button
+                onClick={() => setLanguage("tet")}
+                className={`text-xs px-4 py-2 rounded-md ${
+                  language === "tet" ? "bg-white text-green-600" : "border border-white text-white hover:bg-white hover:text-green-600"
+                }`}
+              >
+                TET
+              </Button>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Game Content */}
       <div className="container mx-auto px-4 py-8">
-        {/* Game Stats */}
         <div className="max-w-4xl mx-auto mb-8">
-          <div className="flex justify-between items-center mb-4">
-            <div className="flex space-x-4">
-              <Badge className="bg-green-600 text-white px-4 py-2 text-lg">
-                <Trophy className="h-4 w-4 mr-2" />
+          <div className="flex flex-wrap justify-between items-center mb-4 gap-4">
+            <div className="flex flex-wrap gap-4">
+              <Badge className="bg-green-600 text-white px-4 py-2 text-lg flex items-center gap-2">
+                <Trophy className="h-4 w-4" />
                 {t.score}: {score}
               </Badge>
-              <Badge className="bg-blue-600 text-white px-4 py-2 text-lg">
+              <Badge className="bg-blue-600 text-white px-4 py-2 text-lg flex items-center gap-2">
                 {t.attempts}: {attempts}
               </Badge>
-              <Badge className="bg-yellow-600 text-white px-4 py-2 text-lg">
-                <Heart className="h-4 w-4 mr-2" />
+              <Badge className="bg-yellow-600 text-white px-4 py-2 text-lg flex items-center gap-2">
+                <Heart className="h-4 w-4" />
                 {matchedPairs.length}/{wordPairs.length}
               </Badge>
             </div>
             <Button
               onClick={resetGame}
-              className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold py-2 px-4 rounded-full"
+              className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold py-2 px-4 rounded-full flex items-center gap-2"
             >
-              <RotateCcw className="h-4 w-4 mr-2" />
+              <RotateCcw className="h-4 w-4" />
               {t.playAgain}
             </Button>
           </div>
-
           <Card className="bg-white/90 backdrop-blur-sm border-2 border-green-200">
-            <CardContent className="p-4">
-              <p className="text-center text-green-700 font-medium">{t.instructions}</p>
-            </CardContent>
+            <div className="p-4 text-center text-green-700 font-medium">{t.instructions}</div>
           </Card>
         </div>
 
-        {/* Game Board */}
         {!gameComplete ? (
-          <div className="max-w-6xl mx-auto">
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
-              {gameCards.map((card, index) => (
+          <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            {gameCards.map((card, index) => (
+              <div key={index} onClick={() => handleCardClick(index)} className="cursor-pointer">
                 <Card
-                  key={index}
-                  className={`cursor-pointer transition-all transform hover:scale-105 ${
+                  className={`transition-transform hover:scale-105 ${
                     card.matched
                       ? "bg-green-200 border-4 border-green-400"
                       : selectedCard === `${index}`
-                        ? "bg-yellow-200 border-4 border-yellow-400"
-                        : card.type === "tetun"
-                          ? "bg-blue-100 border-2 border-blue-300 hover:border-blue-400"
-                          : "bg-red-100 border-2 border-red-300 hover:border-red-400"
+                      ? "bg-yellow-200 border-4 border-yellow-400"
+                      : card.type === "tetun"
+                      ? "bg-blue-100 border-2 border-blue-300 hover:border-blue-400"
+                      : "bg-red-100 border-2 border-red-300 hover:border-red-400"
                   }`}
-                  onClick={() => handleCardClick(index)}
                 >
-                  <CardContent className="p-4 text-center">
+                  <div className="p-4 text-center">
                     <div className={`text-lg font-bold ${card.type === "tetun" ? "text-blue-700" : "text-red-700"}`}>
                       {card.word}
                     </div>
                     <div className="text-xs text-gray-500 mt-2">{card.type === "tetun" ? "Tetun" : "English"}</div>
-                  </CardContent>
+                  </div>
                 </Card>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
         ) : (
-          /* Game Complete */
           <div className="max-w-2xl mx-auto">
             <Card className="bg-gradient-to-r from-green-100 to-blue-100 border-4 border-green-300">
-              <CardContent className="p-8 text-center">
-                <div className="mb-6">
-                  <Trophy className="h-20 w-20 text-yellow-500 mx-auto mb-4" />
-                  <h2 className="text-3xl font-bold text-green-700 mb-2">{t.gameComplete}</h2>
-                  <p className="text-xl text-green-600 mb-4">{getScoreMessage()}</p>
-                  <div className="flex justify-center space-x-4 mb-6">
-                    <Badge className="bg-green-600 text-white px-6 py-3 text-xl">Final Score: {score}</Badge>
-                    <Badge className="bg-blue-600 text-white px-6 py-3 text-xl">Attempts: {attempts}</Badge>
-                  </div>
+              <div className="p-8 text-center">
+                <Trophy className="h-20 w-20 text-yellow-500 mx-auto mb-4" />
+                <h2 className="text-3xl font-bold text-green-700 mb-2">{t.gameComplete}</h2>
+                <p className="text-xl text-green-600 mb-4">{getScoreMessage()}</p>
+                <div className="flex flex-wrap justify-center gap-4 mb-6">
+                  <Badge className="bg-green-600 text-white px-6 py-3 text-xl">Final Score: {score}</Badge>
+                  <Badge className="bg-blue-600 text-white px-6 py-3 text-xl">Attempts: {attempts}</Badge>
                 </div>
-
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <Button
                     onClick={resetGame}
-                    className="bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white font-bold py-4 px-8 rounded-full text-lg"
+                    className="bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white font-bold py-4 px-8 rounded-full text-lg flex items-center gap-2"
                   >
-                    <RotateCcw className="h-5 w-5 mr-2" />
+                    <RotateCcw className="h-5 w-5" />
                     {t.playAgain}
                   </Button>
                   <Link href="/kids/games">
-                    <Button className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold py-4 px-8 rounded-full text-lg">
+                    <Button className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold py-4 px-8 rounded-full text-lg flex items-center justify-center">
                       {t.backToGames}
                     </Button>
                   </Link>
                 </div>
-              </CardContent>
+              </div>
             </Card>
           </div>
         )}

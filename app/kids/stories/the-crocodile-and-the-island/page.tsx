@@ -5,8 +5,8 @@ import Link from "next/link"
 import Image from "next/image"
 import { ArrowLeft, ArrowRight } from "lucide-react"
 import { Navigation } from "@/components/Navigation"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
+import { Button } from "@/components/button"
+import { Card } from "@/components/card"
 
 export default function CrocodileIslandStoryPage() {
   const [language, setLanguage] = useState<"en" | "tet">("en")
@@ -88,15 +88,11 @@ export default function CrocodileIslandStoryPage() {
   const [currentPage, setCurrentPage] = useState(0)
 
   const handleNextPage = () => {
-    if (currentPage < t.pages.length - 1) {
-      setCurrentPage(currentPage + 1)
-    }
+    if (currentPage < t.pages.length - 1) setCurrentPage(currentPage + 1)
   }
 
   const handlePreviousPage = () => {
-    if (currentPage > 0) {
-      setCurrentPage(currentPage - 1)
-    }
+    if (currentPage > 0) setCurrentPage(currentPage - 1)
   }
 
   return (
@@ -104,66 +100,58 @@ export default function CrocodileIslandStoryPage() {
       <Navigation language={language} onLanguageChange={setLanguage} />
 
       <section className="py-16 px-4">
-        <div className="container mx-auto max-w-4xl">
-          <div className="text-center mb-8">
-            <Link href="/kids/stories">
+        <div className="max-w-4xl mx-auto text-center mb-8">
+          <Link href="/kids/stories">
+            <Button className="flex items-center justify-center mb-4 border border-blue-500 text-blue-600 hover:bg-blue-500 hover:text-white bg-transparent">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              {t.backToStories}
+            </Button>
+          </Link>
+          <h1 className="text-4xl md:text-5xl font-bold text-blue-700 mb-4">{t.title}</h1>
+          <p className="text-lg text-gray-600 italic">{t.author}</p>
+        </div>
+
+        <Card className="bg-white/90 backdrop-blur-sm border-2 border-blue-200 max-w-4xl mx-auto">
+          <div className="p-6">
+            <div className="relative w-full h-96 mb-6 rounded-lg overflow-hidden">
+              <Image
+                src={t.pages[currentPage].image || "/placeholder.svg"}
+                alt={`Story page ${currentPage + 1}`}
+                width={600}
+                height={400}
+                className="rounded-lg object-cover"
+              />
+            </div>
+            <p className="text-lg text-gray-700 leading-relaxed text-center mb-6">{t.pages[currentPage].text}</p>
+            <div className="flex justify-between items-center">
               <Button
-                variant="outline"
-                className="mb-4 border-blue-500 text-blue-600 hover:bg-blue-500 hover:text-white bg-transparent"
+                onClick={handlePreviousPage}
+                disabled={currentPage === 0}
+                className="flex items-center justify-center border border-green-500 text-green-600 hover:bg-green-500 hover:text-white bg-transparent"
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                {t.backToStories}
+                Previous
               </Button>
-            </Link>
-            <h1 className="text-4xl md:text-5xl font-bold text-blue-700 mb-4">{t.title}</h1>
-            <p className="text-lg text-gray-600 italic">{t.author}</p>
+              <span className="text-gray-600 font-medium">
+                {currentPage + 1} / {t.pages.length}
+              </span>
+              <Button
+                onClick={handleNextPage}
+                disabled={currentPage === t.pages.length - 1}
+                className="flex items-center justify-center border border-green-500 text-green-600 hover:bg-green-500 hover:text-white bg-transparent"
+              >
+                Next
+                <ArrowRight className="h-4 w-4 ml-2" />
+              </Button>
+            </div>
           </div>
-
-          <Card className="bg-white/90 backdrop-blur-sm border-2 border-blue-200">
-            <CardContent className="p-6">
-              <div className="relative w-full h-96 mb-6 rounded-lg overflow-hidden">
-                <Image
-                  src={t.pages[currentPage].image || "/placeholder.svg"}
-                  alt={`Story page ${currentPage + 1}`}
-                  layout="fill"
-                  objectFit="cover"
-                  className="rounded-lg"
-                />
-              </div>
-              <p className="text-lg text-gray-700 leading-relaxed text-center mb-6">{t.pages[currentPage].text}</p>
-              <div className="flex justify-between items-center">
-                <Button
-                  onClick={handlePreviousPage}
-                  disabled={currentPage === 0}
-                  variant="outline"
-                  className="border-green-500 text-green-600 hover:bg-green-500 hover:text-white bg-transparent"
-                >
-                  <ArrowLeft className="h-4 w-4 mr-2" />
-                  Previous
-                </Button>
-                <span className="text-gray-600 font-medium">
-                  {currentPage + 1} / {t.pages.length}
-                </span>
-                <Button
-                  onClick={handleNextPage}
-                  disabled={currentPage === t.pages.length - 1}
-                  variant="outline"
-                  className="border-green-500 text-green-600 hover:bg-green-500 hover:text-white bg-transparent"
-                >
-                  Next
-                  <ArrowRight className="h-4 w-4 ml-2" />
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+        </Card>
       </section>
 
-      {/* Footer */}
       <footer className="bg-gray-800 text-white py-8">
-        <div className="container mx-auto px-4 text-center">
+        <div className="max-w-4xl mx-auto text-center px-4">
           <Link href="/">
-            <Button variant="outline" className="border-gray-600 text-gray-300 hover:bg-gray-700 mb-4 bg-transparent">
+            <Button className="flex items-center justify-center mb-4 border border-gray-600 text-gray-300 hover:bg-gray-700 bg-transparent">
               ← Back to Home
             </Button>
           </Link>
