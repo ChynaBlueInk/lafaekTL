@@ -5,8 +5,9 @@ import Link from "next/link"
 import Image from "next/image"
 import { Navigation } from "@/components/Navigation"
 import { Button } from "@/components/button"
-import { Card } from "@/components/card"
+import { Card } from "@/components/Card"
 import { Lightbulb, Users, Globe, Handshake, BookOpen } from "lucide-react"
+import { Footer } from "../../components/Footer"
 
 export default function AboutPage() {
   const [language, setLanguage] = useState<"en" | "tet">("en")
@@ -33,21 +34,9 @@ export default function AboutPage() {
       values: {
         title: "Our Core Values",
         items: [
-          {
-            icon: Lightbulb,
-            title: "Education for All",
-            description: "Ensuring every child has access to quality learning.",
-          },
-          {
-            icon: Users,
-            title: "Community Empowerment",
-            description: "Building local capacity and fostering self-reliance.",
-          },
-          {
-            icon: Globe,
-            title: "Cultural Relevance",
-            description: "Creating content that resonates with Timorese identity.",
-          },
+          { icon: Lightbulb, title: "Education for All", description: "Ensuring every child has access to quality learning." },
+          { icon: Users, title: "Community Empowerment", description: "Building local capacity and fostering self-reliance." },
+          { icon: Globe, title: "Cultural Relevance", description: "Creating content that resonates with Timorese identity." },
           { icon: Handshake, title: "Collaboration", description: "Working together for greater impact." },
         ],
       },
@@ -84,21 +73,9 @@ export default function AboutPage() {
       values: {
         title: "Ami-nia Valor Prinsipál",
         items: [
-          {
-            icon: Lightbulb,
-            title: "Edukasaun ba Ema Hotu",
-            description: "Garante katak labarik hotu iha asesu ba aprendizajen kualidade.",
-          },
-          {
-            icon: Users,
-            title: "Hametin Komunidade",
-            description: "Harii kapasidade lokál no promove auto-sufisiénsia.",
-          },
-          {
-            icon: Globe,
-            title: "Relevánsia Kulturál",
-            description: "Kria konteúdu ne'ebé reflete identidade Timor nian.",
-          },
+          { icon: Lightbulb, title: "Edukasaun ba Ema Hotu", description: "Garante katak labarik hotu iha asesu ba aprendizajen kualidade." },
+          { icon: Users, title: "Hametin Komunidade", description: "Harii kapasidade lokál no promove auto-sufisiénsia." },
+          { icon: Globe, title: "Relevánsia Kulturál", description: "Kria konteúdu ne'ebé reflete identidade Timor nian." },
           { icon: Handshake, title: "Kolaborasaun", description: "Servisu hamutuk ba impactu boot liu." },
         ],
       },
@@ -119,18 +96,18 @@ export default function AboutPage() {
   const t = content[language]
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
       <Navigation language={language} onLanguageChange={setLanguage} />
 
-      <main>
+      <main className="flex-grow">
         {/* Hero Section */}
         <section className="relative w-full h-[400px] bg-gradient-to-r from-blue-500 to-green-500 flex items-center justify-center text-white overflow-hidden">
           <Image
-            src={t.hero.image || "/placeholder.svg"}
+            src={t.hero.image}
             alt="About Lafaek Learning Media"
-width={600}
-  height={400}
-              className="absolute inset-0 z-0 opacity-30"
+            width={600}
+            height={400}
+            className="absolute inset-0 z-0 opacity-30 object-cover"
           />
           <div className="relative z-10 text-center px-4">
             <h1 className="text-4xl md:text-6xl font-extrabold leading-tight mb-4 drop-shadow-lg">{t.hero.title}</h1>
@@ -151,9 +128,7 @@ width={600}
           <div className="container mx-auto px-4">
             <div className="text-center mb-12">
               <h2 className="text-4xl font-bold text-orange-700 mb-4">{t.history.title}</h2>
-              <p className="text-xl text-gray-600">
-                Our journey from a small initiative to a national impact organization.
-              </p>
+              <p className="text-xl text-gray-600">Our journey from a small initiative to a national impact organization.</p>
             </div>
             <div className="max-w-4xl mx-auto space-y-6 text-lg text-gray-700 leading-relaxed">
               {t.history.paragraphs.map((paragraph, index) => (
@@ -173,18 +148,17 @@ width={600}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               {t.values.items.map((value, index) => (
                 <Card
-  key={index}
-  className="bg-white/80 backdrop-blur-sm border-2 border-green-200 hover:border-green-400 transition-all transform hover:scale-105"
->
-  <div className="p-6 flex flex-col items-center text-center">
-    <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-blue-500 rounded-full flex items-center justify-center mb-4 shadow-md">
-      <value.icon className="h-8 w-8 text-white" />
-    </div>
-    <h3 className="text-xl font-semibold text-gray-800 mb-2">{value.title}</h3>
-    <p className="text-gray-600">{value.description}</p>
-  </div>
-</Card>
-
+                  key={index}
+                  className="bg-white/80 backdrop-blur-sm border-2 border-green-200 hover:border-green-400 transition-all transform hover:scale-105"
+                >
+                  <div className="p-6 flex flex-col items-center text-center">
+                    <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-blue-500 rounded-full flex items-center justify-center mb-4 shadow-md">
+                      <value.icon className="h-8 w-8 text-white" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-gray-800 mb-2">{value.title}</h3>
+                    <p className="text-gray-600">{value.description}</p>
+                  </div>
+                </Card>
               ))}
             </div>
           </div>
@@ -200,7 +174,7 @@ width={600}
               </div>
               <div className="relative">
                 <Image
-                  src={t.team.image || "/placeholder.svg"}
+                  src={t.team.image}
                   alt="Lafaek Learning Media Team"
                   width={500}
                   height={300}
@@ -221,26 +195,17 @@ width={600}
             <p className="text-lg text-gray-700 leading-relaxed max-w-4xl mx-auto">{t.future.description}</p>
             <div className="mt-12">
               <Link href="/get-involved">
-                <Button
-  className="px-8 py-4 text-lg bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white font-bold rounded-full shadow-lg flex items-center justify-center"
->
-  Join Our Future
-  <BookOpen className="ml-2 h-5 w-5" />
-</Button>
-
-
+                <Button className="px-8 py-4 text-lg bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white font-bold rounded-full shadow-lg flex items-center justify-center">
+                  Join Our Future
+                  <BookOpen className="ml-2 h-5 w-5" />
+                </Button>
               </Link>
             </div>
           </div>
         </section>
       </main>
 
-      {/* Footer */}
-      <footer className="bg-gray-800 text-white py-8">
-        <div className="container mx-auto px-4 text-center">
-          <p className="text-gray-400">&copy; 2024 Lafaek Learning Media. All rights reserved.</p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   )
 }

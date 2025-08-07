@@ -7,9 +7,10 @@ import { Mail, Phone, MapPin, Send } from "lucide-react"
 
 import { Navigation } from "@/components/Navigation"
 import { Button } from "@/components/button"
-import { Card } from "@/components/card"
+import { Card } from "@/components/Card"
 import { Input } from "@/components/input"
 import { Textarea } from "@/components/textarea"
+import { Footer } from "../../components/Footer" // ✅ Shared footer
 
 export default function ContactPage() {
   const [language, setLanguage] = useState<"en" | "tet">("en")
@@ -113,10 +114,10 @@ export default function ContactPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
       <Navigation language={language} onLanguageChange={setLanguage} />
 
-      <main>
+      <main className="flex-grow">
         <section className="py-20 px-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white text-center">
           <div className="container mx-auto">
             <h1 className="text-4xl md:text-6xl font-bold mb-4">{t.hero.title}</h1>
@@ -190,11 +191,7 @@ export default function ContactPage() {
         </section>
       </main>
 
-      <footer className="bg-gray-800 text-white py-8">
-        <div className="container mx-auto px-4 text-center">
-          <p className="text-gray-400">&copy; 2024 Lafaek Learning Media. All rights reserved.</p>
-        </div>
-      </footer>
+      <Footer /> {/* ✅ Unified footer across all pages */}
     </div>
   )
 }

@@ -5,10 +5,12 @@ import { useState } from "react"
 import Image from "next/image"
 import { Navigation } from "@/components/Navigation"
 import { Button } from "@/components/button"
-import { Card } from "@/components/card"
+import { Card } from "@/components/Card"
 import { Input } from "@/components/input"
 import { Textarea } from "@/components/textarea"
 import { Handshake, Users, Heart, Target, ArrowRight } from "lucide-react"
+import { Footer } from "../../components/Footer"
+
 
 export default function GetInvolvedPage() {
   const [language, setLanguage] = useState<"en" | "tet">("en")
@@ -417,11 +419,8 @@ export default function GetInvolvedPage() {
         ))}
       </main>
 
-      <footer className="bg-gray-800 text-white py-8">
-        <div className="max-w-7xl mx-auto px-4 text-center">
-          <p className="text-gray-400">&copy; 2024 Lafaek Learning Media. All rights reserved.</p>
-        </div>
-      </footer>
+    <Footer />
+
     </div>
   )
 }

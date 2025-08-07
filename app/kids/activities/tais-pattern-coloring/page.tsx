@@ -6,7 +6,7 @@ import Link from "next/link"
 import { ArrowLeft, Download, RefreshCw } from "lucide-react"
 import { Navigation } from "@/components/Navigation"
 import { Button } from "@/components/button"
-import { Card } from "@/components/card"
+import { Card } from "@/components/Card"
 
 export default function TaisPatternColoringPage() {
   const [language, setLanguage] = useState<"en" | "tet">("en")

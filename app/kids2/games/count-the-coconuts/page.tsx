@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { Button } from "@/components/button"
-import { Card } from "@/components/card"
+import { Card } from "@/components/Card"
 import { Badge } from "@/components/badge"
 import { Home, RotateCcw, Trophy, Plus, Minus } from "lucide-react"
 import Link from "next/link"
