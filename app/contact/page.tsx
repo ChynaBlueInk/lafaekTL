@@ -7,7 +7,7 @@ import { Mail, Phone, MapPin, Send } from "lucide-react"
 
 import { Navigation } from "@/components/Navigation"
 import { Button } from "@/components/button"
-import { Card } from "@/components/card_temp"
+import { Card } from "@/components/Card"
 import { Input } from "@/components/input"
 import { Textarea } from "@/components/textarea"
 import { Footer } from "../../components/Footer" // ✅ Shared footer

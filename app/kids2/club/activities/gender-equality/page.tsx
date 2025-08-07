@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { Button } from "@/components/button"
-import { Card } from "@/components/card_temp"
+import { Card } from "@/components/Card"
 import { Badge } from "@/components/badge"
 import { Home, UserCheck, Star, Heart, Award, CheckCircle, Users } from "lucide-react"
 import Link from "next/link"
