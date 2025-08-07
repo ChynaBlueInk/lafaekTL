@@ -6,7 +6,7 @@ import Image from "next/image"
 import { ArrowLeft, ArrowRight } from "lucide-react"
 import { Navigation } from "@/components/Navigation"
 import { Button } from "@/components/button"
-import { Card } from "@/components/Card"
+import { Card } from "@/components/card_temp"
 
 export default function TaisWeavingAdventureStoryPage() {
   const [language, setLanguage] = useState<"en" | "tet">("en")

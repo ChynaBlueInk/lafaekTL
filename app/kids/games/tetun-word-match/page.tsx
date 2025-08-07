@@ -5,7 +5,7 @@ import Link from "next/link"
 import { ArrowLeft, RefreshCw, CheckCircle, XCircle } from "lucide-react"
 import { Navigation } from "@/components/Navigation"
 import { Button } from "@/components/button"
-import { Card } from "@/components/Card"
+import { Card } from "@/components/card_temp"
 import { Badge } from "@/components/badge"
 import clsx from "clsx"
 

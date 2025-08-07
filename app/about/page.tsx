@@ -5,7 +5,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { Navigation } from "@/components/Navigation"
 import { Button } from "@/components/button"
-import { Card } from "@/components/Card"
+import { Card } from "@/components/card_temp"
 import { Lightbulb, Users, Globe, Handshake, BookOpen } from "lucide-react"
 import { Footer } from "../../components/Footer"
 

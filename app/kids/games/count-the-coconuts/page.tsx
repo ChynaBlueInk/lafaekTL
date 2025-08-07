@@ -7,7 +7,7 @@ import Image from "next/image"
 import { Gamepad2, ArrowLeft, RefreshCw, CheckCircle, XCircle } from "lucide-react"
 import { Navigation } from "@/components/Navigation"
 import { Button } from "@/components/button"
-import { Card } from "@/components/Card"
+import { Card } from "@/components/card_temp"
 import { Input } from "@/components/input"
 import { Badge } from "@/components/badge"
 
