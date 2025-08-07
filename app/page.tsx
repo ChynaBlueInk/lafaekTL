@@ -2,7 +2,7 @@
 "use client";
 
 import { useState } from "react";
-import { Card } from "../components/Card";
+import { Card } from "@/components/Card";
 import { Badge } from "@/components/badge";
 import { Navigation } from "@/components/Navigation";
 import Carousel from "@/components/Carousel";
