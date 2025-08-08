@@ -6,6 +6,8 @@ import { Card } from "@/components/Card"
 import { Badge } from "@/components/badge"
 import { BookOpen, Play, Download, Gamepad2, Music, Palette, Star, Heart, Smile, Sparkles } from "lucide-react"
 import Link from "next/link"
+import { Navigation } from "@/components/Navigation"
+import { Footer } from "@/components/Footer"
 
 export default function KidsPage() {
   const [language, setLanguage] = useState<"en" | "tet">("en")
@@ -109,10 +111,13 @@ export default function KidsPage() {
     },
   }
 
-   const t = content[language]
+  const t = content[language]
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-yellow-100 via-pink-100 to-blue-100">
+    <div className="min-h-screen bg-gradient-to-br from-yellow-100 via-pink-100 to-blue-100 flex flex-col">
+      <Navigation language={language} onLanguageChange={setLanguage} />
+         <main className="flex-grow">
+
       <div className="bg-gradient-to-r from-orange-400 to-pink-500 text-white py-8">
         <div className="container mx-auto px-4 text-center">
           <div className="flex justify-center items-center space-x-2 mb-4">
@@ -364,6 +369,9 @@ export default function KidsPage() {
           </Link>
         </div>
       </div>
+     </main>
+
+      <Footer />
     </div>
   )
 }
