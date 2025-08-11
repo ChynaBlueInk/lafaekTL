@@ -7,7 +7,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react"
 import Link from "next/link"
 
 const slides = [
-  { src: "/carousel/slide1.JPG", alt: "Team in field" },       // note .JPG
+  { src: "/carousel/slide1.JPG", alt: "Team in field" },
   { src: "/carousel/slide2.JPG", alt: "Children reading" },
   { src: "/carousel/slide3.JPG", alt: "Lafaek workshop" },
   { src: "/carousel/slide4.JPG", alt: "Lafaek placeholder" },
@@ -26,6 +26,7 @@ export default function Carousel() {
 
   return (
     <div className="relative w-full h-[600px] overflow-hidden">
+      {/* Slides */}
       {slides.map((slide, index) => (
         <div
           key={slide.src}
@@ -44,11 +45,11 @@ export default function Carousel() {
         </div>
       ))}
 
-      {/* Arrows (above overlay) */}
+      {/* Arrows (kept near the edge, above overlay/text) */}
       <button
         type="button"
         onClick={prevSlide}
-        className="absolute left-4 top-1/2 -translate-y-1/2 z-40 rounded-full bg-white/80 hover:bg-white p-2 shadow"
+        className="absolute left-4 top-1/2 -translate-y-1/2 z-50 rounded-full bg-white/80 hover:bg-white p-2 shadow"
         aria-label="Previous slide"
       >
         <ChevronLeft className="w-6 h-6 text-[#4F4F4F]" />
@@ -56,34 +57,37 @@ export default function Carousel() {
       <button
         type="button"
         onClick={nextSlide}
-        className="absolute right-4 top-1/2 -translate-y-1/2 z-40 rounded-full bg-white/80 hover:bg-white p-2 shadow"
+        className="absolute right-4 top-1/2 -translate-y-1/2 z-50 rounded-full bg-white/80 hover:bg-white p-2 shadow"
         aria-label="Next slide"
       >
-        <ChevronRight className="w-6 h-6 text[#4F4F4F]" />
+        <ChevronRight className="w-6 h-6 text-[#4F4F4F]" />
       </button>
 
-      {/* Overlay (non-blocking) */}
+      {/* Dim overlay */}
       <div className="absolute inset-0 z-30 pointer-events-none">
-        <div className="absolute inset-0 bg-black/40" />
-        <div className="h-full flex items-center text-white px-8 pointer-events-auto">
-          <div className="max-w-xl text-left">
-            <h1 className="text-4xl md:text-6xl font-extrabold drop-shadow-lg">
-              Welcome to Lafaek Learning Media
-            </h1>
-            <p className="text-lg md:text-2xl mt-4">
-              Empowering Timor-Leste through Education & Stories
-            </p>
-            <p className="mt-6 text-base md:text-lg leading-relaxed max-w-md">
-              You can support Lafaek by purchasing our magazines and products, sponsoring educational content,
-              advertising with us, or hiring our talented team of writers, illustrators, and videographers.
-            </p>
-            <Link
-              href="/get-involved#donate"
-              className="inline-block mt-6 bg-[#EB5757] hover:bg-red-600 text-white font-bold py-3 px-6 rounded-full text-lg shadow-lg transition"
-            >
-              ❤️ Support Us
-            </Link>
-          </div>
+        <div className="absolute inset-0 bg-black/45" />
+      </div>
+
+      {/* Text content – forced white and shifted right to clear the arrow */}
+      <div className="absolute inset-0 z-40 flex items-center pointer-events-none">
+        <div className="pointer-events-auto max-w-xl text-left 
+                        pl-24 pr-6 md:pl-36 lg:pl-48">
+          <h1 className="text-4xl md:text-6xl font-extrabold drop-shadow-lg text-white">
+            Welcome to Lafaek Learning Media
+          </h1>
+          <p className="text-lg md:text-2xl mt-4 text-white/95">
+            Empowering Timor-Leste through Education & Stories
+          </p>
+          <p className="mt-6 text-base md:text-lg leading-relaxed max-w-md text-white/90">
+            You can support Lafaek by purchasing our magazines and products, sponsoring educational content,
+            advertising with us, or hiring our talented team of writers, illustrators, and videographers.
+          </p>
+          <Link
+            href="/get-involved#donate"
+            className="inline-block mt-6 bg-[#EB5757] hover:bg-red-600 text-white font-bold py-3 px-6 rounded-full text-lg shadow-lg transition"
+          >
+            ❤️ Support Us
+          </Link>
         </div>
       </div>
     </div>
