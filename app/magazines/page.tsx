@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { Navigation } from "@/components/Navigation"
+import Image from "next/image"
 
 const fakeMagazines = [
   { id: 1, name: "Lafaek Kiik January 2025", date: "2025-01-15", location: "Ermera", topic: "Early Childhood" },
@@ -28,6 +29,18 @@ export default function MagazinesPage() {
   return (
     <>
       <Navigation language={language} onLanguageChange={setLanguage} />
+
+      {/* Banner Image */}
+      <div className="w-full h-64 relative">
+        <Image
+          src="/product.jpg"
+          alt="Products Banner"
+          layout="fill"
+          objectFit="cover"
+          priority
+        />
+      </div>
+
       <main className="min-h-screen bg-white p-8">
         <h1 className="text-4xl font-bold text-green-700 mb-6">Our Magazines</h1>
         <input
