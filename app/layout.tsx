@@ -1,24 +1,20 @@
-import type React from "react"
 import type { Metadata } from "next"
-import { Inter } from "next/font/google"
 import "./globals.css"
-
-const inter = Inter({ subsets: ["latin"] })
+import ClientLayoutShell from "@/components/ClientLayoutShell"
 
 export const metadata: Metadata = {
   title: "Lafaek Learning Media",
   description: "Empowering Timor-Leste through Education & Stories",
-    generator: 'v0.dev'
 }
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body>
+        <ClientLayoutShell>
+          {children}
+        </ClientLayoutShell>
+      </body>
     </html>
   )
 }

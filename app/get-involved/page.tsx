@@ -10,10 +10,11 @@ import { Input } from "@/components/input"
 import { Textarea } from "@/components/textarea"
 import { Handshake, Users, Heart, Target, ArrowRight } from "lucide-react"
 import { Footer } from "../../components/Footer"
+import { useLanguage } from "@/lib/LanguageContext"
 
 
 export default function GetInvolvedPage() {
-  const [language, setLanguage] = useState<"en" | "tet">("en")
+const { language } = useLanguage()
   const [formData, setFormData] = useState<Record<string, string>>({
     name: "",
     email: "",
@@ -312,7 +313,6 @@ export default function GetInvolvedPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navigation language={language} onLanguageChange={setLanguage} />
 
       <main>
         <section className="relative w-full h-[400px] bg-gradient-to-r from-green-500 to-blue-500 flex items-center justify-center text-white overflow-hidden">

@@ -1,17 +1,19 @@
+// app/about/page.tsx
 "use client"
 
-import { useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { Navigation } from "@/components/Navigation"
 import { Button } from "@/components/button"
 import { Card } from "@/components/Card"
-import { Lightbulb, Users, Globe, Handshake, BookOpen } from "lucide-react"
-import { Footer } from "../../components/Footer"
+import { Users, Lightbulb, Globe, Handshake, BookOpen } from "lucide-react"
+import { Footer } from "@/components/Footer"
+import { useLanguage } from "@/lib/LanguageContext"
 
 export default function AboutPage() {
-  const [language, setLanguage] = useState<"en" | "tet">("en")
+  // 🔑 read global language from context (set by your nav buttons)
+  const { language } = useLanguage()
 
+  // page-local copy is fine; it just selects by the global `language`
   const content = {
     en: {
       hero: {
@@ -91,14 +93,12 @@ export default function AboutPage() {
           "Ami vizaun Timor-Leste ida ne'ebé labarik hotu literatu, kuriozu, no hametin atu forma sira-nia destinu rasik no kontribui ba nasaun ne'ebé dame no prósperu. Ami sei kontinua inova, habelar ami-nia asesu, no aprofunda ami-nia impactu, garante katak Lafaek nafatin sai farol aprendizajen ba jerasaun sira tuir mai.",
       },
     },
-  }
+  } as const
 
   const t = content[language]
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      <Navigation language={language} onLanguageChange={setLanguage} />
-
       <main className="flex-grow">
         {/* Hero Section */}
         <section className="relative w-full h-[400px] bg-gradient-to-r from-blue-500 to-green-500 flex items-center justify-center text-white overflow-hidden">
@@ -128,11 +128,15 @@ export default function AboutPage() {
           <div className="container mx-auto px-4">
             <div className="text-center mb-12">
               <h2 className="text-4xl font-bold text-orange-700 mb-4">{t.history.title}</h2>
-              <p className="text-xl text-gray-600">Our journey from a small initiative to a national impact organization.</p>
+              <p className="text-xl text-gray-600">
+                {language === "en"
+                  ? "Our journey from a small initiative to a national impact organization."
+                  : "Ami-nia viajen husi inisiativa ki'ik ba organizasaun ho impaktu nasional."}
+              </p>
             </div>
             <div className="max-w-4xl mx-auto space-y-6 text-lg text-gray-700 leading-relaxed">
-              {t.history.paragraphs.map((paragraph, index) => (
-                <p key={index}>{paragraph}</p>
+              {t.history.paragraphs.map((p, i) => (
+                <p key={i}>{p}</p>
               ))}
             </div>
           </div>
@@ -143,7 +147,11 @@ export default function AboutPage() {
           <div className="container mx-auto px-4">
             <div className="text-center mb-12">
               <h2 className="text-4xl font-bold text-green-700 mb-4">{t.values.title}</h2>
-              <p className="text-xl text-gray-600">The principles that guide our work and our team.</p>
+              <p className="text-xl text-gray-600">
+                {language === "en"
+                  ? "The principles that guide our work and our team."
+                  : "Prinsípiu sira ne'ebé orienta ami-nia servisu no ekipa."}
+              </p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               {t.values.items.map((value, index) => (
@@ -196,7 +204,7 @@ export default function AboutPage() {
             <div className="mt-12">
               <Link href="/get-involved">
                 <Button className="px-8 py-4 text-lg bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white font-bold rounded-full shadow-lg flex items-center justify-center">
-                  Join Our Future
+                  {language === "en" ? "Join Our Future" : "Tuirmai Hamutuk"}
                   <BookOpen className="ml-2 h-5 w-5" />
                 </Button>
               </Link>

@@ -1,23 +1,22 @@
+// components/Navigation.tsx
 "use client"
 
 import { useState } from "react"
 import Link from "next/link"
 import { BookOpen, Menu, X, ChevronDown } from "lucide-react"
 import { Button } from "./button"
-
-interface NavigationProps {
-  language: "en" | "tet"
-  onLanguageChange: (lang: "en" | "tet") => void
-}
+import { useLanguage } from "@/lib/LanguageContext" // ⬅️ use global context
 
 type MegaItem = { href: string; title: string; description: string }
 type NavItem =
   | { href: string; label: string }
   | { label: string; mega: MegaItem[] }
 
-export function Navigation({ language, onLanguageChange }: NavigationProps) {
+export function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [openMobileSubmenu, setOpenMobileSubmenu] = useState<string | null>(null)
+
+  const { language, setLanguage } = useLanguage()
 
   const t = {
     en: {
@@ -125,10 +124,10 @@ export function Navigation({ language, onLanguageChange }: NavigationProps) {
         { href: "/impact/junior-journalist", title: t.juniorJournalist, description: t.juniorJournalistDesc },
         { href: "/impact/junior-activist", title: t.juniorActivist, description: t.juniorActivistDesc },
         { href: "/news", title: t.newsItems, description: t.newsItemsDesc },
-        { href: "/community-stories", title: t.communityStories, description: t.communityStoriesDesc },
+        { href: "/impact-stories", title: t.communityStories, description: t.communityStoriesDesc },
       ],
     },
-    { href: "/kids-club", label: `${t.kidsClub} (${t.comingSoon})` },
+    { href: "/kids", label: `${t.kidsClub} (${t.comingSoon})` },
     {
       label: t.aboutUs,
       mega: [
@@ -167,7 +166,7 @@ export function Navigation({ language, onLanguageChange }: NavigationProps) {
                 "mega" in item ? (
                   <div key={item.label} className="relative group">
                     <button
-                      className="flex items-center text-white hover:text-[#2F80ED] font-medium transition-colors"
+                      className="flex items-center text-white hover:text-[#717273] font-medium transition-colors"
                       aria-haspopup="menu"
                       aria-expanded="false"
                     >
@@ -195,7 +194,7 @@ export function Navigation({ language, onLanguageChange }: NavigationProps) {
                   <Link
                     key={item.href}
                     href={item.href}
-                    className="text-white hover:text-[#2F80ED] font-medium transition-colors"
+                    className="text-white hover:text-[#717273] font-medium transition-colors"
                   >
                     {item.label}
                   </Link>
@@ -209,18 +208,18 @@ export function Navigation({ language, onLanguageChange }: NavigationProps) {
             {/* Desktop language/auth */}
             <div className="hidden md:flex items-center gap-3">
               <Button
-                onClick={() => onLanguageChange("en")}
+                onClick={() => setLanguage("en")}
                 aria-pressed={language === "en"}
                 className={`px-2 py-1 text-xs font-semibold rounded-md transition ${
                   language === "en"
-                    ? "bg-white text-[#219653]"
+                    ? "bg-yellow text-[#219653]"
                     : "border border-white text-white hover:bg-white/20"
                 }`}
               >
                 {t.en}
               </Button>
               <Button
-                onClick={() => onLanguageChange("tet")}
+                onClick={() => setLanguage("tet")}
                 aria-pressed={language === "tet"}
                 className={`px-2 py-1 text-xs font-semibold rounded-md transition ${
                   language === "tet"
@@ -239,7 +238,7 @@ export function Navigation({ language, onLanguageChange }: NavigationProps) {
             {/* Mobile toggler */}
             <Button
               onClick={() => setIsMenuOpen((v) => !v)}
-              className="md:hidden text-white hover:bg-white/20 p-2 rounded-md"
+              className="md:hidden text-white hover:bg:white/20 p-2 rounded-md"
               aria-label="Toggle navigation"
             >
               {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -254,7 +253,7 @@ export function Navigation({ language, onLanguageChange }: NavigationProps) {
               {/* Language + auth on mobile */}
               <div className="flex items-center gap-2 px-4">
                 <Button
-                  onClick={() => onLanguageChange("en")}
+                  onClick={() => setLanguage("en")}
                   aria-pressed={language === "en"}
                   className={`px-2 py-1 text-xs font-semibold rounded-md transition ${
                     language === "en"
@@ -265,11 +264,11 @@ export function Navigation({ language, onLanguageChange }: NavigationProps) {
                   {t.en}
                 </Button>
                 <Button
-                  onClick={() => onLanguageChange("tet")}
+                  onClick={() => setLanguage("tet")}
                   aria-pressed={language === "tet"}
                   className={`px-2 py-1 text-xs font-semibold rounded-md transition ${
                     language === "tet"
-                      ? "bg-white text-[#219653]"
+                      ? "bg:white text-[#219653]"
                       : "border border-white text-white hover:bg-white/20"
                   }`}
                 >

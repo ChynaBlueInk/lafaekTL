@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import { Navigation } from "@/components/Navigation";
+import { useLanguage } from "@/lib/LanguageContext"
 
 export default function BooksPage() {
-  const [language, setLanguage] = useState<"en" | "tet">("en");
+const { language } = useLanguage()
 
   const labels = {
     en: {
@@ -23,7 +24,6 @@ export default function BooksPage() {
 
   return (
     <>
-      <Navigation language={language} onLanguageChange={setLanguage} />
       <main className="min-h-screen bg-white px-6 py-12">
         <h1 className="text-4xl font-bold text-green-700 mb-4">{t.title}</h1>
         <p className="text-lg text-gray-700">{t.description}</p>

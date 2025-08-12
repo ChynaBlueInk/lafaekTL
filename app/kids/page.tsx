@@ -115,7 +115,6 @@ export default function KidsPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-yellow-100 via-pink-100 to-blue-100 flex flex-col">
-      <Navigation language={language} onLanguageChange={setLanguage} />
          <main className="flex-grow">
 
       <div className="bg-gradient-to-r from-orange-400 to-pink-500 text-white py-8">

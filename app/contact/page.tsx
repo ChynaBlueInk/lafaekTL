@@ -11,9 +11,11 @@ import { Card } from "@/components/Card"
 import { Input } from "@/components/input"
 import { Textarea } from "@/components/textarea"
 import { Footer } from "../../components/Footer" // ✅ Shared footer
+import { useLanguage } from "@/lib/LanguageContext"
+
 
 export default function ContactPage() {
-  const [language, setLanguage] = useState<"en" | "tet">("en")
+  const { language } = useLanguage()
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -115,7 +117,6 @@ export default function ContactPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      <Navigation language={language} onLanguageChange={setLanguage} />
 
       <main className="flex-grow">
         <section className="py-20 px-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white text-center">
