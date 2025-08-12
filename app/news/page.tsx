@@ -2,6 +2,7 @@
 
 import Image from "next/image"
 import Link from "next/link"
+import { Footer } from "@/components/Footer"
 import { Calendar, ExternalLink, Heart, Users, Globe } from "lucide-react"
 import { Card } from "../../components/Card"
 import { useLanguage } from "@/lib/LanguageContext"
@@ -164,81 +165,82 @@ export default function NewsPage() {
   const t = ui[language]
 
   return (
-    <div className="min-h-screen bg-white text-gray-900">
-     
-
-      {/* Hero */}
-      <section className="py-12 md:py-20 bg-gradient-to-r from-blue-50 to-green-50">
-        <div className="container mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-6xl font-bold text-green-800 mb-6">{t.heroTitle}</h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">{t.heroDesc}</p>
-          <div className="flex items-center justify-center space-x-4 text-sm text-gray-500">
-            <div className="flex items-center">
-              <Globe className="h-4 w-4 mr-1" />
-              {t.tags.global}
-            </div>
-            <div className="flex items-center">
-              <Users className="h-4 w-4 mr-1" />
-              {t.tags.community}
-            </div>
-            <div className="flex items-center">
-              <Heart className="h-4 w-4 mr-1" />
-              {t.tags.change}
+    <div>
+      <div className="min-h-screen bg-white text-gray-900">
+        {/* Hero */}
+        <section className="py-12 md:py-20 bg-gradient-to-r from-blue-50 to-green-50">
+          <div className="container mx-auto px-4 text-center">
+            <h1 className="text-4xl md:text-6xl font-bold text-green-800 mb-6">{t.heroTitle}</h1>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">{t.heroDesc}</p>
+            <div className="flex items-center justify-center space-x-4 text-sm text-gray-500">
+              <div className="flex items-center">
+                <Globe className="h-4 w-4 mr-1" />
+                {t.tags.global}
+              </div>
+              <div className="flex items-center">
+                <Users className="h-4 w-4 mr-1" />
+                {t.tags.community}
+              </div>
+              <div className="flex items-center">
+                <Heart className="h-4 w-4 mr-1" />
+                {t.tags.change}
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* News Grid */}
-      <section className="py-16">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {newsArticles.map((article) => (
-              <Card key={article.id} className="overflow-hidden shadow hover:shadow-lg transition-shadow rounded-lg border">
-                <div className="relative">
-                  <Image
-                    src={article.thumbnail}
-                    alt={t.bannerAlt}
-                    width={350}
-                    height={200}
-                    className="w-full h-48 object-cover"
-                  />
-                  <div
-                    className={`absolute top-3 left-3 px-2 py-1 text-xs font-medium rounded ${categoryColors[article.category]}`}
-                  >
-                    {categoryLabels[language][article.category]}
+        {/* News Grid */}
+        <section className="py-16">
+          <div className="container mx-auto px-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {newsArticles.map((article) => (
+                <Card key={article.id} className="overflow-hidden shadow hover:shadow-lg transition-shadow rounded-lg border">
+                  <div className="relative">
+                    <Image
+                      src={article.thumbnail}
+                      alt={t.bannerAlt}
+                      width={350}
+                      height={200}
+                      className="w-full h-48 object-cover"
+                    />
+                    <div
+                      className={`absolute top-3 left-3 px-2 py-1 text-xs font-medium rounded ${categoryColors[article.category]}`}
+                    >
+                      {categoryLabels[language][article.category]}
+                    </div>
                   </div>
-                </div>
-                <div className="p-4">
-                  <h3 className="text-lg font-semibold line-clamp-2 mb-1">
-                    {article.title[language]}
-                  </h3>
-                  <div className="flex items-center text-sm text-gray-500 mb-2">
-                    <Calendar className="h-4 w-4 mr-1" />
-                    {new Date(article.date).toLocaleDateString(t.locale, {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })}
+                  <div className="p-4">
+                    <h3 className="text-lg font-semibold line-clamp-2 mb-1">
+                      {article.title[language]}
+                    </h3>
+                    <div className="flex items-center text-sm text-gray-500 mb-2">
+                      <Calendar className="h-4 w-4 mr-1" />
+                      {new Date(article.date).toLocaleDateString(t.locale, {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })}
+                    </div>
+                    <p className="text-sm text-gray-600 line-clamp-3 mb-4">
+                      {article.description[language]}
+                    </p>
+                    <Link
+                      href={article.youtubeUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center text-blue-600 hover:underline"
+                    >
+                      {t.watch}
+                      <ExternalLink className="h-4 w-4 ml-1" />
+                    </Link>
                   </div>
-                  <p className="text-sm text-gray-600 line-clamp-3 mb-4">
-                    {article.description[language]}
-                  </p>
-                  <Link
-                    href={article.youtubeUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center text-blue-600 hover:underline"
-                  >
-                    {t.watch}
-                    <ExternalLink className="h-4 w-4 ml-1" />
-                  </Link>
-                </div>
-              </Card>
-            ))}
+                </Card>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </div>
+      <Footer />
     </div>
   )
 }

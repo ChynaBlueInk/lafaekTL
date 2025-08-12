@@ -5,6 +5,7 @@ import { Card } from "@/components/Card";
 import Carousel from "@/components/Carousel";
 import { useLanguage } from "@/lib/LanguageContext";
 import { Users, Heart, Award, Target } from "lucide-react";
+import { Footer } from "@/components/Footer"
 import Link from "next/link";
 import Image from "next/image";
 
@@ -40,15 +41,8 @@ export default function HomePage() {
           { name: "Magazines", desc: "Trusted content in Tetun and Portuguese" },
         ],
       },
-      impact: {
-        title: "Our Impact Stories",
-        subtitle: "Real change in Timorese communities",
-      },
-      kidsSection: {
-        title: "Fun Zone for Kids!",
-        subtitle: "Coming Soon: Games, Stories, Songs & More!",
-        features: [],
-      },
+      impact: { title: "Our Impact Stories", subtitle: "Real change in Timorese communities" },
+      kidsSection: { title: "Fun Zone for Kids!", subtitle: "Coming Soon: Games, Stories, Songs & More!", features: [] },
       cta: {
         title: "Join Our Mission",
         subtitle: "Help us continue empowering Timor-Leste through education",
@@ -85,10 +79,7 @@ export default function HomePage() {
           { name: "Revista", desc: "Kontentu konfiável iha Tetun no Portugés" },
         ],
       },
-      impact: {
-        title: "Istória Impaktu Ami",
-        subtitle: "Mudansa ida-ne’ebé real iha komunidade Timor-oan",
-      },
+      impact: { title: "Istória Impaktu Ami", subtitle: "Mudansa ida-ne’ebé real iha komunidade Timor-oan" },
       kidsSection: {
         title: "Zona Divertidu ba Labarik!",
         subtitle: "Mai la’ós laran: jogos, istória, kanzona no buat barak tan!",
@@ -109,81 +100,109 @@ export default function HomePage() {
   return (
     <div className="flex flex-col min-h-screen bg-white">
       <main className="flex-1">
-        {/* Carousel reads language via context (see snippet below) */}
         <Carousel />
 
-        {/* Social + CTA Block */}
-        <section className="bg-gray-50 py-12 px-4">
-          <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {/* Facebook */}
-            <div className="bg-white border border-gray-300 rounded-lg shadow p-6 flex flex-col justify-between">
-              <div>
-                <h3 className="text-2xl font-bold text-blue-700 mb-2">
-                  {language === "tet" ? "Segue ami iha Facebook" : "Follow us on Facebook"}
-                </h3>
-                <p className="text-gray-600 mb-4">
-                  {language === "tet"
-                    ? "Hahú hatene notísia foun no eventu komunitáriu sira."
-                    : "Stay updated with our latest stories and community events."}
-                </p>
-              </div>
-              <Link
-                href="https://www.facebook.com/RevistaLafaek"
-                target="_blank"
-                className="bg-blue-600 hover:bg-blue-700 text-white font-bold text-center py-3 px-6 rounded-full mt-auto"
-              >
-                {language === "tet" ? "Vizita Facebook" : "Visit Facebook"}
-              </Link>
-            </div>
+       {/* Social + CTA Block */}
+<section className="bg-gray-50 py-12 px-4">
+  <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
 
-            {/* YouTube */}
-            <div className="bg-white border border-gray-300 rounded-lg shadow p-6 flex flex-col justify-between">
-              <div>
-                <h3 className="text-2xl font-bold text-red-600 mb-2">
-                  {language === "tet" ? "Haree ami iha YouTube" : "Watch us on YouTube"}
-                </h3>
-                <p className="text-gray-600 mb-4">
-                  {language === "tet"
-                    ? "Haree konténu behind-the-scenes, istória, no vídeu sira husi terenu."
-                    : "Discover our behind-the-scenes content, stories, and videos from the field."}
-                </p>
-              </div>
-              <Link
-                href="https://www.youtube.com/@LafaekMagazine"
-                target="_blank"
-                className="bg-red-600 hover:bg-red-700 text-white font-bold text-center py-3 px-6 rounded-full mt-auto"
-              >
-                {language === "tet" ? "Vizita YouTube" : "Visit YouTube"}
-              </Link>
-            </div>
+    {/* Facebook */}
+    <div className="bg-white border border-gray-300 rounded-lg shadow overflow-hidden flex flex-col">
+      {/* Image */}
+      <div className="relative w-full h-48 bg-gray-100">
+        <Image
+          src="/HomePage/LafaekFacebook.png"  // if you renamed: "/HomePage/lafaek-facebook.jpg"
+          alt="Lafaek Facebook"
+          fill
+          sizes="(min-width:1024px) 33vw, 100vw"
+          className="object-cover"
+          priority
+        />
+      </div>
+      {/* Text + Button */}
+      <div className="p-6 flex flex-col flex-grow">
+        <h3 className="text-2xl font-bold text-blue-700 mb-2">
+          {language === "tet" ? "Segue ami iha Facebook" : "Follow us on Facebook"}
+        </h3>
+        <p className="text-gray-600 mb-4">
+          {language === "tet"
+            ? "Hahú hatene notísia foun no eventu komunitáriu sira."
+            : "Stay updated with our latest stories and community events."}
+        </p>
+        <a
+          href="https://www.facebook.com/RevistaLafaek"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="bg-blue-600 hover:bg-blue-700 text-white font-bold text-center py-3 px-6 rounded-full mt-auto"
+        >
+          {language === "tet" ? "Vizita Facebook" : "Visit Facebook"}
+        </a>
+      </div>
+    </div>
 
-            {/* CTA */}
-            <div className="bg-gradient-to-br from-purple-500 to-blue-500 text-white rounded-lg shadow-lg flex flex-col items-center justify-center p-8">
-              <h2 className="text-3xl font-bold mb-4">{t.cta.title}</h2>
-              <p className="text-lg mb-6 text-center">{t.cta.subtitle}</p>
-              <div className="flex flex-col gap-4 w-full">
-                <Link
-                  href="/get-involved#volunteer"
-                  className="w-full text-center bg-white text-purple-600 font-bold py-3 px-6 rounded-full shadow hover:bg-gray-100"
-                >
-                  <Users className="inline-block mr-2" /> {t.cta.volunteer}
-                </Link>
-                <Link
-                  href="/get-involved#donate"
-                  className="w-full text-center border-4 border-white text-white font-bold py-3 px-6 rounded-full shadow hover:bg-white hover:text-blue-600"
-                >
-                  <Heart className="inline-block mr-2" /> {t.cta.donate}
-                </Link>
-                <Link
-                  href="/get-involved#partner"
-                  className="w-full text-center bg-yellow-400 text-purple-800 font-bold py-3 px-6 rounded-full shadow hover:bg-yellow-300"
-                >
-                  <Target className="inline-block mr-2" /> {t.cta.partner}
-                </Link>
-              </div>
-            </div>
-          </div>
-        </section>
+    {/* YouTube */}
+    <div className="bg-white border border-gray-300 rounded-lg shadow overflow-hidden flex flex-col">
+      {/* Image */}
+      <div className="relative w-full h-48 bg-gray-100">
+        <Image
+          src="/HomePage/LafaekWebsite.png"   // if you renamed: "/HomePage/lafaek-website.jpg"
+          alt="Lafaek YouTube"
+          fill
+          sizes="(min-width:1024px) 33vw, 100vw"
+          className="object-cover"
+          priority
+        />
+      </div>
+      {/* Text + Button */}
+      <div className="p-6 flex flex-col flex-grow">
+        <h3 className="text-2xl font-bold text-red-600 mb-2">
+          {language === "tet" ? "Haree ami iha YouTube" : "Watch us on YouTube"}
+        </h3>
+        <p className="text-gray-600 mb-4">
+          {language === "tet"
+            ? "Haree konténu behind-the-scenes, istória, no vídeu sira husi terenu."
+            : "Discover our behind-the-scenes content, stories, and videos from the field."}
+        </p>
+        <a
+          href="https://www.youtube.com/@lafaek"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="bg-red-600 hover:bg-red-700 text-white font-bold text-center py-3 px-6 rounded-full mt-auto"
+        >
+          {language === "tet" ? "Vizita YouTube" : "Visit YouTube"}
+        </a>
+      </div>
+    </div>
+
+    {/* CTA */}
+    <div className="bg-gradient-to-br from-purple-500 to-blue-500 text-white rounded-lg shadow-lg flex flex-col items-center justify-center p-8">
+      <h2 className="text-3xl font-bold mb-4">{t.cta.title}</h2>
+      <p className="text-lg mb-6 text-center">{t.cta.subtitle}</p>
+      <div className="flex flex-col gap-4 w-full">
+        <Link
+          href="/get-involved#volunteer"
+          className="w-full text-center bg-white text-purple-600 font-bold py-3 px-6 rounded-full shadow hover:bg-gray-100"
+        >
+          Volunteer
+        </Link>
+        <Link
+          href="/get-involved#donate"
+          className="w-full text-center border-4 border-white text-white font-bold py-3 px-6 rounded-full shadow hover:bg-white hover:text-blue-600"
+        >
+          Support Us
+        </Link>
+        <Link
+          href="/get-involved#partner"
+          className="w-full text-center bg-yellow-400 text-purple-800 font-bold py-3 px-6 rounded-full shadow hover:bg-yellow-300"
+        >
+          Partner With Us
+        </Link>
+      </div>
+    </div>
+
+  </div>
+</section>
+
 
         {/* News */}
         <section className="py-20 bg-white">
@@ -201,9 +220,7 @@ export default function HomePage() {
                     className="rounded mb-4"
                   />
                   <h3 className="text-xl font-semibold mb-2">News Title {index}</h3>
-                  <p className="text-gray-600">
-                    A short summary of this Lafaek update or announcement.
-                  </p>
+                  <p className="text-gray-600">A short summary of this Lafaek update or announcement.</p>
                 </Card>
               ))}
             </div>
@@ -281,11 +298,8 @@ export default function HomePage() {
         </section>
       </main>
 
-      <footer className="bg-gray-800 text-white py-8">
-        <div className="container mx-auto px-4 text-center">
-          <p className="text-gray-400">&copy; 2024 Lafaek Learning Media. All rights reserved.</p>
-        </div>
-      </footer>
+      
+      <Footer />
     </div>
   );
 }

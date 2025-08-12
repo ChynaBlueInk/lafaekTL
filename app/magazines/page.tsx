@@ -1,20 +1,21 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Image from "next/image"
-import { useLanguage } from "@/lib/LanguageContext"
+import { useState } from "react";
+import Image from "next/image";
+import { useLanguage } from "@/lib/LanguageContext";
+import { Navigation } from "@/components/Navigation";
+import { Footer } from "@/components/Footer";
 
-type Lang = "en" | "tet"
+type Lang = "en" | "tet";
 
 type Magazine = {
-  id: number
-  name: { en: string; tet: string }
-  date: string // ISO yyyy-mm-dd
-  location: { en: string; tet: string }
-  topic: { en: string; tet: string }
-}
+  id: number;
+  name: { en: string; tet: string };
+  date: string; // ISO yyyy-mm-dd
+  location: { en: string; tet: string };
+  topic: { en: string; tet: string };
+};
 
-// Demo data with bilingual fields
 const magazines: Magazine[] = [
   {
     id: 1,
@@ -28,7 +29,7 @@ const magazines: Magazine[] = [
     name: { en: "Lafaek Prima March 2025", tet: "Lafaek Prima Marsu 2025" },
     date: "2025-03-10",
     location: { en: "Dili", tet: "Díli" },
-    topic: { en: "Environment", tet: "Meiu‑Ambiente" },
+    topic: { en: "Environment", tet: "Meiu-Ambiente" },
   },
   {
     id: 3,
@@ -51,9 +52,8 @@ const magazines: Magazine[] = [
     location: { en: "Covalima", tet: "Kovalima" },
     topic: { en: "Children's Rights", tet: "Direitu Labarik" },
   },
-]
+];
 
-// UI copy
 const ui = {
   en: {
     title: "Our Magazines",
@@ -63,24 +63,26 @@ const ui = {
     bannerAlt: "Magazines banner",
   },
   tet: {
-    title: "Ami‑nia Revista",
+    title: "Ami-nia Revista",
     searchPlaceholder: "Buka tuir naran, data, fatin ka asuntu",
     labels: { date: "Data", location: "Fatin", topic: "Asuntu" },
-    noResults: "La hetan revista ne’ebé hanesan ho ita‑nia buka.",
+    noResults: "La hetan revista ne’ebé hanesan ho ita-nia buka.",
     bannerAlt: "Baner revista",
   },
-} as const
+} as const;
 
 export default function MagazinesPage() {
-  const { language } = useLanguage() as { language: Lang }
-  const t = ui[language]
-  const [search, setSearch] = useState("")
+  const { language, setLanguage } = useLanguage() as {
+    language: Lang;
+    setLanguage: (lang: Lang) => void;
+  };
+  const t = ui[language];
+  const [search, setSearch] = useState("");
 
   const filteredMagazines = magazines.filter((m) => {
-    const q = search.trim().toLowerCase()
-    if (!q) return true
+    const q = search.trim().toLowerCase();
+    if (!q) return true;
 
-    // include bilingual fields + date (raw) in search haystack
     const haystack = [
       m.name.en,
       m.name.tet,
@@ -88,16 +90,17 @@ export default function MagazinesPage() {
       m.location.tet,
       m.topic.en,
       m.topic.tet,
-      m.date, // "2025-03-10"
+      m.date,
     ]
       .join(" ")
-      .toLowerCase()
+      .toLowerCase();
 
-    return haystack.includes(q)
-  })
+    return haystack.includes(q);
+  });
 
   return (
-    <>
+    <div className="flex flex-col min-h-screen bg-white">
+      
       {/* Banner Image */}
       <div className="w-full h-96 relative">
         <Image
@@ -109,7 +112,8 @@ export default function MagazinesPage() {
         />
       </div>
 
-      <main className="min-h-screen bg-white p-8">
+      {/* Main Content */}
+      <main className="flex-grow p-8">
         <h1 className="text-4xl font-bold text-green-700 mb-6">{t.title}</h1>
 
         <input
@@ -122,7 +126,10 @@ export default function MagazinesPage() {
 
         <div className="grid gap-4 md:grid-cols-2">
           {filteredMagazines.map((m) => (
-            <div key={m.id} className="border rounded-lg p-4 shadow hover:shadow-md transition">
+            <div
+              key={m.id}
+              className="border rounded-lg p-4 shadow hover:shadow-md transition"
+            >
               <h2 className="text-xl font-semibold text-red-700 mb-2">
                 {m.name[language]}
               </h2>
@@ -143,6 +150,9 @@ export default function MagazinesPage() {
           )}
         </div>
       </main>
-    </>
-  )
+
+      {/* Footer */}
+      <Footer />
+    </div>
+  );
 }
