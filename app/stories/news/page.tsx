@@ -4,7 +4,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { Footer } from "@/components/Footer"
 import { Calendar, ExternalLink, Heart, Users, Globe } from "lucide-react"
-import { Card } from "../../components/Card"
+import { Card } from "../../../components/Card"
 import { useLanguage } from "@/lib/LanguageContext"
 
 type Lang = "en" | "tet"

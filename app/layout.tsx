@@ -1,6 +1,8 @@
+// app/layout.tsx
 import type { Metadata } from "next"
 import "./globals.css"
 import ClientLayoutShell from "@/components/ClientLayoutShell"
+import ChatWidget from "@/components/ChatWidget"
 
 export const metadata: Metadata = {
   title: "Lafaek Learning Media",
@@ -13,6 +15,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <ClientLayoutShell>
           {children}
+          {/* Site-wide floating chat widget */}
+          <ChatWidget />
         </ClientLayoutShell>
       </body>
     </html>
