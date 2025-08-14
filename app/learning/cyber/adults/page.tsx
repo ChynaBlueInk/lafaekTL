@@ -23,9 +23,7 @@ export default function CyberAdultsPage() {
 
   const t = {
     en: {
-      breadcrumbHome: "Home",
-      breadcrumbCyber: "Cyber Security",
-      breadcrumbAdults: "Adults / Parents",
+ 
       title: "Protect Your Children Online",
       subtitle:
         "Practical steps for parents and carers to secure devices, set healthy rules, and support kids when things go wrong.",
@@ -232,18 +230,6 @@ export default function CyberAdultsPage() {
       {/* Header / Hero */}
       <section className="bg-[#219653] text-white">
         <div className="max-w-6xl mx-auto px-4 py-6">
-          {/* Breadcrumbs */}
-          <nav className="text-white/90 text-sm mb-3">
-            <Link href="/" className="underline hover:no-underline">
-              {t.breadcrumbHome}
-            </Link>
-            <span className="mx-2">/</span>
-            <Link href="/cyber" className="underline hover:no-underline">
-              {t.breadcrumbCyber}
-            </Link>
-            <span className="mx-2">/</span>
-            <span className="font-semibold">{t.breadcrumbAdults}</span>
-          </nav>
 
           <div className="flex items-start justify-between gap-4">
             <div>

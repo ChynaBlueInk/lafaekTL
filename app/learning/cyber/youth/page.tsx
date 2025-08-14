@@ -18,15 +18,11 @@ import {
 import { useLanguage } from "@/lib/LanguageContext";
 
 export default function CyberYouthPage() {
-  // 🔑 read global language from context (set by your nav buttons)
   const { language } = useLanguage();
 
   const t = {
     en: {
-      breadcrumbHome: "Home",
-      breadcrumbCyber: "Cyber Security",
-      breadcrumbYouth: "Youth",
-      title: "Stay Safe Online (Ages 15–25)",
+        title: "Stay Safe Online (Ages 15–25)",
       subtitle:
         "Smart habits for social, study, and work. Learn how to avoid scams, protect your accounts, manage your digital footprint, and spot deepfakes.",
       heroBadge: "Ages 15–25",
@@ -120,9 +116,6 @@ export default function CyberYouthPage() {
       note: "This page is original Lafaek guidance, with an external link for optional deeper learning.",
     },
     tet: {
-      breadcrumbHome: "Uma",
-      breadcrumbCyber: "Seguransa Sibernétika",
-      breadcrumbYouth: "Jovens",
       title: "Seguransa Online (Idade 15–25)",
       subtitle:
         "Habitu intelijente ba rede sosial, estuda no servisu. Aprende atu evita scam, proteje konta, halo privasidade seguru no identifika deepfake.",
@@ -224,17 +217,7 @@ export default function CyberYouthPage() {
       <section className="bg-[#219653] text-white">
         <div className="max-w-6xl mx-auto px-4 py-6">
           {/* Breadcrumbs */}
-          <nav className="text-white/90 text-sm mb-3">
-            <Link href="/" className="underline hover:no-underline">
-              {t.breadcrumbHome}
-            </Link>
-            <span className="mx-2">/</span>
-            <Link href="/cyber" className="underline hover:no-underline">
-              {t.breadcrumbCyber}
-            </Link>
-            <span className="mx-2">/</span>
-            <span className="font-semibold">{t.breadcrumbYouth}</span>
-          </nav>
+       
 
           <div className="flex items-start justify-between gap-4">
             <div>

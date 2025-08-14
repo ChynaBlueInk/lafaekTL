@@ -11,9 +11,7 @@ export default function CyberChildrenPage() {
 
   const t = {
     en: {
-      breadcrumbHome: "Home",
-      breadcrumbCyber: "Cyber Security",
-      breadcrumbChildren: "Children",
+
       title: "Cyber Safety for Children",
       subtitle:
         "Simple, friendly tips to help kids aged 7–10 stay safe online at school, at home, and on mobiles.",
@@ -196,17 +194,7 @@ export default function CyberChildrenPage() {
       <section className="bg-[#219653] text-white">
         <div className="max-w-6xl mx-auto px-4 py-6">
           {/* Breadcrumbs */}
-          <nav className="text-white/90 text-sm mb-3">
-            <Link href="/" className="underline hover:no-underline">
-              {t.breadcrumbHome}
-            </Link>
-            <span className="mx-2">/</span>
-            <Link href="/cyber" className="underline hover:no-underline">
-              {t.breadcrumbCyber}
-            </Link>
-            <span className="mx-2">/</span>
-            <span className="font-semibold">{t.breadcrumbChildren}</span>
-          </nav>
+ 
 
         <div className="flex items-start justify-between gap-4">
             <div>

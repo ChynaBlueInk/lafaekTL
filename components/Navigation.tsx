@@ -3,6 +3,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { BookOpen, Menu, X, ChevronDown } from "lucide-react"
 import { Button } from "./button"
 import { useLanguage } from "@/lib/LanguageContext" // ⬅️ global context
@@ -215,24 +216,28 @@ export function Navigation() {
     { href: "/get-involved", label: t.getInvolved },
   ]
 
-  return (
+   return (
     <nav className="bg-[#219653]/90 backdrop-blur-sm border-b-2 border-[#F2C94C] sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 py-3">
         {/* TOP BAR */}
         <div className="flex items-center justify-between gap-4">
           {/* LEFT: Logo + main menu */}
           <div className="flex items-center gap-6">
-            {/* Logo */}
-            <Link href="/" className="flex items-center space-x-2">
-              <div
-                className="w-10 h-10 rounded-full flex items-center justify-center"
-                style={{ background: "linear-gradient(135deg, #EB5757 0%, #F2C94C 100%)" }}
-                aria-label="Lafaek logo"
-              >
-                <BookOpen className="h-6 w-6 text-white" />
-              </div>
-              <span className="text-2xl font-bold text-white">{t.brand}</span>
-            </Link>
+            {/* Logo (uses /public/logo/lafaek-logo.png) */}
+           <Link href="/" className="flex items-center gap-3">
+  <div className="relative h-14 w-14 md:h-16 md:w-16">
+    <Image
+      src="/logo/lafaek-logo.png"
+      alt={`${t.brand} logo`}
+      fill
+      sizes="(min-width: 768px) 64px, 56px"
+      className="object-contain"
+      priority
+    />
+  </div>
+  <span className="text-2xl md:text-3xl font-bold text-white">{t.brand}</span>
+</Link>
+
 
             {/* Desktop main nav */}
             <div className="hidden md:flex items-center gap-6">
