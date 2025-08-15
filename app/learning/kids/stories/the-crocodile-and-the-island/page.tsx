@@ -1,17 +1,21 @@
+// app/learning/kids/stories/crocodile-and-the-island/page.tsx
 "use client"
 
 import { useState } from "react"
+import Link from "next/link"
 import { Button } from "@/components/button"
 import { Card } from "@/components/Card"
 import { ChevronLeft, ChevronRight, Home, Volume2, BookOpen } from "lucide-react"
-import Link from "next/link"
+import { useLanguage } from "@/lib/LanguageContext"
 
 export default function CrocodileStoryPage() {
-  const [language, setLanguage] = useState<"en" | "tet">("en")
+  // ✅ get global language from Navigation / LanguageProvider
+  const { language } = useLanguage()
   const [currentPage, setCurrentPage] = useState(0)
 
   const story = {
     en: {
+      kidsZone: "Kids Zone",
       title: "The Crocodile and the Island",
       pages: [
         {
@@ -44,9 +48,16 @@ export default function CrocodileStoryPage() {
         previous: "Previous",
         readAgain: "Read Again",
         backToStories: "Back to Stories",
+        listen: "Listen",
+        page: "Page",
+        of: "of",
       },
+      completeTitle: "Great job reading!",
+      completeText: "You've learned about the legend of how Timor-Leste got its shape!",
+      playGames: "Play Games",
     },
     tet: {
+      kidsZone: "Kids Zone",
       title: "Lafaek ho Illa",
       pages: [
         {
@@ -79,70 +90,45 @@ export default function CrocodileStoryPage() {
         previous: "Kotuk",
         readAgain: "Lee Fali",
         backToStories: "Fila ba Istoria",
+        listen: "Rona",
+        page: "Pájina",
+        of: "husi",
       },
+      completeTitle: "Leitura di'ak tebes!",
+      completeText: "Ita aprende kona-ba lenda oinsá Timor-Leste hetan nia forma!",
+      playGames: "Halimar Jogu",
     },
-  }
+  } as const
 
   const t = story[language]
 
   const nextPage = () => {
-    if (currentPage < t.pages.length - 1) {
-      setCurrentPage(currentPage + 1)
-    }
+    if (currentPage < t.pages.length - 1) setCurrentPage((p) => p + 1)
   }
-
   const previousPage = () => {
-    if (currentPage > 0) {
-      setCurrentPage(currentPage - 1)
-    }
+    if (currentPage > 0) setCurrentPage((p) => p - 1)
   }
-
-  const resetStory = () => {
-    setCurrentPage(0)
-  }
+  const resetStory = () => setCurrentPage(0)
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-100 via-green-100 to-yellow-100">
-      {/* Header */}
+      {/* Local header; global Navigation already in layout */}
       <div className="bg-gradient-to-r from-blue-500 to-green-500 text-white py-6">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <Link href="/kids">
+              <Link href="/learning/kids">
                 <Button className="flex items-center gap-2 border border-white text-white hover:bg-white hover:text-blue-600 bg-transparent text-sm px-4 py-2 rounded-md">
-  <Home className="h-4 w-4" />
-  Kids Zone
-</Button>
-
+                  <Home className="h-4 w-4" />
+                  {t.kidsZone}
+                </Button>
               </Link>
               <div className="flex items-center space-x-2">
                 <BookOpen className="h-6 w-6" />
                 <h1 className="text-2xl font-bold">{t.title}</h1>
               </div>
             </div>
-            <div className="flex items-center gap-2">
-  <Button
-    onClick={() => setLanguage("en")}
-    className={`text-xs px-4 py-2 rounded-md ${
-      language === "en"
-        ? "bg-white text-blue-600"
-        : "border border-white text-white hover:bg-white hover:text-blue-600 bg-transparent"
-    }`}
-  >
-    EN
-  </Button>
-  <Button
-    onClick={() => setLanguage("tet")}
-    className={`text-xs px-4 py-2 rounded-md ${
-      language === "tet"
-        ? "bg-white text-blue-600"
-        : "border border-white text-white hover:bg-white hover:text-blue-600 bg-transparent"
-    }`}
-  >
-    TET
-  </Button>
-</div>
-
+            {/* ✅ No page-level language buttons */}
           </div>
         </div>
       </div>
@@ -156,19 +142,21 @@ export default function CrocodileStoryPage() {
               <div className="inline-flex items-center space-x-2 bg-blue-100 rounded-full px-4 py-2">
                 <BookOpen className="h-4 w-4 text-blue-600" />
                 <span className="text-blue-700 font-medium">
-                  Page {currentPage + 1} of {t.pages.length}
+                  {t.navigation.page} {currentPage + 1} {t.navigation.of} {t.pages.length}
                 </span>
               </div>
             </div>
 
-            {/* Story Illustration */}
+            {/* Illustration placeholder */}
             <div className="mb-8">
               <div className="w-full h-80 bg-gradient-to-br from-blue-200 to-green-200 rounded-xl flex items-center justify-center border-4 border-blue-300">
                 <div className="text-center p-6">
                   <div className="w-32 h-32 bg-gradient-to-br from-blue-400 to-green-400 rounded-full mx-auto mb-4 flex items-center justify-center">
                     <BookOpen className="h-16 w-16 text-white" />
                   </div>
-                  <p className="text-blue-700 font-medium text-sm max-w-md">{t.pages[currentPage].illustration}</p>
+                  <p className="text-blue-700 font-medium text-sm max-w-md">
+                    {t.pages[currentPage].illustration}
+                  </p>
                 </div>
               </div>
             </div>
@@ -193,9 +181,9 @@ export default function CrocodileStoryPage() {
 
               <div className="flex space-x-2">
                 <Button className="flex items-center gap-2 border-2 border-green-500 text-green-600 hover:bg-green-500 hover:text-white bg-transparent px-4 py-2 rounded-md">
-  <Volume2 className="h-4 w-4" />
-  Listen
-</Button>
+                  <Volume2 className="h-4 w-4" />
+                  {t.navigation.listen}
+                </Button>
 
                 {currentPage === t.pages.length - 1 && (
                   <Button
@@ -224,18 +212,18 @@ export default function CrocodileStoryPage() {
           <div className="max-w-4xl mx-auto mt-8">
             <Card className="bg-gradient-to-r from-green-100 to-blue-100 border-2 border-green-300">
               <div className="p-6 text-center">
-                <h3 className="text-2xl font-bold text-green-700 mb-4">Great job reading!</h3>
-                <p className="text-green-600 mb-6">You've learned about the legend of how Timor-Leste got its shape!</p>
+                <h3 className="text-2xl font-bold text-green-700 mb-4">{t.completeTitle}</h3>
+                <p className="text-green-600 mb-6">{t.completeText}</p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <Link href="/kids/stories">
+                  <Link href="/learning/kids/stories">
                     <Button className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-bold py-3 px-6 rounded-full">
                       <BookOpen className="h-5 w-5 mr-2" />
                       {t.navigation.backToStories}
                     </Button>
                   </Link>
-                  <Link href="/kids/games">
+                  <Link href="/learning/kids/games">
                     <Button className="bg-gradient-to-r from-green-500 to-yellow-500 hover:from-green-600 hover:to-yellow-600 text-white font-bold py-3 px-6 rounded-full">
-                      Play Games
+                      {t.playGames}
                     </Button>
                   </Link>
                 </div>

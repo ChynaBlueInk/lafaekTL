@@ -1,25 +1,30 @@
+// app/learning/kids/games/count-the-coconuts/page.tsx   (adjust path if different)
 "use client"
 
 import { useState, useEffect } from "react"
+import Link from "next/link"
 import { Button } from "@/components/button"
 import { Card } from "@/components/Card"
 import { Badge } from "@/components/badge"
 import { Home, RotateCcw, Trophy, Plus, Minus } from "lucide-react"
-import Link from "next/link"
+import { useLanguage } from "@/lib/LanguageContext"
 
 export default function CountCoconutsPage() {
-  const [language, setLanguage] = useState<"en" | "tet">("en")
+  // ✅ use global language from Navigation/Provider
+  const { language } = useLanguage()
+
   const [score, setScore] = useState(0)
   const [currentQuestion, setCurrentQuestion] = useState(0)
   const [userAnswer, setUserAnswer] = useState("")
   const [feedback, setFeedback] = useState<string | null>(null)
   const [gameComplete, setGameComplete] = useState(false)
   const [questions, setQuestions] = useState<
-    Array<{ coconuts: number; operation?: string; num2?: number; answer: number }>
+    Array<{ coconuts: number; operation?: "plus" | "minus"; num2?: number; answer: number }>
   >([])
 
   const content = {
     en: {
+      kidsZone: "Kids Zone",
       title: "Count the Coconuts",
       subtitle: "Help count coconuts and solve math problems!",
       score: "Score",
@@ -31,7 +36,10 @@ export default function CountCoconutsPage() {
       correct: "Correct! Great job!",
       incorrect: "Not quite right. Try again!",
       nextQuestion: "Next Question",
+      finishGame: "Finish Game",
+      tryAgain: "Try Again",
       gameComplete: "Amazing! You're a coconut counting expert!",
+      finalScore: "Final Score",
       playAgain: "Play Again",
       backToGames: "Back to Games",
       plus: "plus",
@@ -39,6 +47,7 @@ export default function CountCoconutsPage() {
       equals: "equals",
     },
     tet: {
+      kidsZone: "Kids Zone",
       title: "Konta Nu",
       subtitle: "Ajuda konta nu no rezolve problema matematika!",
       score: "Pontu",
@@ -50,14 +59,17 @@ export default function CountCoconutsPage() {
       correct: "Los! Servisu di'ak!",
       incorrect: "La los liu. Tenta fali!",
       nextQuestion: "Pergunta Tuir Mai",
+      finishGame: "Remata Jogu",
+      tryAgain: "Tenta Fali",
       gameComplete: "Di'ak tebes! Ita mak espesialista konta nu!",
+      finalScore: "Pontu Final",
       playAgain: "Halimar Fali",
       backToGames: "Fila ba Jogu",
       plus: "tan",
       minus: "hasai",
       equals: "hanesan",
     },
-  }
+  } as const
 
   const t = content[language]
 
@@ -66,39 +78,26 @@ export default function CountCoconutsPage() {
   }, [])
 
   const generateQuestions = () => {
-    const newQuestions = []
+    const newQuestions: Array<{ coconuts: number; operation?: "plus" | "minus"; num2?: number; answer: number }> = []
 
-    // Simple counting questions (1-10 coconuts)
+    // Simple counting questions (1–10)
     for (let i = 0; i < 5; i++) {
-      newQuestions.push({
-        coconuts: Math.floor(Math.random() * 10) + 1,
-        answer: Math.floor(Math.random() * 10) + 1,
-      })
-      newQuestions[i].answer = newQuestions[i].coconuts
+      const coconuts = Math.floor(Math.random() * 10) + 1
+      newQuestions.push({ coconuts, answer: coconuts })
     }
 
     // Addition questions
     for (let i = 0; i < 3; i++) {
       const num1 = Math.floor(Math.random() * 8) + 1
       const num2 = Math.floor(Math.random() * 8) + 1
-      newQuestions.push({
-        coconuts: num1,
-        operation: "plus",
-        num2: num2,
-        answer: num1 + num2,
-      })
+      newQuestions.push({ coconuts: num1, operation: "plus", num2, answer: num1 + num2 })
     }
 
     // Subtraction questions
     for (let i = 0; i < 2; i++) {
       const num1 = Math.floor(Math.random() * 8) + 5
       const num2 = Math.floor(Math.random() * (num1 - 1)) + 1
-      newQuestions.push({
-        coconuts: num1,
-        operation: "minus",
-        num2: num2,
-        answer: num1 - num2,
-      })
+      newQuestions.push({ coconuts: num1, operation: "minus", num2, answer: num1 - num2 })
     }
 
     setQuestions(newQuestions)
@@ -116,9 +115,8 @@ export default function CountCoconutsPage() {
   const handleSubmit = () => {
     const answer = Number.parseInt(userAnswer)
     const correctAnswer = questions[currentQuestion].answer
-
     if (answer === correctAnswer) {
-      setScore(score + 10)
+      setScore((s) => s + 10)
       setFeedback(t.correct)
     } else {
       setFeedback(t.incorrect)
@@ -127,7 +125,7 @@ export default function CountCoconutsPage() {
 
   const nextQuestion = () => {
     if (currentQuestion < questions.length - 1) {
-      setCurrentQuestion(currentQuestion + 1)
+      setCurrentQuestion((q) => q + 1)
       setUserAnswer("")
       setFeedback(null)
     } else {
@@ -135,36 +133,29 @@ export default function CountCoconutsPage() {
     }
   }
 
-  const renderCoconuts = (count: number) => {
-    const coconuts = []
-    for (let i = 0; i < count; i++) {
-      coconuts.push(
-        <div
-          key={i}
-          className="w-12 h-12 bg-gradient-to-br from-amber-600 to-amber-800 rounded-full flex items-center justify-center text-white font-bold text-sm border-2 border-amber-700"
-        >
-          🥥
-        </div>,
-      )
-    }
-    return coconuts
-  }
+  const renderCoconuts = (count: number) =>
+    Array.from({ length: count }, (_, i) => (
+      <div
+        key={i}
+        className="w-12 h-12 bg-gradient-to-br from-amber-600 to-amber-800 rounded-full flex items-center justify-center text-white font-bold text-sm border-2 border-amber-700"
+      >
+        🥥
+      </div>
+    ))
 
   const currentQ = questions[currentQuestion]
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-yellow-100 via-green-100 to-blue-100">
-      {/* Header */}
+      {/* Local header for the game (Navigation is global) */}
       <div className="bg-gradient-to-r from-yellow-500 to-green-500 text-white py-6">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <Link href="/kids">
-                  <Button
-                  className="border-white text-white hover:bg-white hover:text-yellow-600 bg-transparent"
-                >
+              <Link href="/learning/kids">
+                <Button className="border-white text-white hover:bg-white hover:text-yellow-600 bg-transparent">
                   <Home className="h-4 w-4 mr-2" />
-                  Kids Zone
+                  {t.kidsZone}
                 </Button>
               </Link>
               <div className="flex items-center space-x-2">
@@ -172,23 +163,7 @@ export default function CountCoconutsPage() {
                 <h1 className="text-2xl font-bold">{t.title}</h1>
               </div>
             </div>
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2">
-                <Button
-                  onClick={() => setLanguage("en")}
-                  className={`text-xs ${language === "en" ? "bg-gray-200 text-black" : "bg-transparent text-white border"}`}
-                >
-                  EN
-                </Button>
-              <Button
-  onClick={() => setLanguage("tet")}
-  className={`text-xs ${language === "tet" ? "bg-gray-200 text-black" : "bg-transparent text-white border"}`}
->
-  TET
-</Button>
-
-              </div>
-            </div>
+            {/* no page-level language buttons—use Navigation */}
           </div>
         </div>
       </div>
@@ -230,10 +205,8 @@ export default function CountCoconutsPage() {
                   {/* Coconut Display */}
                   <div className="bg-gradient-to-r from-green-100 to-yellow-100 rounded-xl p-6 mb-6 border-2 border-green-200">
                     {!currentQ.operation ? (
-                      /* Simple counting */
                       <div className="flex flex-wrap justify-center gap-3">{renderCoconuts(currentQ.coconuts)}</div>
                     ) : (
-                      /* Math problem */
                       <div className="flex items-center justify-center space-x-4 text-2xl font-bold text-green-700">
                         <div className="flex flex-wrap justify-center gap-2">{renderCoconuts(currentQ.coconuts)}</div>
 
@@ -243,7 +216,7 @@ export default function CountCoconutsPage() {
                           ) : (
                             <Minus className="h-8 w-8 text-red-600" />
                           )}
-                          <span className="text-gray-700">{t[currentQ.operation as keyof typeof t]}</span>
+                          <span className="text-gray-700">{t[currentQ.operation]}</span>
                         </div>
 
                         <div className="flex flex-wrap justify-center gap-2">
@@ -264,8 +237,8 @@ export default function CountCoconutsPage() {
                       value={userAnswer}
                       onChange={(e) => setUserAnswer(e.target.value)}
                       className="w-32 h-16 text-3xl text-center border-4 border-yellow-300 rounded-xl focus:border-yellow-500 focus:outline-none"
-                      min="0"
-                      max="20"
+                      min={0}
+                      max={20}
                     />
                   </div>
 
@@ -297,14 +270,14 @@ export default function CountCoconutsPage() {
                           onClick={nextQuestion}
                           className="bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white font-bold py-4 px-8 rounded-full text-lg"
                         >
-                          {currentQuestion < questions.length - 1 ? t.nextQuestion : "Finish Game"}
+                          {currentQuestion < questions.length - 1 ? t.nextQuestion : t.finishGame}
                         </Button>
                       ) : (
                         <Button
                           onClick={() => setFeedback(null)}
                           className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-bold py-4 px-8 rounded-full text-lg"
                         >
-                          Try Again
+                          {t.tryAgain}
                         </Button>
                       )}
                     </div>
@@ -322,7 +295,7 @@ export default function CountCoconutsPage() {
                   <div className="text-6xl mb-4">🏆🥥</div>
                   <h2 className="text-3xl font-bold text-green-700 mb-2">{t.gameComplete}</h2>
                   <Badge className="bg-yellow-600 text-white px-6 py-3 text-xl mb-6">
-                    Final Score: {score}/{questions.length * 10}
+                    {t.finalScore}: {score}/{questions.length * 10}
                   </Badge>
                 </div>
 
@@ -334,7 +307,7 @@ export default function CountCoconutsPage() {
                     <RotateCcw className="h-5 w-5 mr-2" />
                     {t.playAgain}
                   </Button>
-                  <Link href="/kids/games">
+                  <Link href="/learning/kids/games">
                     <Button className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold py-4 px-8 rounded-full text-lg">
                       {t.backToGames}
                     </Button>

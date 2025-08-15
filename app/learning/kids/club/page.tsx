@@ -1,15 +1,15 @@
 "use client"
 
-import { useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { Users, Sparkles, HandHeart, Lightbulb, ArrowRight } from "lucide-react"
-import { Navigation } from "@/components/Navigation"
 import { Button } from "@/components/button"
 import { Card } from "@/components/Card"
+import { useLanguage } from "@/lib/LanguageContext"
 
 export default function KidsClubPage() {
-  const [language, setLanguage] = useState<"en" | "tet">("en")
+  // ✅ Read global language from Navigation/Provider
+  const { language } = useLanguage()
 
   const content = {
     en: {
@@ -26,6 +26,7 @@ export default function KidsClubPage() {
       },
       values: {
         title: "Club Values",
+        subtitle: "The principles that guide our club members",
         items: [
           { icon: Users, title: "Friendship", description: "Building strong bonds and supporting each other." },
           { icon: HandHeart, title: "Responsibility", description: "Taking care of our community and environment." },
@@ -36,24 +37,27 @@ export default function KidsClubPage() {
       activities: {
         title: "Club Activities",
         subtitle: "Engaging ways to learn and grow",
+        exploreLabel: "Explore Activity",
         items: [
           {
             title: "Gender Equality Challenge",
             description: "Learn about fairness and respect for everyone.",
-            link: "/kids/club/activities/gender-equality",
+            link: "/learning/kids/club/activities/gender-equality",
             image: "/placeholder.svg?height=200&width=300",
           },
           {
             title: "Climate Action Heroes",
             description: "Discover how to protect our planet and its beautiful nature.",
-            link: "/kids/club/activities/climate-action",
+            link: "/learning/kids/club/activities/climate-action",
             image: "/placeholder.svg?height=200&width=300",
           },
         ],
         viewAll: "View All Activities",
+        viewAllHref: "/learning/kids/club/activities",
       },
       join: {
         title: "How to Join the Club",
+        subtitle: "It's easy to become a Lafaek Friend!",
         steps: [
           "Explore our activities and choose one you like.",
           "Participate and complete the challenges.",
@@ -61,6 +65,9 @@ export default function KidsClubPage() {
           "Become an official Lafaek Friend!",
         ],
         cta: "Start Your Club Journey",
+      },
+      common: {
+        backHome: "← Back to Home",
       },
     },
     tet: {
@@ -77,6 +84,7 @@ export default function KidsClubPage() {
       },
       values: {
         title: "Valor Klube",
+        subtitle: "Prinsípiu sira ne'ebé gida membru klube sira",
         items: [
           { icon: Users, title: "Amizade", description: "Harii ligasaun forte no suporta malu." },
           { icon: HandHeart, title: "Responsabilidade", description: "Kuidadu ami-nia komunidade no ambiente." },
@@ -87,24 +95,27 @@ export default function KidsClubPage() {
       activities: {
         title: "Atividade Klube",
         subtitle: "Dalan envolvente atu aprende no moris",
+        exploreLabel: "Haree Atividade",
         items: [
           {
             title: "Desafiu Igualdade Jéneru",
             description: "Aprende kona-ba justisa no respeitu ba ema hotu.",
-            link: "/kids/club/activities/gender-equality",
+            link: "/learning/kids/club/activities/gender-equality",
             image: "/placeholder.svg?height=200&width=300",
           },
           {
             title: "Eroi Asaun Klima",
             description: "Deskobre oinsá atu proteje ami-nia planeta no nia natureza furak.",
-            link: "/kids/club/activities/climate-action",
+            link: "/learning/kids/club/activities/climate-action",
             image: "/placeholder.svg?height=200&width=300",
           },
         ],
         viewAll: "Haree Atividade Hotu",
+        viewAllHref: "/learning/kids/club/activities",
       },
       join: {
         title: "Oinsá atu Partisipa Klube",
+        subtitle: "Fasil de'it atu sai Kolega Lafaek!",
         steps: [
           "Explora ami-nia atividade no hili ida ne'ebé ita gosta.",
           "Partisipa no kompleta desafiu sira.",
@@ -113,22 +124,23 @@ export default function KidsClubPage() {
         ],
         cta: "Hahu Ita-nia Viajen Klube",
       },
+      common: {
+        backHome: "← Fila ba Uma",
+      },
     },
-  }
+  } as const
 
   const t = content[language]
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-green-50 to-yellow-50">
-      <Navigation language={language} onLanguageChange={setLanguage} />
-
       {/* Hero Section */}
       <section className="py-20 px-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-center">
         <div className="max-w-5xl mx-auto">
           <h1 className="text-4xl md:text-6xl font-bold mb-6">{t.hero.title}</h1>
           <p className="text-xl md:text-2xl opacity-90 max-w-3xl mx-auto">{t.hero.subtitle}</p>
           <p className="text-lg opacity-80 max-w-4xl mx-auto mt-4">{t.hero.description}</p>
-<div className="w-full h-4 rounded-full opacity-60 mt-8 bg-gradient-to-r from-red-400 via-yellow-400 to-green-400"></div>
+          <div className="w-full h-4 rounded-full opacity-60 mt-8 bg-gradient-to-r from-red-400 via-yellow-400 to-green-400" />
         </div>
       </section>
 
@@ -144,7 +156,7 @@ export default function KidsClubPage() {
       <section className="py-16 bg-gradient-to-r from-blue-100 to-purple-100">
         <div className="max-w-7xl mx-auto px-4 text-center mb-12">
           <h2 className="text-4xl font-bold text-blue-700 mb-4">{t.values.title}</h2>
-          <p className="text-xl text-gray-600">The principles that guide our club members</p>
+          <p className="text-xl text-gray-600">{t.values.subtitle}</p>
         </div>
         <div className="max-w-7xl mx-auto px-4 grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           {t.values.items.map((value, index) => (
@@ -185,7 +197,7 @@ export default function KidsClubPage() {
                 <p className="text-green-600 mb-4">{activity.description}</p>
                 <Link href={activity.link}>
                   <Button className="flex items-center justify-center border border-green-500 text-green-600 hover:bg-green-500 hover:text-white bg-transparent px-3 py-2 text-sm">
-                    Explore Activity
+                    {t.activities.exploreLabel}
                     <ArrowRight className="h-4 w-4 ml-2" />
                   </Button>
                 </Link>
@@ -194,7 +206,7 @@ export default function KidsClubPage() {
           ))}
         </div>
         <div className="text-center mt-8">
-          <Link href="/kids/club/activities">
+          <Link href={t.activities.viewAllHref}>
             <Button className="flex items-center justify-center bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white font-bold py-4 px-8 rounded-full text-lg shadow-lg">
               {t.activities.viewAll}
               <ArrowRight className="h-5 w-5 ml-2" />
@@ -207,7 +219,7 @@ export default function KidsClubPage() {
       <section className="py-16 bg-gradient-to-r from-yellow-100 to-orange-100">
         <div className="max-w-7xl mx-auto px-4 text-center mb-12">
           <h2 className="text-4xl font-bold text-orange-700 mb-4">{t.join.title}</h2>
-          <p className="text-xl text-gray-600">It's easy to become a Lafaek Friend!</p>
+          <p className="text-xl text-gray-600">{t.join.subtitle}</p>
         </div>
         <div className="max-w-7xl mx-auto px-4 grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           {t.join.steps.map((step, index) => (
@@ -222,7 +234,7 @@ export default function KidsClubPage() {
           ))}
         </div>
         <div className="text-center mt-8">
-          <Link href="/kids/club/activities">
+          <Link href={t.activities.viewAllHref}>
             <Button className="flex items-center justify-center bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-bold py-4 px-8 rounded-full text-lg shadow-lg">
               <Sparkles className="mr-2 h-5 w-5" />
               {t.join.cta}
@@ -236,7 +248,7 @@ export default function KidsClubPage() {
         <div className="max-w-7xl mx-auto px-4 text-center">
           <Link href="/">
             <Button className="flex items-center justify-center mb-4 border border-gray-600 text-gray-300 hover:bg-gray-700 bg-transparent">
-              ← Back to Home
+              {t.common.backHome}
             </Button>
           </Link>
           <p className="text-gray-400">&copy; 2024 Lafaek Learning Media. All rights reserved.</p>

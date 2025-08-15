@@ -4,7 +4,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { BookOpen, Menu, X, ChevronDown } from "lucide-react"
+import { Menu, X, ChevronDown } from "lucide-react"
 import { Button } from "./button"
 import { useLanguage } from "@/lib/LanguageContext" // ⬅️ global context
 
@@ -17,6 +17,7 @@ export function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [openMobileSubmenu, setOpenMobileSubmenu] = useState<string | null>(null)
 
+  // ✅ Hooks only inside the component
   const { language, setLanguage } = useLanguage()
 
   const t = {
@@ -216,7 +217,7 @@ export function Navigation() {
     { href: "/get-involved", label: t.getInvolved },
   ]
 
-   return (
+  return (
     <nav className="bg-[#219653]/90 backdrop-blur-sm border-b-2 border-[#F2C94C] sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 py-3">
         {/* TOP BAR */}
@@ -224,20 +225,19 @@ export function Navigation() {
           {/* LEFT: Logo + main menu */}
           <div className="flex items-center gap-6">
             {/* Logo (uses /public/logo/lafaek-logo.png) */}
-           <Link href="/" className="flex items-center gap-3">
-  <div className="relative h-14 w-14 md:h-16 md:w-16">
-    <Image
-      src="/logo/lafaek-logo.png"
-      alt={`${t.brand} logo`}
-      fill
-      sizes="(min-width: 768px) 64px, 56px"
-      className="object-contain"
-      priority
-    />
-  </div>
-  <span className="text-2xl md:text-3xl font-bold text-white">{t.brand}</span>
-</Link>
-
+            <Link href="/" className="flex items-center gap-3">
+              <div className="relative h-14 w-14 md:h-16 md:w-16">
+                <Image
+                  src="/logo/lafaek-logo.png"
+                  alt={`${t.brand} logo`}
+                  fill
+                  sizes="(min-width: 768px) 64px, 56px"
+                  className="object-contain"
+                  priority
+                />
+              </div>
+              <span className="text-2xl md:text-3xl font-bold text-white">{t.brand}</span>
+            </Link>
 
             {/* Desktop main nav */}
             <div className="hidden md:flex items-center gap-6">
@@ -294,7 +294,7 @@ export function Navigation() {
                 className={`px-2 py-1 text-xs font-semibold rounded-md transition ${
                   language === "en"
                     ? "bg-[#F2C94C] text-[#219653]"
-                    : "border border-white text-white hover:bg-white/20"
+                    : "border border-white text-white hover:bg:white/20 hover:bg-white/20"
                 }`}
               >
                 {t.en}
@@ -305,7 +305,7 @@ export function Navigation() {
                 className={`px-2 py-1 text-xs font-semibold rounded-md transition ${
                   language === "tet"
                     ? "bg-white text-[#219653]"
-                    : "border border-white text-white hover:bg-white/20"
+                    : "border border-white text-white hover:bg:white/20 hover:bg-white/20"
                 }`}
               >
                 {t.tet}
@@ -329,7 +329,7 @@ export function Navigation() {
 
         {/* MOBILE MENU */}
         {isMenuOpen && (
-          <div className="md:hidden mt-4 pb-4 border-top border-white/20">
+          <div className="md:hidden mt-4 pb-4">
             <div className="flex flex-col space-y-2 pt-2">
               {/* Language + auth on mobile */}
               <div className="flex items-center gap-2 px-4">

@@ -1,17 +1,21 @@
+// app/learning/kids/stories/tais-weaving-adventure/page.tsx
 "use client"
 
 import { useState } from "react"
+import Link from "next/link"
 import { Button } from "@/components/button"
 import { Card } from "@/components/Card"
 import { ChevronLeft, ChevronRight, Home, Volume2, BookOpen, Palette } from "lucide-react"
-import Link from "next/link"
+import { useLanguage } from "@/lib/LanguageContext"
 
 export default function TaisStoryPage() {
-  const [language, setLanguage] = useState<"en" | "tet">("en")
+  // ✅ use global language controlled by Navigation
+  const { language } = useLanguage()
   const [currentPage, setCurrentPage] = useState(0)
 
   const story = {
     en: {
+      kidsZone: "Kids Zone",
       title: "Tais Weaving Adventure",
       pages: [
         {
@@ -44,9 +48,16 @@ export default function TaisStoryPage() {
         previous: "Previous",
         readAgain: "Read Again",
         backToStories: "Back to Stories",
+        listen: "Listen",
+        page: "Page",
+        of: "of",
       },
+      completeTitle: "Wonderful reading!",
+      completeText: "You've learned about the beautiful art of tais weaving!",
+      ctaColor: "Color Tais Patterns",
     },
     tet: {
+      kidsZone: "Kids Zone",
       title: "Aventura Tais",
       pages: [
         {
@@ -79,70 +90,47 @@ export default function TaisStoryPage() {
         previous: "Kotuk",
         readAgain: "Lee Fali",
         backToStories: "Fila ba Istoria",
+        listen: "Rona",
+        page: "Pájina",
+        of: "husi",
       },
+      completeTitle: "Leitura di'ak tebes!",
+      completeText: "Ita aprende kona-ba arte tais ne'ebé furak!",
+      ctaColor: "Kolore Padraun Tais",
     },
-  }
+  } as const
 
   const t = story[language]
 
   const nextPage = () => {
-    if (currentPage < t.pages.length - 1) {
-      setCurrentPage(currentPage + 1)
-    }
+    if (currentPage < t.pages.length - 1) setCurrentPage((p) => p + 1)
   }
 
   const previousPage = () => {
-    if (currentPage > 0) {
-      setCurrentPage(currentPage - 1)
-    }
+    if (currentPage > 0) setCurrentPage((p) => p - 1)
   }
 
-  const resetStory = () => {
-    setCurrentPage(0)
-  }
+  const resetStory = () => setCurrentPage(0)
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-red-100 via-yellow-100 to-green-100">
-      {/* Header */}
+      {/* Local header for the story (Navigation is global in layout) */}
       <div className="bg-gradient-to-r from-red-500 to-yellow-500 text-white py-6">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <Link href="/kids">
+              <Link href="/learning/kids">
                 <Button className="flex items-center gap-2 border border-white text-white hover:bg-white hover:text-red-600 bg-transparent text-sm px-4 py-2 rounded-md">
-  <Home className="h-4 w-4" />
-  Kids Zone
-</Button>
-
+                  <Home className="h-4 w-4" />
+                  {t.kidsZone}
+                </Button>
               </Link>
               <div className="flex items-center space-x-2">
                 <Palette className="h-6 w-6" />
                 <h1 className="text-2xl font-bold">{t.title}</h1>
               </div>
             </div>
-            <div className="flex items-center gap-2">
-  <Button
-    onClick={() => setLanguage("en")}
-    className={`text-xs px-4 py-2 rounded-md ${
-      language === "en"
-        ? "bg-white text-red-600"
-        : "border border-white text-white hover:bg-white hover:text-red-600 bg-transparent"
-    }`}
-  >
-    EN
-  </Button>
-  <Button
-    onClick={() => setLanguage("tet")}
-    className={`text-xs px-4 py-2 rounded-md ${
-      language === "tet"
-        ? "bg-white text-red-600"
-        : "border border-white text-white hover:bg-white hover:text-red-600 bg-transparent"
-    }`}
-  >
-    TET
-  </Button>
-</div>
-
+            {/* ✅ No page-level language buttons — Navigation controls language globally */}
           </div>
         </div>
       </div>
@@ -156,12 +144,12 @@ export default function TaisStoryPage() {
               <div className="inline-flex items-center space-x-2 bg-red-100 rounded-full px-4 py-2">
                 <Palette className="h-4 w-4 text-red-600" />
                 <span className="text-red-700 font-medium">
-                  Page {currentPage + 1} of {t.pages.length}
+                  {t.navigation.page} {currentPage + 1} {t.navigation.of} {t.pages.length}
                 </span>
               </div>
             </div>
 
-            {/* Story Illustration */}
+            {/* Story Illustration (placeholder illustration block) */}
             <div className="mb-8">
               <div className="w-full h-80 bg-gradient-to-br from-red-200 to-yellow-200 rounded-xl flex items-center justify-center border-4 border-red-300">
                 <div className="text-center p-6">
@@ -173,7 +161,7 @@ export default function TaisStoryPage() {
               </div>
             </div>
 
-<div className="w-full h-6 rounded-full mb-6 opacity-70 bg-gradient-to-r from-red-500 via-green-500 to-blue-500"></div>
+            <div className="w-full h-6 rounded-full mb-6 opacity-70 bg-gradient-to-r from-red-500 via-green-500 to-blue-500"></div>
 
             {/* Story Text */}
             <div className="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl p-6 mb-8 border-2 border-yellow-200">
@@ -194,10 +182,10 @@ export default function TaisStoryPage() {
               </Button>
 
               <div className="flex space-x-2">
-               <Button className="flex items-center gap-2 border-2 border-green-500 text-green-600 hover:bg-green-500 hover:text-white bg-transparent px-4 py-2 rounded-md">
-  <Volume2 className="h-4 w-4" />
-  Listen
-</Button>
+                <Button className="flex items-center gap-2 border-2 border-green-500 text-green-600 hover:bg-green-500 hover:text-white bg-transparent px-4 py-2 rounded-md">
+                  <Volume2 className="h-4 w-4" />
+                  {t.navigation.listen}
+                </Button>
 
                 {currentPage === t.pages.length - 1 && (
                   <Button
@@ -226,16 +214,16 @@ export default function TaisStoryPage() {
           <div className="max-w-4xl mx-auto mt-8">
             <Card className="bg-gradient-to-r from-red-100 to-yellow-100 border-2 border-red-300">
               <div className="p-6 text-center">
-                <h3 className="text-2xl font-bold text-red-700 mb-4">Wonderful reading!</h3>
-                <p className="text-red-600 mb-6">You've learned about the beautiful art of tais weaving!</p>
+                <h3 className="text-2xl font-bold text-red-700 mb-4">{t.completeTitle}</h3>
+                <p className="text-red-600 mb-6">{t.completeText}</p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <Link href="/kids/activities/tais-pattern-coloring">
+                  <Link href="/learning/kids/activities/tais-pattern-coloring">
                     <Button className="bg-gradient-to-r from-red-500 to-yellow-500 hover:from-red-600 hover:to-yellow-600 text-white font-bold py-3 px-6 rounded-full">
                       <Palette className="h-5 w-5 mr-2" />
-                      Color Tais Patterns
+                      {t.ctaColor}
                     </Button>
                   </Link>
-                  <Link href="/kids/stories">
+                  <Link href="/learning/kids/stories">
                     <Button className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-bold py-3 px-6 rounded-full">
                       <BookOpen className="h-5 w-5 mr-2" />
                       {t.navigation.backToStories}

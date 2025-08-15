@@ -1,21 +1,22 @@
+// app/learning/kids/activities/tais-pattern-coloring/page.tsx
 "use client"
 
 import type React from "react"
-import { useState, useRef, useEffect } from "react"
+import { useRef, useEffect, useState } from "react"
 import Link from "next/link"
 import { ArrowLeft, Download, RefreshCw } from "lucide-react"
-import { Navigation } from "@/components/Navigation"
 import { Button } from "@/components/button"
 import { Card } from "@/components/Card"
+import { useLanguage } from "@/lib/LanguageContext"
 
 export default function TaisPatternColoringPage() {
-  const [language, setLanguage] = useState<"en" | "tet">("en")
+  const { language } = useLanguage()
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [selectedColor, setSelectedColor] = useState("#FF0000")
   const [isDrawing, setIsDrawing] = useState(false)
   const [patternImage, setPatternImage] = useState<HTMLImageElement | null>(null)
 
-  const activityContent = {
+  const content = {
     en: {
       title: "Tais Pattern Coloring",
       subtitle: "Bring Timorese Tais patterns to life with your colors!",
@@ -25,10 +26,8 @@ export default function TaisPatternColoringPage() {
       colorsLabel: "Choose your color:",
       resetButton: "Reset Canvas",
       downloadButton: "Download Image",
-      patterns: [
-        "/placeholder.svg?height=300&width=400", // Placeholder for Tais pattern 1
-        "/placeholder.svg?height=300&width=400", // Placeholder for Tais pattern 2
-      ],
+      backHome: "← Back to Home",
+      patterns: ["/placeholder.svg?height=300&width=400", "/placeholder.svg?height=300&width=400"],
     },
     tet: {
       title: "Tais Pattern Coloring",
@@ -39,44 +38,42 @@ export default function TaisPatternColoringPage() {
       colorsLabel: "Hili ita-nia kór:",
       resetButton: "Reset Canvas",
       downloadButton: "Download Imajén",
+      backHome: "← Fila ba Uma",
       patterns: ["/placeholder.svg?height=300&width=400", "/placeholder.svg?height=300&width=400"],
     },
-  }
+  } as const
 
-  const t = activityContent[language]
-  const colors = ["#FF0000", "#00FF00", "#0000FF", "#FFFF00", "#FFA500", "#800080", "#000000", "#FFFFFF"]
+  const t = content[language]
+  const swatchColors = ["#FF0000", "#00FF00", "#0000FF", "#FFFF00", "#FFA500", "#800080", "#000000", "#FFFFFF"]
 
+  // draw (or redraw) the base image whenever it loads
   useEffect(() => {
     const canvas = canvasRef.current
-    if (canvas) {
-      const ctx = canvas.getContext("2d")
-      if (ctx) {
-        ctx.clearRect(0, 0, canvas.width, canvas.height)
-        if (patternImage) ctx.drawImage(patternImage, 0, 0, canvas.width, canvas.height)
-      }
-    }
-  }, [language, patternImage])
+    if (!canvas) return
+    const ctx = canvas.getContext("2d")
+    if (!ctx) return
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
+    if (patternImage) ctx.drawImage(patternImage, 0, 0, canvas.width, canvas.height)
+  }, [patternImage])
 
-  const loadImage = (src: string) => {
+  // load (or reload) the pattern when language changes (safe even if same file)
+  useEffect(() => {
+    const src = t.patterns[0]
     const img = new window.Image()
     img.crossOrigin = "anonymous"
     img.src = src
     img.onload = () => {
       setPatternImage(img)
       const canvas = canvasRef.current
-      if (canvas) {
-        const ctx = canvas.getContext("2d")
-        if (ctx) {
-          canvas.width = img.width
-          canvas.height = img.height
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
-        }
-      }
+      if (!canvas) return
+      const ctx = canvas.getContext("2d")
+      if (!ctx) return
+      canvas.width = img.width
+      canvas.height = img.height
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
     }
     img.onerror = (err) => console.error("Failed to load image:", err)
-  }
-
-  useEffect(() => { loadImage(t.patterns[0]) }, [])
+  }, [language]) // re-run if language changes
 
   const startDrawing = (e: React.MouseEvent<HTMLCanvasElement>) => {
     setIsDrawing(true)
@@ -103,33 +100,30 @@ export default function TaisPatternColoringPage() {
 
   const resetCanvas = () => {
     const canvas = canvasRef.current
-    if (canvas) {
-      const ctx = canvas.getContext("2d")
-      if (ctx && patternImage) {
-        ctx.clearRect(0, 0, canvas.width, canvas.height)
-        ctx.drawImage(patternImage, 0, 0, canvas.width, canvas.height)
-      }
-    }
+    if (!canvas || !patternImage) return
+    const ctx = canvas.getContext("2d")
+    if (!ctx) return
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
+    ctx.drawImage(patternImage, 0, 0, canvas.width, canvas.height)
   }
 
   const downloadImage = () => {
     const canvas = canvasRef.current
-    if (canvas) {
-      const link = document.createElement("a")
-      link.download = "tais_coloring.png"
-      link.href = canvas.toDataURL("image/png")
-      link.click()
-    }
+    if (!canvas) return
+    const link = document.createElement("a")
+    link.download = "tais_coloring.png"
+    link.href = canvas.toDataURL("image/png")
+    link.click()
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-yellow-50 via-blue-50 to-green-50">
-      <Navigation language={language} onLanguageChange={setLanguage} />
+      {/* ✅ Navigation is rendered globally in your layout; no props here */}
 
       <section className="py-16 px-4">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-8">
-            <Link href="/kids/activities">
+            <Link href="/learning/kids/activities">
               <Button className="mb-4 flex items-center justify-center border border-blue-500 text-blue-600 hover:bg-blue-500 hover:text-white bg-transparent">
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 {t.backToActivities}
@@ -156,9 +150,9 @@ export default function TaisPatternColoringPage() {
                   />
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  {colors.map((color, index) => (
+                  {swatchColors.map((color) => (
                     <button
-                      key={index}
+                      key={color}
                       type="button"
                       className={`w-8 h-8 rounded-full border-2 ${
                         selectedColor === color ? "border-blue-500 scale-110" : "border-gray-300"
@@ -207,7 +201,7 @@ export default function TaisPatternColoringPage() {
         <div className="max-w-5xl mx-auto text-center px-4">
           <Link href="/">
             <Button className="mb-4 flex items-center justify-center border border-gray-600 text-gray-300 hover:bg-gray-700 bg-transparent">
-              ← Back to Home
+              {t.backHome}
             </Button>
           </Link>
           <p className="text-gray-400">&copy; 2024 Lafaek Learning Media. All rights reserved.</p>

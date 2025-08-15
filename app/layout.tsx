@@ -3,6 +3,7 @@ import type { Metadata } from "next"
 import "./globals.css"
 import ClientLayoutShell from "@/components/ClientLayoutShell"
 import ChatWidget from "@/components/ChatWidget"
+import { LanguageProvider } from "@/lib/LanguageContext"
 
 export const metadata: Metadata = {
   title: "Lafaek Learning Media",
@@ -14,9 +15,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body>
         <ClientLayoutShell>
-          {children}
-          {/* Site-wide floating chat widget */}
-          <ChatWidget />
+          <LanguageProvider>
+            {children}
+            {/* Site-wide floating chat widget */}
+            <ChatWidget />
+          </LanguageProvider>
         </ClientLayoutShell>
       </body>
     </html>
