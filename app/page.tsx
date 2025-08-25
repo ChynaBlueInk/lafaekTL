@@ -1,16 +1,15 @@
 // app/page.tsx
 "use client";
 
-import { Card } from "@/components/Card";
 import Carousel from "@/components/Carousel";
 import { useLanguage } from "@/lib/LanguageContext";
-import { Users, Heart, Award, Target } from "lucide-react";
-import { Footer } from "@/components/Footer"
-import Link from "next/link";
 import Image from "next/image";
+import Link from "next/link";
+import { news } from "@/data/news";
 
 export default function HomePage() {
   const { language } = useLanguage();
+  const L = language === "tet" ? "tet" : "en";  // ✅ safe language key
 
   const content = {
     en: {
@@ -20,7 +19,7 @@ export default function HomePage() {
         supportText:
           "You can support Lafaek by purchasing our magazines and products, sponsoring educational content, advertising with us, or hiring our talented team of writers, illustrators, and videographers.",
       },
-      news: { title: "Latest News", subtitle: "What's happening at Lafaek?" },
+      news: { title: "Latest News", subtitle: "What's happening at Lafaek?", viewAll: "View all news" },
       socialEnterprise: {
         title: "Lafaek Social Enterprise",
         subtitle: "From Community Initiative to Timorese-Owned Impact Organization",
@@ -58,7 +57,7 @@ export default function HomePage() {
         supportText:
           "Ita bele suporta Lafaek hodi sosa revista no produtu sira, patrosina kontentu edukativu, halo anunsiu ho ami, ka kontrata ekipa ami ne’ebé iha talentu iha área hakerek, ilustrasaun no videografia.",
       },
-      news: { title: "Notísia Foun", subtitle: "Saida mak akontese iha Lafaek?" },
+      news: { title: "Notísia Foun", subtitle: "Saida mak akontese iha Lafaek?", viewAll: "Haree hotu notísia" },
       socialEnterprise: {
         title: "Empreza Sosial Lafaek",
         subtitle: "Husi inisiativa komunidade ba organizasaun Timor-oan",
@@ -80,11 +79,7 @@ export default function HomePage() {
         ],
       },
       impact: { title: "Istória Impaktu Ami", subtitle: "Mudansa ida-ne’ebé real iha komunidade Timor-oan" },
-      kidsSection: {
-        title: "Zona Divertidu ba Labarik!",
-        subtitle: "Mai la’ós laran: jogos, istória, kanzona no buat barak tan!",
-        features: [],
-      },
+      kidsSection: { title: "Zona Divertidu ba Labarik!", subtitle: "Mai la’ós laran: jogos, istória, kanzona no buat barak tan!", features: [] },
       cta: {
         title: "Tama ba Misaun Ami",
         subtitle: "Ajuda ami kontinua hodi empodera Timor-Leste liuhosi edukasaun",
@@ -95,142 +90,161 @@ export default function HomePage() {
     },
   } as const;
 
-  const t = content[language];
+  const t = content[L]; // ✅ use the safe key
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
       <main className="flex-1">
         <Carousel />
 
-       {/* Social + CTA Block */}
-<section className="bg-gray-50 py-12 px-4">
-  <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {/* Social + CTA Block */}
+        <section className="bg-gray-50 py-12 px-4" aria-labelledby="social-and-cta">
+          <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
 
-    {/* Facebook */}
-    <div className="bg-white border border-gray-300 rounded-lg shadow overflow-hidden flex flex-col">
-      {/* Image */}
-      <div className="relative w-full h-48 bg-gray-100">
-        <Image
-          src="/HomePage/LafaekFacebook.png"  // if you renamed: "/HomePage/lafaek-facebook.jpg"
-          alt="Lafaek Facebook"
-          fill
-          sizes="(min-width:1024px) 33vw, 100vw"
-          className="object-cover"
-          priority
-        />
-      </div>
-      {/* Text + Button */}
-      <div className="p-6 flex flex-col flex-grow">
-        <h3 className="text-2xl font-bold text-blue-700 mb-2">
-          {language === "tet" ? "Segue ami iha Facebook" : "Follow us on Facebook"}
-        </h3>
-        <p className="text-gray-600 mb-4">
-          {language === "tet"
-            ? "Hahú hatene notísia foun no eventu komunitáriu sira."
-            : "Stay updated with our latest stories and community events."}
-        </p>
-        <a
-          href="https://www.facebook.com/RevistaLafaek"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="bg-blue-600 hover:bg-blue-700 text-white font-bold text-center py-3 px-6 rounded-full mt-auto"
-        >
-          {language === "tet" ? "Vizita Facebook" : "Visit Facebook"}
-        </a>
-      </div>
-    </div>
-
-    {/* YouTube */}
-    <div className="bg-white border border-gray-300 rounded-lg shadow overflow-hidden flex flex-col">
-      {/* Image */}
-      <div className="relative w-full h-48 bg-gray-100">
-        <Image
-          src="/HomePage/LafaekWebsite.png"   // if you renamed: "/HomePage/lafaek-website.jpg"
-          alt="Lafaek YouTube"
-          fill
-          sizes="(min-width:1024px) 33vw, 100vw"
-          className="object-cover"
-          priority
-        />
-      </div>
-      {/* Text + Button */}
-      <div className="p-6 flex flex-col flex-grow">
-        <h3 className="text-2xl font-bold text-red-600 mb-2">
-          {language === "tet" ? "Haree ami iha YouTube" : "Watch us on YouTube"}
-        </h3>
-        <p className="text-gray-600 mb-4">
-          {language === "tet"
-            ? "Haree konténu behind-the-scenes, istória, no vídeu sira husi terenu."
-            : "Discover our behind-the-scenes content, stories, and videos from the field."}
-        </p>
-        <a
-          href="https://www.youtube.com/@lafaek"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="bg-red-600 hover:bg-red-700 text-white font-bold text-center py-3 px-6 rounded-full mt-auto"
-        >
-          {language === "tet" ? "Vizita YouTube" : "Visit YouTube"}
-        </a>
-      </div>
-    </div>
-
-    {/* CTA */}
-    <div className="bg-gradient-to-br from-purple-500 to-blue-500 text-white rounded-lg shadow-lg flex flex-col items-center justify-center p-8">
-      <h2 className="text-3xl font-bold mb-4">{t.cta.title}</h2>
-      <p className="text-lg mb-6 text-center">{t.cta.subtitle}</p>
-      <div className="flex flex-col gap-4 w-full">
-        <Link
-          href="/get-involved#volunteer"
-          className="w-full text-center bg-white text-purple-600 font-bold py-3 px-6 rounded-full shadow hover:bg-gray-100"
-        >
-          Volunteer
-        </Link>
-        <Link
-          href="/get-involved#donate"
-          className="w-full text-center border-4 border-white text-white font-bold py-3 px-6 rounded-full shadow hover:bg-white hover:text-blue-600"
-        >
-          Support Us
-        </Link>
-        <Link
-          href="/get-involved#partner"
-          className="w-full text-center bg-yellow-400 text-purple-800 font-bold py-3 px-6 rounded-full shadow hover:bg-yellow-300"
-        >
-          Partner With Us
-        </Link>
-      </div>
-    </div>
-
-  </div>
-</section>
-
-
-        {/* News */}
-        <section className="py-20 bg-white">
-          <div className="container mx-auto px-4 text-center">
-            <h2 className="text-4xl font-bold text-blue-800 mb-4">{t.news.title}</h2>
-            <p className="text-xl text-gray-600 mb-12">{t.news.subtitle}</p>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {[1, 2, 3].map((index) => (
-                <Card key={index} className="bg-gray-50 border border-gray-200 rounded-lg p-6">
-                  <Image
-                    src={`/placeholder.svg?height=200&width=300`}
-                    alt={`News ${index}`}
-                    width={300}
-                    height={200}
-                    className="rounded mb-4"
-                  />
-                  <h3 className="text-xl font-semibold mb-2">News Title {index}</h3>
-                  <p className="text-gray-600">A short summary of this Lafaek update or announcement.</p>
-                </Card>
-              ))}
+            {/* Facebook */}
+            <div className="bg-white border border-gray-300 rounded-lg shadow overflow-hidden flex flex-col">
+              <div className="relative w-full h-48 bg-gray-100">
+                <Image
+                  src="/HomePage/LafaekFacebook.png"
+                  alt="Lafaek Facebook"
+                  fill
+                  sizes="(min-width:1024px) 33vw, 100vw"
+                  className="object-cover"
+                  priority
+                />
+              </div>
+              <div className="p-6 flex flex-col flex-grow">
+                <h3 className="text-2xl font-bold text-blue-700 mb-2">
+                  {language === "tet" ? "Segue ami iha Facebook" : "Follow us on Facebook"}
+                </h3>
+                <p className="text-gray-600 mb-4">
+                  {language === "tet"
+                    ? "Hahú hatene notísia foun no eventu komunitáriu sira."
+                    : "Stay updated with our latest stories and community events."}
+                </p>
+                <a
+                  href="https://www.facebook.com/RevistaLafaek"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-bold text-center py-3 px-6 rounded-full mt-auto"
+                  aria-label="Visit our Facebook page (opens in a new tab)"
+                >
+                  {language === "tet" ? "Vizita Facebook" : "Visit Facebook"}
+                </a>
+              </div>
             </div>
+
+            {/* YouTube */}
+            <div className="bg-white border border-gray-300 rounded-lg shadow overflow-hidden flex flex-col">
+              <div className="relative w-full h-48 bg-gray-100">
+                <Image
+                  src="/HomePage/LafaekWebsite.png"
+                  alt="Lafaek YouTube"
+                  fill
+                  sizes="(min-width:1024px) 33vw, 100vw"
+                  className="object-cover"
+                  priority
+                />
+              </div>
+              <div className="p-6 flex flex-col flex-grow">
+                <h3 className="text-2xl font-bold text-red-600 mb-2">
+                  {language === "tet" ? "Haree ami iha YouTube" : "Watch us on YouTube"}
+                </h3>
+                <p className="text-gray-600 mb-4">
+                  {language === "tet"
+                    ? "Haree konténu behind-the-scenes, istória, no vídeu sira husi terenu."
+                    : "Discover our behind-the-scenes content, stories, and videos from the field."}
+                </p>
+                <a
+                  href="https://www.youtube.com/@lafaek"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-red-600 hover:bg-red-700 text-white font-bold text-center py-3 px-6 rounded-full mt-auto"
+                  aria-label="Visit our YouTube channel (opens in a new tab)"
+                >
+                  {language === "tet" ? "Vizita YouTube" : "Visit YouTube"}
+                </a>
+              </div>
+            </div>
+
+            {/* CTA */}
+            <div className="bg-gradient-to-br from-purple-500 to-blue-500 text-white rounded-lg shadow-lg flex flex-col items-center justify-center p-8">
+              <h2 className="text-3xl font-bold mb-4">{t.cta.title}</h2>
+              <p className="text-lg mb-6 text-center">{t.cta.subtitle}</p>
+              <div className="flex flex-col gap-4 w-full">
+                <Link
+                  href="/get-involved#volunteer"
+                  className="w-full text-center bg-white text-purple-600 font-bold py-3 px-6 rounded-full shadow hover:bg-gray-100"
+                >
+                  {t.cta.volunteer}
+                </Link>
+                <Link
+                  href="/get-involved#donate"
+                  className="w-full text-center border-4 border-white text-white font-bold py-3 px-6 rounded-full shadow hover:bg-white hover:text-blue-600"
+                >
+                  {t.cta.donate}
+                </Link>
+                <Link
+                  href="/get-involved#partner"
+                  className="w-full text-center bg-yellow-400 text-purple-800 font-bold py-3 px-6 rounded-full shadow hover:bg-yellow-300"
+                >
+                  {t.cta.partner}
+                </Link>
+              </div>
+            </div>
+
           </div>
         </section>
 
+   <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+  {news.slice(0, 3).map((item) => {
+    const href = item.externalUrl || "/stories/news";
+    return (
+      <Link
+        key={item.slug}
+        href={href}
+        className="group"
+        target={item.externalUrl ? "_blank" : undefined}
+        rel={item.externalUrl ? "noopener noreferrer" : undefined}
+      >
+        <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 transition-shadow group-hover:shadow-md">
+          <Image
+            src={item.image || "/placeholder.svg?height=200&width=300"}
+            alt={item.title[L] ?? item.title.en}
+            width={300}
+            height={200}
+            className="rounded mb-4 w-full h-auto"
+          />
+          {item.category?.[L] && (
+            <div className="text-xs uppercase tracking-wide text-green-700 mb-1">
+              {item.category[L]}
+            </div>
+          )}
+          <h3 className="text-xl font-semibold mb-2 group-hover:underline">
+            {item.title[L] ?? item.title.en}
+          </h3>
+          <p className="text-gray-600">
+            {item.excerpt[L] ?? item.excerpt.en}
+          </p>
+        </div>
+      </Link>
+    );
+  })}
+</div>
+<div className="mt-10">
+  <Link
+    href="/stories/news"
+    className="inline-block bg-[#219653] text-white font-semibold px-6 py-3 rounded-full hover:bg-[#1a7b44]"
+  >
+    {t.news.viewAll}
+  </Link>
+</div>
+
+
         {/* Social Enterprise */}
-        <section className="py-20 bg-gradient-to-br from-green-50 to-blue-50 text-center">
-          <div className="container mx-auto px-4">
-            <h2 className="text-4xl font-bold text-green-800 mb-4">{t.socialEnterprise.title}</h2>
+        <section className="py-20 bg-gradient-to-br from-green-50 to-blue-50 text-center" aria-labelledby="social-enterprise">
+          <div className="max-w-7xl mx-auto px-4">
+            <h2 id="social-enterprise" className="text-4xl font-bold text-green-800 mb-4">{t.socialEnterprise.title}</h2>
             <p className="text-xl text-gray-700 mb-10">{t.socialEnterprise.subtitle}</p>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
               {t.socialEnterprise.stats.map((stat, index) => (
@@ -243,63 +257,49 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Products */}
-        <section className="py-20 bg-gradient-to-br from-yellow-50 to-orange-50">
-          <div className="container mx-auto px-4 text-center">
-            <h2 className="text-4xl font-bold text-yellow-700 mb-4">{t.products.title}</h2>
-            <p className="text-xl text-gray-600 mb-12">{t.products.subtitle}</p>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {t.products.items.map((item, index) => (
-                <Card
-                  key={index}
-                  className="bg-white border border-yellow-200 rounded-xl shadow-md p-6 hover:shadow-lg"
-                >
-                  <Image
-                    src="/placeholder.svg?height=200&width=150"
-                    alt={item.name}
-                    width={150}
-                    height={200}
-                    className="mx-auto mb-4 rounded-lg shadow-md"
-                  />
-                  <h3 className="text-xl font-bold text-yellow-700 mb-1">{item.name}</h3>
-                  <p className="text-gray-600">{item.desc}</p>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Impact */}
-        <section className="py-20 bg-white">
-          <div className="container mx-auto px-4 text-center">
-            <h2 className="text-4xl font-bold text-green-700 mb-4">{t.impact.title}</h2>
-            <p className="text-xl text-gray-600 mb-12">{t.impact.subtitle}</p>
-            <div className="flex items-center justify-center h-64 bg-gray-100 rounded-lg border-2 border-gray-200 text-gray-500 text-lg italic">
-              {language === "tet" ? "Istória transformasaun sei mai lalais!" : "Stories of transformation coming soon!"}
-            </div>
-            <div className="mt-12">
-              <Link
-                href="/impact-stories"
-                className="inline-flex items-center px-8 py-4 text-lg bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white font-bold rounded-full shadow-lg"
-              >
-                {language === "tet" ? "Haree Impaktu Ami" : "See Our Impact"}
-                <Award className="ml-2 h-5 w-5 inline-block align-middle" />
-              </Link>
+        {/* Donors & Sponsors */}
+        <section className="bg-gray-50 border-t border-gray-200 py-12" aria-labelledby="sponsors">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 id="sponsors" className="text-4xl font-bold text-[#219653] mb-8">
+              Our Donors & Sponsors
+            </h2>
+            <div className="flex flex-wrap justify-center items-center gap-10">
+              <div className="relative h-16 w-40">
+                <Image
+                  src="/sponsors/care.png"
+                  alt="Care International"
+                  fill
+                  className="object-contain"
+                />
+              </div>
+              <div className="relative h-16 w-40">
+                <Image
+                  src="/sponsors/nz-mfat.png"
+                  alt="New Zealand Ministry of Foreign Affairs & Trade"
+                  fill
+                  className="object-contain"
+                />
+              </div>
+              <div className="relative h-16 w-40">
+                <Image
+                  src="/sponsors/timor-education.png"
+                  alt="Timor-Leste Ministry of Education"
+                  fill
+                  className="object-contain"
+                />
+              </div>
             </div>
           </div>
         </section>
 
         {/* Kids */}
-        <section className="py-16 bg-gradient-to-br from-blue-50 to-green-50">
-          <div className="container mx-auto px-4 text-center">
-            <h2 className="text-3xl font-bold text-blue-700 mb-4">{t.kidsSection.title}</h2>
+        <section className="py-16 bg-gradient-to-br from-blue-50 to-green-50" aria-labelledby="kids-zone">
+          <div className="max-w-7xl mx-auto px-4 text-center">
+            <h2 id="kids-zone" className="text-3xl font-bold text-blue-700 mb-4">{t.kidsSection.title}</h2>
             <p className="text-xl text-gray-600">{t.kidsSection.subtitle}</p>
           </div>
         </section>
       </main>
-
-      
-      <Footer />
     </div>
   );
 }

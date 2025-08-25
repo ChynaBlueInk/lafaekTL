@@ -20,7 +20,6 @@ import {
   Sun,
 } from "lucide-react"
 import Link from "next/link"
-import { Footer } from "@/components/Footer"
 import { useLanguage } from "@/lib/LanguageContext"
 
 export default function KidsPage() {
@@ -493,7 +492,6 @@ export default function KidsPage() {
         </div>
       </main>
 
-      <Footer />
     </div>
   )
 }

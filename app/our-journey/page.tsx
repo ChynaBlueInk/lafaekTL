@@ -1,8 +1,7 @@
 // app/our-journey/page.tsx
 "use client";
 
-import { Navigation } from "@/components/Navigation";
-import { Footer } from "@/components/Footer";
+
 import { useLanguage } from "@/lib/LanguageContext";
 import Link from "next/link";
 
@@ -152,8 +151,7 @@ export default function OurJourneyPage() {
         </section>
       </main>
 
-      {/* Footer */}
-      <Footer />
+
     </div>
   );
 }

@@ -1,8 +1,7 @@
 // app/junior-journalist/page.tsx
 "use client";
 
-import { Navigation } from "@/components/Navigation";
-import { Footer } from "@/components/Footer";
+
 import { useLanguage } from "@/lib/LanguageContext";
 
 export default function JuniorJournalistPage() {
@@ -52,8 +51,6 @@ export default function JuniorJournalistPage() {
         </div>
       </main>
 
-      {/* Footer */}
-      <Footer />
     </div>
   );
 }

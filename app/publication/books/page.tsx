@@ -1,7 +1,6 @@
 "use client";
 
-import { Navigation } from "@/components/Navigation";
-import { Footer } from "@/components/Footer";
+
 import { useLanguage } from "@/lib/LanguageContext";
 
 export default function BooksPage() {
@@ -40,8 +39,7 @@ export default function BooksPage() {
         </div>
       </main>
 
-      {/* Footer */}
-      <Footer />
+
     </div>
   );
 }

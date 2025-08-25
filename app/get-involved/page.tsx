@@ -3,13 +3,11 @@
 import type React from "react"
 import { useState } from "react"
 import Image from "next/image"
-import { Navigation } from "@/components/Navigation"
 import { Button } from "@/components/button"
 import { Card } from "@/components/Card"
 import { Input } from "@/components/input"
 import { Textarea } from "@/components/textarea"
 import { Handshake, Users, Heart, Target, ArrowRight } from "lucide-react"
-import { Footer } from "../../components/Footer"
 import { useLanguage } from "@/lib/LanguageContext"
 
 
@@ -419,7 +417,6 @@ const { language } = useLanguage()
         ))}
       </main>
 
-    <Footer />
 
     </div>
   )

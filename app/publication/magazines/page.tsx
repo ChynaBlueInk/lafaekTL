@@ -3,8 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { useLanguage } from "@/lib/LanguageContext";
-import { Navigation } from "@/components/Navigation";
-import { Footer } from "@/components/Footer";
+
 
 type Lang = "en" | "tet";
 
@@ -151,8 +150,7 @@ export default function MagazinesPage() {
         </div>
       </main>
 
-      {/* Footer */}
-      <Footer />
+
     </div>
   );
 }

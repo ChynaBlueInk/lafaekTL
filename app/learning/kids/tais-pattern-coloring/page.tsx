@@ -197,16 +197,7 @@ export default function TaisPatternColoringPage() {
         </div>
       </section>
 
-      <footer className="bg-gray-800 text-white py-8">
-        <div className="max-w-5xl mx-auto text-center px-4">
-          <Link href="/">
-            <Button className="mb-4 flex items-center justify-center border border-gray-600 text-gray-300 hover:bg-gray-700 bg-transparent">
-              {t.backHome}
-            </Button>
-          </Link>
-          <p className="text-gray-400">&copy; 2024 Lafaek Learning Media. All rights reserved.</p>
-        </div>
-      </footer>
+
     </div>
   )
 }

@@ -4,7 +4,6 @@
 import { useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Footer } from "@/components/Footer";
 import { useLanguage } from "@/lib/LanguageContext";
 import {
   Briefcase,
@@ -599,7 +598,6 @@ export default function JobsPage() {
       )}
 
       {/* Optional shared Footer */}
-      {/* <Footer /> */}
     </div>
   );
 }

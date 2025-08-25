@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import Link from "next/link"
+import Link from "next/link";
 
 export function Footer() {
   return (
@@ -17,17 +17,22 @@ export function Footer() {
           <h4 className="font-semibold mb-4">Quick Links</h4>
           <ul className="space-y-2 text-sm text-gray-300">
             <li><Link href="/">Home</Link></li>
-            <li><Link href="/magazines">Our Products</Link></li>
-            <li><Link href="/kids">For Kids</Link></li>
-            <li><Link href="/library/books">Library</Link></li>
+            {/* FIX: Our Products -> /products */}
+            <li><Link href="/products">Our Products</Link></li>
+            {/* FIX: For Kids -> /learning/kids */}
+            <li><Link href="/learning/kids">For Kids</Link></li>
+            {/* FIX: Library -> /publication (points to archive for MVP) */}
+            <li><Link href="/publication">Library</Link></li>
           </ul>
         </div>
 
         <div>
           <h4 className="font-semibold mb-4">More Info</h4>
           <ul className="space-y-2 text-sm text-gray-300">
-            <li><Link href="/news">News</Link></li>
-            <li><Link href="/impact-stories">Impact Stories</Link></li>
+            {/* FIX: News -> /stories/news */}
+            <li><Link href="/stories/news">News</Link></li>
+            {/* FIX: Impact Stories -> /stories/community */}
+            <li><Link href="/stories/community">Impact Stories</Link></li>
             <li><Link href="/about">About Us</Link></li>
             <li><Link href="/contact">Contact</Link></li>
           </ul>
@@ -48,5 +53,5 @@ export function Footer() {
         © {new Date().getFullYear()} Lafaek TL. All rights reserved.
       </div>
     </footer>
-  )
+  );
 }

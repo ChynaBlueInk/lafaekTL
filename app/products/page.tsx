@@ -1,8 +1,7 @@
 // app/products/page.tsx
 "use client";
 
-import { Navigation } from "@/components/Navigation";
-import { Footer } from "@/components/Footer";
+
 import { useLanguage } from "@/lib/LanguageContext";
 
 export default function ProductsPage() {
@@ -44,8 +43,6 @@ export default function ProductsPage() {
         </div>
       </main>
 
-      {/* Footer */}
-      <Footer />
     </div>
   );
 }

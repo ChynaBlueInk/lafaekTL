@@ -6,7 +6,6 @@ import Image from "next/image"
 import { Button } from "@/components/button"
 import { Card } from "@/components/Card"
 import { Users, Lightbulb, Globe, Handshake, BookOpen } from "lucide-react"
-import { Footer } from "@/components/Footer"
 import { useLanguage } from "@/lib/LanguageContext"
 
 export default function AboutPage() {
@@ -213,7 +212,6 @@ export default function AboutPage() {
         </section>
       </main>
 
-      <Footer />
     </div>
   )
 }

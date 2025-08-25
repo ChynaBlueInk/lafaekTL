@@ -18,7 +18,6 @@ import { Button } from "@/components/button"
 import { Card } from "@/components/Card"
 import { Badge } from "@/components/badge"
 import { useLanguage } from "@/lib/LanguageContext"
-import { Footer } from "@/components/Footer"
 import { useState } from "react"
 
 type Lang = "en" | "tet"
@@ -567,7 +566,6 @@ const [completed, setCompleted] = useState(false)
         </div>
       </section>
 
-      <Footer />
     </div>
   )
 }

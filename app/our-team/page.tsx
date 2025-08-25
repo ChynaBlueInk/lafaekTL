@@ -1,10 +1,8 @@
 // app/our-team/page.tsx
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import Image from "next/image";
-import { Navigation } from "@/components/Navigation";
-import { Footer } from "@/components/Footer";
 import { useLanguage } from "@/lib/LanguageContext";
 import { X } from "lucide-react";
 
@@ -14,10 +12,12 @@ type Member = {
   id: string;
   name: string;
   role: string;
-  started?: string; // e.g., "2021"
+  roleTet?: string;   // Optional Tetun role
+  started?: string;   // e.g., "2024"
   bio: string;
-  photo: string;     // nice portrait
-  sketch: string;    // caricature shown on hover
+  bioTet?: string;    // Optional Tetun bio
+  photo: string;      // nice portrait
+  sketch: string;     // caricature shown on hover
 };
 
 export default function OurTeamPage() {
@@ -26,56 +26,65 @@ export default function OurTeamPage() {
     setLanguage: (l: Lang) => void;
   };
 
-  const t = {
-    en: {
-      title: "Our Team",
-      subtitle:
-        "Meet the people behind Lafaek — designers, educators, coordinators, and field teams working across Timor‑Leste.",
-      labels: { role: "Role", started: "Started", about: "About" },
-      close: "Close",
-    },
-    tet: {
-      title: "Ami‑nia Ekipá",
-      subtitle:
-        "Hasoru ema sira ne’ebé hala’o Lafaek — dezenhador, edukadór, koordinadór, no ekipa terenu sira iha Timor‑Leste tomak.",
-      labels: { role: "Kargu", started: "Hahu servisu", about: "Kona‑ba" },
-      close: "Taka",
-    },
-  }[language];
+  const copy = useMemo(
+    () =>
+      ({
+        en: {
+          title: "Our Team",
+          subtitle:
+            "Meet the people behind Lafaek — designers, educators, coordinators, and field teams working across Timor‑Leste.",
+          labels: { role: "Role", started: "Started", about: "About" },
+          close: "Close",
+          langToggle: { en: "English", tet: "Tetun", label: "Language" },
+        },
+        tet: {
+          title: "Ami‑nia Ekipá",
+          subtitle:
+            "Hasoru ema sira ne’ebé hala’o Lafaek — dezenhador, edukadór, koordinadór, no ekipa terenu sira iha Timor‑Leste tomak.",
+          labels: { role: "Kargu", started: "Hahu servisu", about: "Kona‑ba" },
+          close: "Taka",
+          langToggle: { en: "Inglés", tet: "Tetun", label: "Liafuan" },
+        },
+      } as const)[language],
+    [language]
+  );
 
-  // NOTE: Keep placeholder images; replace with your real files later:
-  // Put your real images in /public/team/<slug>-photo.jpg and /public/team/<slug>-sketch.jpg
-  // then update "photo" and "sketch" below to "/team/filename.jpg"
+  // Placeholder helper (replace with real images under /public/team)
   const P = (w = 640, h = 720) => `/placeholder.svg?width=${w}&height=${h}`;
 
   const team: Member[] = [
- {
-  id: "test-person",
-  name: "Test Person",
-  role: "Lafaek Test Role",
-  started: "2024",
-  bio: "This is a test role so we can see what will happen.",
-  photo: "/team/test-photo.png", // realistic photo
-  sketch: "/team/test-sketch.png", // caricature sketch
-},
+    {
+      id: "test-person",
+      name: "Test Person",
+      role: "Lafaek Test Role",
+      roleTet: "Kargu Teste Lafaek",
+      started: "2024",
+      bio: "This is a test role so we can see what will happen.",
+      bioTet: "Ita ne’e kargu teste de’it atu haree saida mak sei akontese.",
+      photo: "/team/test-photo.png",
+      sketch: "/team/test-sketch.png",
+    },
     {
       id: "marcelino-pm",
       name: "Marcelino Martins",
       role: "Lafaek Social Enterprise Director",
+      roleTet: "Diretór Empreza Sosial Lafaek",
       started: "2022",
-      bio:
-        "Manages project delivery, timelines, and coordination with field teams and content production.",
+      bio: "Manages project delivery, timelines, and coordination with field teams and content production.",
+      bioTet:
+        "Jere entrega projetu, planu tempu no koordinasaun ho ekipa terenu no produsaun konténudu.",
       photo: P(),
       sketch: P(),
     },
-  
     {
       id: "filomeno",
       name: "Filomeno Maia",
       role: "Senior Graphic Designer Officer",
+      roleTet: "Ofisiál Senior Dezénhu Gráfiku",
       started: "2019",
-      bio:
-        "Leads print and digital design standards across magazines, posters, and children’s books.",
+      bio: "Leads print and digital design standards across magazines, posters, and children’s books.",
+      bioTet:
+        "Lidera padraun dezenhu ba impresu no digital iha revista, poster no livru labarik sira.",
       photo: P(),
       sketch: P(),
     },
@@ -83,9 +92,11 @@ export default function OurTeamPage() {
       id: "joaquim",
       name: "Joaquim Pires",
       role: "Senior Communication Officer",
+      roleTet: "Ofisiál Senior Komunikasaun",
       started: "2020",
-      bio:
-        "Produces multimedia content and coordinates interviews and community stories.",
+      bio: "Produces multimedia content and coordinates interviews and community stories.",
+      bioTet:
+        "Halo konténudu multimedia no koordinadu entrevista no istória komunidade sira.",
       photo: P(),
       sketch: P(),
     },
@@ -93,9 +104,11 @@ export default function OurTeamPage() {
       id: "adelino",
       name: "Adelino Guterres",
       role: "Field Implementation Manager",
+      roleTet: "Jere Implementasaun Terenu",
       started: "2017",
-      bio:
-        "Leads field teams, logistics, and school delivery for magazines and activities.",
+      bio: "Leads field teams, logistics, and school delivery for magazines and activities.",
+      bioTet:
+        "Lidera ekipa terenu, lojístika no distribui revista ho atividade sira ba eskola.",
       photo: P(),
       sketch: P(),
     },
@@ -103,9 +116,11 @@ export default function OurTeamPage() {
       id: "celestina",
       name: "Celestina Pereira",
       role: "Senior Gender & Advocacy Officer",
+      roleTet: "Ofisiál Senior Jéneru no Advokasia",
       started: "2016",
-      bio:
-        "Ensures gender‑responsive content and leads advocacy with partners and schools.",
+      bio: "Ensures gender-responsive content and leads advocacy with partners and schools.",
+      bioTet:
+        "Assegura konténudu sensível ba jéneru no lidera advokasia ho parceiru no eskola sira.",
       photo: P(),
       sketch: P(),
     },
@@ -114,8 +129,7 @@ export default function OurTeamPage() {
       name: "Anito Ximenes",
       role: "Deputy Project Manager, Monitoring & Evaluation",
       started: "2021",
-      bio:
-        "Coordinates M&E design and learning loops across provinces.",
+      bio: "Coordinates M&E design and learning loops across provinces.",
       photo: P(),
       sketch: P(),
     },
@@ -124,8 +138,7 @@ export default function OurTeamPage() {
       name: "Joana dos Santos",
       role: "Senior Project Officer",
       started: "2020",
-      bio:
-        "Supports planning, finance tracking, and partner communications.",
+      bio: "Supports planning, finance tracking, and partner communications.",
       photo: P(),
       sketch: P(),
     },
@@ -134,8 +147,7 @@ export default function OurTeamPage() {
       name: "Elisa Verdial",
       role: "Content Development Officer",
       started: "2022",
-      bio:
-        "Writes and edits children’s stories and teacher resources in Tetun and Portuguese.",
+      bio: "Writes and edits children’s stories and teacher resources in Tetun and Portuguese.",
       photo: P(),
       sketch: P(),
     },
@@ -144,8 +156,7 @@ export default function OurTeamPage() {
       name: "Rubencia Borges",
       role: "Monitoring, Evaluation & Learning Officer – Liquiçá",
       started: "2023",
-      bio:
-        "Leads local data collection and school feedback cycles in Liquiçá.",
+      bio: "Leads local data collection and school feedback cycles in Liquiçá.",
       photo: P(),
       sketch: P(),
     },
@@ -154,8 +165,7 @@ export default function OurTeamPage() {
       name: "Ondina Babo de Jesus",
       role: "Finance and Operation Manager",
       started: "2015",
-      bio:
-        "Oversees finance systems, procurement, and operational policies.",
+      bio: "Oversees finance systems, procurement, and operational policies.",
       photo: P(),
       sketch: P(),
     },
@@ -164,8 +174,7 @@ export default function OurTeamPage() {
       name: "Domingas Bere",
       role: "Project Officer – Aileu",
       started: "2022",
-      bio:
-        "Coordinates distribution and community events in Aileu.",
+      bio: "Coordinates distribution and community events in Aileu.",
       photo: P(),
       sketch: P(),
     },
@@ -174,8 +183,7 @@ export default function OurTeamPage() {
       name: "Lucio Alves",
       role: "Monitoring, Evaluation & Learning Officer – Viqueque",
       started: "2023",
-      bio:
-        "Leads MEL activities and partner engagement in Viqueque municipality.",
+      bio: "Leads MEL activities and partner engagement in Viqueque municipality.",
       photo: P(),
       sketch: P(),
     },
@@ -184,8 +192,7 @@ export default function OurTeamPage() {
       name: "Delfrida Gomes",
       role: "Finance Officer",
       started: "2021",
-      bio:
-        "Handles accounts payable/receivable and financial reporting support.",
+      bio: "Handles accounts payable/receivable and financial reporting support.",
       photo: P(),
       sketch: P(),
     },
@@ -194,8 +201,7 @@ export default function OurTeamPage() {
       name: "Octavio Andrade",
       role: "Production & Publication Manager",
       started: "2018",
-      bio:
-        "Manages print production schedules and quality control for magazines and books.",
+      bio: "Manages print production schedules and quality control for magazines and books.",
       photo: P(),
       sketch: P(),
     },
@@ -204,8 +210,7 @@ export default function OurTeamPage() {
       name: "Jony dos Santos",
       role: "Project Officer – Ermera",
       started: "2022",
-      bio:
-        "Oversees school engagement and delivery in Ermera.",
+      bio: "Oversees school engagement and delivery in Ermera.",
       photo: P(),
       sketch: P(),
     },
@@ -214,8 +219,7 @@ export default function OurTeamPage() {
       name: "Abelito Viegas",
       role: "Monitoring, Evaluation & Learning Officer – Bobonaro",
       started: "2023",
-      bio:
-        "Supports MEL cycles and learning workshops in Bobonaro.",
+      bio: "Supports MEL cycles and learning workshops in Bobonaro.",
       photo: P(),
       sketch: P(),
     },
@@ -224,8 +228,7 @@ export default function OurTeamPage() {
       name: "Ideltina Martins",
       role: "Administration & Logistic Officer",
       started: "2019",
-      bio:
-        "Coordinates logistics, fleet, and office administration.",
+      bio: "Coordinates logistics, fleet, and office administration.",
       photo: P(),
       sketch: P(),
     },
@@ -234,8 +237,7 @@ export default function OurTeamPage() {
       name: "Alianca Do Rego",
       role: "Content Development Team Leader",
       started: "2017",
-      bio:
-        "Leads the content team across languages and formats with a quality focus.",
+      bio: "Leads the content team across languages and formats with a quality focus.",
       photo: P(),
       sketch: P(),
     },
@@ -244,8 +246,7 @@ export default function OurTeamPage() {
       name: "Joanita de Fatima",
       role: "Monitoring, Evaluation & Learning Officer – Cova‑Lima",
       started: "2023",
-      bio:
-        "Coordinates MEL and feedback loops in Cova‑Lima.",
+      bio: "Coordinates MEL and feedback loops in Cova‑Lima.",
       photo: P(),
       sketch: P(),
     },
@@ -253,14 +254,22 @@ export default function OurTeamPage() {
 
   const [active, setActive] = useState<Member | null>(null);
 
+  // Helpers to render translated fields with fallback
+  const roleLabel = (lang: Lang) => (lang === "tet" ? "Kargu" : "Role");
+  const startedLabel = (lang: Lang) => (lang === "tet" ? "Hahu servisu" : "Started");
+  const aboutLabel = (lang: Lang) => (lang === "tet" ? "Kona‑ba" : "About");
+  const closeLabel = (lang: Lang) => (lang === "tet" ? "Taka" : "Close");
+
+  const getRole = (m: Member, lang: Lang) => (lang === "tet" ? m.roleTet || m.role : m.role);
+  const getBio = (m: Member, lang: Lang) => (lang === "tet" ? m.bioTet || m.bio : m.bio);
+
   return (
     <div className="flex flex-col min-h-screen bg-stone-100">
-
       <main className="flex-grow py-12 px-4">
         <div className="max-w-7xl mx-auto">
           <header className="mb-10 text-center">
-            <h1 className="text-4xl font-bold text-green-700">{t.title}</h1>
-            <p className="text-lg text-gray-700 mt-3">{t.subtitle}</p>
+            <h1 className="text-4xl font-bold text-[#219653]">{copy.title}</h1>
+            <p className="text-lg text-[#4F4F4F] mt-3">{copy.subtitle}</p>
           </header>
 
           {/* Grid */}
@@ -270,7 +279,7 @@ export default function OurTeamPage() {
                 {/* Image area with hover swap */}
                 <button
                   onClick={() => setActive(m)}
-                  className="relative block w-full aspect-[4/3] rounded-lg overflow-hidden shadow focus:outline-none focus:ring-4 focus:ring-blue-300"
+                  className="relative block w-full aspect-[4/3] rounded-lg overflow-hidden shadow focus:outline-none focus:ring-4 focus:ring-[#2F80ED]/40"
                   aria-label={`Open details for ${m.name}`}
                 >
                   {/* base photo */}
@@ -295,7 +304,7 @@ export default function OurTeamPage() {
                 <div className="pt-4">
                   <h3 className="text-lg font-semibold text-[#333333]">{m.name}</h3>
                   <p className="text-sm text-[#4F4F4F]">
-                    {language === "tet" ? "Kargu" : "Role"}: {m.role}
+                    {language === "tet" ? "Kargu" : "Role"}: {getRole(m, language)}
                   </p>
                 </div>
               </article>
@@ -317,10 +326,40 @@ export default function OurTeamPage() {
             <button
               onClick={() => setActive(null)}
               className="absolute right-3 top-3 rounded-full bg-white/90 hover:bg-white p-2 shadow"
-              aria-label={t.close}
+              aria-label={closeLabel(language)}
             >
               <X className="h-5 w-5 text-[#4F4F4F]" />
             </button>
+
+            {/* Modal language toggle — updates global site language */}
+            <div className="absolute left-3 top-3">
+              <div className="inline-flex rounded-xl border border-[#BDBDBD] overflow-hidden bg-white shadow-sm">
+                <button
+                  type="button"
+                  onClick={() => setLanguage("en")}
+                  className={`px-3 py-1.5 text-sm font-medium transition ${
+                    language === "en"
+                      ? "bg-[#219653] text-white"
+                      : "text-[#4F4F4F] hover:bg-[#F5F5F5]"
+                  }`}
+                  aria-pressed={language === "en"}
+                >
+                  EN
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setLanguage("tet")}
+                  className={`px-3 py-1.5 text-sm font-medium transition border-l border-[#BDBDBD] ${
+                    language === "tet"
+                      ? "bg-[#219653] text-white"
+                      : "text-[#4F4F4F] hover:bg-[#F5F5F5]"
+                  }`}
+                  aria-pressed={language === "tet"}
+                >
+                  TET
+                </button>
+              </div>
+            </div>
 
             <div className="grid md:grid-cols-2">
               {/* Left: image */}
@@ -336,29 +375,33 @@ export default function OurTeamPage() {
 
               {/* Right: details */}
               <div className="p-6 md:p-8">
-                <h2 id="member-title" className="text-2xl font-bold text-green-700">
+                <h2 id="member-title" className="text-2xl font-bold text-[#219653]">
                   {active.name}
                 </h2>
-                <p className="mt-1 text-sm text-gray-600">
-                  <span className="font-semibold">{t.labels.role}:</span> {active.role}
+                <p className="mt-1 text-sm text-[#4F4F4F]">
+                  <span className="font-semibold">{roleLabel(language)}:</span>{" "}
+                  {getRole(active, language)}
                 </p>
                 {active.started && (
-                  <p className="text-sm text-gray-600">
-                    <span className="font-semibold">{t.labels.started}:</span> {active.started}
+                  <p className="text-sm text-[#4F4F4F]">
+                    <span className="font-semibold">{startedLabel(language)}:</span>{" "}
+                    {active.started}
                   </p>
                 )}
-                <h3 className="mt-4 text-lg font-semibold text-blue-700">
-                  {t.labels.about}
+
+                <h3 className="mt-4 text-lg font-semibold text-[#2F80ED]">
+                  {aboutLabel(language)}
                 </h3>
-                <p className="text-gray-700 mt-1 leading-relaxed">{active.bio}</p>
+                <p className="text-[#4F4F4F] mt-1 leading-relaxed">
+                  {getBio(active, language)}
+                </p>
               </div>
             </div>
           </div>
         </div>
       )}
 
-      {/* Footer */}
-      <Footer />
+
     </div>
   );
 }

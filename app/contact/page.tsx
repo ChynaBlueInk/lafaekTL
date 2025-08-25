@@ -5,12 +5,10 @@ import Image from "next/image"
 import { useState } from "react"
 import { Mail, Phone, MapPin, Send } from "lucide-react"
 
-import { Navigation } from "@/components/Navigation"
 import { Button } from "@/components/button"
 import { Card } from "@/components/Card"
 import { Input } from "@/components/input"
 import { Textarea } from "@/components/textarea"
-import { Footer } from "../../components/Footer" // ✅ Shared footer
 import { useLanguage } from "@/lib/LanguageContext"
 
 
@@ -192,7 +190,6 @@ export default function ContactPage() {
         </section>
       </main>
 
-      <Footer /> {/* ✅ Unified footer across all pages */}
     </div>
   )
 }

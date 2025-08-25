@@ -1,8 +1,7 @@
 // app/about-lafaek/page.tsx
 "use client";
 
-import { Navigation } from "@/components/Navigation";
-import { Footer } from "@/components/Footer";
+
 import { useLanguage } from "@/lib/LanguageContext";
 
 export default function AboutLafaekPage() {
@@ -95,8 +94,7 @@ export default function AboutLafaekPage() {
         </div>
       </main>
 
-      {/* Footer */}
-      <Footer />
+
     </div>
   );
 }

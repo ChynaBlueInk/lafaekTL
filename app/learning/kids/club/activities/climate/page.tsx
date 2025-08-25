@@ -16,7 +16,6 @@ import {
   Sun,
   Award,
 } from "lucide-react"
-import { Footer } from "@/components/Footer"
 import { Button } from "@/components/button"
 import { Card } from "@/components/Card"
 import { Badge } from "@/components/badge"
@@ -567,8 +566,6 @@ export default function ClimateActionCombinedPage() {
         </div>
       </section>
 
-      {/* Global Footer */}
-      <Footer />
     </div>
   )
 }

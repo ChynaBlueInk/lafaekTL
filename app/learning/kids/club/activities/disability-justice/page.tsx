@@ -15,8 +15,6 @@ import {
   Users,
   Lightbulb,
 } from "lucide-react"
-import { Navigation } from "@/components/Navigation"
-import { Footer } from "@/components/Footer"
 import { Button } from "@/components/button"
 import { Card } from "@/components/Card"
 import { Badge } from "@/components/badge"
@@ -577,8 +575,7 @@ type StepType = "introduction" | "learning" | "actions" | "pledge"
         </div>
       </section>
 
-      {/* Global Footer */}
-      <Footer />
+ 
     </div>
   )
 }

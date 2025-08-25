@@ -1,14 +1,9 @@
-"use client"
+"use client";
 
-import { ReactNode } from "react"
-import { Navigation } from "@/components/Navigation"
-import { LanguageProvider } from "@/lib/LanguageContext"  // ← single import
+import { ReactNode } from "react";
 
 export default function ClientLayoutShell({ children }: { children: ReactNode }) {
-  return (
-    <LanguageProvider>
-      <Navigation />
-      {children}
-    </LanguageProvider>
-  )
+  // No Navigation, no LanguageProvider here.
+  // This shell can remain for any future client-only wrappers if needed.
+  return <>{children}</>;
 }
