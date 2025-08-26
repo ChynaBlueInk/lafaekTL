@@ -112,16 +112,17 @@ export default function KidsPage() {
             },
           ],
         },
-        characters: {
-          title: "Meet Our Friends",
-          subtitle: "Your favorite Lafaek characters",
-          items: [
-            { name: "Lafaek Kiik", personality: "Curious & Playful", story: "Loves to learn" },
-            { name: "Lafaek Nina", personality: "Kind & Helpful", story: "Helps everyone" },
-            { name: "Manu", personality: "Brave & Adventurous", story: "Explores everywhere" },
-          ],
-          comingSoon: "Characters coming soon",
-        },
+characters: {
+  title: "Meet Our Friends",
+  subtitle: "Your favorite Lafaek characters",
+  preview: [
+    { name: "Lafaek Kiik", personality: "Curious & Playful", story: "Loves to learn" },
+    { name: "Lafaek Nina", personality: "Kind & Helpful", story: "Helps everyone" },
+    { name: "Manu", personality: "Brave & Adventurous", story: "Explores everywhere" },
+  ],
+  viewAll: "See all characters",
+  viewAllHref: "/learning/kids/characters",
+},
       },
       cta: {
         readStory: "Read Story",
@@ -223,16 +224,18 @@ export default function KidsPage() {
             },
           ],
         },
-        characters: {
-          title: "Hasoru Ami-nia Kolega",
-          subtitle: "Karakter Lafaek favoritu",
-          items: [
-            { name: "Lafaek Kiik", personality: "Kuriozu & Halimar", story: "Gosta aprende" },
-            { name: "Lafaek Nina", personality: "Di’ak & Ajuda", story: "Ajuda ema hotu" },
-            { name: "Manu", personality: "Korajoza & Aventura", story: "Esplora fatin hotu" },
-          ],
-          comingSoon: "Karakter tuir mai",
-        },
+       characters: {
+  title: "Hasoru Ami-nia Kolega",
+  subtitle: "Karakter Lafaek favoritu",
+  preview: [
+    { name: "Lafaek Kiik", personality: "Kuriozu & Halimar", story: "Gosta aprende" },
+    { name: "Lafaek Nina", personality: "Di’ak & Ajuda", story: "Ajuda ema hotu" },
+    { name: "Manu", personality: "Korajoza & Aventura", story: "Esplora fatin hotu" },
+  ],
+  viewAll: "Haree karakter hotu",
+  viewAllHref: "/learning/kids/characters",
+},
+
       },
       cta: {
         readStory: "Lee Istória",
@@ -446,40 +449,32 @@ export default function KidsPage() {
           </div>
         </section>
 
-        {/* Characters (coming soon) */}
-        <section className="py-16 bg-gradient-to-r from-purple-100 to-indigo-100">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-12">
-              <h2 className="text-4xl font-bold text-purple-700 mb-4 flex items-center justify-center">
-                <Smile className="mr-4 h-10 w-10" />
-                {c.characters.title}
-              </h2>
-              <p className="text-xl text-purple-600">{c.characters.subtitle}</p>
-              <p className="mt-2 text-purple-500">{c.characters.comingSoon}</p>
-            </div>
+{/* Characters – single banner + link */}
+<section className="py-16 bg-gradient-to-r from-purple-100 to-indigo-100">
+  <div className="container mx-auto px-4 text-center">
+    <h2 className="text-4xl font-bold text-purple-700 mb-4 flex items-center justify-center">
+      <Smile className="mr-4 h-10 w-10" />
+      {c.characters.title}
+    </h2>
+    <p className="text-xl text-purple-600 mb-8">{c.characters.subtitle}</p>
 
-            <div className="grid md:grid-cols-3 gap-6">
-              {c.characters.items.map((ch, index) => (
-                <Card
-                  key={index}
-                  className="bg-white/90 backdrop-blur-sm border-4 border-purple-200 hover:border-purple-400 transition-all"
-                >
-                  <div className="p-6 text-center">
-                    <div className="w-32 h-32 bg-gradient-to-br from-purple-300 to-indigo-400 rounded-full mx-auto mb-4 flex items-center justify-center">
-                      <Smile className="h-16 w-16 text-white" />
-                    </div>
-                    <h3 className="text-2xl font-bold text-purple-700 mb-2">{ch.name}</h3>
-                    <Badge className="bg-yellow-500 text-white mb-3">{ch.personality}</Badge>
-                    <p className="text-purple-600 mb-4">{ch.story}</p>
-                    <Button disabled aria-disabled className="bg-purple-400 text-white font-bold rounded-full opacity-60 cursor-not-allowed">
-                      {t[language].cta.meet} {ch.name.split(" ")[0]}
-                    </Button>
-                  </div>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </section>
+    {/* Friends group image */}
+    <div className="max-w-3xl mx-auto mb-8">
+      <img
+        src="/characters/0-lafaek-friends.png"
+        alt={c.characters.title}
+        className="rounded-2xl shadow-lg mx-auto"
+      />
+    </div>
+
+    {/* View All button */}
+    <Link href={c.characters.viewAllHref}>
+      <Button className="bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white font-bold py-3 px-6 rounded-full">
+        {c.characters.viewAll}
+      </Button>
+    </Link>
+  </div>
+</section>
 
         {/* Fun Navigation */}
         <section className="py-12 bg-gradient-to-r from-yellow-200 to-orange-200">
