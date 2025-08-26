@@ -54,6 +54,13 @@ export default function KidsPage() {
           subtitle: "Learn while you play!",
           items: [
             {
+              title: "Measure & Weight (Maths)",
+              href: "/learning/kids/games/measure",
+              subject: "Math",
+              difficulty: "Easy",
+              approval: "From Lafaek magazine – approved by the Ministry of Education",
+            },
+            {
               title: "Count the Coconuts",
               href: "/learning/kids/games/count-the-coconuts",
               subject: "Math",
@@ -71,7 +78,7 @@ export default function KidsPage() {
           title: "Club Activities",
           subtitle: "Learn, act, and make a difference",
           items: [
-                        {
+            {
               title: "Gender Equality Challenge",
               href: "/learning/kids/club/activities/gender-equality",
               icon: Scale,
@@ -158,6 +165,13 @@ export default function KidsPage() {
           subtitle: "Aprende bainhira halimar!",
           items: [
             {
+              title: "Medida no Todan (Matemátika)",
+              href: "/learning/kids/games/measure",
+              subject: "Matematika",
+              difficulty: "Fasil",
+              approval: "Husi Revista Lafaek – aprova hosi Ministériu Edukasaun",
+            },
+            {
               title: "Konta Nu Kokonat",
               href: "/learning/kids/games/count-the-coconuts",
               subject: "Matematika",
@@ -175,7 +189,6 @@ export default function KidsPage() {
           title: "Atividade Klube",
           subtitle: "Aprende, halo asaun, no halo diferensa",
           items: [
-            
             {
               title: "Desafiu Igualdade Jéneru",
               href: "/learning/kids/club/activities/gender-equality",
@@ -297,83 +310,102 @@ export default function KidsPage() {
           </div>
         </section>
 
-        {/* Games */}
-        <section className="py-16 bg-gradient-to-r from-green-100 to-yellow-100">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-12">
-              <h2 className="text-4xl font-bold text-green-700 mb-4 flex items-center justify-center">
-                <Gamepad2 className="mr-4 h-10 w-10" />
-                {c.games.title}
-              </h2>
-              <p className="text-xl text-green-600">{c.games.subtitle}</p>
+{/* Games */}
+<section className="py-16 bg-gradient-to-r from-green-100 to-yellow-100">
+  <div className="container mx-auto px-4">
+    <div className="text-center mb-12">
+      <h2 className="text-4xl font-bold text-green-700 mb-4 flex items-center justify-center">
+        <Gamepad2 className="mr-4 h-10 w-10" />
+        {c.games.title}
+      </h2>
+      <p className="text-xl text-green-600">{c.games.subtitle}</p>
+    </div>
+
+    <div className="grid md:grid-cols-3 gap-6">
+      {c.games.items.map((game, index) => (
+        <Card
+          key={index}
+          className="bg-white/90 backdrop-blur-sm border-2 border-green-200 hover:border-green-400 transition transform hover:scale-105"
+        >
+          <div className="p-6 flex flex-col items-center text-center h-full">
+            {/* Square-ish icon box */}
+            <div className="w-20 h-20 bg-gradient-to-br from-green-400 to-yellow-500 rounded-xl mb-4 flex items-center justify-center">
+              <Gamepad2 className="h-10 w-10 text-white" />
             </div>
 
-            <div className="grid md:grid-cols-2 gap-6">
-              {c.games.items.map((game, index) => (
-                <Card
-                  key={index}
-                  className="bg-white/90 backdrop-blur-sm border-4 border-green-200 hover:border-green-400 transition-all transform hover:scale-105 hover:shadow-xl"
-                >
-                  <div className="p-6">
-                    <div className="w-full h-40 bg-gradient-to-br from-green-300 to-yellow-400 rounded-lg mb-4 flex items-center justify-center">
-                      <Gamepad2 className="h-16 w-16 text-white" />
-                    </div>
-                    <h3 className="text-xl font-bold text-green-700 mb-2">{game.title}</h3>
-                    <div className="flex justify-between items-center mb-4">
-                      {"subject" in game ? <Badge className="bg-blue-500 text-white">{game.subject}</Badge> : null}
-                      {"difficulty" in game ? <Badge className="bg-orange-500 text-white">{game.difficulty}</Badge> : null}
-                    </div>
-                    <Link href={game.href}>
-                      <Button className="w-full bg-gradient-to-r from-green-500 to-yellow-500 hover:from-green-600 hover:to-yellow-600 text-white font-bold rounded-full">
-                        <Play className="mr-2 h-4 w-4" />
-                        {labels.startGame}
-                      </Button>
-                    </Link>
-                  </div>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </section>
+            <h3 className="text-lg font-bold text-green-700 mb-3">{game.title}</h3>
 
-        {/* Club Activities */}
-        <section className="py-16 bg-white">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-12">
-              <h2 className="text-4xl font-bold text-green-700 mb-2">{c.club.title}</h2>
-              <p className="text-xl text-gray-600">{c.club.subtitle}</p>
+            <div className="flex flex-wrap justify-center gap-2 mb-4">
+              {"subject" in game ? <Badge className="bg-blue-500 text-white">{game.subject}</Badge> : null}
+              {"difficulty" in game ? <Badge className="bg-orange-500 text-white">{game.difficulty}</Badge> : null}
+              {"approval" in game ? <Badge className="bg-green-600 text-white">{game.approval}</Badge> : null}
             </div>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {c.club.items.map((item, idx) => (
-                <Card key={idx} className="bg-white/90 backdrop-blur-sm border-2 border-green-200 hover:border-green-400 transition">
-                  <div className="p-6 text-center">
-                    <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-blue-500 rounded-full mx-auto mb-4 flex items-center justify-center">
-                      <item.icon className="h-8 w-8 text-white" />
-                    </div>
-                    <h3 className="text-lg font-bold text-green-700 mb-2">{item.title}</h3>
-                    {"tag" in item ? <Badge className="bg-green-600 text-white">{item.tag}</Badge> : null}
-                    <div className="mt-4">
-                      <Link href={item.href}>
-                        <Button className="border border-green-500 text-green-600 hover:bg-green-500 hover:text-white bg-transparent px-3 py-2 text-sm">
-                          {labels.viewAllClub}
-                        </Button>
-                      </Link>
-                    </div>
-                  </div>
-                </Card>
-              ))}
-            </div>
-
-            <div className="text-center mt-8">
-              <Link href={c.club.viewAllHref}>
-                <Button className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white font-bold py-3 px-6 rounded-full">
-                  {c.club.viewAll}
+            <div className="mt-auto w-full">
+              <Link href={game.href}>
+                <Button className="w-full bg-gradient-to-r from-green-500 to-yellow-500 hover:from-green-600 hover:to-yellow-600 text-white font-bold rounded-full">
+                  <Play className="mr-2 h-4 w-4" />
+                  {labels.startGame}
                 </Button>
               </Link>
             </div>
           </div>
-        </section>
+        </Card>
+      ))}
+    </div>
+  </div>
+</section>
+
+
+{/* Club Activities */}
+<section className="py-16 bg-white">
+  <div className="container mx-auto px-4">
+    <div className="text-center mb-12">
+      <h2 className="text-4xl font-bold text-green-700 mb-2">{c.club.title}</h2>
+      <p className="text-xl text-gray-600">{c.club.subtitle}</p>
+    </div>
+
+    {/* Center the grid on the page and the cards within cells */}
+    <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 place-items-center">
+      {c.club.items.map((item, idx) => (
+        <Card
+          key={idx}
+          className="w-full max-w-sm bg-white/90 backdrop-blur-sm border-2 border-green-200 hover:border-green-400 transition"
+        >
+          <div className="p-6 text-center text-green-700">
+            <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-blue-500 rounded-full mx-auto mb-4 flex items-center justify-center">
+              <item.icon className="h-8 w-8 text-white" />
+            </div>
+
+            <h3 className="text-lg font-bold mb-2">{item.title}</h3>
+            {"tag" in item ? (
+              <Badge className="bg-green-600 text-white">{item.tag}</Badge>
+            ) : null}
+
+            <div className="mt-4">
+              <Link href={item.href}>
+                {/* Force white bg + dark green text; hover flips to dark green bg + white text */}
+                <Button className="!bg-white !text-green-700 border border-green-600 hover:!bg-green-600 hover:!text-white px-3 py-2 text-sm">
+                  {labels.viewAllClub}
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </Card>
+      ))}
+    </div>
+
+    <div className="text-center mt-8">
+      <Link href={c.club.viewAllHref}>
+        <Button className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white font-bold py-3 px-6 rounded-full">
+          {c.club.viewAll}
+        </Button>
+      </Link>
+    </div>
+  </div>
+</section>
+
+
 
         {/* Creative Activities */}
         <section className="py-16 bg-gradient-to-r from-pink-100 to-red-100">
@@ -491,7 +523,6 @@ export default function KidsPage() {
           </div>
         </div>
       </main>
-
     </div>
   )
 }
