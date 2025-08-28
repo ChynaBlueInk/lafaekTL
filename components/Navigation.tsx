@@ -33,6 +33,8 @@ export function Navigation() {
       magazinesDesc: "Lafaek Kiik, Lafaek Prima, Manorin, and Komunidade.",
       printables: "Printables",
       printablesDesc: "Client work: posters, flyers, brochures, worksheets, illustrations.",
+      schoolGallery: "School Photo Gallery",
+      schoolGalleryDesc: "Photos from schools and classrooms across Timor-Leste.",
 
       // IA: Learning
       learning: "Learning",
@@ -74,9 +76,9 @@ export function Navigation() {
       ourJourneyDesc: "25 years of learning with Timor-Leste.",
       socialEnterprise: "Social Enterprise",
       socialEnterpriseDesc: "Our transition from NGO to a sustainable business model.",
-      careers: "Job Opportunities",
 
       // Right side
+      careers: "Careers",              // ✅ added
       getInvolved: "Get involved",
       loginSignup: "Login / Signup",
       en: "EN",
@@ -94,13 +96,13 @@ export function Navigation() {
       magazinesDesc: "Lafaek Kiik, Lafaek Prima, Manorin no Komunidade.",
       printables: "Printables",
       printablesDesc: "Trabalhu ba kliente: póster, flyer, folhetu, worksheet no ilutrasaun.",
+      schoolGallery: "Galeria Eskola",
+      schoolGalleryDesc: "Foto hosi eskola no sala aula sira iha Timor-Leste.",
 
       // IA: Learning
       learning: "Aprendizajen",
       kidsClub: "Kids Club",
       kidsClubDesc: "Atividade, istória no jogu ba labarik.",
-      cyber: "Seguransa Online (Landing)",
-      cyberDesc: "Hatudu dalan seguru online — ba labarik, jovem no pais/mestra.",
       cyberChildren: "Seguransa Online — Labarik",
       cyberChildrenDesc: "Dalan simples ba labarik tinan kiik.",
       cyberYouth: "Seguransa Online — Jovens",
@@ -112,8 +114,6 @@ export function Navigation() {
 
       // IA: Programs
       programs: "Programa",
-      journalists: "Lafaek Jurnalista (Landing)",
-      journalistsDesc: "Reportajen estudante, entrevista no literasia mídia.",
       kiik: "Lafaek Jornalista Kiik",
       foinSae: "Lafaek Jurnalista Foin Sae",
       diplomatiku: "Lafaek Jurnalista Diplomátiku",
@@ -139,10 +139,9 @@ export function Navigation() {
       ourJourneyDesc: "Tinan 25 aprende hamutuk ho Timor-Leste.",
       socialEnterprise: "Empreza Sosiál",
       socialEnterpriseDesc: "Transitasaun husi NGO ba modelu negósiu sustentavel.",
-      careers: "Vaga Serbisu",
-      careersDesc: "Serbisu hamutuk ho ami atu halo mídia edukativu.",
 
       // Right side
+      careers: "Empregu/Vaga",        // ✅ added
       getInvolved: "Partisipa",
       loginSignup: "Tama / Rejistu",
       en: "EN",
@@ -161,6 +160,7 @@ export function Navigation() {
         { href: "/publication/books", title: t.books, description: t.booksDesc },
         { href: "/publication/magazines", title: t.magazines, description: t.magazinesDesc },
         { href: "/publication/printables", title: t.printables, description: t.printablesDesc },
+        { href: "/publication/school-gallery", title: t.schoolGallery, description: t.schoolGalleryDesc }, // NEW
       ],
     },
 
@@ -206,12 +206,11 @@ export function Navigation() {
         { href: "/our-team", title: t.ourTeam, description: t.ourTeamDesc },
         { href: "/our-journey", title: t.ourJourney, description: t.ourJourneyDesc },
         { href: "/social-enterprise", title: t.socialEnterprise, description: t.socialEnterpriseDesc },
-        { href: "/careers", title: t.careers, description: t.careersDesc }, // Job Opportunities also here
       ],
     },
 
     // Dedicated top-level Job Opportunities (requested)
-    { href: "/careers", label: t.careers },
+{ href: "/careers", label: t.careers },
 
     // Right-side item requested to stay in topbar list (kept for parity on mobile)
     { href: "/get-involved", label: t.getInvolved },

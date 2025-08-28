@@ -12,12 +12,12 @@ type Member = {
   id: string;
   name: string;
   role: string;
-  roleTet?: string;   // Optional Tetun role
-  started?: string;   // e.g., "2024"
+  roleTet?: string;
+  started?: string;
   bio: string;
-  bioTet?: string;    // Optional Tetun bio
-  photo: string;      // nice portrait
-  sketch: string;     // caricature shown on hover
+  bioTet?: string;
+  photo: string;
+  sketch: string;
 };
 
 export default function OurTeamPage() {
@@ -32,27 +32,27 @@ export default function OurTeamPage() {
         en: {
           title: "Our Team",
           subtitle:
-            "Meet the people behind Lafaek — designers, educators, coordinators, and field teams working across Timor‑Leste.",
-          labels: { role: "Role", started: "Started", about: "About" },
-          close: "Close",
-          langToggle: { en: "English", tet: "Tetun", label: "Language" },
+            "Meet the people behind Lafaek — designers, educators, writers and production teams working across Timor-Leste.",
         },
         tet: {
-          title: "Ami‑nia Ekipá",
+          title: "Ami-nia Ekipá",
           subtitle:
-            "Hasoru ema sira ne’ebé hala’o Lafaek — dezenhador, edukadór, koordinadór, no ekipa terenu sira iha Timor‑Leste tomak.",
-          labels: { role: "Kargu", started: "Hahu servisu", about: "Kona‑ba" },
-          close: "Taka",
-          langToggle: { en: "Inglés", tet: "Tetun", label: "Liafuan" },
+            "Hasoru ema sira ne’ebé hala’o Lafaek — dezenhadór, edukadór, hakerek-na’in, no ekipa produsaun sira iha Timor-Leste tomak.",
         },
       } as const)[language],
     [language]
   );
 
-  // Placeholder helper (replace with real images under /public/team)
+  const roleLabel = (lang: Lang) => (lang === "tet" ? "Kargu" : "Role");
+  const startedLabel = (lang: Lang) => (lang === "tet" ? "Hahu servisu" : "Started");
+  const aboutLabel = (lang: Lang) => (lang === "tet" ? "Kona-ba" : "About");
+  const closeLabel = (lang: Lang) => (lang === "tet" ? "Taka" : "Close");
+
+  // Placeholder helper (swap with real images in /public/team)
   const P = (w = 640, h = 720) => `/placeholder.svg?width=${w}&height=${h}`;
 
   const team: Member[] = [
+    // ✅ Test Person (added back)
     {
       id: "test-person",
       name: "Test Person",
@@ -61,204 +61,106 @@ export default function OurTeamPage() {
       started: "2024",
       bio: "This is a test role so we can see what will happen.",
       bioTet: "Ita ne’e kargu teste de’it atu haree saida mak sei akontese.",
-      photo: "/team/test-photo.png",
-      sketch: "/team/test-sketch.png",
+      photo: "/team/test-photo.png",   // put file in public/team
+      sketch: "/team/test-sketch.png", // put file in public/team
     },
+
+    // Keep: Director
     {
       id: "marcelino-pm",
       name: "Marcelino Martins",
       role: "Lafaek Social Enterprise Director",
       roleTet: "Diretór Empreza Sosial Lafaek",
       started: "2022",
-      bio: "Manages project delivery, timelines, and coordination with field teams and content production.",
+      bio:
+        "Manages project delivery, timelines, and coordination with field teams and content production.",
       bioTet:
         "Jere entrega projetu, planu tempu no koordinasaun ho ekipa terenu no produsaun konténudu.",
       photo: P(),
       sketch: P(),
     },
-    {
-      id: "filomeno",
-      name: "Filomeno Maia",
-      role: "Senior Graphic Designer Officer",
-      roleTet: "Ofisiál Senior Dezénhu Gráfiku",
-      started: "2019",
-      bio: "Leads print and digital design standards across magazines, posters, and children’s books.",
-      bioTet:
-        "Lidera padraun dezenhu ba impresu no digital iha revista, poster no livru labarik sira.",
-      photo: P(),
-      sketch: P(),
-    },
-    {
-      id: "joaquim",
-      name: "Joaquim Pires",
-      role: "Senior Communication Officer",
-      roleTet: "Ofisiál Senior Komunikasaun",
-      started: "2020",
-      bio: "Produces multimedia content and coordinates interviews and community stories.",
-      bioTet:
-        "Halo konténudu multimedia no koordinadu entrevista no istória komunidade sira.",
-      photo: P(),
-      sketch: P(),
-    },
-    {
-      id: "adelino",
-      name: "Adelino Guterres",
-      role: "Field Implementation Manager",
-      roleTet: "Jere Implementasaun Terenu",
-      started: "2017",
-      bio: "Leads field teams, logistics, and school delivery for magazines and activities.",
-      bioTet:
-        "Lidera ekipa terenu, lojístika no distribui revista ho atividade sira ba eskola.",
-      photo: P(),
-      sketch: P(),
-    },
-    {
-      id: "celestina",
-      name: "Celestina Pereira",
-      role: "Senior Gender & Advocacy Officer",
-      roleTet: "Ofisiál Senior Jéneru no Advokasia",
-      started: "2016",
-      bio: "Ensures gender-responsive content and leads advocacy with partners and schools.",
-      bioTet:
-        "Assegura konténudu sensível ba jéneru no lidera advokasia ho parceiru no eskola sira.",
-      photo: P(),
-      sketch: P(),
-    },
-    {
-      id: "anito",
-      name: "Anito Ximenes",
-      role: "Deputy Project Manager, Monitoring & Evaluation",
-      started: "2021",
-      bio: "Coordinates M&E design and learning loops across provinces.",
-      photo: P(),
-      sketch: P(),
-    },
-    {
-      id: "joana",
-      name: "Joana dos Santos",
-      role: "Senior Project Officer",
-      started: "2020",
-      bio: "Supports planning, finance tracking, and partner communications.",
-      photo: P(),
-      sketch: P(),
-    },
-    {
-      id: "elisa",
-      name: "Elisa Verdial",
-      role: "Content Development Officer",
-      started: "2022",
-      bio: "Writes and edits children’s stories and teacher resources in Tetun and Portuguese.",
-      photo: P(),
-      sketch: P(),
-    },
-    {
-      id: "rubencia",
-      name: "Rubencia Borges",
-      role: "Monitoring, Evaluation & Learning Officer – Liquiçá",
-      started: "2023",
-      bio: "Leads local data collection and school feedback cycles in Liquiçá.",
-      photo: P(),
-      sketch: P(),
-    },
-    {
-      id: "ondina",
-      name: "Ondina Babo de Jesus",
-      role: "Finance and Operation Manager",
-      started: "2015",
-      bio: "Oversees finance systems, procurement, and operational policies.",
-      photo: P(),
-      sketch: P(),
-    },
-    {
-      id: "domingas",
-      name: "Domingas Bere",
-      role: "Project Officer – Aileu",
-      started: "2022",
-      bio: "Coordinates distribution and community events in Aileu.",
-      photo: P(),
-      sketch: P(),
-    },
-    {
-      id: "lucio",
-      name: "Lucio Alves",
-      role: "Monitoring, Evaluation & Learning Officer – Viqueque",
-      started: "2023",
-      bio: "Leads MEL activities and partner engagement in Viqueque municipality.",
-      photo: P(),
-      sketch: P(),
-    },
-    {
-      id: "delfrida",
-      name: "Delfrida Gomes",
-      role: "Finance Officer",
-      started: "2021",
-      bio: "Handles accounts payable/receivable and financial reporting support.",
-      photo: P(),
-      sketch: P(),
-    },
+
+    // Keep: Production & Publication Manager
     {
       id: "octavio",
       name: "Octavio Andrade",
       role: "Production & Publication Manager",
+      roleTet: "Jere Produsaun no Publikasaun",
       started: "2018",
-      bio: "Manages print production schedules and quality control for magazines and books.",
+      bio:
+        "Manages print production schedules and quality control for magazines and books.",
+      bioTet:
+        "Jere oráriu produsaun impresu no kontrolu kualidade ba revista no livru sira.",
       photo: P(),
       sketch: P(),
     },
-    {
-      id: "jony",
-      name: "Jony dos Santos",
-      role: "Project Officer – Ermera",
-      started: "2022",
-      bio: "Oversees school engagement and delivery in Ermera.",
-      photo: P(),
-      sketch: P(),
-    },
-    {
-      id: "abelito",
-      name: "Abelito Viegas",
-      role: "Monitoring, Evaluation & Learning Officer – Bobonaro",
-      started: "2023",
-      bio: "Supports MEL cycles and learning workshops in Bobonaro.",
-      photo: P(),
-      sketch: P(),
-    },
-    {
-      id: "ideltina",
-      name: "Ideltina Martins",
-      role: "Administration & Logistic Officer",
-      started: "2019",
-      bio: "Coordinates logistics, fleet, and office administration.",
-      photo: P(),
-      sketch: P(),
-    },
+
+    // Supervisor (Writing team lead)
     {
       id: "alianca",
-      name: "Alianca Do Rego",
-      role: "Content Development Team Leader",
-      started: "2017",
-      bio: "Leads the content team across languages and formats with a quality focus.",
+      name: "Alianca Mesquita do Rego",
+      role: "Content Development Team Supervisor",
+      roleTet: "Supervizór Ekipamentu Dezenvolvimentu Konteúdu",
+      bio:
+        "Writer’s supervisor at CARE. Leads teacher-facing content aligned to the national curriculum—mapping, lesson planning, team brainstorming, and field research to test methodology and gather data.",
+      bioTet:
+        "Supervizór ba hakerek-na’in iha CARE. Lidera kontéudu ba manorin tuir kurríkulu nasional—mapping, planu lisaun, brainstorming ho ekipa, no halo peskiza iha terenu atu testa metodolojia no foti dadus.",
+      photo: P(),
+      sketch: P(),
+    },
+
+    // Writing / Production team
+    {
+      id: "elisa",
+      name: "Elisa Verdial",
+      role: "Content Development Officer (CDO)",
+      roleTet: "Hakerek-na’in ba Konteúdu (CDO)",
+      bio:
+        "Content Development Officer creating educational stories, learning materials, and child-friendly creative content; develops simple methodologies for teachers.",
+      bioTet:
+        "Ofisiál Dezenvolvimentu Konteúdu ne’ebé kria istória edukasionál, materiál aprendizajen no kontéudu amigavel ba labarik; dezenvolve metodolojia simples ba manorin.",
       photo: P(),
       sketch: P(),
     },
     {
-      id: "joanita",
-      name: "Joanita de Fatima",
-      role: "Monitoring, Evaluation & Learning Officer – Cova‑Lima",
-      started: "2023",
-      bio: "Coordinates MEL and feedback loops in Cova‑Lima.",
+      id: "ronaldo",
+      name: "Ronaldo Ima Dias do Rêgo",
+      role: "Content Developer Officer (CDO)",
+      roleTet: "Ofisiál Dezenvolvimentu Konteúdu (CDO)",
+      bio:
+        "Creates pre-school and basic education content in magazine and video formats; leads the Lafaek Ki’ik content cycle from mapping to pre-testing and reviews with teachers and MoE.",
+      bioTet:
+        "Kria kontéudu ba pre-eskolar no ensinu báziku iha revista no vídeo; lidera siklu kontéudu Lafaek Ki’ik husi mapping to’o pre-teste no revizaun ho manorin sira no ME.",
+      photo: P(),
+      sketch: P(),
+    },
+    {
+      id: "lucena",
+      name: "Lucena Allen",
+      role: "Content Developer Officer (CDO)",
+      roleTet: "Ofisiál Dezenvolvimentu Konteúdu (CDO)",
+      bio:
+        "Writes educational content and imaginative stories for pre-school to primary, including teacher methodology; committed to teamwork and continuous learning.",
+      bioTet:
+        "Hakerek kontéudu edukasionál no istória imajinativu ba pre-eskolar to’o primária, inklui metodolojia ba manorin; kompromisu ho serbisu hamutuk no aprende kontínuu.",
+      photo: P(),
+      sketch: P(),
+    },
+    {
+      id: "aguida",
+      name: "Aguida J. de Araujo",
+      role: "Content Development Officer (CDO) – Lafaek Komunidade",
+      roleTet: "Hakerek-na’in – Lafaek Komunidade",
+      bio:
+        "Develops educational content for children, teachers, and communities; writes children’s and traditional community stories; loves learning local histories and food practices.",
+      bioTet:
+        "Dezenvolve kontéudu edukativu ba labarik, manorin no komunidade; hakerek istória ba labarik no tradisionál; gosta aprende istória lokál no pratika hahán tradisionál.",
       photo: P(),
       sketch: P(),
     },
   ];
 
   const [active, setActive] = useState<Member | null>(null);
-
-  // Helpers to render translated fields with fallback
-  const roleLabel = (lang: Lang) => (lang === "tet" ? "Kargu" : "Role");
-  const startedLabel = (lang: Lang) => (lang === "tet" ? "Hahu servisu" : "Started");
-  const aboutLabel = (lang: Lang) => (lang === "tet" ? "Kona‑ba" : "About");
-  const closeLabel = (lang: Lang) => (lang === "tet" ? "Taka" : "Close");
 
   const getRole = (m: Member, lang: Lang) => (lang === "tet" ? m.roleTet || m.role : m.role);
   const getBio = (m: Member, lang: Lang) => (lang === "tet" ? m.bioTet || m.bio : m.bio);
@@ -279,7 +181,7 @@ export default function OurTeamPage() {
                 {/* Image area with hover swap */}
                 <button
                   onClick={() => setActive(m)}
-                  className="relative block w-full aspect-[4/3] rounded-lg overflow-hidden shadow focus:outline-none focus:ring-4 focus:ring-[#2F80ED]/40"
+                  className="relative block w-full aspect-[4/3] rounded-lg overflow-hidden shadow focus:outline-none focus:ring-4 focus:ring-[#2F80ED]/40 group"
                   aria-label={`Open details for ${m.name}`}
                 >
                   {/* base photo */}
@@ -400,8 +302,6 @@ export default function OurTeamPage() {
           </div>
         </div>
       )}
-
-
     </div>
   );
 }
