@@ -58,7 +58,7 @@ export default function KidsPage() {
               href: "/learning/kids/games/measure",
               subject: "Math",
               difficulty: "Easy",
-              approval: "From Lafaek magazine – approved by the Ministry of Education",
+              approval: "From Lafaek Magazine – approved by the Ministry of Education",
             },
             {
               title: "Count the Coconuts",
@@ -71,6 +71,13 @@ export default function KidsPage() {
               href: "/learning/kids/games/tetun-word-match",
               subject: "Language",
               difficulty: "Easy",
+            },
+            {
+              title: "Tetun Alphabet",
+              href: "/learning/kids/games/tetun/alphabet",
+              subject: "Language",
+              difficulty: "Easy",
+              approval: "Adapted from Lafaek Magazine",
             },
           ],
         },
@@ -112,17 +119,17 @@ export default function KidsPage() {
             },
           ],
         },
-characters: {
-  title: "Meet Our Friends",
-  subtitle: "Your favorite Lafaek characters",
-  preview: [
-    { name: "Lafaek Kiik", personality: "Curious & Playful", story: "Loves to learn" },
-    { name: "Lafaek Nina", personality: "Kind & Helpful", story: "Helps everyone" },
-    { name: "Manu", personality: "Brave & Adventurous", story: "Explores everywhere" },
-  ],
-  viewAll: "See all characters",
-  viewAllHref: "/learning/kids/characters",
-},
+        characters: {
+          title: "Meet Our Friends",
+          subtitle: "Your favorite Lafaek characters",
+          preview: [
+            { name: "Lafaek Kiik", personality: "Curious & Playful", story: "Loves to learn" },
+            { name: "Lafaek Nina", personality: "Kind & Helpful", story: "Helps everyone" },
+            { name: "Manu", personality: "Brave & Adventurous", story: "Explores everywhere" },
+          ],
+          viewAll: "See all characters",
+          viewAllHref: "/learning/kids/characters",
+        },
       },
       cta: {
         readStory: "Read Story",
@@ -184,6 +191,13 @@ characters: {
               subject: "Lian",
               difficulty: "Fasil",
             },
+            {
+              title: "Alfabetu Tetun",
+              href: "/learning/kids/games/tetun/alphabet",
+              subject: "Lian",
+              difficulty: "Fasil",
+              approval: "Adapta husi Revista Lafaek",
+            },
           ],
         },
         club: {
@@ -224,18 +238,17 @@ characters: {
             },
           ],
         },
-       characters: {
-  title: "Hasoru Ami-nia Kolega",
-  subtitle: "Karakter Lafaek favoritu",
-  preview: [
-    { name: "Lafaek Kiik", personality: "Kuriozu & Halimar", story: "Gosta aprende" },
-    { name: "Lafaek Nina", personality: "Di’ak & Ajuda", story: "Ajuda ema hotu" },
-    { name: "Manu", personality: "Korajoza & Aventura", story: "Esplora fatin hotu" },
-  ],
-  viewAll: "Haree karakter hotu",
-  viewAllHref: "/learning/kids/characters",
-},
-
+        characters: {
+          title: "Hasoru Ami-nia Kolega",
+          subtitle: "Karakter Lafaek favoritu",
+          preview: [
+            { name: "Lafaek Kiik", personality: "Kuriozu & Halimar", story: "Gosta aprende" },
+            { name: "Lafaek Nina", personality: "Di’ak & Ajuda", story: "Ajuda ema hotu" },
+            { name: "Manu", personality: "Korajoza & Aventura", story: "Esplora fatin hotu" },
+          ],
+          viewAll: "Haree karakter hotu",
+          viewAllHref: "/learning/kids/characters",
+        },
       },
       cta: {
         readStory: "Lee Istória",
@@ -313,102 +326,94 @@ characters: {
           </div>
         </section>
 
-{/* Games */}
-<section className="py-16 bg-gradient-to-r from-green-100 to-yellow-100">
-  <div className="container mx-auto px-4">
-    <div className="text-center mb-12">
-      <h2 className="text-4xl font-bold text-green-700 mb-4 flex items-center justify-center">
-        <Gamepad2 className="mr-4 h-10 w-10" />
-        {c.games.title}
-      </h2>
-      <p className="text-xl text-green-600">{c.games.subtitle}</p>
-    </div>
-
-    <div className="grid md:grid-cols-3 gap-6">
-      {c.games.items.map((game, index) => (
-        <Card
-          key={index}
-          className="bg-white/90 backdrop-blur-sm border-2 border-green-200 hover:border-green-400 transition transform hover:scale-105"
-        >
-          <div className="p-6 flex flex-col items-center text-center h-full">
-            {/* Square-ish icon box */}
-            <div className="w-20 h-20 bg-gradient-to-br from-green-400 to-yellow-500 rounded-xl mb-4 flex items-center justify-center">
-              <Gamepad2 className="h-10 w-10 text-white" />
+        {/* Games */}
+        <section className="py-16 bg-gradient-to-r from-green-100 to-yellow-100">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-12">
+              <h2 className="text-4xl font-bold text-green-700 mb-4 flex items-center justify-center">
+                <Gamepad2 className="mr-4 h-10 w-10" />
+                {c.games.title}
+              </h2>
+              <p className="text-xl text-green-600">{c.games.subtitle}</p>
             </div>
 
-            <h3 className="text-lg font-bold text-green-700 mb-3">{game.title}</h3>
+            <div className="grid md:grid-cols-3 gap-6">
+              {c.games.items.map((game, index) => (
+                <Card
+                  key={index}
+                  className="bg-white/90 backdrop-blur-sm border-2 border-green-200 hover:border-green-400 transition transform hover:scale-105"
+                >
+                  <div className="p-6 flex flex-col items-center text-center h-full">
+                    <div className="w-20 h-20 bg-gradient-to-br from-green-400 to-yellow-500 rounded-xl mb-4 flex items-center justify-center">
+                      <Gamepad2 className="h-10 w-10 text-white" />
+                    </div>
 
-            <div className="flex flex-wrap justify-center gap-2 mb-4">
-              {"subject" in game ? <Badge className="bg-blue-500 text-white">{game.subject}</Badge> : null}
-              {"difficulty" in game ? <Badge className="bg-orange-500 text-white">{game.difficulty}</Badge> : null}
-              {"approval" in game ? <Badge className="bg-green-600 text-white">{game.approval}</Badge> : null}
+                    <h3 className="text-lg font-bold text-green-700 mb-3">{game.title}</h3>
+
+                    <div className="flex flex-wrap justify-center gap-2 mb-4">
+                      {"subject" in game ? <Badge className="bg-blue-500 text-white">{game.subject}</Badge> : null}
+                      {"difficulty" in game ? <Badge className="bg-orange-500 text-white">{game.difficulty}</Badge> : null}
+                      {"approval" in game ? <Badge className="bg-green-600 text-white">{game.approval}</Badge> : null}
+                    </div>
+
+                    <div className="mt-auto w-full">
+                      <Link href={game.href}>
+                        <Button className="w-full bg-gradient-to-r from-green-500 to-yellow-500 hover:from-green-600 hover:to-yellow-600 text-white font-bold rounded-full">
+                          <Play className="mr-2 h-4 w-4" />
+                          {labels.startGame}
+                        </Button>
+                      </Link>
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Club Activities */}
+        <section className="py-16 bg-white">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-12">
+              <h2 className="text-4xl font-bold text-green-700 mb-2">{c.club.title}</h2>
+              <p className="text-xl text-gray-600">{c.club.subtitle}</p>
             </div>
 
-            <div className="mt-auto w-full">
-              <Link href={game.href}>
-                <Button className="w-full bg-gradient-to-r from-green-500 to-yellow-500 hover:from-green-600 hover:to-yellow-600 text-white font-bold rounded-full">
-                  <Play className="mr-2 h-4 w-4" />
-                  {labels.startGame}
+            <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 place-items-center">
+              {c.club.items.map((item, idx) => (
+                <Card
+                  key={idx}
+                  className="w-full max-w-sm bg-white/90 backdrop-blur-sm border-2 border-green-200 hover:border-green-400 transition"
+                >
+                  <div className="p-6 text-center text-green-700">
+                    <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-blue-500 rounded-full mx-auto mb-4 flex items-center justify-center">
+                      <item.icon className="h-8 w-8 text-white" />
+                    </div>
+
+                    <h3 className="text-lg font-bold mb-2">{item.title}</h3>
+                    {"tag" in item ? <Badge className="bg-green-600 text-white">{item.tag}</Badge> : null}
+
+                    <div className="mt-4">
+                      <Link href={item.href}>
+                        <Button className="!bg-white !text-green-700 border border-green-600 hover:!bg-green-600 hover:!text-white px-3 py-2 text-sm">
+                          {labels.viewAllClub}
+                        </Button>
+                      </Link>
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
+
+            <div className="text-center mt-8">
+              <Link href={c.club.viewAllHref}>
+                <Button className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white font-bold py-3 px-6 rounded-full">
+                  {c.club.viewAll}
                 </Button>
               </Link>
             </div>
           </div>
-        </Card>
-      ))}
-    </div>
-  </div>
-</section>
-
-
-{/* Club Activities */}
-<section className="py-16 bg-white">
-  <div className="container mx-auto px-4">
-    <div className="text-center mb-12">
-      <h2 className="text-4xl font-bold text-green-700 mb-2">{c.club.title}</h2>
-      <p className="text-xl text-gray-600">{c.club.subtitle}</p>
-    </div>
-
-    {/* Center the grid on the page and the cards within cells */}
-    <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 place-items-center">
-      {c.club.items.map((item, idx) => (
-        <Card
-          key={idx}
-          className="w-full max-w-sm bg-white/90 backdrop-blur-sm border-2 border-green-200 hover:border-green-400 transition"
-        >
-          <div className="p-6 text-center text-green-700">
-            <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-blue-500 rounded-full mx-auto mb-4 flex items-center justify-center">
-              <item.icon className="h-8 w-8 text-white" />
-            </div>
-
-            <h3 className="text-lg font-bold mb-2">{item.title}</h3>
-            {"tag" in item ? (
-              <Badge className="bg-green-600 text-white">{item.tag}</Badge>
-            ) : null}
-
-            <div className="mt-4">
-              <Link href={item.href}>
-                {/* Force white bg + dark green text; hover flips to dark green bg + white text */}
-                <Button className="!bg-white !text-green-700 border border-green-600 hover:!bg-green-600 hover:!text-white px-3 py-2 text-sm">
-                  {labels.viewAllClub}
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </Card>
-      ))}
-    </div>
-
-    <div className="text-center mt-8">
-      <Link href={c.club.viewAllHref}>
-        <Button className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white font-bold py-3 px-6 rounded-full">
-          {c.club.viewAll}
-        </Button>
-      </Link>
-    </div>
-  </div>
-</section>
-
-
+        </section>
 
         {/* Creative Activities */}
         <section className="py-16 bg-gradient-to-r from-pink-100 to-red-100">
@@ -449,32 +454,30 @@ characters: {
           </div>
         </section>
 
-{/* Characters – single banner + link */}
-<section className="py-16 bg-gradient-to-r from-purple-100 to-indigo-100">
-  <div className="container mx-auto px-4 text-center">
-    <h2 className="text-4xl font-bold text-purple-700 mb-4 flex items-center justify-center">
-      <Smile className="mr-4 h-10 w-10" />
-      {c.characters.title}
-    </h2>
-    <p className="text-xl text-purple-600 mb-8">{c.characters.subtitle}</p>
+        {/* Characters – single banner + link */}
+        <section className="py-16 bg-gradient-to-r from-purple-100 to-indigo-100">
+          <div className="container mx-auto px-4 text-center">
+            <h2 className="text-4xl font-bold text-purple-700 mb-4 flex items-center justify-center">
+              <Smile className="mr-4 h-10 w-10" />
+              {c.characters.title}
+            </h2>
+            <p className="text-xl text-purple-600 mb-8">{c.characters.subtitle}</p>
 
-    {/* Friends group image */}
-    <div className="max-w-3xl mx-auto mb-8">
-      <img
-        src="/characters/0-lafaek-friends.png"
-        alt={c.characters.title}
-        className="rounded-2xl shadow-lg mx-auto"
-      />
-    </div>
+            <div className="max-w-3xl mx-auto mb-8">
+              <img
+                src="/characters/0-lafaek-friends.png"
+                alt={c.characters.title}
+                className="rounded-2xl shadow-lg mx-auto"
+              />
+            </div>
 
-    {/* View All button */}
-    <Link href={c.characters.viewAllHref}>
-      <Button className="bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white font-bold py-3 px-6 rounded-full">
-        {c.characters.viewAll}
-      </Button>
-    </Link>
-  </div>
-</section>
+            <Link href={c.characters.viewAllHref}>
+              <Button className="bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white font-bold py-3 px-6 rounded-full">
+                {c.characters.viewAll}
+              </Button>
+            </Link>
+          </div>
+        </section>
 
         {/* Fun Navigation */}
         <section className="py-12 bg-gradient-to-r from-yellow-200 to-orange-200">

@@ -26,6 +26,9 @@ export default function OurTeamPage() {
     setLanguage: (l: Lang) => void;
   };
 
+  // Show/hide the modal language switch for ALL members
+  const SHOW_MODAL_LANG_SWITCH = true;
+
   const copy = useMemo(
     () =>
       ({
@@ -52,7 +55,6 @@ export default function OurTeamPage() {
   const P = (w = 640, h = 720) => `/placeholder.svg?width=${w}&height=${h}`;
 
   const team: Member[] = [
-    // ✅ Test Person (added back)
     {
       id: "test-person",
       name: "Test Person",
@@ -61,11 +63,9 @@ export default function OurTeamPage() {
       started: "2024",
       bio: "This is a test role so we can see what will happen.",
       bioTet: "Ita ne’e kargu teste de’it atu haree saida mak sei akontese.",
-      photo: "/team/test-photo.png",   // put file in public/team
-      sketch: "/team/test-sketch.png", // put file in public/team
+      photo: "/team/test-photo.png",
+      sketch: "/team/test-sketch.png",
     },
-
-    // Keep: Director
     {
       id: "marcelino-pm",
       name: "Marcelino Martins",
@@ -79,8 +79,6 @@ export default function OurTeamPage() {
       photo: P(),
       sketch: P(),
     },
-
-    // Keep: Production & Publication Manager
     {
       id: "octavio",
       name: "Octavio Andrade",
@@ -94,8 +92,6 @@ export default function OurTeamPage() {
       photo: P(),
       sketch: P(),
     },
-
-    // Supervisor (Writing team lead)
     {
       id: "alianca",
       name: "Alianca Mesquita do Rego",
@@ -105,11 +101,9 @@ export default function OurTeamPage() {
         "Writer’s supervisor at CARE. Leads teacher-facing content aligned to the national curriculum—mapping, lesson planning, team brainstorming, and field research to test methodology and gather data.",
       bioTet:
         "Supervizór ba hakerek-na’in iha CARE. Lidera kontéudu ba manorin tuir kurríkulu nasional—mapping, planu lisaun, brainstorming ho ekipa, no halo peskiza iha terenu atu testa metodolojia no foti dadus.",
-      photo: P(),
-      sketch: P(),
+      photo: "/team/alianca.jpg",
+      sketch: "/team/alianca-sketch.png",
     },
-
-    // Writing / Production team
     {
       id: "elisa",
       name: "Elisa Verdial",
@@ -131,7 +125,7 @@ export default function OurTeamPage() {
         "Creates pre-school and basic education content in magazine and video formats; leads the Lafaek Ki’ik content cycle from mapping to pre-testing and reviews with teachers and MoE.",
       bioTet:
         "Kria kontéudu ba pre-eskolar no ensinu báziku iha revista no vídeo; lidera siklu kontéudu Lafaek Ki’ik husi mapping to’o pre-teste no revizaun ho manorin sira no ME.",
-      photo: P(),
+      photo: "/team/ronaldo.jpg",
       sketch: P(),
     },
     {
@@ -143,8 +137,8 @@ export default function OurTeamPage() {
         "Writes educational content and imaginative stories for pre-school to primary, including teacher methodology; committed to teamwork and continuous learning.",
       bioTet:
         "Hakerek kontéudu edukasionál no istória imajinativu ba pre-eskolar to’o primária, inklui metodolojia ba manorin; kompromisu ho serbisu hamutuk no aprende kontínuu.",
-      photo: P(),
-      sketch: P(),
+      photo: "/team/allen.jpg",
+      sketch: "/team/allen-sketch.png",
     },
     {
       id: "aguida",
@@ -155,9 +149,97 @@ export default function OurTeamPage() {
         "Develops educational content for children, teachers, and communities; writes children’s and traditional community stories; loves learning local histories and food practices.",
       bioTet:
         "Dezenvolve kontéudu edukativu ba labarik, manorin no komunidade; hakerek istória ba labarik no tradisionál; gosta aprende istória lokál no pratika hahán tradisionál.",
-      photo: P(),
-      sketch: P(),
+      photo: "/team/aguida.jpg",
+      sketch: "/team/aguida-sketch.png",
     },
+
+    // New members
+    {
+      id: "gualter-soares",
+      name: "Gualter Vicente José Barreto Soares",
+      role: "Graphic Designer",
+      roleTet: "Dezeñadór Gráfiku",
+      bio:
+        "Graphic Designer on the Lafaek Learning Media project, strengthening messages through clear layout, typography, and visual elements so audiences can understand content easily.",
+      bioTet:
+        "Dezeñadór Gráfiku iha projetu Lafaek Learning Media, haforsa no kompleta mensajen liuhusi maneja no hafurak testu, dezeñu no elementu vizuál atu hatudu klaru ba audénsia.",
+      photo: "/team/gualter.jpg",
+      sketch: "/team/gualter-sketch.png",
+    },
+    {
+      id: "antoninho-ramalho",
+      name: "Antoninho Soares Ramalho",
+      role: "Senior Illustrator",
+      roleTet: "Ilustradór Sênior",
+      bio:
+        "Dedicated, creative illustrator designing culturally relevant visuals for health, school, and gender-equality content; character design, storyboards, and clear visual structure supporting editors and community facilitators.",
+      bioTet:
+        "Ilustradór dedikadu no kreativu; halo ilustrasaun edukativu, inkluzivu no relevante kulturel ba komunidade Timor-Leste. Kria karakter, storyboard, no estrutura vizuál hodi fasilita kompriensaun ba labarik, família no edukadór.",
+      photo: "/team/antoninho.jpg",
+      sketch: "/team/antoninho-sketch.png",
+    },
+    {
+      id: "nabila-sagran",
+      name: "Nabila Natasha Sagran",
+      role: "Digital Illustrator & Motion Graphics",
+      roleTet: "Ilustradór Digital & Motion Graphics",
+      bio:
+        "Digital illustrator who also enjoys motion graphics—bringing children’s stories to life with engaging, animated visuals that spark curiosity and emotion.",
+      bioTet:
+        "Ilustradór digital ne’ebé gosta mos halo motion graphics—hari’i istória ba labarik ho vizuál animadu ne’ebé atrativu no foti-kuriosidade.",
+      photo: "/team/nabila.jpg",
+      sketch: "/team/nabila-sketch.png",
+    },
+    {
+      id: "filomeno-maia",
+      name: "Filomeno Guterres Maia",
+      role: "Graphic Designer & Photographer",
+      roleTet: "Dezeñadór Gráfiku no Fotógrafu",
+      bio:
+        "Graphic designer and photographer who crafts magazines, posters, and brand visuals, and captures key moments, products, and landscapes—combining both to tell meaningful visual stories.",
+      bioTet:
+        "Dezeñadór gráfiku no fotógrafu ne’ebé kria revista, poster no vizuál marka, no kaer momentu importante, produtu no paisajen—hamutuk atu konta istória vizuál ho signifikadu.",
+      photo: "/team/filomeno.jpg",
+      sketch: "/team/filomeno-sketch.png",
+    },
+    {
+      id: "helder-belo",
+      name: "Helder Tomas Pereira Ximenes Belo",
+      role: "Illustrator Officer (IO)",
+      roleTet: "Ilustradór Officer (IO)",
+      bio:
+        "Illustrator specializing in children’s book art—warm, imaginative, and easy to understand. Collaborates with content, editors, and facilitators to ensure real classroom impact.",
+      bioTet:
+        "Ilustradór spesialista iha livru ba labarik—maneira moras, imajinativu no fasil kompriende. Kolabora ho konténudu, editor no fasilitadór atu fó impaktu reais iha sala aula.",
+      photo: "/team/helder.jpg",
+      sketch: "/team/helder-sketch.png",
+    },
+    {
+      id: "pedro-g-soares",
+      name: "Pedro G. Soares",
+      role: "Graphic Designer & Photographer",
+      roleTet: "Dezeñadór Gráfiku no Fotógrafu",
+      started: "2022",
+      bio:
+        "Graphic designer and photographer for Lafaek Magazine since 2022. Skilled with Adobe Photoshop, Lightroom, Illustrator and InDesign—crafting beautiful layouts and visuals that motivate teachers, students, and communities to read.",
+      bioTet:
+        "Dezeñadór gráfiku no fotógrafu ba Revista Lafaek husi 2022. Domi Adobe (Photoshop, Lightroom, Illustrator, InDesign) atu halo layout no vizuál furak atu motiva manorin, kanorin no komunidade atu lee.",
+      photo: "/team/pedroS.jpg",
+      sketch: "/team/pedroS-sketch.png",
+    },
+
+  {
+  id: "pedro-da-silva",
+  name: "Pedro Rebelo da Silva", 
+  role: "Digital Illustrator",
+  roleTet: "Ilustradór Digital",
+  bio:
+    "Digital illustrator focused on children’s storybooks in a cheerful, color-rich style. He draws on everyday life and Timorese culture to create visuals that celebrate local identity and ways of life. His illustrations aim not only to look beautiful but to help children understand, spark imagination, and build empathy.",
+  bioTet:
+    "Ilustradór digital ne’ebé foka ba livru istória ba labarik ho estilu alegre no kolor barak. Nia inspira husi moris lor-loron no kultura Timor atu kria vizuál sira ne’ebé haforsa no promove identidade Timor nian no moris Timoroan. Nia ilustrasaun la’ós de’it furak; mos ajuda labarik kompriende vizuál, fó estimulu ba imajinasaun no hadia empatia.",
+  photo: "/team/pedrodaS.jpg",
+  sketch: "/team/pedrodaS-sketch.png",
+}
   ];
 
   const [active, setActive] = useState<Member | null>(null);
@@ -178,10 +260,10 @@ export default function OurTeamPage() {
           <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
             {team.map((m) => (
               <article key={m.id} className="group">
-                {/* Image area with hover swap */}
+                {/* Image area with hover swap — PORTRAIT + object-contain */}
                 <button
                   onClick={() => setActive(m)}
-                  className="relative block w-full aspect-[4/3] rounded-lg overflow-hidden shadow focus:outline-none focus:ring-4 focus:ring-[#2F80ED]/40 group"
+                  className="relative block w-full aspect-[2/3] rounded-lg overflow-hidden shadow bg-white focus:outline-none focus:ring-4 focus:ring-[#2F80ED]/40 group"
                   aria-label={`Open details for ${m.name}`}
                 >
                   {/* base photo */}
@@ -190,7 +272,7 @@ export default function OurTeamPage() {
                     alt={m.name}
                     fill
                     sizes="(min-width:1024px) 25vw, (min-width:640px) 50vw, 100vw"
-                    className="object-cover transition-opacity duration-300 group-hover:opacity-0"
+                    className="object-contain transition-opacity duration-300 group-hover:opacity-0"
                   />
                   {/* sketch on hover */}
                   <Image
@@ -198,7 +280,7 @@ export default function OurTeamPage() {
                     alt={`${m.name} caricature`}
                     fill
                     sizes="(min-width:1024px) 25vw, (min-width:640px) 50vw, 100vw"
-                    className="object-cover opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                    className="object-contain opacity-0 transition-opacity duration-300 group-hover:opacity-100"
                   />
                 </button>
 
@@ -227,56 +309,58 @@ export default function OurTeamPage() {
             {/* Close */}
             <button
               onClick={() => setActive(null)}
-              className="absolute right-3 top-3 rounded-full bg-white/90 hover:bg-white p-2 shadow"
+              className="absolute right-3 top-3 z-20 rounded-full bg-white/90 hover:bg-white p-2 shadow"
               aria-label={closeLabel(language)}
             >
               <X className="h-5 w-5 text-[#4F4F4F]" />
             </button>
 
-            {/* Modal language toggle — updates global site language */}
-            <div className="absolute left-3 top-3">
-              <div className="inline-flex rounded-xl border border-[#BDBDBD] overflow-hidden bg-white shadow-sm">
-                <button
-                  type="button"
-                  onClick={() => setLanguage("en")}
-                  className={`px-3 py-1.5 text-sm font-medium transition ${
-                    language === "en"
-                      ? "bg-[#219653] text-white"
-                      : "text-[#4F4F4F] hover:bg-[#F5F5F5]"
-                  }`}
-                  aria-pressed={language === "en"}
-                >
-                  EN
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setLanguage("tet")}
-                  className={`px-3 py-1.5 text-sm font-medium transition border-l border-[#BDBDBD] ${
-                    language === "tet"
-                      ? "bg-[#219653] text-white"
-                      : "text-[#4F4F4F] hover:bg-[#F5F5F5]"
-                  }`}
-                  aria-pressed={language === "tet"}
-                >
-                  TET
-                </button>
-              </div>
-            </div>
-
             <div className="grid md:grid-cols-2">
-              {/* Left: image */}
-              <div className="relative h-64 md:h-full min-h-[280px]">
+              {/* Left: image — object-contain to avoid cropping */}
+              <div className="relative h-64 md:h-full min-h-[280px] z-0 bg-white">
                 <Image
                   src={active.photo}
                   alt={active.name}
                   fill
                   sizes="50vw"
-                  className="object-cover"
+                  className="object-contain"
+                  priority
                 />
               </div>
 
-              {/* Right: details */}
-              <div className="p-6 md:p-8">
+              {/* Right: details + language switch */}
+              <div className="relative z-10 p-6 md:p-8">
+                {SHOW_MODAL_LANG_SWITCH && (
+                  <div className="mb-3 flex justify-end">
+                    <div className="inline-flex rounded-xl border border-[#BDBDBD] overflow-hidden bg-white shadow-sm">
+                      <button
+                        type="button"
+                        onClick={() => setLanguage("en")}
+                        className={`px-3 py-1.5 text-sm font-medium transition ${
+                          language === "en"
+                            ? "bg-[#219653] text-white"
+                            : "text-[#4F4F4F] hover:bg-[#F5F5F5]"
+                        }`}
+                        aria-pressed={language === "en"}
+                      >
+                        EN
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setLanguage("tet")}
+                        className={`px-3 py-1.5 text-sm font-medium transition border-l border-[#BDBDBD] ${
+                          language === "tet"
+                            ? "bg-[#219653] text-white"
+                            : "text-[#4F4F4F] hover:bg-[#F5F5F5]"
+                        }`}
+                        aria-pressed={language === "tet"}
+                      >
+                        TET
+                      </button>
+                    </div>
+                  </div>
+                )}
+
                 <h2 id="member-title" className="text-2xl font-bold text-[#219653]">
                   {active.name}
                 </h2>
