@@ -49,16 +49,10 @@ export function Navigation() {
       guides: "Parent & Teacher Guides",
       guidesDesc: "Practical ideas from Manorin/Komunidade content.",
 
-      // IA: Programs
+      // IA: Explore (combines stories + programs)
+      explore: "Explore",
       programs: "Programs",
-      kiik: "Lafaek Jornalista Kiik",
-      foinSae: "Lafaek Journalista Foin Sae",
-      diplomatiku: "Lafaek Jornalista Diplomátiku",
-      filaLiman: "Lafaek Fila Liman",
-      ambiente: "Ativista Luta ba Ambiente",
-
-      // IA: Stories
-      stories: "Stories",
+      programsDesc: "All Lafaek programs in one place.",
       news: "News",
       newsDesc: "Updates from our projects and partners.",
       communityStories: "Impact Stories",
@@ -78,7 +72,7 @@ export function Navigation() {
       socialEnterpriseDesc: "Our transition from NGO to a sustainable business model.",
 
       // Right side
-      careers: "Careers",              // ✅ added
+      careers: "Careers",
       getInvolved: "Get involved",
       loginSignup: "Login / Signup",
       en: "EN",
@@ -112,19 +106,13 @@ export function Navigation() {
       guides: "Guia ba Pais & Maestri",
       guidesDesc: "Ideia pratiku husi konténudu Manorin/Komunidade.",
 
-      // IA: Programs
+      // IA: Explore (combines stories + programs)
+      explore: "Explora",
       programs: "Programa",
-      kiik: "Lafaek Jornalista Kiik",
-      foinSae: "Lafaek Jurnalista Foin Sae",
-      diplomatiku: "Lafaek Jurnalista Diplomátiku",
-      filaLiman: "Lafaek Fila Liman",
-      ambiente: "Ativista Luta ba Ambiente",
-
-      // IA: Stories
-      stories: "Istória",
+      programsDesc: "Programa hotu-hotu iha pájina ida de'it.",
       news: "Notísia",
       newsDesc: "Atualizasaun hosi projetu no parceiru sira.",
-      communityStories: "Istória Komunidade",
+      communityStories: "Istória Impaktu",
       communityStoriesDesc: "Istória verídiku hosi eskola no suku sira.",
       gallery: "Galeria (Vídeu & Imajens)",
       galleryDesc: "Tuir mai: vídeu no foto istória.",
@@ -141,7 +129,7 @@ export function Navigation() {
       socialEnterpriseDesc: "Transitasaun husi NGO ba modelu negósiu sustentavel.",
 
       // Right side
-      careers: "Empregu/Vaga",        // ✅ added
+      careers: "Empregu/Vaga",
       getInvolved: "Partisipa",
       loginSignup: "Tama / Rejistu",
       en: "EN",
@@ -160,7 +148,7 @@ export function Navigation() {
         { href: "/publication/books", title: t.books, description: t.booksDesc },
         { href: "/publication/magazines", title: t.magazines, description: t.magazinesDesc },
         { href: "/publication/printables", title: t.printables, description: t.printablesDesc },
-        { href: "/publication/school-gallery", title: t.schoolGallery, description: t.schoolGalleryDesc }, // NEW
+        { href: "/publication/school-gallery", title: t.schoolGallery, description: t.schoolGalleryDesc }, // kept
       ],
     },
 
@@ -176,24 +164,13 @@ export function Navigation() {
       ],
     },
 
-    // Programs (mega)
+    // Explore (mega) — combines Stories + Programs
     {
-      label: t.programs,
-      mega: [
-        { href: "/programs/journalists/kiik", title: t.kiik },
-        { href: "/programs/journalists/foin-sae", title: t.foinSae },
-        { href: "/programs/journalists/diplomatiku", title: t.diplomatiku },
-        { href: "/programs/journalists/fila-liman", title: t.filaLiman },
-        { href: "/programs/journalists/ambiente", title: t.ambiente },
-      ],
-    },
-
-    // Stories (mega)
-    {
-      label: t.stories,
+      label: t.explore,
       mega: [
         { href: "/stories/news", title: t.news, description: t.newsDesc },
         { href: "/stories/community", title: t.communityStories, description: t.communityStoriesDesc },
+        { href: "/programs", title: t.programs, description: t.programsDesc }, // one main programs page
         { href: "/stories/gallery", title: t.gallery, description: t.galleryDesc },
       ],
     },
@@ -210,7 +187,7 @@ export function Navigation() {
     },
 
     // Dedicated top-level Job Opportunities (requested)
-{ href: "/careers", label: t.careers },
+    { href: "/careers", label: t.careers },
 
     // Right-side item requested to stay in topbar list (kept for parity on mobile)
     { href: "/get-involved", label: t.getInvolved },
