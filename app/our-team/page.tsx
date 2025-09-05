@@ -126,7 +126,7 @@ export default function OurTeamPage() {
       bioTet:
         "Kria kontéudu ba pre-eskolar no ensinu báziku iha revista no vídeo; lidera siklu kontéudu Lafaek Ki’ik husi mapping to’o pre-teste no revizaun ho manorin sira no ME.",
       photo: "/team/ronaldo.jpg",
-      sketch: P(),
+      sketch: "/team/ronaldo-sketch.png",
     },
     {
       id: "lucena",
