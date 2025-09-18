@@ -17,7 +17,6 @@ export function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [openMobileSubmenu, setOpenMobileSubmenu] = useState<string | null>(null)
 
-  // ✅ Hooks only inside the component
   const { language, setLanguage } = useLanguage()
 
   const t = {
@@ -25,7 +24,6 @@ export function Navigation() {
       brand: "Lafaek",
       home: "Home",
 
-      // IA: Publications
       publication: "Publication",
       books: "Children’s Books",
       booksDesc: "Picture books and early readers in Tetun, Portuguese, and English.",
@@ -36,7 +34,6 @@ export function Navigation() {
       schoolGallery: "School Photo Gallery",
       schoolGalleryDesc: "Photos from schools and classrooms across Timor-Leste.",
 
-      // IA: Learning
       learning: "Learning",
       kidsClub: "Kids Club",
       kidsClubDesc: "Activities, stories, and games for children.",
@@ -49,7 +46,6 @@ export function Navigation() {
       guides: "Parent & Teacher Guides",
       guidesDesc: "Practical ideas from Manorin/Komunidade content.",
 
-      // IA: Explore (combines stories + programs)
       explore: "Explore",
       programs: "Programs",
       programsDesc: "All Lafaek programs in one place.",
@@ -60,7 +56,6 @@ export function Navigation() {
       gallery: "Gallery (Videos & Images)",
       galleryDesc: "Coming soon: videos and photo stories.",
 
-      // IA: About
       about: "About",
       aboutUs: "About Us",
       aboutUsDesc: "Lafaek’s mission, values, and services.",
@@ -71,9 +66,9 @@ export function Navigation() {
       socialEnterprise: "Social Enterprise",
       socialEnterpriseDesc: "Our transition from NGO to a sustainable business model.",
 
-      // Right side
       careers: "Careers",
       getInvolved: "Get involved",
+      friends: "Friends of Lafaek",
       loginSignup: "Login / Signup",
       en: "EN",
       tet: "TET",
@@ -82,7 +77,6 @@ export function Navigation() {
       brand: "Lafaek",
       home: "Uma",
 
-      // IA: Publications
       publication: "Publikasaun",
       books: "Livru ba Labarik",
       booksDesc: "Livru imajen no leitura ba labarik iha Tetun, Portugés no Inglés.",
@@ -93,7 +87,6 @@ export function Navigation() {
       schoolGallery: "Galeria Eskola",
       schoolGalleryDesc: "Foto hosi eskola no sala aula sira iha Timor-Leste.",
 
-      // IA: Learning
       learning: "Aprendizajen",
       kidsClub: "Kids Club",
       kidsClubDesc: "Atividade, istória no jogu ba labarik.",
@@ -106,7 +99,6 @@ export function Navigation() {
       guides: "Guia ba Pais & Maestri",
       guidesDesc: "Ideia pratiku husi konténudu Manorin/Komunidade.",
 
-      // IA: Explore (combines stories + programs)
       explore: "Explora",
       programs: "Programa",
       programsDesc: "Programa hotu-hotu iha pájina ida de'it.",
@@ -117,7 +109,6 @@ export function Navigation() {
       gallery: "Galeria (Vídeu & Imajens)",
       galleryDesc: "Tuir mai: vídeu no foto istória.",
 
-      // IA: About
       about: "Kona-ba",
       aboutUs: "Kona-ba Ami",
       aboutUsDesc: "Misaun, valor no servisu Lafaek.",
@@ -128,31 +119,27 @@ export function Navigation() {
       socialEnterprise: "Empreza Sosiál",
       socialEnterpriseDesc: "Transitasaun husi NGO ba modelu negósiu sustentavel.",
 
-      // Right side
       careers: "Empregu/Vaga",
       getInvolved: "Partisipa",
+      friends: "Kolega Lafaek",
       loginSignup: "Tama / Rejistu",
       en: "EN",
       tet: "TET",
     },
   }[language]
 
-  // LEFT: Logo + Main navigation (matches IA)
   const leftNav: NavItem[] = [
     { href: "/", label: t.home },
 
-    // Publications (mega)
     {
       label: t.publication,
       mega: [
         { href: "/publication/books", title: t.books, description: t.booksDesc },
         { href: "/publication/magazines", title: t.magazines, description: t.magazinesDesc },
         { href: "/publication/printables", title: t.printables, description: t.printablesDesc },
-        { href: "/publication/school-gallery", title: t.schoolGallery, description: t.schoolGalleryDesc }, // kept
+        { href: "/publication/school-gallery", title: t.schoolGallery, description: t.schoolGalleryDesc },
       ],
     },
-
-    // Learning (mega)
     {
       label: t.learning,
       mega: [
@@ -163,19 +150,15 @@ export function Navigation() {
         { href: "/learning/guides", title: t.guides, description: t.guidesDesc },
       ],
     },
-
-    // Explore (mega) — combines Stories + Programs
     {
       label: t.explore,
       mega: [
         { href: "/stories/news", title: t.news, description: t.newsDesc },
         { href: "/stories/community", title: t.communityStories, description: t.communityStoriesDesc },
-        { href: "/programs", title: t.programs, description: t.programsDesc }, // one main programs page
+        { href: "/programs", title: t.programs, description: t.programsDesc },
         { href: "/stories/gallery", title: t.gallery, description: t.galleryDesc },
       ],
     },
-
-    // About (mega)
     {
       label: t.about,
       mega: [
@@ -186,21 +169,17 @@ export function Navigation() {
       ],
     },
 
-    // Dedicated top-level Job Opportunities (requested)
     { href: "/careers", label: t.careers },
-
-    // Right-side item requested to stay in topbar list (kept for parity on mobile)
     { href: "/get-involved", label: t.getInvolved },
+    { href: "/friends", label: t.friends }, // New button
   ]
 
   return (
     <nav className="bg-[#219653]/90 backdrop-blur-sm border-b-2 border-[#F2C94C] sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 py-3">
-        {/* TOP BAR */}
         <div className="flex items-center justify-between gap-4">
           {/* LEFT: Logo + main menu */}
           <div className="flex items-center gap-6">
-            {/* Logo (uses /public/logo/lafaek-logo.png) */}
             <Link href="/" className="flex items-center gap-3">
               <div className="relative h-14 w-14 md:h-16 md:w-16">
                 <Image
@@ -217,37 +196,49 @@ export function Navigation() {
 
             {/* Desktop main nav */}
             <div className="hidden md:flex items-center gap-6">
-              {leftNav.map((item) =>
-                "mega" in item ? (
-                  <div key={item.label} className="relative group">
-                    <button
-                      className="flex items-center text-white hover:text-[#717273] font-medium transition-colors"
-                      aria-haspopup="menu"
-                      aria-expanded="false"
-                    >
-                      {item.label}
-                      <ChevronDown className="ml-1 h-4 w-4" />
-                    </button>
-
-                    {/* Mega dropdown */}
-                    <div className="absolute left-0 mt-3 w-[680px] bg-white rounded-xl shadow-lg border border-[#F5F5F5] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                      <div className="p-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        {item.mega.map((m) => (
-                          <Link
-                            key={m.href}
-                            href={m.href}
-                            className="block rounded-lg p-3 hover:bg-[#F5F5F5] transition"
-                          >
-                            <div className="text-[15px] font-semibold text-[#4F4F4F]">{m.title}</div>
-                            {m.description ? (
-                              <div className="mt-1 text-sm text-[#828282] leading-snug">{m.description}</div>
-                            ) : null}
-                          </Link>
-                        ))}
+              {leftNav.map((item) => {
+                if ("mega" in item) {
+                  return (
+                    <div key={item.label} className="relative group">
+                      <button
+                        className="flex items-center text-white hover:text-[#717273] font-medium transition-colors"
+                        aria-haspopup="menu"
+                        aria-expanded="false"
+                      >
+                        {item.label}
+                        <ChevronDown className="ml-1 h-4 w-4" />
+                      </button>
+                      <div className="absolute left-0 mt-3 w-[680px] bg-white rounded-xl shadow-lg border border-[#F5F5F5] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                        <div className="p-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          {item.mega.map((m) => (
+                            <Link
+                              key={m.href}
+                              href={m.href}
+                              className="block rounded-lg p-3 hover:bg-[#F5F5F5] transition"
+                            >
+                              <div className="text-[15px] font-semibold text-[#4F4F4F]">{m.title}</div>
+                              {m.description && (
+                                <div className="mt-1 text-sm text-[#828282] leading-snug">{m.description}</div>
+                              )}
+                            </Link>
+                          ))}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ) : (
+                  )
+                }
+
+                if (item.href === "/friends") {
+                  return (
+                    <Link key={item.href} href={item.href} className="inline-flex">
+                      <Button className="bg-[#F2C94C] text-[#219653] hover:opacity-90 font-semibold px-4 py-2 rounded-lg">
+                        {item.label}
+                      </Button>
+                    </Link>
+                  )
+                }
+
+                return (
                   <Link
                     key={item.href}
                     href={item.href}
@@ -256,13 +247,12 @@ export function Navigation() {
                     {item.label}
                   </Link>
                 )
-              )}
+              })}
             </div>
           </div>
 
           {/* RIGHT: language + auth + mobile toggle */}
           <div className="flex items-center gap-2">
-            {/* Desktop language/auth */}
             <div className="hidden md:flex items-center gap-3">
               <Button
                 onClick={() => setLanguage("en")}
@@ -270,7 +260,7 @@ export function Navigation() {
                 className={`px-2 py-1 text-xs font-semibold rounded-md transition ${
                   language === "en"
                     ? "bg-[#F2C94C] text-[#219653]"
-                    : "border border-white text-white hover:bg:white/20 hover:bg-white/20"
+                    : "border border-white text-white hover:bg-white/20"
                 }`}
               >
                 {t.en}
@@ -281,18 +271,15 @@ export function Navigation() {
                 className={`px-2 py-1 text-xs font-semibold rounded-md transition ${
                   language === "tet"
                     ? "bg-white text-[#219653]"
-                    : "border border-white text-white hover:bg:white/20 hover:bg-white/20"
+                    : "border border-white text-white hover:bg-white/20"
                 }`}
               >
                 {t.tet}
               </Button>
-
               <Link href="/auth" className="text-white hover:text-[#F2C94C] font-medium transition-colors">
                 {t.loginSignup}
               </Link>
             </div>
-
-            {/* Mobile toggler */}
             <Button
               onClick={() => setIsMenuOpen((v) => !v)}
               className="md:hidden text-white hover:bg-white/20 p-2 rounded-md"
@@ -307,7 +294,6 @@ export function Navigation() {
         {isMenuOpen && (
           <div className="md:hidden mt-4 pb-4">
             <div className="flex flex-col space-y-2 pt-2">
-              {/* Language + auth on mobile */}
               <div className="flex items-center gap-2 px-4">
                 <Button
                   onClick={() => setLanguage("en")}
@@ -331,7 +317,6 @@ export function Navigation() {
                 >
                   {t.tet}
                 </Button>
-
                 <Link
                   href="/auth"
                   className="ml-auto text-white hover:text-[#F2C94C] font-medium transition-colors"
@@ -343,7 +328,6 @@ export function Navigation() {
 
               <div className="h-px bg-white/20 my-2" />
 
-              {/* Main menu items with collapsible mega sections */}
               {leftNav.map((item) =>
                 "mega" in item ? (
                   <div key={item.label} className="px-2">
@@ -374,9 +358,9 @@ export function Navigation() {
                             }}
                           >
                             <div className="text-white/95">{m.title}</div>
-                            {m.description ? (
+                            {m.description && (
                               <div className="text-white/70 text-sm leading-snug">{m.description}</div>
-                            ) : null}
+                            )}
                           </Link>
                         ))}
                       </div>
@@ -386,7 +370,11 @@ export function Navigation() {
                   <Link
                     key={item.href}
                     href={item.href}
-                    className="text-white hover:text-[#F2C94C] py-2 px-4 rounded-md hover:bg-white/10 transition-colors"
+                    className={`py-2 px-4 rounded-md transition-colors ${
+                      item.href === "/friends"
+                        ? "bg-[#F2C94C] text-[#219653] font-semibold"
+                        : "text-white hover:text-[#F2C94C] hover:bg-white/10"
+                    }`}
                     onClick={() => setIsMenuOpen(false)}
                   >
                     {item.label}
