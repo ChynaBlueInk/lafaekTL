@@ -1,21 +1,35 @@
-# Node/Next.js
-node_modules
-.next
-out
-dist
+# --- Node / Next.js ---
+node_modules/
+.next/
+out/
+dist/
+.vercel/
+.turbo/
+.eslintcache
+
+# --- Envs (commit a sample .env.example instead) ---
 .env
 .env.local
 .env.*.local
 
-# Logs
+# --- Logs ---
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-# OS / editor
+# --- OS / Editors ---
 .DS_Store
+Thumbs.db
 *.swp
-.idea
+.idea/
 .vscode/*
 !.vscode/extensions.json
+
+# --- App-specific (we store assets on S3, not git) ---
+public/uploads/
+public/tmp/
+
+# --- Test / Coverage (if you add tests later) ---
+coverage/

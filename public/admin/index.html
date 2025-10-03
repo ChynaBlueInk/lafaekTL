@@ -1,0 +1,31 @@
+<script>
+  window.CMS_MANUAL_INIT = true;
+  window.CMS_CONFIG = {
+    local_backend: true,
+    backend: { name: "github" },
+    media_folder: "public/uploads",
+    public_folder: "/uploads",
+    collections: [
+      {
+        name: "our_team",
+        label: "Our Team",
+        folder: "content/our-team",
+        extension: "md",
+        format: "frontmatter",
+        create: true,
+        slug: "{{name}}",
+        fields: [
+          { name: "name", label: "Name", widget: "string" },
+          { name: "role", label: "Role", widget: "string" },
+          { name: "bio", label: "Bio", widget: "markdown" }
+        ]
+      }
+    ]
+  };
+</script>
+<script src="https://unpkg.com/decap-cms@^2.12.0/dist/decap-cms.js"></script>
+<script>
+  window.addEventListener("load", function () {
+    CMS.init(window.CMS_CONFIG);
+  });
+</script>
