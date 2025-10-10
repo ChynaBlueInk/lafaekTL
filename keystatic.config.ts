@@ -1,28 +1,35 @@
 // keystatic.config.ts
-import { config, collection, fields } from '@keystatic/core';
+import { config, collection, fields, type Config } from '@keystatic/core';
 
-const isProd = process.env.NODE_ENV === 'production';
+// Read all GitHub OAuth envs Keystatic needs for "github" storage:
+const owner        = process.env.KEYSTATIC_GITHUB_OWNER;
+const repo         = process.env.KEYSTATIC_GITHUB_REPO;
+const clientId     = process.env.KEYSTATIC_GITHUB_CLIENT_ID;
+const clientSecret = process.env.KEYSTATIC_GITHUB_CLIENT_SECRET;
+const appSecret    = process.env.KEYSTATIC_SECRET;
+
+// Only use GitHub storage when ALL required envs are present.
+// Otherwise (e.g. local builds) fall back to local storage so build works.
+const githubReady =
+  !!owner && !!repo && !!clientId && !!clientSecret && !!appSecret;
+
+const storage: Config['storage'] = githubReady
+  ? {
+      kind: 'github',
+      repo: { owner: owner!, name: repo! },
+      // OAuth values are read from process.env by Keystatic’s route handler.
+    }
+  : { kind: 'local' };
 
 export default config({
-  // Local files in dev; GitHub in production (token comes from env)
-  storage: isProd
-    ? {
-        kind: 'github',
-        repo: {
-          owner: process.env.KEYSTATIC_GITHUB_OWNER!, // "ChynaBlueInk"
-          name: process.env.KEYSTATIC_GITHUB_REPO!,   // "lafaekTL"
-        },
-        // no 'token' or 'branch' here; Keystatic reads KEYSTATIC_GITHUB_TOKEN and uses the repo's default branch
-      }
-    : { kind: 'local' },
-
+  storage,
   ui: { brand: { name: 'Lafaek Editor' } },
-
   collections: {
     our_team: collection({
       label: 'Our Team',
       path: 'content/our-team/*',
-      format: { data: 'yaml' }, // store all fields in YAML frontmatter
+      // store everything in front-matter (no file body)
+      format: { data: 'yaml' },
       slugField: 'name',
       schema: {
         name: fields.text({ label: 'Name', validation: { isRequired: true } }),
@@ -31,13 +38,10 @@ export default config({
         started: fields.text({ label: 'Started (year)' }),
         photoUrl: fields.url({
           label: 'Photo URL (S3)',
-          description: 'Use “Upload to S3” (drawer) then paste / auto-fill.',
+          description: 'Use the uploader to get this URL',
           validation: { isRequired: true },
         }),
-        sketchUrl: fields.url({
-          label: 'Sketch URL (S3)',
-          description: 'Optional.',
-        }),
+        sketchUrl: fields.url({ label: 'Sketch URL (S3)' }),
         bio: fields.text({ label: 'Bio (EN)', multiline: true }),
         bioTet: fields.text({ label: 'Bio (Tetun)', multiline: true }),
       },
