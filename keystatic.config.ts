@@ -1,56 +1,51 @@
 // keystatic.config.ts
-import { config, collection, fields, type Config } from "@keystatic/core";
+import { config, collection, fields } from '@keystatic/core';
 
-// Read all GitHub OAuth envs Keystatic needs for "github" storage:
-const owner = process.env.KEYSTATIC_GITHUB_OWNER;
-const repo = process.env.KEYSTATIC_GITHUB_REPO;
-const clientId = process.env.KEYSTATIC_GITHUB_CLIENT_ID;
-const clientSecret = process.env.KEYSTATIC_GITHUB_CLIENT_SECRET;
-const appSecret = process.env.KEYSTATIC_SECRET;
-
-// Check if all GitHub-related environment variables are available
-const githubReady =
-  !!owner && !!repo && !!clientId && !!clientSecret && !!appSecret;
-
-// Switch between GitHub storage (for live) and local (for dev)
-const storage: Config["storage"] = githubReady
-  ? {
-      kind: "github",
-      repo: { owner: owner!, name: repo! },
-      // no branch here; Keystatic uses the repo's default branch
-    }
-  : { kind: "local" };
-
+const hasGithubEnvs =
+  !!process.env.KEYSTATIC_GITHUB_OWNER &&
+  !!process.env.KEYSTATIC_GITHUB_REPO &&
+  !!process.env.KEYSTATIC_SECRET &&
+  !!process.env.KEYSTATIC_GITHUB_CLIENT_ID &&
+  !!process.env.KEYSTATIC_GITHUB_CLIENT_SECRET;
 
 export default config({
-  storage,
   ui: {
-    brand: {
-      name: "Lafaek CMS",
-    },
+    brand: { name: 'Lafaek CMS' },
   },
+
+  // Prod: GitHub (OAuth handled via /api/keystatic route + envs)
+  // Dev:  Local (so the UI always renders)
+  storage: hasGithubEnvs
+    ? {
+        kind: 'github',
+        repo: {
+          owner: process.env.KEYSTATIC_GITHUB_OWNER!,
+          name: process.env.KEYSTATIC_GITHUB_REPO!,
+        },
+        branchPrefix: 'keystatic/',
+      }
+    : { kind: 'local' },
+
+  // ── UPDATED: match live fields/labels and YAML data files ───────────────────
   collections: {
     our_team: collection({
-      label: "Our Team",
-      path: "content/our-team/*",
-      format: { data: "yaml" },
-      slugField: "name",
+      label: 'Our Team',
+      path: 'content/our-team/*',
+      format: { data: 'yaml' }, // live site uses YAML for entries
+      slugField: 'name',
       schema: {
-        name: fields.text({ label: "Name", validation: { isRequired: true } }),
-        role: fields.text({
-          label: "Role (EN)",
-          validation: { isRequired: true },
-        }),
-        roleTet: fields.text({ label: "Kargu (Tetun)" }),
-        started: fields.text({ label: "Started (year)" }),
+        name:     fields.text({ label: 'Name', validation: { isRequired: true } }),
+        role:     fields.text({ label: 'Role (EN)', validation: { isRequired: true } }),
+        roleTet:  fields.text({ label: 'Kargu (Tetun)' }),
+        started:  fields.text({ label: 'Started (year)' }),
         photoUrl: fields.url({
-          label: "Photo URL (S3)",
-          description: "Use the uploader to get this URL",
+          label: 'Photo URL (S3)',
+          description: 'Use the uploader to get this URL',
           validation: { isRequired: true },
         }),
-        sketchUrl: fields.url({ label: "Sketch URL (S3)" }),
-        bio: fields.text({ label: "Bio (EN)", multiline: true }),
-        bioTet: fields.text({ label: "Bio (Tetun)", multiline: true }),
+        sketchUrl: fields.url({ label: 'Sketch URL (S3)' }),
+        bio:     fields.text({ label: 'Bio (EN)', multiline: true }),
+        bioTet:  fields.text({ label: 'Bio (Tetun)', multiline: true }),
       },
     }),
   },

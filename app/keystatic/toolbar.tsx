@@ -2,13 +2,46 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { usePathname } from 'next/navigation';
 
 type Folder = 'our-team' | 'school-gallery' | 'pdfs';
+const ALLOWED_HOSTS = [
+  'lafaek-media.s3.ap-southeast-2.amazonaws.com',
+];
 
 export default function Toolbar() {
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [folder, setFolder] = useState<Folder>('our-team');
   const [toast, setToast] = useState<string>('');
+  const [busyDelete, setBusyDelete] = useState(false);
+
+  // Detect item view: /keystatic/collection/our_team/item/<slug>
+  const match = pathname?.match(/\/keystatic\/collection\/our_team\/item\/([^/]+)$/);
+  const currentSlug = match?.[1];
+
+  // Track focused field value so we can decide if "Delete from S3" should be enabled
+  const [focusedUrl, setFocusedUrl] = useState<string>('');
+  useEffect(() => {
+    function onFocusIn() {
+      const active = document.activeElement as HTMLInputElement | HTMLTextAreaElement | null;
+      if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA')) {
+        setFocusedUrl((active as any).value ?? '');
+      }
+    }
+    function onInput(e: Event) {
+      const t = e.target as HTMLInputElement | HTMLTextAreaElement;
+      if (document.activeElement === t) {
+        setFocusedUrl(t.value ?? '');
+      }
+    }
+    window.addEventListener('focusin', onFocusIn);
+    window.addEventListener('input', onInput, true);
+    return () => {
+      window.removeEventListener('focusin', onFocusIn);
+      window.removeEventListener('input', onInput, true);
+    };
+  }, []);
 
   const uploaderSrc = useMemo(() => {
     const params = new URLSearchParams();
@@ -22,22 +55,25 @@ export default function Toolbar() {
     const proto =
       el.tagName === 'TEXTAREA' ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype;
     const valueSetter = Object.getOwnPropertyDescriptor(proto, 'value')?.set;
-    if (valueSetter) {
-      valueSetter.call(el, value);
-    } else {
-      // fallback
-      (el as any).value = value;
-    }
+    if (valueSetter) valueSetter.call(el, value);
+    else (el as any).value = value;
     el.dispatchEvent(new Event('input', { bubbles: true }));
+  }
+
+  function isAllowedS3Url(url: string) {
+    try {
+      const u = new URL(url);
+      return ALLOWED_HOSTS.includes(u.hostname);
+    } catch {
+      return false;
+    }
   }
 
   // Listen for URLs posted by the embedded uploader and insert into focused field
   useEffect(() => {
     function onMessage(e: MessageEvent) {
       const data = e.data as { type?: string; urls?: string[]; folder?: string };
-      if (!data || data.type !== 'LAFAEK_UPLOAD_URLS' || !Array.isArray(data.urls) || data.urls.length === 0) {
-        return;
-      }
+      if (data?.type !== 'LAFAEK_UPLOAD_URLS' || !Array.isArray(data.urls) || data.urls.length === 0) return;
 
       const firstUrl = data.urls[0];
       const active = document.activeElement as HTMLInputElement | HTMLTextAreaElement | null;
@@ -45,26 +81,73 @@ export default function Toolbar() {
       if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA')) {
         setFieldValue(active, firstUrl);
         setToast('URL inserted into focused field');
-        setTimeout(() => setToast(''), 2000);
       } else {
         navigator.clipboard.writeText(firstUrl);
         setToast('URL copied to clipboard');
-        setTimeout(() => setToast(''), 2000);
       }
+      const t = setTimeout(() => setToast(''), 2000);
+      return () => clearTimeout(t);
     }
     window.addEventListener('message', onMessage);
     return () => window.removeEventListener('message', onMessage);
   }, []);
 
+  async function onDeleteS3() {
+    const url = focusedUrl?.trim();
+    if (!isAllowedS3Url(url)) return;
+    if (!window.confirm('Delete this file from S3? This cannot be undone.')) return;
+
+    setBusyDelete(true);
+    try {
+      const res = await fetch('/api/uploads/s3/delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data?.ok) {
+        alert(`Failed to delete from S3: ${data?.error ?? res.statusText}`);
+        return;
+      }
+      // If we deleted the object successfully, clear the focused field (if any)
+      const active = document.activeElement as HTMLInputElement | HTMLTextAreaElement | null;
+      if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA')) {
+        setFieldValue(active, '');
+      }
+      setToast('File deleted from S3');
+      setTimeout(() => setToast(''), 2000);
+    } catch (e: any) {
+      alert(`Failed to delete from S3: ${e?.message ?? 'Unknown error'}`);
+    } finally {
+      setBusyDelete(false);
+    }
+  }
+
   return (
     <>
       <div className="mx-auto max-w-screen-2xl px-4">
-        <div className="mb-3 flex items-center justify-between rounded-xl border border-[#BDBDBD] bg-white px-3 py-2 shadow-sm">
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-[#BDBDBD] bg-white px-3 py-2 shadow-sm">
           <div className="text-sm text-[#4F4F4F]">
             <span className="font-medium text-[#219653]">Lafaek tools:</span>{' '}
             Upload images/PDFs and auto-fill the focused field.
           </div>
-          <div className="flex items-center gap-2">
+
+          <div className="flex flex-wrap items-center gap-2">
+            {/* Quick nav */}
+            <a
+              href="/keystatic/collection/our_team"
+              className="rounded-md border border-[#BDBDBD] px-3 py-1.5 text-sm font-medium hover:bg-[#F5F5F5]"
+            >
+              Our Team
+            </a>
+            <a
+              href="/keystatic/collection/our_team/create"
+              className="rounded-md bg-[#219653] px-3 py-1.5 text-sm font-semibold text-white hover:brightness-95"
+            >
+              + Add
+            </a>
+
+            {/* Folder picker + uploader */}
             <select
               value={folder}
               onChange={(e) => setFolder(e.target.value as Folder)}
@@ -81,6 +164,25 @@ export default function Toolbar() {
             >
               Upload to S3
             </button>
+
+            {/* Delete the focused S3 file (e.g., photoUrl or sketchUrl) */}
+            <button
+              onClick={onDeleteS3}
+              disabled={!isAllowedS3Url(focusedUrl) || busyDelete}
+              className="rounded-md bg-[#EB5757] px-3 py-1.5 text-sm font-semibold text-white hover:brightness-95 disabled:opacity-60"
+              title={isAllowedS3Url(focusedUrl) ? 'Delete the focused S3 file' : 'Focus a field with an S3 URL to enable'}
+            >
+              {busyDelete ? 'Deleting…' : 'Delete from S3'}
+            </button>
+
+            {/* Delete entry appears only on an item page */}
+            {currentSlug && (
+              <a
+                href={`/keystatic/collection/our_team/item/${currentSlug}`} // keep route stable
+                onClick={(e) => { e.preventDefault(); /* handled by item delete below if added */ }}
+                className="hidden"
+              />
+            )}
           </div>
         </div>
       </div>
