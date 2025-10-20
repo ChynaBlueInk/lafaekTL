@@ -33,6 +33,5 @@ export async function GET() {
   } catch {
     apiOk = false;
   }
-
   return NextResponse.json({ envs, apiOk, apiStatus, checkedOrigin: origin });
 }
