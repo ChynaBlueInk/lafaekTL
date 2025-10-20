@@ -13,14 +13,24 @@ export async function GET() {
     KEYSTATIC_SECRET: !!process.env.KEYSTATIC_SECRET,
   };
 
+  // Resolve the correct origin in every environment
+  const origin = process.env.VERCEL_URL
+    ? `https://${process.env.VERCEL_URL}`
+    : (process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || 'http://localhost:3000');
+
   let apiOk = false;
+  let apiStatus: number | null = null;
+
   try {
-    const base = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || 'http://localhost:3000';
-    const res = await fetch(`${base}/api/keystatic`, { method: 'GET' });
+    const res = await fetch(`${origin}/api/keystatic`, {
+      method: 'GET',
+      cache: 'no-store',
+    });
+    apiStatus = res.status;
     apiOk = res.ok;
   } catch {
     apiOk = false;
   }
 
-  return NextResponse.json({ envs, apiOk });
+  return NextResponse.json({ envs, apiOk, apiStatus, checkedOrigin: origin });
 }
