@@ -24,9 +24,8 @@ export async function GET() {
     const res = await fetch(`${origin}/api/keystatic`, {
       method: 'GET',
       cache: 'no-store',
-      // ✅ send secret header expected by secured API
       headers: {
-        'x-keystatic-secret': process.env.KEYSTATIC_SECRET ?? '',
+        Authorization: `Bearer ${process.env.KEYSTATIC_SECRET ?? ''}`,
       },
     });
     apiStatus = res.status;
