@@ -13,7 +13,6 @@ export async function GET() {
     KEYSTATIC_SECRET: !!process.env.KEYSTATIC_SECRET,
   };
 
-  // Resolve the correct origin in every environment
   const origin = process.env.VERCEL_URL
     ? `https://${process.env.VERCEL_URL}`
     : (process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || 'http://localhost:3000');
@@ -25,6 +24,10 @@ export async function GET() {
     const res = await fetch(`${origin}/api/keystatic`, {
       method: 'GET',
       cache: 'no-store',
+      // ✅ send secret header expected by secured API
+      headers: {
+        'x-keystatic-secret': process.env.KEYSTATIC_SECRET ?? '',
+      },
     });
     apiStatus = res.status;
     apiOk = res.ok;
