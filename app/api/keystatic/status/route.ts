@@ -5,6 +5,7 @@ export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 
 export async function GET() {
+  // report which critical envs are present (booleans only)
   const envs = {
     KEYSTATIC_GITHUB_OWNER: !!process.env.KEYSTATIC_GITHUB_OWNER,
     KEYSTATIC_GITHUB_REPO: !!process.env.KEYSTATIC_GITHUB_REPO,
@@ -13,25 +14,33 @@ export async function GET() {
     KEYSTATIC_SECRET: !!process.env.KEYSTATIC_SECRET,
   };
 
-  const origin = process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}`
-    : (process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || 'http://localhost:3000');
+  // resolve the correct origin for the currently running deployment
+  const origin =
+    process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : (process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || 'http://localhost:3000');
 
   let apiOk = false;
   let apiStatus: number | null = null;
+
+  // construct headers in a way that satisfies HeadersInit
+  const secret = process.env.KEYSTATIC_SECRET ?? '';
+  const headers: HeadersInit = secret
+    ? { Authorization: `Bearer ${secret}` }
+    : {}; // don't send empty bearer
 
   try {
     const res = await fetch(`${origin}/api/keystatic`, {
       method: 'GET',
       cache: 'no-store',
-      headers: {
-        Authorization: `Bearer ${process.env.KEYSTATIC_SECRET ?? ''}`,
-      },
-    });
+      headers,
+    } as RequestInit);
+
     apiStatus = res.status;
     apiOk = res.ok;
   } catch {
     apiOk = false;
   }
+
   return NextResponse.json({ envs, apiOk, apiStatus, checkedOrigin: origin });
 }
