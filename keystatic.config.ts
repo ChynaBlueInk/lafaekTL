@@ -1,37 +1,30 @@
 // keystatic.config.ts
 import { config, collection, fields } from '@keystatic/core';
 
-const hasGithubEnvs =
-  !!process.env.KEYSTATIC_GITHUB_OWNER &&
-  !!process.env.KEYSTATIC_GITHUB_REPO &&
-  !!process.env.KEYSTATIC_SECRET &&
-  !!process.env.KEYSTATIC_GITHUB_CLIENT_ID &&
-  !!process.env.KEYSTATIC_GITHUB_CLIENT_SECRET;
+// ❌ Remove the hasGithubEnvs branching (browser sees non-NEXT_PUBLIC envs as undefined)
+// const hasGithubEnvs = ...
 
 export default config({
   ui: {
     brand: { name: 'Lafaek CMS' },
   },
 
-  // Prod: GitHub (OAuth handled via /api/keystatic route + envs)
-  // Dev:  Local (so the UI always renders)
-  storage: hasGithubEnvs
-    ? {
-        kind: 'github',
-        repo: {
-          owner: process.env.KEYSTATIC_GITHUB_OWNER!,
-          name: process.env.KEYSTATIC_GITHUB_REPO!,
-        },
-        branchPrefix: 'keystatic/',
-      }
-    : { kind: 'local' },
+  // ✅ Always use GitHub storage; the UI will call /api/keystatic for auth
+  storage: {
+    kind: 'github',
+    repo: {
+      owner: process.env.KEYSTATIC_GITHUB_OWNER!, // server env read by API
+      name: process.env.KEYSTATIC_GITHUB_REPO!,   // server env read by API
+    },
+    branchPrefix: 'keystatic/',
+    // (Optional) branch: 'main', // if you want to pin writes to main
+  },
 
-  // ── UPDATED: match live fields/labels and YAML data files ───────────────────
   collections: {
     our_team: collection({
       label: 'Our Team',
       path: 'content/our-team/*',
-      format: { data: 'yaml' }, // live site uses YAML for entries
+      format: { data: 'yaml' },
       slugField: 'name',
       schema: {
         name:     fields.text({ label: 'Name', validation: { isRequired: true } }),
