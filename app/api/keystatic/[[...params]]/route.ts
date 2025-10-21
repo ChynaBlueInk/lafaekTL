@@ -2,11 +2,12 @@
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-import { makeHandler } from '@keystatic/next/route-handler';
+import { makeRouteHandler } from '@keystatic/next/route-handler';
 import config from '../../../../keystatic.config';
 
 // Keystatic's built-in API handler (supports all /api/keystatic/* routes)
-export const { GET, POST } = makeHandler({
+export const { GET, POST } = makeRouteHandler({
   config,
+  // optional but recommended if you secured /api/keystatic:
   secret: process.env.KEYSTATIC_SECRET!,
 });
