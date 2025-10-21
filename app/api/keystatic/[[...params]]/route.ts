@@ -5,9 +5,11 @@ export const dynamic = 'force-dynamic';
 import { makeRouteHandler } from '@keystatic/next/route-handler';
 import config from '../../../../keystatic.config';
 
-// Keystatic's built-in API handler (supports all /api/keystatic/* routes)
+// Keystatic API handler for all /api/keystatic/* routes
 export const { GET, POST } = makeRouteHandler({
   config,
-  // optional but recommended if you secured /api/keystatic:
+  // HMAC used for state/csrf — must be set in server env
   secret: process.env.KEYSTATIC_SECRET!,
+  // NOTE: Do NOT pass { github: { ... } } here for your version;
+  // the handler will read KEYSTATIC_GITHUB_CLIENT_ID/SECRET from env.
 });
