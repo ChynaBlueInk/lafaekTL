@@ -8,15 +8,17 @@ import { Keystatic } from '@keystatic/core/ui';
 import type { Config as KSConfig } from '@keystatic/core';
 import rawConfig from '../../../keystatic.config';
 import Toolbar from '../toolbar';
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { usePathname, useRouter } from 'next/navigation';
+import { useEffect, useMemo, useState } from 'react';
+import { usePathname } from 'next/navigation';
 
 // Cast to base Config (generic mismatch in core UI types)
 const config = rawConfig as unknown as KSConfig;
 
+// Some Keystatic versions don’t surface `apiPath` in types; this keeps TS happy.
+const KeystaticUI = Keystatic as unknown as React.ComponentType<any>;
+
 export default function KeystaticPage() {
   const pathname = usePathname();
-  const router = useRouter();
 
   const isItemView = useMemo(
     () => /\/collection\/[^/]+\/item\/[^/]+$/.test(pathname ?? ''),
@@ -34,7 +36,6 @@ export default function KeystaticPage() {
     return () => clearTimeout(t);
   }, [isItemView, pathname]);
 
-  // (We’ll keep the rest of your logic as-is; this step only adds the scroll wrapper.)
   return (
     <div className="min-h-screen">
       <Toolbar />
@@ -43,12 +44,12 @@ export default function KeystaticPage() {
           Preparing entry…
         </div>
       ) : (
-        // ⬇️ NEW: give the admin area its own scrollable viewport
         <div className="mt-3 max-h-[80vh] overflow-y-auto overscroll-contain pr-2">
-          <Keystatic
+          <KeystaticUI
             key={pathname}
             config={config}
             appSlug={{ value: 'keystatic', envName: 'KEYSTATIC_CMS_SLUG' }}
+            apiPath="/api/keystatic"   // ✅ point UI at API so GitHub sign-in appears
           />
         </div>
       )}
