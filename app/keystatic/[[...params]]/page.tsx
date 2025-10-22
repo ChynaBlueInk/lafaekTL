@@ -14,7 +14,7 @@ import { usePathname } from 'next/navigation';
 // Cast to base Config (generic mismatch in core UI types)
 const config = rawConfig as unknown as KSConfig;
 
-// Some Keystatic versions don’t surface `apiPath` in types; this keeps TS happy.
+// Some Keystatic versions don’t surface props well; keep TS happy.
 const KeystaticUI = Keystatic as unknown as React.ComponentType<any>;
 
 export default function KeystaticPage() {
@@ -45,11 +45,16 @@ export default function KeystaticPage() {
         </div>
       ) : (
         <div className="mt-3 max-h-[80vh] overflow-y-auto overscroll-contain pr-2">
+          {/* CANARY: PAT mode (no OAuth) */}
+          <div style={{padding:6, fontSize:12, background:'#F5F5F5', color:'#4F4F4F'}}>
+            Admin UI: PAT mode (no OAuth) • CANARY-PAT-01
+          </div>
+
           <KeystaticUI
             key={pathname}
             config={config}
             appSlug={{ value: 'keystatic', envName: 'KEYSTATIC_CMS_SLUG' }}
-            apiPath="/api/keystatic"   // ✅ point UI at API so GitHub sign-in appears
+            /* apiPath removed to disable OAuth */
           />
         </div>
       )}
