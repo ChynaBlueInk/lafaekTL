@@ -10,13 +10,12 @@ const base = makeRouteHandler({
   secret: process.env.KEYSTATIC_SECRET!, // HMAC/state cookie
 });
 
-// Wrap GET/POST so we can log failures into Vercel “Deployment → Logs”
+// Wrap GET/POST so we can see precise errors in the browser during auth
 export const GET = async (req: Request) => {
   const url = new URL(req.url);
   try {
     const res = await base.GET!(req);
-
-    // clone response so we can add a header safely
+    // clone to add a tiny header so we know this file handled it
     const out = new Response(res.body, {
       status: res.status,
       statusText: res.statusText,
@@ -25,13 +24,19 @@ export const GET = async (req: Request) => {
     out.headers.set('x-keystatic-handler', 'live');
     return out;
   } catch (err: any) {
-    console.error('KS::GET error', {
+    const payload = {
+      phase: 'GET',
       path: url.pathname,
       search: url.search,
-      msg: err?.message ?? String(err),
+      message: err?.message ?? String(err),
       stack: err?.stack ?? null,
+      hint: 'If this is the OAuth callback, check Client ID/Secret, callback URL, and KEYSTATIC_SECRET.',
+    };
+    console.error('KS::GET error', payload);
+    return new Response(`Authorization failed\n\n${JSON.stringify(payload, null, 2)}`, {
+      status: 500,
+      headers: { 'content-type': 'text/plain; charset=utf-8' },
     });
-    return new Response('Authorization failed (GET)', { status: 500 });
   }
 };
 
@@ -40,12 +45,17 @@ export const POST = async (req: Request) => {
   try {
     return await base.POST!(req);
   } catch (err: any) {
-    console.error('KS::POST error', {
+    const payload = {
+      phase: 'POST',
       path: url.pathname,
       search: url.search,
-      msg: err?.message ?? String(err),
+      message: err?.message ?? String(err),
       stack: err?.stack ?? null,
+    };
+    console.error('KS::POST error', payload);
+    return new Response(`Authorization failed\n\n${JSON.stringify(payload, null, 2)}`, {
+      status: 500,
+      headers: { 'content-type': 'text/plain; charset=utf-8' },
     });
-    return new Response('Authorization failed (POST)', { status: 500 });
   }
 };
