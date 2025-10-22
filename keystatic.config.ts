@@ -3,20 +3,13 @@ import { config, collection, fields } from '@keystatic/core';
 
 export default config({
   ui: {
-    brand: { name: 'Lafaek CMS' },
+    brand: { name: 'Lafaek CMS — PAT' }, // canary label
   },
-
-  // keystatic.config.ts  (replace only the storage block)
-storage: {
-  kind: 'github',
-  repo: {
-    owner: 'ChynaBlueInk',
-    name: 'lafaekTL',
+  storage: {
+    kind: 'github',
+    repo: { owner: 'ChynaBlueInk', name: 'lafaekTL' },
+    branchPrefix: 'keystatic/',
   },
-  branchPrefix: 'keystatic/',
-  // ✅ PAT mode: read from Vercel env (server-side)
-  token: process.env.KEYSTATIC_GITHUB_TOKEN!,
-} as any,
 
   // ── Match live fields/labels and YAML data files ────────────────────────────
   collections: {
