@@ -6,17 +6,17 @@ export default config({
     brand: { name: 'Lafaek CMS' },
   },
 
-  // Always use GitHub in the UI (avoid process.env on client)
-  // The API route (/api/keystatic) still uses server envs & KEYSTATIC_SECRET.
-  storage: {
-    kind: 'github',
-    repo: {
-      owner: 'ChynaBlueInk', // <- literal so client bundle doesn't read env
-      name: 'lafaekTL',      // <- literal
-    },
-    branchPrefix: 'keystatic/',
-    // branch: 'main', // uncomment to force writes to main
+  // keystatic.config.ts  (replace only the storage block)
+storage: {
+  kind: 'github',
+  repo: {
+    owner: 'ChynaBlueInk',
+    name: 'lafaekTL',
   },
+  branchPrefix: 'keystatic/',
+  // ✅ PAT mode: read from Vercel env (server-side)
+  token: process.env.KEYSTATIC_GITHUB_TOKEN!,
+} as any,
 
   // ── Match live fields/labels and YAML data files ────────────────────────────
   collections: {
