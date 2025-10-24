@@ -67,8 +67,8 @@ export default function AboutPage() {
       history: {
         title: "Ami-nia Istoria",
         paragraphs: [
-          "Hahu iha tinan 2003 nu'udar inisiativa komunidade, Lafaek Learning Media hahu ho objetivu simples ida: atu fó asesu ba konteúdu edukativu ne'ebé fasil no envolvente ba labarik Timor nian. Buat ne'ebé hahu nu'udar ekipa ki'ik ida ne'ebé produz revista ida de'it, agora sai empreza sosiál boot ida.",
-          "Durante tinan sira, ami habelar ami-nia asesu, diversifika ami-nia konteúdu, no harii parseria forte ho komunidade lokál, edukadór, no organizasaun internasionál. Iha tinan 2018, ami orgulhu hakat ba sai organizasaun ne'ebé Timor-oan nian no jere rasik, nu'udar prova ba ami-nia kompromisu ba hametin lokál no sustentabilidade.",
+          "Harii iha tinan 2001 nu’udar inisiativa edukasionál, Lafaek Learning Media hahú ho objetivu simples ida: atu fornese konteúdu edukasionál ne’ebé asesivel no envolve ba labarik Timoroan sira. Saida maka hahú hanesan ekipa ki'ik ida ne'ebé produz revista ida de'it sai hanesan empreza sosiál ida ne'ebé importante.",
+          "Iha tinan hirak nia laran, ami habelar ami-nia alkanse, diversifika ami-nia konteúdu, no harii parseria forte ho GoTL, komunidade lokál sira, edukadór sira, no organizasaun internasionál sira. Iha tinan 2018, ami halo tranzisaun ho orgullu atu sai organizasaun ida ne’ebé kompletamente na’in no operadu husi Timoroan, testamentu ida ba ami nia kompromisu ba empoderamentu lokál no sustentabilidade.",
         ],
       },
       values: {
