@@ -21,15 +21,15 @@ export default function AboutPage() {
         image: "/placeholder.svg?height=400&width=800",
       },
       mission: {
-        title: "Our Mission",
+        title: "Lafaek Mission Statement: ",
         description:
-          "Lafaek Learning Media is dedicated to fostering literacy, critical thinking, and civic engagement among children and youth in Timor-Leste. We create high-quality, culturally relevant educational materials in Tetun and Portuguese, empowering the next generation to build a brighter future for their nation.",
+          "Lafaek Learning Media is dedicated to fostering literacy, numeracy,  critical thinking, and civic engagement among children and youth in Timor-Leste. We create high-quality, culturally relevant educational materials in Tetun and Portuguese, empowering the next generation to build a brighter future for the nation.",
       },
       history: {
         title: "Our History",
         paragraphs: [
-          "Founded in 2003 as a community initiative, Lafaek Learning Media began with a simple goal: to provide accessible and engaging educational content to Timorese children. What started as a small team producing a single magazine has grown into a leading social enterprise.",
-          "Over the years, we have expanded our reach, diversified our content, and built strong partnerships with local communities, educators, and international organizations. In 2018, we proudly transitioned to become a fully Timorese-owned and operated organization, a testament to our commitment to local empowerment and sustainability.",
+          "Founded in 2001 as an educational initiative, Lafaek Learning Media began with a simple goal: to provide accessible and engaging educational content to Timorese children. What started as a small team producing a single magazine has grown into a leading social enterprise.",
+          "Over the years, we have expanded our reach, diversified our content, and built strong partnerships with GoTL,  local communities, educators, and international organisations. In 2018, we proudly transitioned to become a fully Timorese-owned and operated organisation, a testament to our commitment to local empowerment and sustainability.",
         ],
       },
       values: {
