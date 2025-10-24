@@ -62,7 +62,7 @@ export default function AboutPage() {
       mission: {
         title: "Ami-nia Misaun",
         description:
-          "Lafaek Learning Media dedika an atu promove literasia, hanoin kritiku, no partisipasaun sivika entre labarik no joven sira iha Timor-Leste. Ami kria materiál edukativu ho kualidade aas, relevante ba kultura iha Tetun no Portugés, hametin jerasaun tuir mai atu harii futuru ne'ebé naroman ba sira-nia nasaun.",
+          "Lafaek Learning Media dedika ba haburas literasia, numerasia, pensamentu kritiku, no envolvimentu síviku entre labarik no foin-sa'e sira iha Timor-Leste. Ita kria materiál edukativu sira ho kualidade aas, relevante kulturalmente iha lian Tetun no Portugés, fó kbiit ba jerasaun tuirmai atu harii futuru ida nabilan liu ba nasaun.",
       },
       history: {
         title: "Ami-nia Istoria",
