@@ -38,3 +38,4 @@ export function Button({
     </button>
   );
 }
+export default Button; // <-- added default export (safe, non-breaking)

@@ -10,3 +10,4 @@ export function Card({ children, className = "" }: CardProps) {
     </div>
   );
 }
+export default Card; // <-- added default export (safe, non-breaking)

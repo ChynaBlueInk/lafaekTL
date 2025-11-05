@@ -1,37 +1,49 @@
-// keystatic.config.ts
-import { config, collection, fields } from '@keystatic/core';
+import { config, fields, collection } from '@keystatic/core';
 
 export default config({
   ui: {
-    brand: { name: 'Lafaek CMS — PAT' }, // canary label
+    // where the admin UI lives
+    path: '/keystatic',
+    brand: {
+      name: 'Lafaek Admin',
+    },
   },
   storage: {
     kind: 'github',
-    repo: { owner: 'ChynaBlueInk', name: 'lafaekTL' },
-    branchPrefix: 'keystatic/',
+    // e.g. "ChynaBlueInk/lafaekTL"
+    repo: `${process.env.KEYSTATIC_GITHUB_OWNER || 'ChynaBlueInk'}/${process.env.KEYSTATIC_GITHUB_REPO || 'lafaekTL'}`,
+    branch: process.env.KEYSTATIC_GITHUB_BRANCH || 'main',
+
+    // OAuth via GitHub App:
+    appSlug: process.env.NEXT_PUBLIC_KEYSTATIC_GITHUB_APP_SLUG,
+    clientId: process.env.GITHUB_CLIENT_ID,
+    clientSecret: process.env.GITHUB_CLIENT_SECRET,
+
+    // Local PAT fallback (optional):
+    // token: process.env.KEYSTATIC_GITHUB_PAT,
   },
 
-  // ── Match live fields/labels and YAML data files ────────────────────────────
+  // --- Collections ---
   collections: {
-    our_team: collection({
+    'our-team': collection({
       label: 'Our Team',
       path: 'content/our-team/*',
-      format: { data: 'yaml' }, // live site uses YAML for entries
-      slugField: 'name',
       schema: {
-        name:     fields.text({ label: 'Name', validation: { isRequired: true } }),
-        role:     fields.text({ label: 'Role (EN)', validation: { isRequired: true } }),
-        roleTet:  fields.text({ label: 'Kargu (Tetun)' }),
-        started:  fields.text({ label: 'Started (year)' }),
-        photoUrl: fields.url({
-          label: 'Photo URL (S3)',
-          description: 'Use the uploader to get this URL',
-          validation: { isRequired: true },
+        name: fields.text({ label: 'Name', validation: { isRequired: true } }),
+        role: fields.text({ label: 'Role', validation: { isRequired: true } }),
+        bio: fields.document({
+          label: 'Bio',
+          formatting: true,
+          links: true,
+          dividers: true,
         }),
-        sketchUrl: fields.url({ label: 'Sketch URL (S3)' }),
-        bio:       fields.text({ label: 'Bio (EN)', multiline: true }),
-        bioTet:    fields.text({ label: 'Bio (Tetun)', multiline: true }),
-      },
+        photo: fields.image({ label: 'Photo', directory: 'public/uploads/our-team' }),
+        order: fields.integer({ label: 'Sort Order', defaultValue: 0 }),
+        visible: fields.checkbox({ label: 'Visible', defaultValue: true })
+      }
     }),
+
+    // Add more collections when ready:
+    // news, impact stories, gallery, pdfs, etc.
   },
 });
