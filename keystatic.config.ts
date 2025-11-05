@@ -1,26 +1,39 @@
+// keystatic.config.ts
 import { config, fields, collection } from '@keystatic/core';
 
 export default config({
   ui: {
-    // where the admin UI lives
-    path: '/keystatic',
-    brand: {
-      name: 'Lafaek Admin',
-    },
+    // No `path` prop here – your Next.js page at /keystatic controls the UI route.
+    brand: { name: 'Lafaek Admin' },
   },
+
+  // --- GitHub storage via GitHub App (OAuth) ---
   storage: {
     kind: 'github',
-    // e.g. "ChynaBlueInk/lafaekTL"
-    repo: `${process.env.KEYSTATIC_GITHUB_OWNER || 'ChynaBlueInk'}/${process.env.KEYSTATIC_GITHUB_REPO || 'lafaekTL'}`,
-    branch: process.env.KEYSTATIC_GITHUB_BRANCH || 'main',
+    repo: {
+      owner: process.env.KEYSTATIC_GITHUB_OWNER || 'ChynaBlueInk',
+      name:  process.env.KEYSTATIC_GITHUB_REPO  || 'lafaekTL',
+    },
+    // NOTE: no `branch` field in your installed type – repo default branch is used.
 
-    // OAuth via GitHub App:
-    appSlug: process.env.NEXT_PUBLIC_KEYSTATIC_GITHUB_APP_SLUG,
-    clientId: process.env.GITHUB_CLIENT_ID,
-    clientSecret: process.env.GITHUB_CLIENT_SECRET,
+    appSlug: {
+      envName: 'NEXT_PUBLIC_KEYSTATIC_GITHUB_APP_SLUG',
+      value: process.env.NEXT_PUBLIC_KEYSTATIC_GITHUB_APP_SLUG, // e.g. "lafaek-keystatic" (lowercase)
+    },
+    clientId: {
+      envName: 'GITHUB_CLIENT_ID',
+      value: process.env.GITHUB_CLIENT_ID,
+    },
+    clientSecret: {
+      envName: 'GITHUB_CLIENT_SECRET',
+      value: process.env.GITHUB_CLIENT_SECRET,
+    },
 
-    // Local PAT fallback (optional):
-    // token: process.env.KEYSTATIC_GITHUB_PAT,
+    // Optional PAT fallback (keep commented out while using OAuth)
+    // token: {
+    //   envName: 'KEYSTATIC_GITHUB_PAT',
+    //   value: process.env.KEYSTATIC_GITHUB_PAT,
+    // },
   },
 
   // --- Collections ---
@@ -28,6 +41,10 @@ export default config({
     'our-team': collection({
       label: 'Our Team',
       path: 'content/our-team/*',
+
+      // REQUIRED by your current @keystatic/core types
+      slugField: 'name',
+
       schema: {
         name: fields.text({ label: 'Name', validation: { isRequired: true } }),
         role: fields.text({ label: 'Role', validation: { isRequired: true } }),
@@ -37,13 +54,13 @@ export default config({
           links: true,
           dividers: true,
         }),
-        photo: fields.image({ label: 'Photo', directory: 'public/uploads/our-team' }),
+        photo: fields.image({
+          label: 'Photo',
+          directory: 'public/uploads/our-team',
+        }),
         order: fields.integer({ label: 'Sort Order', defaultValue: 0 }),
-        visible: fields.checkbox({ label: 'Visible', defaultValue: true })
-      }
+        visible: fields.checkbox({ label: 'Visible', defaultValue: true }),
+      },
     }),
-
-    // Add more collections when ready:
-    // news, impact stories, gallery, pdfs, etc.
   },
 });
