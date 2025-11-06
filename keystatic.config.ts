@@ -3,7 +3,7 @@ import { config, fields, collection } from '@keystatic/core';
 
 export default config({
   ui: {
-    // No `path` prop here – your Next.js page at /keystatic controls the UI route.
+    // No `path` here — your Next.js page at /keystatic controls the route
     brand: { name: 'Lafaek Admin' },
   },
 
@@ -12,24 +12,24 @@ export default config({
     kind: 'github',
     repo: {
       owner: process.env.KEYSTATIC_GITHUB_OWNER || 'ChynaBlueInk',
-      name:  process.env.KEYSTATIC_GITHUB_REPO  || 'lafaekTL',
+      name: process.env.KEYSTATIC_GITHUB_REPO || 'lafaekTL',
     },
-    // NOTE: no `branch` field in your installed type – repo default branch is used.
+    // NOTE: do NOT add `branch` here; your installed types don't include it.
 
+    // Expected object shape: { envName, value }
     appSlug: {
       envName: 'NEXT_PUBLIC_KEYSTATIC_GITHUB_APP_SLUG',
-      value: process.env.NEXT_PUBLIC_KEYSTATIC_GITHUB_APP_SLUG, // e.g. "lafaek-keystatic" (lowercase)
+      value: process.env.NEXT_PUBLIC_KEYSTATIC_GITHUB_APP_SLUG, // e.g., "lafaek-keystatic" (lowercase)
     },
     clientId: {
-      envName: 'GITHUB_CLIENT_ID',
-      value: process.env.GITHUB_CLIENT_ID,
+      envName: 'KEYSTATIC_GITHUB_CLIENT_ID',
+      value: process.env.KEYSTATIC_GITHUB_CLIENT_ID,
     },
     clientSecret: {
-      envName: 'GITHUB_CLIENT_SECRET',
-      value: process.env.GITHUB_CLIENT_SECRET,
+      envName: 'KEYSTATIC_GITHUB_CLIENT_SECRET',
+      value: process.env.KEYSTATIC_GITHUB_CLIENT_SECRET,
     },
-
-    // Optional PAT fallback (keep commented out while using OAuth)
+    // Optional PAT fallback (leave commented while using OAuth):
     // token: {
     //   envName: 'KEYSTATIC_GITHUB_PAT',
     //   value: process.env.KEYSTATIC_GITHUB_PAT,
@@ -42,7 +42,7 @@ export default config({
       label: 'Our Team',
       path: 'content/our-team/*',
 
-      // REQUIRED by your current @keystatic/core types
+      // REQUIRED by your current @keystatic/core types:
       slugField: 'name',
 
       schema: {
