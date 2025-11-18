@@ -2,14 +2,13 @@
 "use client";
 
 import Carousel from "@/components/Carousel";
-import { useLanguage } from "@/lib/LanguageContext";
+import {useLanguage} from "@/lib/LanguageContext";
 import Image from "next/image";
 import Link from "next/link";
-import { news } from "@/data/news";
 
 export default function HomePage() {
-  const { language } = useLanguage();
-  const L = language === "tet" ? "tet" : "en";  // ✅ safe language key
+  const {language} = useLanguage();
+  const L = language === "tet" ? "tet" : "en"; // ✅ safe language key
 
   const content = {
     en: {
@@ -19,29 +18,33 @@ export default function HomePage() {
         supportText:
           "You can support Lafaek by purchasing our magazines and products, sponsoring educational content, advertising with us, or hiring our talented team of writers, illustrators, and videographers.",
       },
-      news: { title: "Latest News", subtitle: "What's happening at Lafaek?", viewAll: "View all news" },
+      news: {title: "Latest News", subtitle: "What's happening at Lafaek?", viewAll: "View all news"},
       socialEnterprise: {
         title: "Lafaek Social Enterprise",
         subtitle: "From Community Initiative to Timorese-Owned Impact Organization",
         stats: [
-          { number: "25+", label: "Years of Impact" },
-          { number: "1M+", label: "Magazines Distributed / Year" },
-          { number: "1,500+", label: "Schools Supported" },
-          { number: "100%", label: "Timorese Owned" },
+          {number: "25+", label: "Years of Impact"},
+          {number: "1M+", label: "Magazines Distributed / Year"},
+          {number: "1,500+", label: "Schools Supported"},
+          {number: "100%", label: "Timorese Owned"},
         ],
       },
       products: {
         title: "Our Products",
         subtitle: "Creative educational resources designed for impact",
         items: [
-          { name: "Children's Books", desc: "Beautifully illustrated stories for early learners" },
-          { name: "Teaching Posters", desc: "Classroom-ready visuals for effective learning" },
-          { name: "Animations & Videos", desc: "Locally made, culturally relevant media" },
-          { name: "Magazines", desc: "Trusted content in Tetun and Portuguese" },
+          {name: "Children's Books", desc: "Beautifully illustrated stories for early learners"},
+          {name: "Teaching Posters", desc: "Classroom-ready visuals for effective learning"},
+          {name: "Animations & Videos", desc: "Locally made, culturally relevant media"},
+          {name: "Magazines", desc: "Trusted content in Tetun and Portuguese"},
         ],
       },
-      impact: { title: "Our Impact Stories", subtitle: "Real change in Timorese communities" },
-      kidsSection: { title: "Fun Zone for Kids!", subtitle: "Coming Soon: Games, Stories, Songs & More!", features: [] },
+      impact: {title: "Our Impact Stories", subtitle: "Real change in Timorese communities"},
+      kidsSection: {
+        title: "Fun Zone for Kids!",
+        subtitle: "Coming Soon: Games, Stories, Songs & More!",
+        features: [],
+      },
       cta: {
         title: "Join Our Mission",
         subtitle: "Help us continue empowering Timor-Leste through education",
@@ -57,29 +60,33 @@ export default function HomePage() {
         supportText:
           "Ita bele suporta Lafaek hodi sosa revista no produtu sira, patrosina kontentu edukativu, halo anunsiu ho ami, ka kontrata ekipa ami ne’ebé iha talentu iha área hakerek, ilustrasaun no videografia.",
       },
-      news: { title: "Notísia Foun", subtitle: "Saida mak akontese iha Lafaek?", viewAll: "Haree hotu notísia" },
+      news: {title: "Notísia Foun", subtitle: "Saida mak akontese iha Lafaek?", viewAll: "Haree hotu notísia"},
       socialEnterprise: {
         title: "Empreza Sosial Lafaek",
         subtitle: "Husi inisiativa komunidade ba organizasaun Timor-oan",
         stats: [
-          { number: "25+", label: "Tinan impaktu" },
-          { number: "1M+", label: "Revista distribui / tinan" },
-          { number: "1,500+", label: "Eskola apoiadu" },
-          { number: "100%", label: "Nudar nia Timor-oan" },
+          {number: "25+", label: "Tinan impaktu"},
+          {number: "1M+", label: "Revista distribui / tinan"},
+          {number: "1,500+", label: "Eskola apoiadu"},
+          {number: "100%", label: "Nudar nia Timor-oan"},
         ],
       },
       products: {
         title: "Produtu Ami",
         subtitle: "Rekursu edukativu kria hodi fó impaktu",
         items: [
-          { name: "Livru ba labarik sira", desc: "Istória ilustradu ne’ebé furak ba aprendisajem" },
-          { name: "Poster hanorin", desc: "Visual prontu ba sala aula" },
-          { name: "Animasaun no Vídeu", desc: "Mídia lokal no relevante ba kultura" },
-          { name: "Revista", desc: "Kontentu konfiável iha Tetun no Portugés" },
+          {name: "Livru ba labarik sira", desc: "Istória ilustradu ne’ebé furak ba aprendisajem"},
+          {name: "Poster hanorin", desc: "Visual prontu ba sala aula"},
+          {name: "Animasaun no Vídeu", desc: "Mídia lokal no relevante ba kultura"},
+          {name: "Revista", desc: "Kontentu konfiável iha Tetun no Portugés"},
         ],
       },
-      impact: { title: "Istória Impaktu Ami", subtitle: "Mudansa ida-ne’ebé real iha komunidade Timor-oan" },
-      kidsSection: { title: "Zona Divertidu ba Labarik!", subtitle: "Mai la’ós laran: jogos, istória, kanzona no buat barak tan!", features: [] },
+      impact: {title: "Istória Impaktu Ami", subtitle: "Mudansa ida-ne’ebé real iha komunidade Timor-oan"},
+      kidsSection: {
+        title: "Zona Divertidu ba Labarik!",
+        subtitle: "Mai la’ós laran: jogos, istória, kanzona no buat barak tan!",
+        features: [],
+      },
       cta: {
         title: "Tama ba Misaun Ami",
         subtitle: "Ajuda ami kontinua hodi empodera Timor-Leste liuhosi edukasaun",
@@ -90,7 +97,7 @@ export default function HomePage() {
     },
   } as const;
 
-  const t = content[L]; // ✅ use the safe key
+  const t = content[L];
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
@@ -100,7 +107,6 @@ export default function HomePage() {
         {/* Social + CTA Block */}
         <section className="bg-gray-50 py-12 px-4" aria-labelledby="social-and-cta">
           <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-
             {/* Facebook */}
             <div className="bg-white border border-gray-300 rounded-lg shadow overflow-hidden flex flex-col">
               <div className="relative w-full h-48 bg-gray-100">
@@ -192,59 +198,15 @@ export default function HomePage() {
                 </Link>
               </div>
             </div>
-
           </div>
         </section>
-
-   <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-  {news.slice(0, 3).map((item) => {
-    const href = item.externalUrl || "/stories/news";
-    return (
-      <Link
-        key={item.slug}
-        href={href}
-        className="group"
-        target={item.externalUrl ? "_blank" : undefined}
-        rel={item.externalUrl ? "noopener noreferrer" : undefined}
-      >
-        <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 transition-shadow group-hover:shadow-md">
-          <Image
-            src={item.image || "/placeholder.svg?height=200&width=300"}
-            alt={item.title[L] ?? item.title.en}
-            width={300}
-            height={200}
-            className="rounded mb-4 w-full h-auto"
-          />
-          {item.category?.[L] && (
-            <div className="text-xs uppercase tracking-wide text-green-700 mb-1">
-              {item.category[L]}
-            </div>
-          )}
-          <h3 className="text-xl font-semibold mb-2 group-hover:underline">
-            {item.title[L] ?? item.title.en}
-          </h3>
-          <p className="text-gray-600">
-            {item.excerpt[L] ?? item.excerpt.en}
-          </p>
-        </div>
-      </Link>
-    );
-  })}
-</div>
-<div className="mt-10">
-  <Link
-    href="/stories/news"
-    className="inline-block bg-[#219653] text-white font-semibold px-6 py-3 rounded-full hover:bg-[#1a7b44]"
-  >
-    {t.news.viewAll}
-  </Link>
-</div>
-
 
         {/* Social Enterprise */}
         <section className="py-20 bg-gradient-to-br from-green-50 to-blue-50 text-center" aria-labelledby="social-enterprise">
           <div className="max-w-7xl mx-auto px-4">
-            <h2 id="social-enterprise" className="text-4xl font-bold text-green-800 mb-4">{t.socialEnterprise.title}</h2>
+            <h2 id="social-enterprise" className="text-4xl font-bold text-green-800 mb-4">
+              {t.socialEnterprise.title}
+            </h2>
             <p className="text-xl text-gray-700 mb-10">{t.socialEnterprise.subtitle}</p>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
               {t.socialEnterprise.stats.map((stat, index) => (
@@ -289,14 +251,6 @@ export default function HomePage() {
                 />
               </div>
             </div>
-          </div>
-        </section>
-
-        {/* Kids */}
-        <section className="py-16 bg-gradient-to-br from-blue-50 to-green-50" aria-labelledby="kids-zone">
-          <div className="max-w-7xl mx-auto px-4 text-center">
-            <h2 id="kids-zone" className="text-3xl font-bold text-blue-700 mb-4">{t.kidsSection.title}</h2>
-            <p className="text-xl text-gray-600">{t.kidsSection.subtitle}</p>
           </div>
         </section>
       </main>

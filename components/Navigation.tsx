@@ -1,177 +1,165 @@
 // components/Navigation.tsx
 "use client"
 
-import { useState } from "react"
+import {useState} from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { Menu, X, ChevronDown } from "lucide-react"
-import { Button } from "./button"
-import { useLanguage } from "@/lib/LanguageContext" // ⬅️ global context
+import {Menu, X, ChevronDown} from "lucide-react"
+import {Button} from "./button"
+import {useLanguage} from "@/lib/LanguageContext" // ⬅️ global context
 
-type MegaItem = { href: string; title: string; description?: string }
-type NavItem =
-  | { href: string; label: string }
-  | { label: string; mega: MegaItem[] }
+type MegaItem={href:string;title:string;description?:string}
+type NavItem=
+  | {href:string;label:string}
+  | {label:string;mega:MegaItem[]}
 
 export function Navigation() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [openMobileSubmenu, setOpenMobileSubmenu] = useState<string | null>(null)
+  const [isMenuOpen,setIsMenuOpen]=useState(false)
+  const [openMobileSubmenu,setOpenMobileSubmenu]=useState<string|null>(null)
 
-  const { language, setLanguage } = useLanguage()
+  const {language,setLanguage}=useLanguage()
 
-  const t = {
-    en: {
-      brand: "Lafaek",
-      home: "Home",
+  const t={
+    en:{
+      brand:"Lafaek",
+      home:"Home",
 
-      publication: "Publication",
-      books: "Children’s Books",
-      booksDesc: "Picture books and early readers in Tetun, Portuguese, and English.",
-      magazines: "Magazines",
-      magazinesDesc: "Lafaek Kiik, Lafaek Prima, Manorin, and Komunidade.",
-      printables: "Printables",
-      printablesDesc: "Client work: posters, flyers, brochures, worksheets, illustrations.",
-      schoolGallery: "School Photo Gallery",
-      schoolGalleryDesc: "Photos from schools and classrooms across Timor-Leste.",
+      publication:"Publication",
+      books:"Children’s Books",
+      booksDesc:"Picture books and early readers in Tetun, Portuguese, and English.",
+      magazines:"Magazines",
+      magazinesDesc:"Lafaek Kiik, Lafaek Prima, Manorin, and Komunidade.",
+      printables:"Printables",
+      printablesDesc:"Client work: posters, flyers, brochures, worksheets, illustrations.",
+      schoolGallery:"School Photo Gallery",
+      schoolGalleryDesc:"Photos from schools and classrooms across Timor-Leste.",
 
-      learning: "Learning",
-      kidsClub: "Kids Club",
-      kidsClubDesc: "Activities, stories, and games for children.",
-      cyberChildren: "Cyber Safety — Children",
-      cyberChildrenDesc: "Simple tips for under 10s.",
-      cyberYouth: "Cyber Safety — Youth",
-      cyberYouthDesc: "Smart, safe online behaviour for teens.",
-      cyberAdults: "Cyber Safety — Adults & Parents",
-      cyberAdultsDesc: "Guides for parents, caregivers, and teachers.",
-      guides: "Parent & Teacher Guides",
-      guidesDesc: "Practical ideas from Manorin/Komunidade content.",
+      learning:"Learning",
+      kidsClub:"Kids Club",
+      kidsClubDesc:"Activities, stories, and games for children.",
+      cyberChildren:"Cyber Safety — Children",
+      cyberChildrenDesc:"Simple tips for under 10s.",
+      cyberYouth:"Cyber Safety — Youth",
+      cyberYouthDesc:"Smart, safe online behaviour for teens.",
+      cyberAdults:"Cyber Safety — Adults & Parents",
+      cyberAdultsDesc:"Guides for parents, caregivers, and teachers.",
+      guides:"Parent & Teacher Guides",
+      guidesDesc:"Practical ideas from Manorin/Komunidade content.",
 
-      explore: "Explore",
-      programs: "Programs",
-      programsDesc: "All Lafaek programs in one place.",
-      news: "News",
-      newsDesc: "Updates from our projects and partners.",
-      communityStories: "Impact Stories",
-      communityStoriesDesc: "Real stories from schools and suku across Timor-Leste.",
-      gallery: "Gallery (Videos & Images)",
-      galleryDesc: "Coming soon: videos and photo stories.",
+      explore:"Explore",
+      programs:"Programs",
+      programsDesc:"All Lafaek programs in one place.",
+      news:"News",
+      newsDesc:"Updates from our projects and partners.",
+      communityStories:"Impact Stories",
+      communityStoriesDesc:"Real stories from schools and suku across Timor-Leste.",
+      gallery:"Gallery (Videos & Images)",
+      galleryDesc:"Coming soon: videos and photo stories.",
 
-      about: "About",
-      aboutUs: "About Us",
-      aboutUsDesc: "Lafaek’s mission, values, and services.",
-      ourTeam: "Our Team",
-      ourTeamDesc: "Writers, illustrators, designers, and production crew.",
-      ourJourney: "Our Journey",
-      ourJourneyDesc: "25 years of learning with Timor-Leste.",
-      socialEnterprise: "Social Enterprise",
-      socialEnterpriseDesc: "Our transition from NGO to a sustainable business model.",
+      about:"About",
+      aboutUs:"About Us",
+      aboutUsDesc:"Lafaek’s mission, values, and services.",
+      ourTeam:"Our Team",
+      ourTeamDesc:"Writers, illustrators, designers, and production crew.",
+      ourJourney:"Our Journey",
+      ourJourneyDesc:"25 years of learning with Timor-Leste.",
+      socialEnterprise:"Social Enterprise",
+      socialEnterpriseDesc:"Our transition from NGO to a sustainable business model.",
 
-      careers: "Careers",
-      getInvolved: "Get involved",
-      friends: "Friends of Lafaek",
-      loginSignup: "Login / Signup",
-      en: "EN",
-      tet: "TET",
+      careers:"Careers",
+      getInvolved:"Get involved",
+      friends:"Friends of Lafaek",
+      contact:"Contact",
+      loginSignup:"Login / Signup",
+      en:"EN",
+      tet:"TET",
     },
-    tet: {
-      brand: "Lafaek",
-      home: "Uma",
+    tet:{
+      brand:"Lafaek",
+      home:"Uma",
 
-      publication: "Publikasaun",
-      books: "Livru ba Labarik",
-      booksDesc: "Livru imajen no leitura ba labarik iha Tetun, Portugés no Inglés.",
-      magazines: "Revista",
-      magazinesDesc: "Lafaek Kiik, Lafaek Prima, Manorin no Komunidade.",
-      printables: "Printables",
-      printablesDesc: "Trabalhu ba kliente: póster, flyer, folhetu, worksheet no ilutrasaun.",
-      schoolGallery: "Galeria Eskola",
-      schoolGalleryDesc: "Foto hosi eskola no sala aula sira iha Timor-Leste.",
+      publication:"Publikasaun",
+      books:"Livru ba Labarik",
+      booksDesc:"Livru imajen no leitura ba labarik iha Tetun, Portugés no Inglés.",
+      magazines:"Revista",
+      magazinesDesc:"Lafaek Kiik, Lafaek Prima, Manorin no Komunidade.",
+      printables:"Printables",
+      printablesDesc:"Trabalhu ba kliente: póster, flyer, folhetu, worksheet no ilutrasaun.",
+      schoolGallery:"Galeria Eskola",
+      schoolGalleryDesc:"Foto hosi eskola no sala aula sira iha Timor-Leste.",
 
-      learning: "Aprendizajen",
-      kidsClub: "Kids Club",
-      kidsClubDesc: "Atividade, istória no jogu ba labarik.",
-      cyberChildren: "Seguransa Online — Labarik",
-      cyberChildrenDesc: "Dalan simples ba labarik tinan kiik.",
-      cyberYouth: "Seguransa Online — Jovens",
-      cyberYouthDesc: "Kompurtamentu online di'ak no seguru ba adolesente.",
-      cyberAdults: "Seguransa Online — Ibu/Aman & Adultu",
-      cyberAdultsDesc: "Guia ba pais, kuidadór no mestra sira.",
-      guides: "Guia ba Pais & Maestri",
-      guidesDesc: "Ideia pratiku husi konténudu Manorin/Komunidade.",
+      learning:"Aprendizajen",
+      kidsClub:"Kids Club",
+      kidsClubDesc:"Atividade, istória no jogu ba labarik.",
+      cyberChildren:"Seguransa Online — Labarik",
+      cyberChildrenDesc:"Dalan simples ba labarik tinan kiik.",
+      cyberYouth:"Seguransa Online — Jovens",
+      cyberYouthDesc:"Kompurtamentu online di'ak no seguru ba adolesente.",
+      cyberAdults:"Seguransa Online — Ibu/Aman & Adultu",
+      cyberAdultsDesc:"Guia ba pais, kuidadór no mestra sira.",
+      guides:"Guia ba Pais & Maestri",
+      guidesDesc:"Ideia pratiku husi konténudu Manorin/Komunidade.",
 
-      explore: "Explora",
-      programs: "Programa",
-      programsDesc: "Programa hotu-hotu iha pájina ida de'it.",
-      news: "Notísia",
-      newsDesc: "Atualizasaun hosi projetu no parceiru sira.",
-      communityStories: "Istória Impaktu",
-      communityStoriesDesc: "Istória verídiku hosi eskola no suku sira.",
-      gallery: "Galeria (Vídeu & Imajens)",
-      galleryDesc: "Tuir mai: vídeu no foto istória.",
+      explore:"Explora",
+      programs:"Programa",
+      programsDesc:"Programa hotu-hotu iha pájina ida de'it.",
+      news:"Notísia",
+      newsDesc:"Atualizasaun hosi projetu no parceiru sira.",
+      communityStories:"Istória Impaktu",
+      communityStoriesDesc:"Istória verídiku hosi eskola no suku sira.",
+      gallery:"Galeria (Vídeu & Imajens)",
+      galleryDesc:"Tuir mai: vídeu no foto istória.",
 
-      about: "Kona-ba",
-      aboutUs: "Kona-ba Ami",
-      aboutUsDesc: "Misaun, valor no servisu Lafaek.",
-      ourTeam: "Ekip Ami",
-      ourTeamDesc: "Escritor, ilustradór, dezainer no ekipasaun produsaun.",
-      ourJourney: "Dalan Ami",
-      ourJourneyDesc: "Tinan 25 aprende hamutuk ho Timor-Leste.",
-      socialEnterprise: "Empreza Sosiál",
-      socialEnterpriseDesc: "Transitasaun husi NGO ba modelu negósiu sustentavel.",
+      about:"Kona-ba",
+      aboutUs:"Kona-ba Ami",
+      aboutUsDesc:"Misaun, valor no servisu Lafaek.",
+      ourTeam:"Ekip Ami",
+      ourTeamDesc:"Escritor, ilustradór, dezainer no ekipasaun produsaun.",
+      ourJourney:"Dalan Ami",
+      ourJourneyDesc:"Tinan 25 aprende hamutuk ho Timor-Leste.",
+      socialEnterprise:"Empreza Sosiál",
+      socialEnterpriseDesc:"Transitasaun husi NGO ba modelu negósiu sustentavel.",
 
-      careers: "Empregu/Vaga",
-      getInvolved: "Partisipa",
-      friends: "Kolega Lafaek",
-      loginSignup: "Tama / Rejistu",
-      en: "EN",
-      tet: "TET",
+      careers:"Empregu/Vaga",
+      getInvolved:"Partisipa",
+      friends:"Kolega Lafaek",
+      contact:"Kontakt",
+      loginSignup:"Tama / Rejistu",
+      en:"EN",
+      tet:"TET",
     },
   }[language]
 
-  const leftNav: NavItem[] = [
-    { href: "/", label: t.home },
+  const leftNav:NavItem[]=[
+    {href:"/",label:t.home},
 
+    // Magazines as a simple top-level link
+    {href:"/publication/magazines",label:t.magazines},
+
+    // Learning mega: keep cyber safety + guides (you can also keep Kids Club if you want it visible)
     {
-      label: t.publication,
-      mega: [
-        { href: "/publication/books", title: t.books, description: t.booksDesc },
-        { href: "/publication/magazines", title: t.magazines, description: t.magazinesDesc },
-        { href: "/publication/printables", title: t.printables, description: t.printablesDesc },
-        { href: "/publication/school-gallery", title: t.schoolGallery, description: t.schoolGalleryDesc },
-      ],
-    },
-    {
-      label: t.learning,
-      mega: [
-        { href: "/learning/kids", title: t.kidsClub, description: t.kidsClubDesc },
-        { href: "/learning/cyber/children", title: t.cyberChildren, description: t.cyberChildrenDesc },
-        { href: "/learning/cyber/youth", title: t.cyberYouth, description: t.cyberYouthDesc },
-        { href: "/learning/cyber/adults", title: t.cyberAdults, description: t.cyberAdultsDesc },
-        { href: "/learning/guides", title: t.guides, description: t.guidesDesc },
-      ],
-    },
-    {
-      label: t.explore,
-      mega: [
-        { href: "/stories/news", title: t.news, description: t.newsDesc },
-        { href: "/stories/community", title: t.communityStories, description: t.communityStoriesDesc },
-        { href: "/programs", title: t.programs, description: t.programsDesc },
-        { href: "/stories/gallery", title: t.gallery, description: t.galleryDesc },
-      ],
-    },
-    {
-      label: t.about,
-      mega: [
-        { href: "/about", title: t.aboutUs, description: t.aboutUsDesc },
-        { href: "/our-team", title: t.ourTeam, description: t.ourTeamDesc },
-        { href: "/our-journey", title: t.ourJourney, description: t.ourJourneyDesc },
-        { href: "/social-enterprise", title: t.socialEnterprise, description: t.socialEnterpriseDesc },
+      label:t.learning,
+      mega:[
+        {href:"/learning/cyber/children",title:t.cyberChildren,description:t.cyberChildrenDesc},
+        {href:"/learning/cyber/youth",title:t.cyberYouth,description:t.cyberYouthDesc},
+        {href:"/learning/cyber/adults",title:t.cyberAdults,description:t.cyberAdultsDesc},
+        {href:"/learning/guides",title:t.guides,description:t.guidesDesc},
       ],
     },
 
-    { href: "/careers", label: t.careers },
-    { href: "/get-involved", label: t.getInvolved },
-    { href: "/friends", label: t.friends }, // New button
+    // About mega: About Us, Our Team, Our Journey, Social Enterprise
+    {
+      label:t.about,
+      mega:[
+        {href:"/about",title:t.aboutUs,description:t.aboutUsDesc},
+        {href:"/our-team",title:t.ourTeam,description:t.ourTeamDesc},
+        {href:"/our-journey",title:t.ourJourney,description:t.ourJourneyDesc},
+        {href:"/social-enterprise",title:t.socialEnterprise,description:t.socialEnterpriseDesc},
+      ],
+    },
+
+    // Simple Contact link
+    {href:"/contact",label:t.contact},
   ]
 
   return (
@@ -196,7 +184,7 @@ export function Navigation() {
 
             {/* Desktop main nav */}
             <div className="hidden md:flex items-center gap-6">
-              {leftNav.map((item) => {
+              {leftNav.map((item)=>{
                 if ("mega" in item) {
                   return (
                     <div key={item.label} className="relative group">
@@ -210,7 +198,7 @@ export function Navigation() {
                       </button>
                       <div className="absolute left-0 mt-3 w-[680px] bg-white rounded-xl shadow-lg border border-[#F5F5F5] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
                         <div className="p-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                          {item.mega.map((m) => (
+                          {item.mega.map((m)=>(
                             <Link
                               key={m.href}
                               href={m.href}
@@ -228,16 +216,7 @@ export function Navigation() {
                   )
                 }
 
-                if (item.href === "/friends") {
-                  return (
-                    <Link key={item.href} href={item.href} className="inline-flex">
-                      <Button className="bg-[#F2C94C] text-[#219653] hover:opacity-90 font-semibold px-4 py-2 rounded-lg">
-                        {item.label}
-                      </Button>
-                    </Link>
-                  )
-                }
-
+                // No special Friends button in MVP – just simple links
                 return (
                   <Link
                     key={item.href}
@@ -255,10 +234,10 @@ export function Navigation() {
           <div className="flex items-center gap-2">
             <div className="hidden md:flex items-center gap-3">
               <Button
-                onClick={() => setLanguage("en")}
-                aria-pressed={language === "en"}
+                onClick={()=>setLanguage("en")}
+                aria-pressed={language==="en"}
                 className={`px-2 py-1 text-xs font-semibold rounded-md transition ${
-                  language === "en"
+                  language==="en"
                     ? "bg-[#F2C94C] text-[#219653]"
                     : "border border-white text-white hover:bg-white/20"
                 }`}
@@ -266,10 +245,10 @@ export function Navigation() {
                 {t.en}
               </Button>
               <Button
-                onClick={() => setLanguage("tet")}
-                aria-pressed={language === "tet"}
+                onClick={()=>setLanguage("tet")}
+                aria-pressed={language==="tet"}
                 className={`px-2 py-1 text-xs font-semibold rounded-md transition ${
-                  language === "tet"
+                  language==="tet"
                     ? "bg-white text-[#219653]"
                     : "border border-white text-white hover:bg-white/20"
                 }`}
@@ -281,7 +260,7 @@ export function Navigation() {
               </Link>
             </div>
             <Button
-              onClick={() => setIsMenuOpen((v) => !v)}
+              onClick={()=>setIsMenuOpen((v)=>!v)}
               className="md:hidden text-white hover:bg-white/20 p-2 rounded-md"
               aria-label="Toggle navigation"
             >
@@ -296,10 +275,10 @@ export function Navigation() {
             <div className="flex flex-col space-y-2 pt-2">
               <div className="flex items-center gap-2 px-4">
                 <Button
-                  onClick={() => setLanguage("en")}
-                  aria-pressed={language === "en"}
+                  onClick={()=>setLanguage("en")}
+                  aria-pressed={language==="en"}
                   className={`px-2 py-1 text-xs font-semibold rounded-md transition ${
-                    language === "en"
+                    language==="en"
                       ? "bg-white text-[#219653]"
                       : "border border-white text-white hover:bg-white/20"
                   }`}
@@ -307,10 +286,10 @@ export function Navigation() {
                   {t.en}
                 </Button>
                 <Button
-                  onClick={() => setLanguage("tet")}
-                  aria-pressed={language === "tet"}
+                  onClick={()=>setLanguage("tet")}
+                  aria-pressed={language==="tet"}
                   className={`px-2 py-1 text-xs font-semibold rounded-md transition ${
-                    language === "tet"
+                    language==="tet"
                       ? "bg-white text-[#219653]"
                       : "border border-white text-white hover:bg-white/20"
                   }`}
@@ -320,7 +299,7 @@ export function Navigation() {
                 <Link
                   href="/auth"
                   className="ml-auto text-white hover:text-[#F2C94C] font-medium transition-colors"
-                  onClick={() => setIsMenuOpen(false)}
+                  onClick={()=>setIsMenuOpen(false)}
                 >
                   {t.loginSignup}
                 </Link>
@@ -328,31 +307,31 @@ export function Navigation() {
 
               <div className="h-px bg-white/20 my-2" />
 
-              {leftNav.map((item) =>
+              {leftNav.map((item)=>
                 "mega" in item ? (
                   <div key={item.label} className="px-2">
                     <button
                       className="w-full text-left px-2 py-2 text-white font-semibold flex items-center justify-between hover:bg-white/10 rounded-md"
-                      onClick={() =>
-                        setOpenMobileSubmenu((cur) => (cur === item.label ? null : item.label))
+                      onClick={()=>
+                        setOpenMobileSubmenu((cur)=>cur===item.label ? null : item.label)
                       }
-                      aria-expanded={openMobileSubmenu === item.label}
+                      aria-expanded={openMobileSubmenu===item.label}
                     >
                       <span>{item.label}</span>
                       <ChevronDown
                         className={`h-4 w-4 transition-transform ${
-                          openMobileSubmenu === item.label ? "rotate-180" : ""
+                          openMobileSubmenu===item.label ? "rotate-180" : ""
                         }`}
                       />
                     </button>
-                    {openMobileSubmenu === item.label && (
+                    {openMobileSubmenu===item.label && (
                       <div className="mt-1 ml-2">
-                        {item.mega.map((m) => (
+                        {item.mega.map((m)=>(
                           <Link
                             key={m.href}
                             href={m.href}
-                            className="block px-4 py-2 rounded-md hover:bg-white/10 transition-colors"
-                            onClick={() => {
+                            className="block px-4 py-2 rounded-md hover:bg:white/10 transition-colors"
+                            onClick={()=>{
                               setIsMenuOpen(false)
                               setOpenMobileSubmenu(null)
                             }}
@@ -370,12 +349,8 @@ export function Navigation() {
                   <Link
                     key={item.href}
                     href={item.href}
-                    className={`py-2 px-4 rounded-md transition-colors ${
-                      item.href === "/friends"
-                        ? "bg-[#F2C94C] text-[#219653] font-semibold"
-                        : "text-white hover:text-[#F2C94C] hover:bg-white/10"
-                    }`}
-                    onClick={() => setIsMenuOpen(false)}
+                    className="py-2 px-4 rounded-md transition-colors text-white hover:text-[#F2C94C] hover:bg-white/10"
+                    onClick={()=>setIsMenuOpen(false)}
                   >
                     {item.label}
                   </Link>
