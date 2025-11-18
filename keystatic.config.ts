@@ -1,36 +1,65 @@
 // keystatic.config.ts
-import { config, collection, fields } from '@keystatic/core';
+import { config, fields, collection } from '@keystatic/core';
 
 export default config({
   ui: {
-    brand: { name: 'Lafaek CMS — PAT' }, // canary label
-  },
-  storage: {
-    kind: 'github',
-    repo: { owner: 'ChynaBlueInk', name: 'lafaekTL' },
-    branchPrefix: 'keystatic/',
+    // No `path` here — your Next.js page at /keystatic controls the route
+    brand: { name: 'Lafaek Admin' },
   },
 
-  // ── Match live fields/labels and YAML data files ────────────────────────────
+  // --- GitHub storage via GitHub App (OAuth) ---
+  storage: {
+    kind: 'github',
+    repo: {
+      owner: process.env.KEYSTATIC_GITHUB_OWNER || 'ChynaBlueInk',
+      name: process.env.KEYSTATIC_GITHUB_REPO || 'lafaekTL',
+    },
+    // NOTE: do NOT add `branch` here; your installed types don't include it.
+
+    // Expected object shape: { envName, value }
+    appSlug: {
+      envName: 'NEXT_PUBLIC_KEYSTATIC_GITHUB_APP_SLUG',
+      value: process.env.NEXT_PUBLIC_KEYSTATIC_GITHUB_APP_SLUG, // e.g., "lafaek-keystatic" (lowercase)
+    },
+    clientId: {
+      envName: 'KEYSTATIC_GITHUB_CLIENT_ID',
+      value: process.env.KEYSTATIC_GITHUB_CLIENT_ID,
+    },
+    clientSecret: {
+      envName: 'KEYSTATIC_GITHUB_CLIENT_SECRET',
+      value: process.env.KEYSTATIC_GITHUB_CLIENT_SECRET,
+    },
+    // Optional PAT fallback (leave commented while using OAuth):
+    // token: {
+    //   envName: 'KEYSTATIC_GITHUB_PAT',
+    //   value: process.env.KEYSTATIC_GITHUB_PAT,
+    // },
+  },
+
+  // --- Collections ---
   collections: {
-    our_team: collection({
+    'our-team': collection({
       label: 'Our Team',
       path: 'content/our-team/*',
-      format: { data: 'yaml' }, // live site uses YAML for entries
+
+      // REQUIRED by your current @keystatic/core types:
       slugField: 'name',
+
       schema: {
-        name:     fields.text({ label: 'Name', validation: { isRequired: true } }),
-        role:     fields.text({ label: 'Role (EN)', validation: { isRequired: true } }),
-        roleTet:  fields.text({ label: 'Kargu (Tetun)' }),
-        started:  fields.text({ label: 'Started (year)' }),
-        photoUrl: fields.url({
-          label: 'Photo URL (S3)',
-          description: 'Use the uploader to get this URL',
-          validation: { isRequired: true },
+        name: fields.text({ label: 'Name', validation: { isRequired: true } }),
+        role: fields.text({ label: 'Role', validation: { isRequired: true } }),
+        bio: fields.document({
+          label: 'Bio',
+          formatting: true,
+          links: true,
+          dividers: true,
         }),
-        sketchUrl: fields.url({ label: 'Sketch URL (S3)' }),
-        bio:       fields.text({ label: 'Bio (EN)', multiline: true }),
-        bioTet:    fields.text({ label: 'Bio (Tetun)', multiline: true }),
+        photo: fields.image({
+          label: 'Photo',
+          directory: 'public/uploads/our-team',
+        }),
+        order: fields.integer({ label: 'Sort Order', defaultValue: 0 }),
+        visible: fields.checkbox({ label: 'Visible', defaultValue: true }),
       },
     }),
   },

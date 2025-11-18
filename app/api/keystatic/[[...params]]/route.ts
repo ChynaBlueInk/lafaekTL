@@ -7,6 +7,9 @@ import config from '../../../../keystatic.config';
 
 const base = makeRouteHandler({
   config,
+  // Explicitly pass what the handler is complaining about:
+  clientId: process.env.KEYSTATIC_GITHUB_CLIENT_ID!,
+  clientSecret: process.env.KEYSTATIC_GITHUB_CLIENT_SECRET!,
   secret: process.env.KEYSTATIC_SECRET!, // HMAC/state cookie
 });
 
@@ -15,7 +18,6 @@ export const GET = async (req: Request) => {
   const url = new URL(req.url);
   try {
     const res = await base.GET!(req);
-    // clone to add a tiny header so we know this file handled it
     const out = new Response(res.body, {
       status: res.status,
       statusText: res.statusText,
