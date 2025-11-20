@@ -36,8 +36,11 @@ type TeamMemberRecord={
 }
 
 async function readTeamJsonFromS3():Promise<TeamMemberRecord[]>{
+  // If BUCKET is not configured (e.g. local dev without envs),
+  // fail gracefully and just return an empty list.
   if(!BUCKET){
-    throw new Error("AWS_S3_BUCKET is not configured")
+    console.warn("[api/admin/our-team] AWS_S3_BUCKET not set, returning empty members list")
+    return []
   }
 
   const cmd=new GetObjectCommand({
@@ -174,7 +177,7 @@ export async function PUT(req:Request){
         roleEn:String(raw.roleEn??""),
         roleTet:typeof raw.roleTet==="string"?raw.roleTet:undefined,
         bioEn:String(raw.bioEn??""),
-        bioTet:typeof raw.bioTet==="string"?raw.bioTet:undefined,
+        bioTet:String(raw.bioTet??""),
         photo:photoFromRaw||undefined,
         sketch:sketchFromRaw||undefined,
         started:typeof raw.started==="string"?raw.started:undefined,

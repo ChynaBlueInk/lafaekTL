@@ -2,23 +2,26 @@
 "use client";
 
 import {useState, useMemo} from "react";
-import Image from "next/image";
 import {useLanguage} from "@/lib/LanguageContext";
 import {X} from "lucide-react";
 import type {MemberFile} from "@/lib/content-team";
 
 type Lang="en"|"tet";
-type Props={membersTet:MemberFile[]; membersEn:MemberFile[]; initialLocale?:Lang};
+type Props={membersTet:MemberFile[]; membersEn:MemberFile[]};
 
 export default function TeamClient({membersTet, membersEn}:Props){
   const {language}=useLanguage() as {language:Lang};
 
-  const copy=useMemo(()=>(
-    {
-      en:{title:"Our Team", subtitle:"Meet the people behind Lafaek — designers, educators, writers and production teams working across Timor-Leste."},
-      tet:{title:"Ami-nia Ekipá", subtitle:"Hasoru ema sira ne’ebé hala’o Lafaek — dezenhadór, edukadór, hakerek-na’in, no ekipa produsaun sira iha Timor-Leste tomak."}
-    } as const
-  )[language], [language]);
+  const copy=useMemo(()=>({
+    en:{
+      title:"Our Team",
+      subtitle:"Meet the people behind Lafaek — designers, educators, writers and production teams working across Timor-Leste."
+    },
+    tet:{
+      title:"Ami-nia Ekipá",
+      subtitle:"Hasoru ema sira ne’ebé hala’o Lafaek — dezenhadór, edukadór, hakerek-na’in, no ekipa produsaun sira iha Timor-Leste tomak."
+    }
+  } as const)[language],[language]);
 
   const roleLabel=(lang:Lang)=> lang==="tet"?"Kargu":"Role";
   const aboutLabel=(lang:Lang)=> lang==="tet"?"Kona-ba":"About";
@@ -28,7 +31,7 @@ export default function TeamClient({membersTet, membersEn}:Props){
   const members=language==="tet"? membersTet: membersEn;
 
   type Member=MemberFile&{started?:string};
-  const [active, setActive]=useState<Member|null>(null);
+  const [active,setActive]=useState<Member|null>(null);
 
   return (
     <div className="flex flex-col min-h-screen bg-stone-100">
@@ -47,20 +50,22 @@ export default function TeamClient({membersTet, membersEn}:Props){
                   className="relative block w-full aspect-[2/3] rounded-lg overflow-hidden shadow bg-white focus:outline-none focus:ring-4 focus:ring-[#2F80ED]/40 group"
                   aria-label={`Open details for ${m.name}`}
                 >
-                  <Image
-                    src={m.photo||"/placeholder.svg?width=640&height=720"}
-                    alt={m.name}
-                    fill
-                    sizes="(min-width:1024px) 25vw, (min-width:640px) 50vw, 100vw"
-                    className="object-contain transition-opacity duration-300 group-hover:opacity-0"
-                  />
-                  <Image
-                    src={m.sketch||"/placeholder.svg?width=640&height=720"}
-                    alt={`${m.name} caricature`}
-                    fill
-                    sizes="(min-width:1024px) 25vw, (min-width:640px) 50vw, 100vw"
-                    className="object-contain opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-                  />
+                  {/* Photo layer */}
+                  <div className="absolute inset-0">
+                    <img
+                      src={m.photo || "/placeholder.svg?width=640&height=720"}
+                      alt={m.name}
+                      className="h-full w-full object-contain transition-opacity duration-300 group-hover:opacity-0"
+                    />
+                  </div>
+                  {/* Sketch layer */}
+                  <div className="absolute inset-0">
+                    <img
+                      src={m.sketch || "/placeholder.svg?width=640&height=720"}
+                      alt={`${m.name} caricature`}
+                      className="h-full w-full object-contain opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                    />
+                  </div>
                 </button>
 
                 <div className="pt-4">
@@ -76,7 +81,12 @@ export default function TeamClient({membersTet, membersEn}:Props){
       </main>
 
       {active && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" role="dialog" aria-modal="true" aria-labelledby="member-title">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="member-title"
+        >
           <div className="relative w-full max-w-3xl bg-white rounded-2xl overflow-hidden shadow-2xl">
             <button
               onClick={()=> setActive(null)}
@@ -87,14 +97,11 @@ export default function TeamClient({membersTet, membersEn}:Props){
             </button>
 
             <div className="grid md:grid-cols-2">
-              <div className="relative h-64 md:h-full min-h-[280px] z-0 bg-white">
-                <Image
-                  src={active.photo||"/placeholder.svg?width=640&height=720"}
+              <div className="relative h-64 md:h-full min-h-[280px] z-0 bg-white flex items-center justify-center">
+                <img
+                  src={active.photo || "/placeholder.svg?width=640&height=720"}
                   alt={active.name}
-                  fill
-                  sizes="50vw"
-                  className="object-contain"
-                  priority
+                  className="max-h-full w-full object-contain"
                 />
               </div>
 
