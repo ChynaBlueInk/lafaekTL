@@ -8,8 +8,9 @@ import {createPresignedPost} from '@aws-sdk/s3-presigned-post';
 
 const REGION=process.env.AWS_REGION||'ap-southeast-2';
 const BUCKET=process.env.AWS_S3_BUCKET;
-const BASE_PATH=process.env.AWS_S3_BASE_PATH||'uploads';
-// We keep the env var for future use, but we do NOT use ACLs with this bucket
+const RAW_BASE_PATH=process.env.AWS_S3_BASE_PATH||'uploads';
+// strip leading slashes so keys never start with "/"
+const BASE_PATH_NORMALISED=RAW_BASE_PATH.replace(/^\/+/,'');
 const USE_ACL=process.env.AWS_S3_USE_ACL==='true';
 
 const s3=new S3Client({
@@ -48,7 +49,7 @@ export async function POST(req:NextRequest){
     const allowed=['our-team','school-gallery','pdfs'] as const;
     const safeFolder=allowed.includes(folder)?folder:'misc';
     const safeName=String(fileName).replace(/[^a-zA-Z0-9._-]/g,'_');
-    const key=`${BASE_PATH}/${safeFolder}/${Date.now()}-${safeName}`;
+    const key=`${BASE_PATH_NORMALISED}/${safeFolder}/${Date.now()}-${safeName}`;
 
     const fields:Record<string,string>={
       'Content-Type':contentType||'application/octet-stream',
@@ -61,12 +62,7 @@ export async function POST(req:NextRequest){
       ['eq','$success_action_status','201']
     ];
 
-    // ⚠ IMPORTANT: do NOT add any ACL fields or ACL conditions.
-    // The bucket has Object Ownership: Bucket owner enforced, so ACLs are not supported.
-    // if(USE_ACL){
-    //   fields['acl']='public-read';
-    //   conditions.push(['eq','$acl','public-read']);
-    // }
+    // ACLs are disabled on this bucket, so we do not add acl/x-amz-acl
 
     const presign=await createPresignedPost(s3,{
       Bucket:BUCKET!,
@@ -76,7 +72,6 @@ export async function POST(req:NextRequest){
       Expires:60
     });
 
-    // Use the signed URL from createPresignedPost
     const actionUrl=presign.url;
     const publicUrl=`${actionUrl}/${key}`;
 
