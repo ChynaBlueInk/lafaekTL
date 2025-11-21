@@ -56,6 +56,7 @@ export default function OurTeamAdminPage(){
   const [status,setStatus]=useState<ApiState>("idle")
   const [error,setError]=useState<string|undefined>()
   const [uploading,setUploading]=useState<boolean>(false)
+  const [editingId,setEditingId]=useState<string|null>(null)
 
   // Load members from API on mount
   useEffect(()=>{
@@ -71,11 +72,17 @@ export default function OurTeamAdminPage(){
         if(!data || !Array.isArray(data.members)){
           throw new Error("Invalid response format from /api/admin/our-team")
         }
-        const sorted=[...data.members].sort((a:TeamMember,b:TeamMember)=>{
-          const oa=typeof a.order==="number"?a.order:0
-          const ob=typeof b.order==="number"?b.order:0
-          return oa-ob
-        })
+        const sorted=[...data.members]
+          .sort((a:TeamMember,b:TeamMember)=>{
+            const oa=typeof a.order==="number"?a.order:0
+            const ob=typeof b.order==="number"?b.order:0
+            return oa-ob
+          })
+          .map((m,index)=>({
+            ...m,
+            order:index+1
+          }))
+
         setMembers(sorted)
         setStatus("idle")
       }catch(err:any){
@@ -115,8 +122,10 @@ export default function OurTeamAdminPage(){
         const o=typeof m.order==="number"?m.order:0
         return o>max?o:max
       },0)
-      return [...prev,emptyMember(maxOrder+1)]
+      const updated=[...prev,emptyMember(maxOrder+1)]
+      return updated
     })
+    // newly added rows will appear but stay read-only until Edit is clicked
   }
 
   const handleMove=(index:number,direction:-1|1)=>{
@@ -172,6 +181,7 @@ export default function OurTeamAdminPage(){
       }
 
       setStatus("success")
+      setEditingId(null)
       setTimeout(()=>{setStatus("idle")},1500)
     }catch(err:any){
       console.error("Error saving team members",err)
@@ -299,7 +309,7 @@ export default function OurTeamAdminPage(){
           <table className="min-w-full text-left text-sm align-top">
             <thead className="bg-slate-100">
               <tr>
-                <th className="px-3 py-2 text-xs font-semibold uppercase tracking-wide text-slate-600">Order</th>
+                <th className="px-3 py-2 text-xs font-semibold uppercase tracking-wide text-slate-600">#</th>
                 <th className="px-3 py-2 text-xs font-semibold uppercase tracking-wide text-slate-600">Visible</th>
                 <th className="px-3 py-2 text-xs font-semibold uppercase tracking-wide text-slate-600">Name (EN)</th>
                 <th className="px-3 py-2 text-xs font-semibold uppercase tracking-wide text-slate-600">Name (Tet)</th>
@@ -314,167 +324,194 @@ export default function OurTeamAdminPage(){
               </tr>
             </thead>
             <tbody>
-              {members.map((m,index)=>(
-                <tr key={m.id || m.slug || index} className={index%2===0?"bg-white":"bg-slate-50"}>
-                  <td className="px-3 py-2 align-top">
-                    <input
-                      type="number"
-                      className="w-16 rounded border border-slate-300 px-1 py-1 text-xs"
-                      value={typeof m.order==="number"?m.order:""}
-                      onChange={(e)=>{
-                        const val=parseInt(e.target.value,10)
-                        handleFieldChange(index,"order",isNaN(val)?undefined:val)
-                      }}
-                    />
-                  </td>
-                  <td className="px-3 py-2 align-top text-center">
-                    <input
-                      type="checkbox"
-                      checked={m.visible!==false}
-                      onChange={()=>handleToggleVisible(index)}
-                    />
-                  </td>
-                  <td className="px-3 py-2 align-top">
-                    <input
-                      type="text"
-                      className="w-full rounded border border-slate-300 px-2 py-1 text-xs"
-                      value={m.nameEn ?? ""}
-                      onChange={(e)=>handleFieldChange(index,"nameEn",e.target.value)}
-                      placeholder="Name (English)"
-                    />
-                  </td>
-                  <td className="px-3 py-2 align-top">
-                    <input
-                      type="text"
-                      className="w-full rounded border border-slate-300 px-2 py-1 text-xs"
-                      value={m.nameTet ?? ""}
-                      onChange={(e)=>handleFieldChange(index,"nameTet",e.target.value)}
-                      placeholder="Naran (Tetun)"
-                    />
-                  </td>
-                  <td className="px-3 py-2 align-top">
-                    <input
-                      type="text"
-                      className="w-full rounded border border-slate-300 px-2 py-1 text-xs"
-                      value={m.roleEn ?? ""}
-                      onChange={(e)=>handleFieldChange(index,"roleEn",e.target.value)}
-                      placeholder="Role (English)"
-                    />
-                  </td>
-                  <td className="px-3 py-2 align-top">
-                    <input
-                      type="text"
-                      className="w-full rounded border border-slate-300 px-2 py-1 text-xs"
-                      value={m.roleTet ?? ""}
-                      onChange={(e)=>handleFieldChange(index,"roleTet",e.target.value)}
-                      placeholder="Kargo (Tetun)"
-                    />
-                  </td>
-                  <td className="px-3 py-2 align-top">
-                    <textarea
-                      className="h-20 w-full rounded border border-slate-300 px-2 py-1 text-xs"
-                      value={m.bioEn ?? ""}
-                      onChange={(e)=>handleFieldChange(index,"bioEn",e.target.value)}
-                      placeholder="Short bio in English"
-                    />
-                  </td>
-                  <td className="px-3 py-2 align-top">
-                    <textarea
-                      className="h-20 w-full rounded border border-slate-300 px-2 py-1 text-xs"
-                      value={m.bioTet ?? ""}
-                      onChange={(e)=>handleFieldChange(index,"bioTet",e.target.value)}
-                      placeholder="Bio iha Tetun"
-                    />
-                  </td>
-                  <td className="px-3 py-2 align-top">
-                    <div className="flex flex-col gap-1">
+              {members.map((m,index)=>{
+                const rowKey=m.id || m.slug || String(index)
+                const isEditing=editingId===rowKey
+
+                return (
+                  <tr key={rowKey} className={index%2===0?"bg-white":"bg-slate-50"}>
+                    <td className="px-3 py-2 align-top text-xs text-slate-700">
+                      {index+1}
+                    </td>
+                    <td className="px-3 py-2 align-top text-center">
+                      <input
+                        type="checkbox"
+                        checked={m.visible!==false}
+                        onChange={()=>handleToggleVisible(index)}
+                        disabled={!isEditing}
+                      />
+                    </td>
+                    <td className="px-3 py-2 align-top">
                       <input
                         type="text"
-                        className="w-full rounded border border-slate-300 px-2 py-1 text-xs"
-                        value={m.photo ?? ""}
-                        onChange={(e)=>handleFieldChange(index,"photo",e.target.value)}
-                        placeholder="https://.../photo.jpg"
+                        className={`w-full rounded border border-slate-300 px-2 py-1 text-xs ${!isEditing?"bg-slate-100 cursor-not-allowed":""}`}
+                        value={m.nameEn ?? ""}
+                        onChange={(e)=>handleFieldChange(index,"nameEn",e.target.value)}
+                        placeholder="Name (English)"
+                        readOnly={!isEditing}
                       />
-                      <label className="w-full cursor-pointer rounded border border-dashed border-slate-300 px-2 py-1 text-center text-xs text-slate-600 hover:bg-slate-100">
-                        Upload photo
-                        <input
-                          type="file"
-                          accept="image/*"
-                          className="hidden"
-                          onChange={(e)=>handleFileUpload(e,index,"photo")}
-                        />
-                      </label>
-                      {m.photo && (
-                        <a
-                          href={normalizeS3Url(m.photo)}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="text-[10px] text-sky-700 underline"
-                        >
-                          View current photo
-                        </a>
-                      )}
-                    </div>
-                  </td>
-                  <td className="px-3 py-2 align-top">
-                    <div className="flex flex-col gap-1">
+                    </td>
+                    <td className="px-3 py-2 align-top">
                       <input
                         type="text"
-                        className="w-full rounded border border-slate-300 px-2 py-1 text-xs"
-                        value={m.sketch ?? ""}
-                        onChange={(e)=>handleFieldChange(index,"sketch",e.target.value)}
-                        placeholder="https://.../sketch.png"
+                        className={`w-full rounded border border-slate-300 px-2 py-1 text-xs ${!isEditing?"bg-slate-100 cursor-not-allowed":""}`}
+                        value={m.nameTet ?? ""}
+                        onChange={(e)=>handleFieldChange(index,"nameTet",e.target.value)}
+                        placeholder="Naran (Tetun)"
+                        readOnly={!isEditing}
                       />
-                      <label className="w-full cursor-pointer rounded border border-dashed border-slate-300 px-2 py-1 text-center text-xs text-slate-600 hover:bg-slate-100">
-                        Upload sketch
+                    </td>
+                    <td className="px-3 py-2 align-top">
+                      <input
+                        type="text"
+                        className={`w-full rounded border border-slate-300 px-2 py-1 text-xs ${!isEditing?"bg-slate-100 cursor-not-allowed":""}`}
+                        value={m.roleEn ?? ""}
+                        onChange={(e)=>handleFieldChange(index,"roleEn",e.target.value)}
+                        placeholder="Role (English)"
+                        readOnly={!isEditing}
+                      />
+                    </td>
+                    <td className="px-3 py-2 align-top">
+                      <input
+                        type="text"
+                        className={`w-full rounded border border-slate-300 px-2 py-1 text-xs ${!isEditing?"bg-slate-100 cursor-not-allowed":""}`}
+                        value={m.roleTet ?? ""}
+                        onChange={(e)=>handleFieldChange(index,"roleTet",e.target.value)}
+                        placeholder="Kargo (Tetun)"
+                        readOnly={!isEditing}
+                      />
+                    </td>
+                    <td className="px-3 py-2 align-top">
+                      <textarea
+                        className={`h-20 w-full rounded border border-slate-300 px-2 py-1 text-xs ${!isEditing?"bg-slate-100 cursor-not-allowed":""}`}
+                        value={m.bioEn ?? ""}
+                        onChange={(e)=>handleFieldChange(index,"bioEn",e.target.value)}
+                        placeholder="Short bio in English"
+                        readOnly={!isEditing}
+                      />
+                    </td>
+                    <td className="px-3 py-2 align-top">
+                      <textarea
+                        className={`h-20 w-full rounded border border-slate-300 px-2 py-1 text-xs ${!isEditing?"bg-slate-100 cursor-not-allowed":""}`}
+                        value={m.bioTet ?? ""}
+                        onChange={(e)=>handleFieldChange(index,"bioTet",e.target.value)}
+                        placeholder="Bio iha Tetun"
+                        readOnly={!isEditing}
+                      />
+                    </td>
+                    <td className="px-3 py-2 align-top">
+                      <div className="flex flex-col gap-1">
                         <input
-                          type="file"
-                          accept="image/*"
-                          className="hidden"
-                          onChange={(e)=>handleFileUpload(e,index,"sketch")}
+                          type="text"
+                          className={`w-full rounded border border-slate-300 px-2 py-1 text-xs ${!isEditing?"bg-slate-100 cursor-not-allowed":""}`}
+                          value={m.photo ?? ""}
+                          onChange={(e)=>handleFieldChange(index,"photo",e.target.value)}
+                          placeholder="https://.../photo.jpg"
+                          readOnly={!isEditing}
                         />
-                      </label>
-                      {m.sketch && (
-                        <a
-                          href={normalizeS3Url(m.sketch)}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="text-[10px] text-sky-700 underline"
+                        <label className={`w-full cursor-pointer rounded border border-dashed border-slate-300 px-2 py-1 text-center text-xs text-slate-600 hover:bg-slate-100 ${!isEditing?"opacity-50 cursor-not-allowed hover:bg-white":""}`}>
+                          Upload photo
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={(e)=>handleFileUpload(e,index,"photo")}
+                            disabled={!isEditing}
+                          />
+                        </label>
+                        {m.photo && (
+                          <a
+                            href={normalizeS3Url(m.photo)}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-[10px] text-sky-700 underline"
+                          >
+                            View current photo
+                          </a>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-3 py-2 align-top">
+                      <div className="flex flex-col gap-1">
+                        <input
+                          type="text"
+                          className={`w-full rounded border border-slate-300 px-2 py-1 text-xs ${!isEditing?"bg-slate-100 cursor-not-allowed":""}`}
+                          value={m.sketch ?? ""}
+                          onChange={(e)=>handleFieldChange(index,"sketch",e.target.value)}
+                          placeholder="https://.../sketch.png"
+                          readOnly={!isEditing}
+                        />
+                        <label className={`w-full cursor-pointer rounded border border-dashed border-slate-300 px-2 py-1 text-center text-xs text-slate-600 hover:bg-slate-100 ${!isEditing?"opacity-50 cursor-not-allowed hover:bg-white":""}`}>
+                          Upload sketch
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={(e)=>handleFileUpload(e,index,"sketch")}
+                            disabled={!isEditing}
+                          />
+                        </label>
+                        {m.sketch && (
+                          <a
+                            href={normalizeS3Url(m.sketch)}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-[10px] text-sky-700 underline"
+                          >
+                            View current sketch
+                          </a>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-3 py-2 align-top">
+                      <div className="flex flex-col items-center gap-1">
+                        <button
+                          type="button"
+                          onClick={()=>handleMove(index,-1)}
+                          className="rounded border border-slate-300 px-2 py-0.5 text-xs hover:bg-slate-100"
+                          disabled={status==="saving" || uploading}
                         >
-                          View current sketch
-                        </a>
-                      )}
-                    </div>
-                  </td>
-                  <td className="px-3 py-2 align-top">
-                    <div className="flex flex-col items-center gap-1">
-                      <button
-                        type="button"
-                        onClick={()=>handleMove(index,-1)}
-                        className="rounded border border-slate-300 px-2 py-0.5 text-xs hover:bg-slate-100"
-                      >
-                        ↑
-                      </button>
-                      <button
-                        type="button"
-                        onClick={()=>handleMove(index,1)}
-                        className="rounded border border-slate-300 px-2 py-0.5 text-xs hover:bg-slate-100"
-                      >
-                        ↓
-                      </button>
-                    </div>
-                  </td>
-                  <td className="px-3 py-2 align-top">
-                    <button
-                      type="button"
-                      onClick={()=>handleDeleteRow(index)}
-                      className="rounded border border-red-300 px-2 py-1 text-xs text-red-700 hover:bg-red-50"
-                    >
-                      Remove
-                    </button>
-                  </td>
-                </tr>
-              ))}
+                          ↑
+                        </button>
+                        <button
+                          type="button"
+                          onClick={()=>handleMove(index,1)}
+                          className="rounded border border-slate-300 px-2 py-0.5 text-xs hover:bg-slate-100"
+                          disabled={status==="saving" || uploading}
+                        >
+                          ↓
+                        </button>
+                      </div>
+                    </td>
+                    <td className="px-3 py-2 align-top">
+                      <div className="flex flex-col gap-1">
+                        <button
+                          type="button"
+                          onClick={()=>{
+                            if(isEditing){
+                              setEditingId(null)
+                            }else{
+                              setEditingId(rowKey)
+                            }
+                          }}
+                          className="rounded border border-slate-300 px-2 py-1 text-xs text-slate-800 hover:bg-slate-100"
+                          disabled={status==="saving" || uploading}
+                        >
+                          {isEditing?"Done":"Edit"}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={()=>handleDeleteRow(index)}
+                          className="rounded border border-red-300 px-2 py-1 text-xs text-red-700 hover:bg-red-50"
+                          disabled={status==="saving" || uploading}
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                )
+              })}
 
               {members.length===0 && status!=="loading" && (
                 <tr>
@@ -503,7 +540,7 @@ export default function OurTeamAdminPage(){
             <li>Bio fields are stored as <code>bioEn</code> and <code>bioTet</code> in <code>content/team.json</code>.</li>
             <li>Photo and sketch URLs are stored as <code>photo</code> and <code>sketch</code>, matching the public loader in <code>lib/content-team.ts</code>.</li>
             <li>Uploads use the existing <code>/api/uploads/s3/presign</code> route with the <code>our-team</code> folder.</li>
-            <li>Always wait for image uploads to finish before clicking &quot;Save Changes&quot;.</li>
+            <li>Use the Edit button per row to enable changes, then Save Changes to persist to S3.</li>
           </ul>
         </section>
       </div>
