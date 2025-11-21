@@ -38,6 +38,19 @@ const emptyMember=(nextOrder:number):TeamMember=>({
   order:nextOrder
 })
 
+// S3 URL normaliser so we never get //uploads/...
+const S3_ORIGIN="https://lafaek-media.s3.ap-southeast-2.amazonaws.com"
+
+const normalizeS3Url=(src?:string)=>{
+  if(!src){return ""}
+  let clean=src.trim()
+  if(clean.startsWith(S3_ORIGIN)){
+    clean=clean.slice(S3_ORIGIN.length)
+  }
+  clean=clean.replace(/^\/+/, "")
+  return `${S3_ORIGIN}/${clean}`
+}
+
 export default function OurTeamAdminPage(){
   const [members,setMembers]=useState<TeamMember[]>([])
   const [status,setStatus]=useState<ApiState>("idle")
@@ -168,71 +181,68 @@ export default function OurTeamAdminPage(){
   }
 
   const handleFileUpload=async (e:ChangeEvent<HTMLInputElement>,index:number,field:"photo"|"sketch")=>{
-  const file=e.target.files?.[0]
-  // clear input so same file can be reselected later
-  e.target.value=""
-  if(!file){return}
+    const file=e.target.files?.[0]
+    e.target.value=""
+    if(!file){return}
 
-  try{
-    setUploading(true)
-    setError(undefined)
+    try{
+      setUploading(true)
+      setError(undefined)
 
-    const presignRes=await fetch("/api/uploads/s3/presign",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({
-        fileName:file.name,
-        contentType:file.type || "application/octet-stream",
-        folder:"our-team"
+      const presignRes=await fetch("/api/uploads/s3/presign",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({
+          fileName:file.name,
+          contentType:file.type || "application/octet-stream",
+          folder:"our-team"
+        })
       })
-    })
 
-    if(!presignRes.ok){
-      const text=await presignRes.text().catch(()=>undefined)
-      console.error("Error getting presigned URL",presignRes.status,text)
-      throw new Error(`Failed to get upload URL (${presignRes.status})`)
+      if(!presignRes.ok){
+        const text=await presignRes.text().catch(()=>undefined)
+        console.error("Error getting presigned URL",presignRes.status,text)
+        throw new Error(`Failed to get upload URL (${presignRes.status})`)
+      }
+
+      const {url,fields,publicUrl}=await presignRes.json()
+
+      const formData=new FormData()
+      Object.entries(fields||{}).forEach(([key,value])=>{
+        formData.append(key,String(value))
+      })
+      formData.append("file",file)
+
+      const uploadRes=await fetch(url,{
+        method:"POST",
+        body:formData
+      })
+
+      const responseText=await uploadRes.text().catch(()=>"")
+      if(!uploadRes.ok){
+        console.error("S3 upload error",uploadRes.status,responseText)
+        throw new Error(`Upload failed with status ${uploadRes.status}`)
+      }
+
+      console.log("S3 upload success",uploadRes.status,responseText)
+
+      const cleanUrl=normalizeS3Url(publicUrl)
+
+      setMembers(prev=>{
+        if(index<0 || index>=prev.length){return prev}
+        const copy=[...prev]
+        const existing=copy[index]
+        if(!existing){return prev}
+        copy[index]={...existing,[field]:cleanUrl}
+        return copy
+      })
+    }catch(err:any){
+      console.error("Error uploading file",err)
+      setError(err?.message ?? "Failed to upload image")
+    }finally{
+      setUploading(false)
     }
-
-    const {url,fields,publicUrl}=await presignRes.json()
-
-    const formData=new FormData()
-    Object.entries(fields||{}).forEach(([key,value])=>{
-      formData.append(key,String(value))
-    })
-    formData.append("file",file)
-
-    const uploadRes=await fetch(url,{
-      method:"POST",
-      body:formData
-    })
-
-    const responseText=await uploadRes.text().catch(()=>"")
-
-    if(!uploadRes.ok){
-      // ⬇️ This is where we’ll see the full S3 XML error
-      console.error("S3 upload error",uploadRes.status,responseText)
-      throw new Error(`Upload failed with status ${uploadRes.status}`)
-    }
-
-    // For debugging, log the success XML (<PostResponse>…</PostResponse>)
-    console.log("S3 upload success",uploadRes.status,responseText)
-
-    setMembers(prev=>{
-      if(index<0 || index>=prev.length){return prev}
-      const copy=[...prev]
-      const existing=copy[index]
-      if(!existing){return prev}
-      copy[index]={...existing,[field]:publicUrl}
-      return copy
-    })
-  }catch(err:any){
-    console.error("Error uploading file",err)
-    setError(err?.message ?? "Failed to upload image")
-  }finally{
-    setUploading(false)
   }
-}
-
 
   return (
     <div className="min-h-screen bg-slate-50 px-4 py-8">
@@ -396,7 +406,7 @@ export default function OurTeamAdminPage(){
                       </label>
                       {m.photo && (
                         <a
-                          href={m.photo}
+                          href={normalizeS3Url(m.photo)}
                           target="_blank"
                           rel="noreferrer"
                           className="text-[10px] text-sky-700 underline"
@@ -426,7 +436,7 @@ export default function OurTeamAdminPage(){
                       </label>
                       {m.sketch && (
                         <a
-                          href={m.sketch}
+                          href={normalizeS3Url(m.sketch)}
                           target="_blank"
                           rel="noreferrer"
                           className="text-[10px] text-sky-700 underline"

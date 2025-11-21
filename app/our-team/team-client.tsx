@@ -9,6 +9,26 @@ import type {MemberFile} from "@/lib/content-team";
 type Lang="en"|"tet";
 type Props={membersTet:MemberFile[]; membersEn:MemberFile[]};
 
+// helper to normalise S3 image URLs
+const S3_ORIGIN="https://lafaek-media.s3.ap-southeast-2.amazonaws.com";
+
+const buildS3ImageUrl=(src?:string)=>{
+  if(!src){return "/placeholder.svg?width=640&height=720";}
+
+  let clean=src.trim();
+
+  // If it's already a full S3 URL, strip the origin off
+  if(clean.startsWith(S3_ORIGIN)){
+    clean=clean.slice(S3_ORIGIN.length);
+  }
+
+  // Remove any leading slashes to avoid //uploads/...
+  clean=clean.replace(/^\/+/, "");
+
+  // Rebuild a clean, canonical URL
+  return `${S3_ORIGIN}/${clean}`;
+};
+
 export default function TeamClient({membersTet, membersEn}:Props){
   const {language}=useLanguage() as {language:Lang};
 
@@ -53,7 +73,7 @@ export default function TeamClient({membersTet, membersEn}:Props){
                   {/* Photo layer */}
                   <div className="absolute inset-0">
                     <img
-                      src={m.photo || "/placeholder.svg?width=640&height=720"}
+                      src={buildS3ImageUrl(m.photo)}
                       alt={m.name}
                       className="h-full w-full object-contain transition-opacity duration-300 group-hover:opacity-0"
                     />
@@ -61,7 +81,7 @@ export default function TeamClient({membersTet, membersEn}:Props){
                   {/* Sketch layer */}
                   <div className="absolute inset-0">
                     <img
-                      src={m.sketch || "/placeholder.svg?width=640&height=720"}
+                      src={buildS3ImageUrl(m.sketch)}
                       alt={`${m.name} caricature`}
                       className="h-full w-full object-contain opacity-0 transition-opacity duration-300 group-hover:opacity-100"
                     />
@@ -99,7 +119,7 @@ export default function TeamClient({membersTet, membersEn}:Props){
             <div className="grid md:grid-cols-2">
               <div className="relative h-64 md:h-full min-h-[280px] z-0 bg-white flex items-center justify-center">
                 <img
-                  src={active.photo || "/placeholder.svg?width=640&height=720"}
+                  src={buildS3ImageUrl(active.photo)}
                   alt={active.name}
                   className="max-h-full w-full object-contain"
                 />
