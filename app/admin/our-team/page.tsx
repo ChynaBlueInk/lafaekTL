@@ -58,6 +58,10 @@ export default function OurTeamAdminPage(){
   const [uploading,setUploading]=useState<boolean>(false)
   const [editingId,setEditingId]=useState<string|null>(null)
 
+  // state for add-member modal
+  const [isAddModalOpen,setIsAddModalOpen]=useState<boolean>(false)
+  const [newMemberDraft,setNewMemberDraft]=useState<TeamMember|null>(null)
+
   // Load members from API on mount
   useEffect(()=>{
     const load=async ()=>{
@@ -116,16 +120,16 @@ export default function OurTeamAdminPage(){
     })
   }
 
+  // open add-member modal with a fresh draft
   const handleAddMember=()=>{
-    setMembers(prev=>{
-      const maxOrder=prev.reduce((max,m)=>{
-        const o=typeof m.order==="number"?m.order:0
-        return o>max?o:max
-      },0)
-      const updated=[...prev,emptyMember(maxOrder+1)]
-      return updated
-    })
-    // newly added rows will appear but stay read-only until Edit is clicked
+    const maxOrder=members.reduce((max,m)=>{
+      const o=typeof m.order==="number"?m.order:0
+      return o>max?o:max
+    },0)
+    const draft=emptyMember(maxOrder+1)
+    setNewMemberDraft(draft)
+    setIsAddModalOpen(true)
+    setEditingId(null)
   }
 
   const handleMove=(index:number,direction:-1|1)=>{
@@ -252,6 +256,47 @@ export default function OurTeamAdminPage(){
     }finally{
       setUploading(false)
     }
+  }
+
+  // handlers for the add-member modal
+  const handleNewMemberFieldChange=(field:keyof TeamMember,value:any)=>{
+    setNewMemberDraft(prev=>{
+      if(!prev){return prev}
+      return {...prev,[field]:value}
+    })
+  }
+
+  const handleCreateMember=()=>{
+    if(!newMemberDraft){return}
+
+    const trimmedNameEn=newMemberDraft.nameEn?.trim() ?? ""
+    const trimmedNameTet=newMemberDraft.nameTet?.trim() ?? ""
+
+    if(!trimmedNameEn || !trimmedNameTet){
+      setError("New member needs a name (we store it for both English and Tetun).")
+      return
+    }
+
+    const draftWithTrim:TeamMember={
+      ...newMemberDraft,
+      nameEn:trimmedNameEn,
+      nameTet:trimmedNameTet
+    }
+
+    setMembers(prev=>{
+      const updated=[...prev,draftWithTrim]
+      return updated.map((m,i)=>({...m,order:i+1}))
+    })
+
+    const newId=draftWithTrim.id || draftWithTrim.slug || null
+    setEditingId(newId)
+    setIsAddModalOpen(false)
+    setNewMemberDraft(null)
+  }
+
+  const handleCancelNewMember=()=>{
+    setIsAddModalOpen(false)
+    setNewMemberDraft(null)
   }
 
   return (
@@ -544,6 +589,113 @@ export default function OurTeamAdminPage(){
           </ul>
         </section>
       </div>
+
+      {/* Add-member modal */}
+      {isAddModalOpen && newMemberDraft && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
+          <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl">
+            <h2 className="text-lg font-semibold text-slate-900 mb-1">Add new team member</h2>
+            <p className="text-xs text-slate-600 mb-4">
+              Enter the main details. The name will be used for both English and Tetun. You can refine roles, bios and images later in the table.
+            </p>
+
+            <div className="grid grid-cols-1 gap-3">
+              <div>
+                <label className="block text-xs font-medium text-slate-700 mb-1">Name</label>
+                <input
+                  type="text"
+                  className="w-full rounded border border-slate-300 px-2 py-1 text-xs"
+                  value={newMemberDraft.nameEn}
+                  onChange={(e)=>{
+                    const val=e.target.value
+                    // keep both nameEn and nameTet in sync for now
+                    setNewMemberDraft(prev=>{
+                      if(!prev){return prev}
+                      return {...prev,nameEn:val,nameTet:val}
+                    })
+                  }}
+                  placeholder="e.g. Maria Soares"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-slate-700 mb-1">Role (English)</label>
+                <input
+                  type="text"
+                  className="w-full rounded border border-slate-300 px-2 py-1 text-xs"
+                  value={newMemberDraft.roleEn ?? ""}
+                  onChange={(e)=>handleNewMemberFieldChange("roleEn",e.target.value)}
+                  placeholder="e.g. Graphic Designer"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-slate-700 mb-1">Kargo (Tetun)</label>
+                <input
+                  type="text"
+                  className="w-full rounded border border-slate-300 px-2 py-1 text-xs"
+                  value={newMemberDraft.roleTet ?? ""}
+                  onChange={(e)=>handleNewMemberFieldChange("roleTet",e.target.value)}
+                  placeholder="e.g. Dezenhador Gráfiku"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-slate-700 mb-1">Bio (English)</label>
+                <textarea
+                  className="w-full rounded border border-slate-300 px-2 py-1 text-xs h-20"
+                  value={newMemberDraft.bioEn ?? ""}
+                  onChange={(e)=>handleNewMemberFieldChange("bioEn",e.target.value)}
+                  placeholder="Short bio in English"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-slate-700 mb-1">Bio (Tetun)</label>
+                <textarea
+                  className="w-full rounded border border-slate-300 px-2 py-1 text-xs h-20"
+                  value={newMemberDraft.bioTet ?? ""}
+                  onChange={(e)=>handleNewMemberFieldChange("bioTet",e.target.value)}
+                  placeholder="Bio iha Tetun"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-slate-700 mb-1">Started (optional)</label>
+                <input
+                  type="text"
+                  className="w-full rounded border border-slate-300 px-2 py-1 text-xs"
+                  value={newMemberDraft.started ?? ""}
+                  onChange={(e)=>handleNewMemberFieldChange("started",e.target.value)}
+                  placeholder="e.g. 2020"
+                />
+              </div>
+              <div>
+                <label className="inline-flex items-center gap-2 text-xs text-slate-700">
+                  <input
+                    type="checkbox"
+                    checked={newMemberDraft.visible!==false}
+                    onChange={(e)=>handleNewMemberFieldChange("visible",e.target.checked)}
+                  />
+                  Show on public Our Team page
+                </label>
+              </div>
+            </div>
+
+            <div className="mt-5 flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={handleCancelNewMember}
+                className="rounded border border-slate-300 px-3 py-1.5 text-xs text-slate-800 hover:bg-slate-100"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleCreateMember}
+                className="rounded bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-700"
+              >
+                Create member
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
