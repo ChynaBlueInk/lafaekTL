@@ -107,7 +107,7 @@ export default function TeamClient({membersTet, membersEn}:Props){
           aria-modal="true"
           aria-labelledby="member-title"
         >
-          <div className="relative w-full max-w-3xl bg-white rounded-2xl overflow-hidden shadow-2xl">
+<div className="relative w-full max-w-3xl bg-white rounded-2xl shadow-2xl max-h-[90vh] flex flex-col">
             <button
               onClick={()=> setActive(null)}
               className="absolute right-3 top-3 z-20 rounded-full bg-white/90 hover:bg-white p-2 shadow"
@@ -125,7 +125,7 @@ export default function TeamClient({membersTet, membersEn}:Props){
                 />
               </div>
 
-              <div className="relative z-10 p-6 md:p-8">
+<div className="relative z-10 p-6 md:p-8 overflow-y-auto max-h-[80vh]">
                 <h2 id="member-title" className="text-2xl font-bold text-[#219653]">{active.name}</h2>
                 <p className="mt-1 text-sm text-[#4F4F4F]">
                   <span className="font-semibold">{roleLabel(language)}:</span> {active.role}
