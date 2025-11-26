@@ -29,11 +29,29 @@ type NewsItemRecord={
   bodyEn:string;
   bodyTet?:string;
   date:string;
-  image?:string;
+  image?:string;      // primary/hero image
+  images?:string[];   // optional gallery of images, including hero
   order?:number;
   visible?:boolean;
   [key:string]:any;
 };
+
+function normaliseImages(raw:any):{image?:string;images?:string[]}{
+  const rawImages=Array.isArray(raw?.images)
+    ? raw.images.filter((img:any)=>typeof img==="string"&&img.trim())
+    : undefined;
+
+  const primaryImage=typeof raw?.image==="string"&&raw.image.trim()
+    ? raw.image.trim()
+    : rawImages&&rawImages.length>0
+    ? rawImages[0]
+    : undefined;
+
+  return{
+    image:primaryImage,
+    images:rawImages&&rawImages.length>0?rawImages:undefined
+  };
+}
 
 async function readNewsJsonFromS3():Promise<NewsItemRecord[]>{
   if(!BUCKET){
@@ -100,6 +118,8 @@ async function readNewsJsonFromS3():Promise<NewsItemRecord[]>{
   }
 
   const records:NewsItemRecord[]=arr.map((raw:any,index:number)=>{
+    const{image,images}=normaliseImages(raw);
+
     const base:NewsItemRecord={
       id:typeof raw.id==="string"&&raw.id.trim()?raw.id.trim():`news-${index}`,
       slug:typeof raw.slug==="string"&&raw.slug.trim()?raw.slug.trim():undefined,
@@ -110,7 +130,8 @@ async function readNewsJsonFromS3():Promise<NewsItemRecord[]>{
       bodyEn:String(raw.bodyEn??""),
       bodyTet:typeof raw.bodyTet==="string"?raw.bodyTet:undefined,
       date:String(raw.date??""),
-      image:typeof raw.image==="string"?raw.image:undefined,
+      image,
+      images,
       order:typeof raw.order==="number"?raw.order:index+1,
       visible:raw.visible!==false
     };
@@ -118,7 +139,8 @@ async function readNewsJsonFromS3():Promise<NewsItemRecord[]>{
     return{
       ...raw,
       ...base,
-      image:base.image
+      image:base.image,
+      images:base.images
     };
   });
 
@@ -186,6 +208,8 @@ export async function PUT(req:Request){
     const incoming:any[]=body.items;
 
     const cleaned:NewsItemRecord[]=incoming.map((raw:any,index:number)=>{
+      const{image,images}=normaliseImages(raw);
+
       const base:NewsItemRecord={
         id:typeof raw.id==="string"&&raw.id.trim()?raw.id.trim():`news-${index}`,
         slug:typeof raw.slug==="string"&&raw.slug.trim()?raw.slug.trim():undefined,
@@ -196,7 +220,8 @@ export async function PUT(req:Request){
         bodyEn:String(raw.bodyEn??""),
         bodyTet:String(raw.bodyTet??""),
         date:String(raw.date??""),
-        image:typeof raw.image==="string"?raw.image:undefined,
+        image,
+        images,
         order:typeof raw.order==="number"?raw.order:index+1,
         visible:raw.visible!==false
       };
@@ -204,7 +229,8 @@ export async function PUT(req:Request){
       return{
         ...raw,
         ...base,
-        image:base.image
+        image:base.image,
+        images:base.images
       };
     });
 

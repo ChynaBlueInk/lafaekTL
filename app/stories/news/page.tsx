@@ -25,6 +25,7 @@ type NewsItem={
   bodyTet?:string;
   date:string;
   image?:string;
+  images?:string[];
   visible?:boolean;
   externalUrl?:string;
   order?:number;
@@ -51,16 +52,27 @@ export default function NewsPage(){
   const[loading,setLoading]=useState<boolean>(true);
   const[error,setError]=useState<string|undefined>();
 
+  const[searchTerm,setSearchTerm]=useState<string>("");
+  const[sortMode,setSortMode]=useState<"latest"|"custom">("latest");
+
   const labels={
     en:{
       heading:"News & Stories",
       intro:"Stay updated with the latest news and inspiring stories from our work across Timor-Leste.",
-      readMore:"Read more"
+      readMore:"Read more",
+      searchPlaceholder:"Search news...",
+      sortLabel:"Sort by",
+      sortLatest:"Latest first",
+      sortCustom:"Custom order"
     },
     tet:{
       heading:"Notísia & Istória",
       intro:"Hatudu informasaun foun no istória inspirativu hosi ami-nia servisu iha Timor-Leste.",
-      readMore:"Lee liu tan"
+      readMore:"Lee liu tan",
+      searchPlaceholder:"Buka notísia...",
+      sortLabel:"Ordena tuir",
+      sortLatest:"Foun liu ba leten",
+      sortCustom:"Ordem personalizadu"
     }
   }[L];
 
@@ -91,8 +103,20 @@ export default function NewsPage(){
             const titleTet=typeof raw.titleTet==="string"?raw.titleTet:undefined;
             const excerptEn=String(raw.excerptEn??"");
             const excerptTet=typeof raw.excerptTet==="string"?raw.excerptTet:undefined;
+            const bodyEn=typeof raw.bodyEn==="string"?raw.bodyEn:undefined;
+            const bodyTet=typeof raw.bodyTet==="string"?raw.bodyTet:undefined;
             const date=String(raw.date??"");
-            const image=typeof raw.image==="string"?raw.image:undefined;
+
+            const rawImages=Array.isArray(raw.images)
+              ? raw.images.filter((img:any)=>typeof img==="string"&&img.trim())
+              : undefined;
+
+            const primaryImage=typeof raw.image==="string"&&raw.image.trim()
+              ? raw.image.trim()
+              : rawImages&&rawImages.length>0
+              ? rawImages[0]
+              : undefined;
+
             const slug=typeof raw.slug==="string"&&raw.slug.trim()?raw.slug.trim():undefined;
             const externalUrl=typeof raw.externalUrl==="string"&&raw.externalUrl.trim()
               ? raw.externalUrl.trim()
@@ -107,31 +131,18 @@ export default function NewsPage(){
               titleTet,
               excerptEn,
               excerptTet,
+              bodyEn,
+              bodyTet,
               date,
-              image,
+              image:primaryImage,
+              images:rawImages,
               slug,
               externalUrl,
               order
             } as NewsItem;
           })
           // only visible items on public page
-          .filter((item)=>item.visible!==false)
-          // 🔑 sort by order ascending first, then by date desc as a tie-breaker
-          .sort((a,b)=>{
-            const oa=a.order??0;
-            const ob=b.order??0;
-            if(oa!==ob){
-              return oa-ob; // 1,2,3 in the same order as admin
-            }
-            if(a.date&&b.date){
-              const da=new Date(a.date).getTime();
-              const db=new Date(b.date).getTime();
-              if(!Number.isNaN(da)&&!Number.isNaN(db)){
-                return db-da;
-              }
-            }
-            return 0;
-          });
+          .filter((item)=>item.visible!==false);
 
         setItems(normalised);
       }catch(err:any){
@@ -145,13 +156,91 @@ export default function NewsPage(){
     load();
   },[]);
 
+  // ── derive filtered + sorted items for display ──
+  const filteredAndSortedItems=(()=>{
+    let list=[...items];
+
+    // text search across titles/excerpts/body EN + Tet
+    const term=searchTerm.trim().toLowerCase();
+    if(term){
+      list=list.filter((item)=>{
+        const fields=[
+          item.titleEn,
+          item.titleTet,
+          item.excerptEn,
+          item.excerptTet,
+          item.bodyEn,
+          item.bodyTet
+        ]
+          .filter(Boolean)
+          .map((f)=>String(f).toLowerCase());
+
+        return fields.some((f)=>f.includes(term));
+      });
+    }
+
+    // sort
+    list.sort((a,b)=>{
+      const da=a.date?new Date(a.date).getTime():0;
+      const db=b.date?new Date(b.date).getTime():0;
+      const oa=a.order??0;
+      const ob=b.order??0;
+
+      if(sortMode==="latest"){
+        // newest date first; fall back to order as tie-breaker
+        if(da!==db){
+          return db-da;
+        }
+        if(oa!==ob){
+          return oa-ob;
+        }
+        return 0;
+      }else{
+        // custom: admin order first, newest date as tie-breaker
+        if(oa!==ob){
+          return oa-ob;
+        }
+        if(da!==db){
+          return db-da;
+        }
+        return 0;
+      }
+    });
+
+    return list;
+  })();
+
   return(
     <div className="min-h-screen bg-white">
       <main className="mx-auto max-w-7xl px-4 py-12">
-        <header className="mb-10 text-center">
+        <header className="mb-6 text-center md:mb-8">
           <h1 className="text-4xl font-bold text-blue-800">{labels.heading}</h1>
           <p className="mt-2 text-gray-600">{labels.intro}</p>
         </header>
+
+        {/* Controls: search + sort */}
+        <div className="mb-8 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <div className="w-full md:max-w-sm">
+            <input
+              type="text"
+              placeholder={labels.searchPlaceholder}
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-[#219653] focus:outline-none focus:ring-1 focus:ring-[#219653]"
+              value={searchTerm}
+              onChange={(e)=>setSearchTerm(e.target.value)}
+            />
+          </div>
+          <div className="flex items-center gap-2 text-sm text-gray-700">
+            <span className="whitespace-nowrap">{labels.sortLabel}:</span>
+            <select
+              className="rounded-md border border-gray-300 px-2 py-1 text-sm focus:border-[#219653] focus:outline-none focus:ring-1 focus:ring-[#219653]"
+              value={sortMode}
+              onChange={(e)=>setSortMode(e.target.value==="latest"?"latest":"custom")}
+            >
+              <option value="latest">{labels.sortLatest}</option>
+              <option value="custom">{labels.sortCustom}</option>
+            </select>
+          </div>
+        </div>
 
         {loading&&(
           <div className="text-center text-sm text-gray-600">
@@ -165,22 +254,24 @@ export default function NewsPage(){
           </div>
         )}
 
-        {!loading&&items.length===0&&!error&&(
+        {!loading&&filteredAndSortedItems.length===0&&!error&&(
           <div className="mx-auto max-w-xl rounded-md border border-gray-200 bg-gray-50 px-4 py-6 text-center text-sm text-gray-600">
             No news to show yet. Please check back soon.
           </div>
         )}
 
-        {!loading&&items.length>0&&(
+        {!loading&&filteredAndSortedItems.length>0&&(
           <section className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {items.map((item)=>{
+            {filteredAndSortedItems.map((item)=>{
               const title=L==="tet"
                 ? item.titleTet||item.titleEn
                 : item.titleEn;
               const excerpt=L==="tet"
                 ? item.excerptTet||item.excerptEn
                 : item.excerptEn;
-              const imageSrc=buildImageUrl(item.image);
+
+              const heroImage=item.image||(Array.isArray(item.images)&&item.images[0])||undefined;
+              const imageSrc=buildImageUrl(heroImage);
 
               const internalIdOrSlug=item.slug||item.id;
               const href=item.externalUrl

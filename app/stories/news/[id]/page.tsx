@@ -26,6 +26,7 @@ type NewsItem={
   bodyTet?:string;
   date:string;
   image?:string;
+  images?:string[];
   visible?:boolean;
   externalUrl?:string;
   order?:number;
@@ -100,7 +101,17 @@ export default function NewsDetailPage(){
           const bodyEn=String(raw.bodyEn??"");
           const bodyTet=typeof raw.bodyTet==="string"?raw.bodyTet:undefined;
           const date=String(raw.date??"");
-          const image=typeof raw.image==="string"?raw.image:undefined;
+
+          const rawImages=Array.isArray(raw.images)
+            ? raw.images.filter((img:any)=>typeof img==="string"&&img.trim())
+            : undefined;
+
+          const primaryImage=typeof raw.image==="string"&&raw.image.trim()
+            ? raw.image.trim()
+            : rawImages&&rawImages.length>0
+            ? rawImages[0]
+            : undefined;
+
           const visible=raw.visible!==false;
           const externalUrl=typeof raw.externalUrl==="string"&&raw.externalUrl.trim()
             ? raw.externalUrl.trim()
@@ -118,7 +129,8 @@ export default function NewsDetailPage(){
             bodyEn,
             bodyTet,
             date,
-            image,
+            image:primaryImage,
+            images:rawImages,
             visible,
             externalUrl,
             order
@@ -173,7 +185,9 @@ export default function NewsDetailPage(){
     const excerpt=L==="tet"
       ? item.excerptTet||item.excerptEn
       : item.excerptEn;
-    const imageSrc=buildImageUrl(item.image);
+
+    const heroImage=item.image||(Array.isArray(item.images)&&item.images[0])||undefined;
+    const imageSrc=buildImageUrl(heroImage);
 
     let dateLabel="";
     if(item.date){
@@ -210,7 +224,7 @@ export default function NewsDetailPage(){
           )}
         </header>
 
-        {item.image&&(
+        {heroImage&&(
           <div className="relative mb-8 h-64 w-full overflow-hidden rounded-lg border border-gray-200">
             <Image
               src={imageSrc}
