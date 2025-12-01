@@ -1,108 +1,254 @@
 // app/page.tsx
 "use client";
 
+import {useEffect,useState}from "react";
 import Carousel from "@/components/Carousel";
-import {useLanguage} from "@/lib/LanguageContext";
+import {useLanguage}from "@/lib/LanguageContext";
 import Image from "next/image";
 import Link from "next/link";
 
-export default function HomePage() {
-  const {language} = useLanguage();
-  const L = language === "tet" ? "tet" : "en"; // ✅ safe language key
+const S3_ORIGIN="https://lafaek-media.s3.ap-southeast-2.amazonaws.com";
 
-  const content = {
-    en: {
-      hero: {
-        title: "Welcome to Lafaek Learning Media",
-        subtitle: "Empowering Timor-Leste through Education & Stories",
+type ImpactApiResponse={
+  ok:boolean;
+  items:any[];
+  error?:string;
+};
+
+type ImpactItem={
+  id:string;
+  slug?:string;
+  titleEn:string;
+  titleTet?:string;
+  excerptEn:string;
+  excerptTet?:string;
+  bodyEn?:string;
+  bodyTet?:string;
+  date:string;
+  image?:string;
+  images?:string[];
+  visible?:boolean;
+  order?:number;
+  pdfKey?:string;
+  [key:string]:any;
+};
+
+const buildS3Url=(src?:string)=>{
+  if(!src){
+    return"/placeholder.svg?height=200&width=300";
+  }
+  let clean=src.trim();
+  if(clean.startsWith("http://")||clean.startsWith("https://")){
+    return clean;
+  }
+  clean=clean.replace(/^\/+/,"");
+  return`${S3_ORIGIN}/${clean}`;
+};
+
+export default function HomePage(){
+  const{language}=useLanguage();
+  const L=language==="tet"?"tet":"en";
+
+  const content={
+    en:{
+      hero:{
+        title:"Welcome to Lafaek Learning Media",
+        subtitle:"Empowering Timor-Leste through Education & Stories",
         supportText:
-          "You can support Lafaek by purchasing our magazines and products, sponsoring educational content, advertising with us, or hiring our talented team of writers, illustrators, and videographers.",
+          "You can support Lafaek by purchasing our magazines and products, sponsoring educational content, advertising with us, or hiring our talented team of writers, illustrators, and videographers."
       },
-      news: {title: "Latest News", subtitle: "What's happening at Lafaek?", viewAll: "View all news"},
-      socialEnterprise: {
-        title: "Lafaek Social Enterprise",
-        subtitle: "From Community Initiative to Timorese-Owned Impact Organization",
-        stats: [
-          {number: "25+", label: "Years of Impact"},
-          {number: "1M+", label: "Magazines Distributed / Year"},
-          {number: "1,500+", label: "Schools Supported"},
-          {number: "100%", label: "Timorese Owned"},
-        ],
+      news:{title:"Latest News",subtitle:"What's happening at Lafaek?",viewAll:"View all news"},
+      socialEnterprise:{
+        title:"Lafaek Social Enterprise",
+        subtitle:"From Community Initiative to Timorese-Owned Impact Organization",
+        stats:[
+          {number:"25+",label:"Years of Impact"},
+          {number:"1M+",label:"Magazines Distributed / Year"},
+          {number:"1,500+",label:"Schools Supported"},
+          {number:"100%",label:"Timorese Owned"}
+        ]
       },
-      products: {
-        title: "Our Products",
-        subtitle: "Creative educational resources designed for impact",
-        items: [
-          {name: "Children's Books", desc: "Beautifully illustrated stories for early learners"},
-          {name: "Teaching Posters", desc: "Classroom-ready visuals for effective learning"},
-          {name: "Animations & Videos", desc: "Locally made, culturally relevant media"},
-          {name: "Magazines", desc: "Trusted content in Tetun and Portuguese"},
-        ],
+      products:{
+        title:"Our Products",
+        subtitle:"Creative educational resources designed for impact",
+        items:[
+          {name:"Children's Books",desc:"Beautifully illustrated stories for early learners"},
+          {name:"Teaching Posters",desc:"Classroom-ready visuals for effective learning"},
+          {name:"Animations & Videos",desc:"Locally made, culturally relevant media"},
+          {name:"Magazines",desc:"Trusted content in Tetun and Portuguese"}
+        ]
       },
-      impact: {title: "Our Impact Stories", subtitle: "Real change in Timorese communities"},
-      kidsSection: {
-        title: "Fun Zone for Kids!",
-        subtitle: "Coming Soon: Games, Stories, Songs & More!",
-        features: [],
+      impact:{
+        title:"Our Impact Stories",
+        subtitle:"Real change in Timorese communities"
       },
-      cta: {
-        title: "Join Our Mission",
-        subtitle: "Help us continue empowering Timor-Leste through education",
-        volunteer: "Volunteer",
-        donate: "Support Us",
-        partner: "Partner With Us",
+      kidsSection:{
+        title:"Fun Zone for Kids!",
+        subtitle:"Coming Soon: Games, Stories, Songs & More!",
+        features:[]
       },
+      cta:{
+        title:"Join Our Mission",
+        subtitle:"Help us continue empowering Timor-Leste through education",
+        volunteer:"Volunteer",
+        donate:"Support Us",
+        partner:"Partner With Us"
+      }
     },
-    tet: {
-      hero: {
-        title: "Bemvindu ba Lafaek Learning Media",
-        subtitle: "Empodera Timor-Leste liuhosi edukasaun no istória sira",
+    tet:{
+      hero:{
+        title:"Bemvindu ba Lafaek Learning Media",
+        subtitle:"Empodera Timor-Leste liuhosi edukasaun no istória sira",
         supportText:
-          "Ita bele suporta Lafaek hodi sosa revista no produtu sira, patrosina kontentu edukativu, halo anunsiu ho ami, ka kontrata ekipa ami ne’ebé iha talentu iha área hakerek, ilustrasaun no videografia.",
+          "Ita bele suporta Lafaek hodi sosa revista no produtu sira, patrosina kontentu edukativu, halo anunsiu ho ami, ka kontrata ekipa ami ne’ebé iha talentu iha área hakerek, ilustrasaun no videografia."
       },
-      news: {title: "Notísia Foun", subtitle: "Saida mak akontese iha Lafaek?", viewAll: "Haree hotu notísia"},
-      socialEnterprise: {
-        title: "Empreza Sosial Lafaek",
-        subtitle: "Husi inisiativa komunidade ba organizasaun Timor-oan",
-        stats: [
-          {number: "25+", label: "Tinan impaktu"},
-          {number: "1M+", label: "Revista distribui / tinan"},
-          {number: "1,500+", label: "Eskola apoiadu"},
-          {number: "100%", label: "Nudar nia Timor-oan"},
-        ],
+      news:{title:"Notísia Foun",subtitle:"Saida mak akontese iha Lafaek?",viewAll:"Haree hotu notísia"},
+      socialEnterprise:{
+        title:"Empreza Sosial Lafaek",
+        subtitle:"Husi inisiativa komunidade ba organizasaun Timor-oan",
+        stats:[
+          {number:"25+",label:"Tinan impaktu"},
+          {number:"1M+",label:"Revista distribui / tinan"},
+          {number:"1,500+",label:"Eskola apoiadu"},
+          {number:"100%",label:"Nudar nia Timor-oan"}
+        ]
       },
-      products: {
-        title: "Produtu Ami",
-        subtitle: "Rekursu edukativu kria hodi fó impaktu",
-        items: [
-          {name: "Livru ba labarik sira", desc: "Istória ilustradu ne’ebé furak ba aprendisajem"},
-          {name: "Poster hanorin", desc: "Visual prontu ba sala aula"},
-          {name: "Animasaun no Vídeu", desc: "Mídia lokal no relevante ba kultura"},
-          {name: "Revista", desc: "Kontentu konfiável iha Tetun no Portugés"},
-        ],
+      products:{
+        title:"Produtu Ami",
+        subtitle:"Rekursu edukativu kria hodi fó impaktu",
+        items:[
+          {name:"Livru ba labarik sira",desc:"Istória ilustradu ne’ebé furak ba aprendisajem"},
+          {name:"Poster hanorin",desc:"Visual prontu ba sala aula"},
+          {name:"Animasaun no Vídeu",desc:"Mídia lokal no relevante ba kultura"},
+          {name:"Revista",desc:"Kontentu konfiável iha Tetun no Portugés"}
+        ]
       },
-      impact: {title: "Istória Impaktu Ami", subtitle: "Mudansa ida-ne’ebé real iha komunidade Timor-oan"},
-      kidsSection: {
-        title: "Zona Divertidu ba Labarik!",
-        subtitle: "Mai la’ós laran: jogos, istória, kanzona no buat barak tan!",
-        features: [],
+      impact:{
+        title:"Istória Impaktu Ami",
+        subtitle:"Mudansa ida-ne’ebé real iha komunidade Timor-oan"
       },
-      cta: {
-        title: "Tama ba Misaun Ami",
-        subtitle: "Ajuda ami kontinua hodi empodera Timor-Leste liuhosi edukasaun",
-        volunteer: "Voluntáriu",
-        donate: "Suporta Ami",
-        partner: "Sai Parceiru ho Ami",
+      kidsSection:{
+        title:"Zona Divertidu ba Labarik!",
+        subtitle:"Mai la’ós laran: jogos, istória, kanzona no buat barak tan!",
+        features:[]
       },
-    },
+      cta:{
+        title:"Tama ba Misaun Ami",
+        subtitle:"Ajuda ami kontinua hodi empodera Timor-Leste liuhosi edukasaun",
+        volunteer:"Voluntáriu",
+        donate:"Suporta Ami",
+        partner:"Sai Parceiru ho Ami"
+      }
+    }
   } as const;
 
-  const t = content[L];
+  const t=content[L];
 
-  return (
+  const impactLabels={
+    en:{readMore:"Read story"},
+    tet:{readMore:"Lee istória"}
+  }[L];
+
+  const[impactItems,setImpactItems]=useState<ImpactItem[]>([]);
+  const[impactLoading,setImpactLoading]=useState<boolean>(false);
+  const[impactError,setImpactError]=useState<string|undefined>();
+
+  // Load latest impact stories for homepage cards
+  useEffect(()=>{
+    const loadImpact=async()=>{
+      try{
+        setImpactLoading(true);
+        setImpactError(undefined);
+        console.log("[home] fetching /api/admin/impact for homepage cards");
+        const res=await fetch("/api/admin/impact",{method:"GET"});
+        if(!res.ok){
+          throw new Error(`Failed to load impact stories: ${res.status}`);
+        }
+        const data:ImpactApiResponse=await res.json();
+        if(!data.ok){
+          throw new Error(data.error||"Unknown error from Impact API");
+        }
+
+        const normalised:ImpactItem[]=(data.items||[])
+          .map((raw:any,index:number)=>{
+            const id=typeof raw.id==="string"&&raw.id.trim()
+              ? raw.id.trim()
+              : `impact-${index}`;
+            const visible=raw.visible!==false;
+            const titleEn=String(raw.titleEn??"Untitled");
+            const titleTet=typeof raw.titleTet==="string"?raw.titleTet:undefined;
+            const excerptEn=String(raw.excerptEn??"");
+            const excerptTet=typeof raw.excerptTet==="string"?raw.excerptTet:undefined;
+            const bodyEn=typeof raw.bodyEn==="string"?raw.bodyEn:undefined;
+            const bodyTet=typeof raw.bodyTet==="string"?raw.bodyTet:undefined;
+            const date=String(raw.date??"");
+
+            const rawImages=Array.isArray(raw.images)
+              ? raw.images.filter((img:any)=>typeof img==="string"&&img.trim())
+              : undefined;
+
+            const primaryImage=typeof raw.image==="string"&&raw.image.trim()
+              ? raw.image.trim()
+              : rawImages&&rawImages.length>0
+              ? rawImages[0]
+              : undefined;
+
+            const slug=typeof raw.slug==="string"&&raw.slug.trim()?raw.slug.trim():undefined;
+            const order=typeof raw.order==="number"?raw.order:index+1;
+            const pdfKey=typeof raw.pdfKey==="string"&&raw.pdfKey.trim()?raw.pdfKey.trim():undefined;
+
+            return{
+              ...raw,
+              id,
+              visible,
+              titleEn,
+              titleTet,
+              excerptEn,
+              excerptTet,
+              bodyEn,
+              bodyTet,
+              date,
+              image:primaryImage,
+              images:rawImages,
+              slug,
+              order,
+              pdfKey
+            } as ImpactItem;
+          })
+          .filter((item)=>item.visible!==false);
+
+        // sort: newest date first, then custom order
+        normalised.sort((a,b)=>{
+          const da=a.date?new Date(a.date).getTime():0;
+          const db=b.date?new Date(b.date).getTime():0;
+          if(da!==db){
+            return db-da;
+          }
+          const oa=a.order??0;
+          const ob=b.order??0;
+          if(oa!==ob){
+            return oa-ob;
+          }
+          return 0;
+        });
+
+        // keep only top 3 for homepage
+        setImpactItems(normalised.slice(0,3));
+      }catch(err:any){
+        console.error("[home] impact load error",err);
+        setImpactError(err.message||"Error loading impact stories");
+      }finally{
+        setImpactLoading(false);
+      }
+    };
+
+    void loadImpact();
+  },[]);
+
+  return(
     <div className="flex flex-col min-h-screen bg-white">
       <main className="flex-1">
-        <Carousel />
+        <Carousel/>
 
         {/* Social + CTA Block */}
         <section className="bg-gray-50 py-12 px-4" aria-labelledby="social-and-cta">
@@ -121,12 +267,12 @@ export default function HomePage() {
               </div>
               <div className="p-6 flex flex-col flex-grow">
                 <h3 className="text-2xl font-bold text-blue-700 mb-2">
-                  {language === "tet" ? "Segue ami iha Facebook" : "Follow us on Facebook"}
+                  {language==="tet"?"Segue ami iha Facebook":"Follow us on Facebook"}
                 </h3>
                 <p className="text-gray-600 mb-4">
-                  {language === "tet"
-                    ? "Hahú hatene notísia foun no eventu komunitáriu sira."
-                    : "Stay updated with our latest stories and community events."}
+                  {language==="tet"
+                    ?"Hahú hatene notísia foun no eventu komunitáriu sira."
+                    :"Stay updated with our latest stories and community events."}
                 </p>
                 <a
                   href="https://www.facebook.com/RevistaLafaek"
@@ -135,7 +281,7 @@ export default function HomePage() {
                   className="bg-blue-600 hover:bg-blue-700 text-white font-bold text-center py-3 px-6 rounded-full mt-auto"
                   aria-label="Visit our Facebook page (opens in a new tab)"
                 >
-                  {language === "tet" ? "Vizita Facebook" : "Visit Facebook"}
+                  {language==="tet"?"Vizita Facebook":"Visit Facebook"}
                 </a>
               </div>
             </div>
@@ -154,12 +300,12 @@ export default function HomePage() {
               </div>
               <div className="p-6 flex flex-col flex-grow">
                 <h3 className="text-2xl font-bold text-red-600 mb-2">
-                  {language === "tet" ? "Haree ami iha YouTube" : "Watch us on YouTube"}
+                  {language==="tet"?"Haree ami iha YouTube":"Watch us on YouTube"}
                 </h3>
                 <p className="text-gray-600 mb-4">
-                  {language === "tet"
-                    ? "Haree konténu behind-the-scenes, istória, no vídeu sira husi terenu."
-                    : "Discover our behind-the-scenes content, stories, and videos from the field."}
+                  {language==="tet"
+                    ?"Haree konténu behind-the-scenes, istória, no vídeu sira husi terenu."
+                    :"Discover our behind-the-scenes content, stories, and videos from the field."}
                 </p>
                 <a
                   href="https://www.youtube.com/@lafaek"
@@ -168,7 +314,7 @@ export default function HomePage() {
                   className="bg-red-600 hover:bg-red-700 text-white font-bold text-center py-3 px-6 rounded-full mt-auto"
                   aria-label="Visit our YouTube channel (opens in a new tab)"
                 >
-                  {language === "tet" ? "Vizita YouTube" : "Visit YouTube"}
+                  {language==="tet"?"Vizita YouTube":"Visit YouTube"}
                 </a>
               </div>
             </div>
@@ -201,6 +347,129 @@ export default function HomePage() {
           </div>
         </section>
 
+        {/* Latest Impact Stories Preview */}
+        <section className="py-16 bg-white border-t border-gray-100" aria-labelledby="home-impact-preview">
+          <div className="max-w-7xl mx-auto px-4">
+            <div className="mb-8 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+              <div>
+                <h2 id="home-impact-preview" className="text-3xl font-bold text-green-800">
+                  {t.impact.title}
+                </h2>
+                <p className="mt-2 text-gray-700">
+                  {t.impact.subtitle}
+                </p>
+              </div>
+              <div>
+                <Link
+                  href="/stories/impact"
+                  className="inline-block text-sm font-semibold text-[#219653] hover:underline"
+                >
+                  {L==="tet"?"Haree hotu istória impaktu":"View all impact stories"}
+                </Link>
+              </div>
+            </div>
+
+            {impactLoading&&(
+              <p className="text-sm text-gray-600">
+                {L==="tet"?"Hamuik istória impaktu...":"Loading impact stories..."}
+              </p>
+            )}
+
+            {impactError&&!impactLoading&&(
+              <p className="text-sm text-red-600">
+                {impactError}
+              </p>
+            )}
+
+            {!impactLoading&&impactItems.length>0&&(
+              <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
+                {impactItems.map((item)=>{
+                  const title=L==="tet"
+                    ? item.titleTet||item.titleEn
+                    : item.titleEn;
+                  const excerpt=L==="tet"
+                    ? item.excerptTet||item.excerptEn
+                    : item.excerptEn;
+
+                  const heroImage=item.image||(Array.isArray(item.images)&&item.images[0])||undefined;
+                  const imageSrc=buildS3Url(heroImage);
+
+                  const internalIdOrSlug=item.slug||item.id;
+                  const hasPdf=Boolean(item.pdfKey);
+                  const detailHref=`/stories/impact/${internalIdOrSlug}`;
+                  const href=hasPdf&&item.pdfKey
+                    ? buildS3Url(item.pdfKey)
+                    : detailHref;
+
+                  let dateLabel="";
+                  if(item.date){
+                    const d=new Date(item.date);
+                    if(!Number.isNaN(d.getTime())){
+                      dateLabel=d.toLocaleDateString();
+                    }
+                  }
+
+                  return(
+                    <article
+                      key={item.id}
+                      className="rounded-lg border border-gray-200 bg-gray-50 p-5 flex flex-col"
+                    >
+                      <div className="relative mb-4 h-40 w-full overflow-hidden rounded">
+                        <Image
+                          src={imageSrc}
+                          alt={title}
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+
+                      {dateLabel&&(
+                        <div className="mb-2 text-xs text-gray-500">
+                          {dateLabel}
+                        </div>
+                      )}
+
+                      <h3 className="mb-2 text-lg font-semibold text-gray-900">
+                        {title}
+                      </h3>
+
+                      {excerpt&&(
+                        <p className="mb-4 text-sm text-gray-700 line-clamp-3">
+                          {excerpt}
+                        </p>
+                      )}
+
+                      <div className="mt-auto flex items-center justify-between">
+                        <Link
+                          href={href}
+                          className="text-sm font-semibold text-[#219653] hover:underline"
+                          target={hasPdf?"_blank":undefined}
+                          rel={hasPdf?"noopener noreferrer":undefined}
+                        >
+                          {impactLabels.readMore}
+                        </Link>
+                        {hasPdf&&(
+                          <span className="ml-3 inline-flex items-center rounded-full bg-white px-3 py-1 text-[11px] font-medium text-gray-700 border border-gray-300">
+                            PDF
+                          </span>
+                        )}
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
+            )}
+
+            {!impactLoading&&!impactError&&impactItems.length===0&&(
+              <p className="text-sm text-gray-600">
+                {L==="tet"
+                  ?"Seidauk iha istória impaktu atu hatudu iha ne'e."
+                  :"No impact stories to show yet. Please check back soon."}
+              </p>
+            )}
+          </div>
+        </section>
+
         {/* Social Enterprise */}
         <section className="py-20 bg-gradient-to-br from-green-50 to-blue-50 text-center" aria-labelledby="social-enterprise">
           <div className="max-w-7xl mx-auto px-4">
@@ -209,7 +478,7 @@ export default function HomePage() {
             </h2>
             <p className="text-xl text-gray-700 mb-10">{t.socialEnterprise.subtitle}</p>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              {t.socialEnterprise.stats.map((stat, index) => (
+              {t.socialEnterprise.stats.map((stat,index)=>(
                 <div key={index} className="bg-white shadow-md rounded-lg p-6">
                   <div className="text-3xl font-bold text-green-700 mb-2">{stat.number}</div>
                   <div className="text-gray-700">{stat.label}</div>
