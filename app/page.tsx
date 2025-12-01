@@ -9,12 +9,6 @@ import Link from "next/link";
 
 const S3_ORIGIN="https://lafaek-media.s3.ap-southeast-2.amazonaws.com";
 
-type ImpactApiResponse={
-  ok:boolean;
-  items:any[];
-  error?:string;
-};
-
 type ImpactItem={
   id:string;
   slug?:string;
@@ -22,20 +16,23 @@ type ImpactItem={
   titleTet?:string;
   excerptEn:string;
   excerptTet?:string;
-  bodyEn?:string;
-  bodyTet?:string;
   date:string;
   image?:string;
   images?:string[];
   visible?:boolean;
   order?:number;
-  pdfKey?:string;
   [key:string]:any;
 };
 
-const buildS3Url=(src?:string)=>{
+type ImpactApiResponse={
+  ok:boolean;
+  items:any[];
+  error?:string;
+};
+
+const buildImageUrl=(src?:string)=>{
   if(!src){
-    return"/placeholder.svg?height=200&width=300";
+    return"/placeholder.svg?height=160&width=280";
   }
   let clean=src.trim();
   if(clean.startsWith("http://")||clean.startsWith("https://")){
@@ -80,7 +77,9 @@ export default function HomePage(){
       },
       impact:{
         title:"Our Impact Stories",
-        subtitle:"Real change in Timorese communities"
+        subtitle:"Real change in Timorese communities",
+        readMore:"Read more",
+        viewAll:"View all impact stories"
       },
       kidsSection:{
         title:"Fun Zone for Kids!",
@@ -125,7 +124,9 @@ export default function HomePage(){
       },
       impact:{
         title:"Istória Impaktu Ami",
-        subtitle:"Mudansa ida-ne’ebé real iha komunidade Timor-oan"
+        subtitle:"Mudansa ida-ne’ebé real iha komunidade Timor-oan",
+        readMore:"Lee liu tan",
+        viewAll:"Haree hotu istória impaktu"
       },
       kidsSection:{
         title:"Zona Divertidu ba Labarik!",
@@ -144,23 +145,16 @@ export default function HomePage(){
 
   const t=content[L];
 
-  const impactLabels={
-    en:{readMore:"Read story"},
-    tet:{readMore:"Lee istória"}
-  }[L];
-
   const[impactItems,setImpactItems]=useState<ImpactItem[]>([]);
-  const[impactLoading,setImpactLoading]=useState<boolean>(false);
   const[impactError,setImpactError]=useState<string|undefined>();
 
-  // Load latest impact stories for homepage cards
   useEffect(()=>{
     const loadImpact=async()=>{
       try{
-        setImpactLoading(true);
         setImpactError(undefined);
-        console.log("[home] fetching /api/admin/impact for homepage cards");
+        console.log("[home] loading impact stories for homepage cards");
         const res=await fetch("/api/admin/impact",{method:"GET"});
+        console.log("[home] /api/admin/impact status",res.status);
         if(!res.ok){
           throw new Error(`Failed to load impact stories: ${res.status}`);
         }
@@ -169,18 +163,16 @@ export default function HomePage(){
           throw new Error(data.error||"Unknown error from Impact API");
         }
 
-        const normalised:ImpactItem[]=(data.items||[])
+        const items:ImpactItem[]=(data.items||[])
           .map((raw:any,index:number)=>{
             const id=typeof raw.id==="string"&&raw.id.trim()
               ? raw.id.trim()
               : `impact-${index}`;
-            const visible=raw.visible!==false;
+            const slug=typeof raw.slug==="string"&&raw.slug.trim()?raw.slug.trim():undefined;
             const titleEn=String(raw.titleEn??"Untitled");
             const titleTet=typeof raw.titleTet==="string"?raw.titleTet:undefined;
             const excerptEn=String(raw.excerptEn??"");
             const excerptTet=typeof raw.excerptTet==="string"?raw.excerptTet:undefined;
-            const bodyEn=typeof raw.bodyEn==="string"?raw.bodyEn:undefined;
-            const bodyTet=typeof raw.bodyTet==="string"?raw.bodyTet:undefined;
             const date=String(raw.date??"");
 
             const rawImages=Array.isArray(raw.images)
@@ -193,62 +185,49 @@ export default function HomePage(){
               ? rawImages[0]
               : undefined;
 
-            const slug=typeof raw.slug==="string"&&raw.slug.trim()?raw.slug.trim():undefined;
+            const visible=raw.visible!==false;
             const order=typeof raw.order==="number"?raw.order:index+1;
-            const pdfKey=typeof raw.pdfKey==="string"&&raw.pdfKey.trim()?raw.pdfKey.trim():undefined;
 
             return{
               ...raw,
               id,
-              visible,
+              slug,
               titleEn,
               titleTet,
               excerptEn,
               excerptTet,
-              bodyEn,
-              bodyTet,
               date,
               image:primaryImage,
               images:rawImages,
-              slug,
-              order,
-              pdfKey
+              visible,
+              order
             } as ImpactItem;
           })
           .filter((item)=>item.visible!==false);
 
-        // sort: newest date first, then custom order
-        normalised.sort((a,b)=>{
+        items.sort((a,b)=>{
           const da=a.date?new Date(a.date).getTime():0;
           const db=b.date?new Date(b.date).getTime():0;
-          if(da!==db){
-            return db-da;
-          }
+          if(db!==da){return db-da;}
           const oa=a.order??0;
           const ob=b.order??0;
-          if(oa!==ob){
-            return oa-ob;
-          }
-          return 0;
+          return oa-ob;
         });
 
-        // keep only top 3 for homepage
-        setImpactItems(normalised.slice(0,3));
+        setImpactItems(items.slice(0,3));
       }catch(err:any){
         console.error("[home] impact load error",err);
         setImpactError(err.message||"Error loading impact stories");
-      }finally{
-        setImpactLoading(false);
       }
     };
 
-    void loadImpact();
+    loadImpact();
   },[]);
 
   return(
     <div className="flex flex-col min-h-screen bg-white">
       <main className="flex-1">
-        <Carousel/>
+        <Carousel />
 
         {/* Social + CTA Block */}
         <section className="bg-gray-50 py-12 px-4" aria-labelledby="social-and-cta">
@@ -347,42 +326,45 @@ export default function HomePage(){
           </div>
         </section>
 
-        {/* Latest Impact Stories Preview */}
-        <section className="py-16 bg-white border-t border-gray-100" aria-labelledby="home-impact-preview">
+        {/* Latest Impact Stories preview */}
+        <section className="py-12 bg-white" aria-labelledby="home-impact-preview">
           <div className="max-w-7xl mx-auto px-4">
-            <div className="mb-8 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+            <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-6">
               <div>
-                <h2 id="home-impact-preview" className="text-3xl font-bold text-green-800">
+                <h2
+                  id="home-impact-preview"
+                  className="text-3xl font-bold text-green-800"
+                >
                   {t.impact.title}
                 </h2>
-                <p className="mt-2 text-gray-700">
+                <p className="text-gray-700 mt-1">
                   {t.impact.subtitle}
                 </p>
               </div>
               <div>
                 <Link
                   href="/stories/impact"
-                  className="inline-block text-sm font-semibold text-[#219653] hover:underline"
+                  className="text-sm font-semibold text-[#219653] hover:underline"
                 >
-                  {L==="tet"?"Haree hotu istória impaktu":"View all impact stories"}
+                  {t.impact.viewAll}
                 </Link>
               </div>
             </div>
 
-            {impactLoading&&(
-              <p className="text-sm text-gray-600">
-                {L==="tet"?"Hamuik istória impaktu...":"Loading impact stories..."}
-              </p>
-            )}
-
-            {impactError&&!impactLoading&&(
-              <p className="text-sm text-red-600">
+            {impactError&&(
+              <div className="mb-4 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
                 {impactError}
-              </p>
+              </div>
             )}
 
-            {!impactLoading&&impactItems.length>0&&(
-              <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
+            {!impactError&&impactItems.length===0&&(
+              <div className="rounded-md border border-gray-200 bg-gray-50 px-4 py-6 text-sm text-gray-600">
+                No impact stories to show yet. Please check back soon.
+              </div>
+            )}
+
+            {impactItems.length>0&&(
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {impactItems.map((item)=>{
                   const title=L==="tet"
                     ? item.titleTet||item.titleEn
@@ -390,16 +372,9 @@ export default function HomePage(){
                   const excerpt=L==="tet"
                     ? item.excerptTet||item.excerptEn
                     : item.excerptEn;
-
                   const heroImage=item.image||(Array.isArray(item.images)&&item.images[0])||undefined;
-                  const imageSrc=buildS3Url(heroImage);
-
+                  const imageSrc=buildImageUrl(heroImage);
                   const internalIdOrSlug=item.slug||item.id;
-                  const hasPdf=Boolean(item.pdfKey);
-                  const detailHref=`/stories/impact/${internalIdOrSlug}`;
-                  const href=hasPdf&&item.pdfKey
-                    ? buildS3Url(item.pdfKey)
-                    : detailHref;
 
                   let dateLabel="";
                   if(item.date){
@@ -412,60 +387,41 @@ export default function HomePage(){
                   return(
                     <article
                       key={item.id}
-                      className="rounded-lg border border-gray-200 bg-gray-50 p-5 flex flex-col"
+                      className="rounded-lg border border-gray-200 bg-gray-50 p-4 flex flex-col"
                     >
-                      <div className="relative mb-4 h-40 w-full overflow-hidden rounded">
+                      <div className="relative mb-3 h-40 w-full">
                         <Image
                           src={imageSrc}
                           alt={title}
                           fill
-                          className="object-cover"
+                          className="rounded object-cover"
                         />
                       </div>
-
                       {dateLabel&&(
                         <div className="mb-2 text-xs text-gray-500">
                           {dateLabel}
                         </div>
                       )}
-
-                      <h3 className="mb-2 text-lg font-semibold text-gray-900">
+                      <h3 className="text-lg font-semibold mb-2">
                         {title}
                       </h3>
-
                       {excerpt&&(
-                        <p className="mb-4 text-sm text-gray-700 line-clamp-3">
+                        <p className="text-sm text-gray-700 mb-3 line-clamp-3">
                           {excerpt}
                         </p>
                       )}
-
-                      <div className="mt-auto flex items-center justify-between">
+                      <div className="mt-auto">
                         <Link
-                          href={href}
-                          className="text-sm font-semibold text-[#219653] hover:underline"
-                          target={hasPdf?"_blank":undefined}
-                          rel={hasPdf?"noopener noreferrer":undefined}
+                          href={`/stories/impact/${internalIdOrSlug}`}
+                          className="inline-block text-sm font-semibold text-[#219653] hover:underline"
                         >
-                          {impactLabels.readMore}
+                          {t.impact.readMore}
                         </Link>
-                        {hasPdf&&(
-                          <span className="ml-3 inline-flex items-center rounded-full bg-white px-3 py-1 text-[11px] font-medium text-gray-700 border border-gray-300">
-                            PDF
-                          </span>
-                        )}
                       </div>
                     </article>
                   );
                 })}
               </div>
-            )}
-
-            {!impactLoading&&!impactError&&impactItems.length===0&&(
-              <p className="text-sm text-gray-600">
-                {L==="tet"
-                  ?"Seidauk iha istória impaktu atu hatudu iha ne'e."
-                  :"No impact stories to show yet. Please check back soon."}
-              </p>
             )}
           </div>
         </section>

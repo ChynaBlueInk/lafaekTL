@@ -2,9 +2,8 @@
 "use client";
 
 import {useEffect,useState}from "react";
-import {useParams}from "next/navigation";
+import {useParams,useRouter}from "next/navigation";
 import Image from "next/image";
-import Link from "next/link";
 import {useLanguage}from "@/lib/LanguageContext";
 
 const S3_ORIGIN="https://lafaek-media.s3.ap-southeast-2.amazonaws.com";
@@ -46,18 +45,19 @@ const buildImageUrl=(src?:string)=>{
   return`${S3_ORIGIN}/${clean}`;
 };
 
-const buildS3Url=(key?:string)=>{
-  if(!key){return"";}
-  let clean=key.trim();
-  clean=clean.replace(/^\/+/,"");
+const buildS3Url=(keyOrUrl?:string)=>{
+  if(!keyOrUrl){return"";}
+  let clean=keyOrUrl.trim();
   if(clean.startsWith("http://")||clean.startsWith("https://")){
     return clean;
   }
+  clean=clean.replace(/^\/+/,"");
   return`${S3_ORIGIN}/${clean}`;
 };
 
 export default function ImpactDetailPage(){
   const params=useParams();
+  const router=useRouter();
   const rawId=(params as any)?.id;
   const id=Array.isArray(rawId)?rawId[0]:rawId;
 
@@ -70,11 +70,11 @@ export default function ImpactDetailPage(){
 
   const labels={
     en:{
-      back:"← Back to Impact Stories",
+      back:"← Back",
       openPdf:"Open Full Impact Story (PDF)"
     },
     tet:{
-      back:"← Fila fali ba Istória Impaktu",
+      back:"← Fila fali",
       openPdf:"Loke Istória Impaktu Kompletu (PDF)"
     }
   }[L];
@@ -107,6 +107,7 @@ export default function ImpactDetailPage(){
             ? raw.id.trim()
             : `impact-${index}`;
           const slug=typeof raw.slug==="string"&&raw.slug.trim()?raw.slug.trim():undefined;
+
           const titleEn=String(raw.titleEn??"Untitled");
           const titleTet=typeof raw.titleTet==="string"?raw.titleTet:undefined;
           const excerptEn=String(raw.excerptEn??"");
@@ -130,9 +131,27 @@ export default function ImpactDetailPage(){
             ? raw.externalUrl.trim()
             : undefined;
           const order=typeof raw.order==="number"?raw.order:index+1;
-          const pdfKey=typeof raw.pdfKey==="string"&&raw.pdfKey.trim()?raw.pdfKey.trim():undefined;
 
-          return{
+          // 🔑 Robust PDF detection:
+          // 1) look for common field names
+          let pdfRaw=(raw.pdfKey
+            ??raw.pdf
+            ??raw.pdfUrl
+            ??raw.pdfFile
+            ??raw.pdfPath) as string|undefined;
+
+          // 2) as a fallback, find any string field that ends with ".pdf"
+          if(!pdfRaw){
+            const pdfFromAny=Object.values(raw).find((value)=>{
+              return typeof value==="string"
+                && value.trim().toLowerCase().endsWith(".pdf");
+            })as string|undefined;
+            pdfRaw=pdfFromAny;
+          }
+
+          const pdfKey=typeof pdfRaw==="string"&&pdfRaw.trim()?pdfRaw.trim():undefined;
+
+          const item:ImpactItem={
             ...raw,
             id:recId,
             slug,
@@ -149,7 +168,8 @@ export default function ImpactDetailPage(){
             externalUrl,
             order,
             pdfKey
-          } as ImpactItem;
+          };
+          return item;
         });
 
         const found=items.find((it)=>it.slug===id||it.id===id);
@@ -158,6 +178,7 @@ export default function ImpactDetailPage(){
           setError("Story not found.");
           setItem(undefined);
         }else{
+          console.log("[stories/impact/[id]] found item",found);
           setItem(found);
         }
       }catch(err:any){
@@ -198,7 +219,6 @@ export default function ImpactDetailPage(){
       ? item.excerptTet||item.excerptEn
       : item.excerptEn;
 
-    // Choose which text to display for detailed body (language aware)
     const body=L==="tet"
       ? item.bodyTet||item.bodyEn||""
       : item.bodyEn||"";
@@ -220,12 +240,19 @@ export default function ImpactDetailPage(){
     content=(
       <article className="mx-auto max-w-3xl">
         <div className="mb-4">
-          <Link
-            href="/stories/impact"
+          <button
+            type="button"
+            onClick={()=>{
+              if(typeof window!=="undefined"&&window.history.length>1){
+                router.back();
+              }else{
+                router.push("/stories/impact");
+              }
+            }}
             className="text-sm font-medium text-[#219653] hover:underline"
           >
             {labels.back}
-          </Link>
+          </button>
         </div>
 
         <header className="mb-6">
@@ -255,7 +282,6 @@ export default function ImpactDetailPage(){
           </div>
         )}
 
-        {/* PDF link if available */}
         {hasPdf&&(
           <div className="mt-6">
             <a
@@ -269,7 +295,6 @@ export default function ImpactDetailPage(){
           </div>
         )}
 
-        {/* Text body, if provided */}
         {body&&(
           <div className="prose max-w-none text-gray-800 prose-p:mb-3 prose-headings:mt-6 mt-8">
             {body.split(/\n{2,}/).map((para,index)=>(
@@ -278,7 +303,7 @@ export default function ImpactDetailPage(){
           </div>
         )}
 
-        {/* Only show this message if there is NO PDF and NO text in either language */}
+        {/* ✅ Only show this if there is NO pdf AND no body text */}
         {!hasPdf&&!hasAnyBody&&(
           <p className="text-gray-600 text-sm bg-gray-50 border border-gray-200 rounded p-4 mt-6">
             No detailed text has been added for this story yet.
