@@ -77,7 +77,7 @@ const seriesLabel = (s: Series) =>
 
 
 const makeMag = (code: string, id: number): Magazine => {
-  const [series, issue, year] = code.split("-");
+  const [series, issue = "", year = ""] = code.split("-");
   const isMonth = series === "LBK";
   const when = isMonth ? monthName(issue) : { en: `Issue ${issue}`, tet: `Numeru ${issue}` };
   const s = seriesLabel(series as Series);

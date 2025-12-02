@@ -1,23 +1,23 @@
 // components/Navigation.tsx
 "use client"
 
-import {useState} from "react"
+import {useState}from "react"
 import Link from "next/link"
 import Image from "next/image"
-import {Menu, X, ChevronDown} from "lucide-react"
-import {Button} from "./button"
-import {useLanguage} from "@/lib/LanguageContext" // ⬅️ global context
+import {Menu, X, ChevronDown}from "lucide-react"
+import {Button}from "./button"
+import {useLanguage}from "@/lib/LanguageContext"
 
 type MegaItem={href:string;title:string;description?:string}
 type NavItem=
   | {href:string;label:string}
   | {label:string;mega:MegaItem[]}
 
-export function Navigation() {
-  const [isMenuOpen,setIsMenuOpen]=useState(false)
-  const [openMobileSubmenu,setOpenMobileSubmenu]=useState<string|null>(null)
+export function Navigation(){
+  const[isMenuOpen,setIsMenuOpen]=useState(false)
+  const[openMobileSubmenu,setOpenMobileSubmenu]=useState<string|null>(null)
 
-  const {language,setLanguage}=useLanguage()
+  const{language,setLanguage}=useLanguage()
 
   const t={
     en:{
@@ -130,13 +130,23 @@ export function Navigation() {
     },
   }[language]
 
+  const desktopLinkClass=
+    "px-2 py-1 rounded-md text-white hover:text-[#F2C94C] hover:bg-white/10 font-medium transition-colors"
+
   const leftNav:NavItem[]=[
     {href:"/",label:t.home},
 
-    // Magazines as a simple top-level link
+    // Direct magazines page
     {href:"/publication/magazines",label:t.magazines},
 
-    // Learning mega: keep cyber safety + guides (you can also keep Kids Club if you want it visible)
+    // Key content: News + Impact Stories
+    {href:"/stories/news",label:t.news},
+    {href:"/stories/impact",label:t.communityStories},
+
+    // Friends of Lafaek (page will be built next)
+    {href:"/friends",label:t.friends},
+
+    // Learning mega
     {
       label:t.learning,
       mega:[
@@ -147,7 +157,7 @@ export function Navigation() {
       ],
     },
 
-    // About mega: About Us, Our Team, Our Journey, Social Enterprise
+    // About mega
     {
       label:t.about,
       mega:[
@@ -183,13 +193,13 @@ export function Navigation() {
             </Link>
 
             {/* Desktop main nav */}
-            <div className="hidden md:flex items-center gap-6">
+            <div className="hidden md:flex items-center gap-3">
               {leftNav.map((item)=>{
-                if ("mega" in item) {
+                if("mega"in item){
                   return (
                     <div key={item.label} className="relative group">
                       <button
-                        className="flex items-center text-white hover:text-[#717273] font-medium transition-colors"
+                        className={`${desktopLinkClass} flex items-center`}
                         aria-haspopup="menu"
                         aria-expanded="false"
                       >
@@ -205,7 +215,7 @@ export function Navigation() {
                               className="block rounded-lg p-3 hover:bg-[#F5F5F5] transition"
                             >
                               <div className="text-[15px] font-semibold text-[#4F4F4F]">{m.title}</div>
-                              {m.description && (
+                              {m.description&&(
                                 <div className="mt-1 text-sm text-[#828282] leading-snug">{m.description}</div>
                               )}
                             </Link>
@@ -216,12 +226,11 @@ export function Navigation() {
                   )
                 }
 
-                // No special Friends button in MVP – just simple links
                 return (
                   <Link
                     key={item.href}
                     href={item.href}
-                    className="text-white hover:text-[#717273] font-medium transition-colors"
+                    className={desktopLinkClass}
                   >
                     {item.label}
                   </Link>
@@ -264,13 +273,13 @@ export function Navigation() {
               className="md:hidden text-white hover:bg-white/20 p-2 rounded-md"
               aria-label="Toggle navigation"
             >
-              {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              {isMenuOpen?<X className="h-5 w-5" />:<Menu className="h-5 w-5" />}
             </Button>
           </div>
         </div>
 
         {/* MOBILE MENU */}
-        {isMenuOpen && (
+        {isMenuOpen&&(
           <div className="md:hidden mt-4 pb-4">
             <div className="flex flex-col space-y-2 pt-2">
               <div className="flex items-center gap-2 px-4">
@@ -308,36 +317,36 @@ export function Navigation() {
               <div className="h-px bg-white/20 my-2" />
 
               {leftNav.map((item)=>
-                "mega" in item ? (
+                "mega"in item?(
                   <div key={item.label} className="px-2">
                     <button
                       className="w-full text-left px-2 py-2 text-white font-semibold flex items-center justify-between hover:bg-white/10 rounded-md"
                       onClick={()=>
-                        setOpenMobileSubmenu((cur)=>cur===item.label ? null : item.label)
+                        setOpenMobileSubmenu((cur)=>cur===item.label?null:item.label)
                       }
                       aria-expanded={openMobileSubmenu===item.label}
                     >
                       <span>{item.label}</span>
                       <ChevronDown
                         className={`h-4 w-4 transition-transform ${
-                          openMobileSubmenu===item.label ? "rotate-180" : ""
+                          openMobileSubmenu===item.label?"rotate-180":""
                         }`}
                       />
                     </button>
-                    {openMobileSubmenu===item.label && (
+                    {openMobileSubmenu===item.label&&(
                       <div className="mt-1 ml-2">
                         {item.mega.map((m)=>(
                           <Link
                             key={m.href}
                             href={m.href}
-                            className="block px-4 py-2 rounded-md hover:bg:white/10 transition-colors"
+                            className="block px-4 py-2 rounded-md hover:bg-white/10 transition-colors"
                             onClick={()=>{
                               setIsMenuOpen(false)
                               setOpenMobileSubmenu(null)
                             }}
                           >
                             <div className="text-white/95">{m.title}</div>
-                            {m.description && (
+                            {m.description&&(
                               <div className="text-white/70 text-sm leading-snug">{m.description}</div>
                             )}
                           </Link>
@@ -345,7 +354,7 @@ export function Navigation() {
                       </div>
                     )}
                   </div>
-                ) : (
+                ):(
                   <Link
                     key={item.href}
                     href={item.href}
