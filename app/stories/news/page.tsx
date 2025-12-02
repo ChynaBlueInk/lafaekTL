@@ -1,4 +1,3 @@
-// app/stories/news/page.tsx
 "use client";
 
 import {useEffect,useState}from "react";
@@ -53,7 +52,7 @@ export default function NewsPage(){
   const[error,setError]=useState<string|undefined>();
 
   const[searchTerm,setSearchTerm]=useState<string>("");
-  const[sortMode,setSortMode]=useState<"latest"|"custom">("latest");
+  const[sortMode,setSortMode]=useState<"latest"|"custom"|"az">("latest");
 
   const labels={
     en:{
@@ -63,7 +62,8 @@ export default function NewsPage(){
       searchPlaceholder:"Search news...",
       sortLabel:"Sort by",
       sortLatest:"Latest first",
-      sortCustom:"Custom order"
+      sortAZ:"Title A–Z",
+      sortCustom:"Editor order (featured first)"
     },
     tet:{
       heading:"Notísia & Istória",
@@ -72,7 +72,8 @@ export default function NewsPage(){
       searchPlaceholder:"Buka notísia...",
       sortLabel:"Ordena tuir",
       sortLatest:"Foun liu ba leten",
-      sortCustom:"Ordem personalizadu"
+      sortAZ:"Titulu A–Z",
+      sortCustom:"Ordem editor (artigu destakadu leten)"
     }
   }[L];
 
@@ -141,7 +142,6 @@ export default function NewsPage(){
               order
             } as NewsItem;
           })
-          // only visible items on public page
           .filter((item)=>item.visible!==false);
 
         setItems(normalised);
@@ -155,6 +155,13 @@ export default function NewsPage(){
 
     load();
   },[]);
+
+  const getDisplayTitle=(item:NewsItem)=>{
+    const base=L==="tet"
+      ? item.titleTet||item.titleEn
+      : item.titleEn;
+    return String(base||"").toLowerCase();
+  };
 
   // ── derive filtered + sorted items for display ──
   const filteredAndSortedItems=(()=>{
@@ -195,16 +202,28 @@ export default function NewsPage(){
           return oa-ob;
         }
         return 0;
-      }else{
-        // custom: admin order first, newest date as tie-breaker
-        if(oa!==ob){
-          return oa-ob;
-        }
+      }
+
+      if(sortMode==="az"){
+        const ta=getDisplayTitle(a);
+        const tb=getDisplayTitle(b);
+        if(ta<tb){return-1;}
+        if(ta>tb){return 1;}
+        // if titles are equal, fall back to newest date
         if(da!==db){
           return db-da;
         }
         return 0;
       }
+
+      // custom: admin order first, newest date as tie-breaker
+      if(oa!==ob){
+        return oa-ob;
+      }
+      if(da!==db){
+        return db-da;
+      }
+      return 0;
     });
 
     return list;
@@ -234,9 +253,10 @@ export default function NewsPage(){
             <select
               className="rounded-md border border-gray-300 px-2 py-1 text-sm focus:border-[#219653] focus:outline-none focus:ring-1 focus:ring-[#219653]"
               value={sortMode}
-              onChange={(e)=>setSortMode(e.target.value==="latest"?"latest":"custom")}
+              onChange={(e)=>setSortMode(e.target.value as "latest"|"custom"|"az")}
             >
               <option value="latest">{labels.sortLatest}</option>
+              <option value="az">{labels.sortAZ}</option>
               <option value="custom">{labels.sortCustom}</option>
             </select>
           </div>
