@@ -1,20 +1,41 @@
+// app/magazines/page.tsx
 "use client";
 
-import {useState,useMemo}from "react";
+import {useState,useMemo,useEffect}from "react";
 import Image from "next/image";
 import Link from "next/link";
+import {useLanguage}from "@/lib/LanguageContext";
 
 type Lang="en"|"tet";
 type Series="LK"|"LBK"|"LP"|"LM";
 
-type Magazine={
+type MagazineBase={
   code:string;
   series:Series;
   year:string;
   name:{en:string;tet:string};
   cover:string;
-  // optional sample image pages – can be added later
+};
+
+type Magazine=MagazineBase&{
   samplePages?:string[];
+};
+
+type SamplesApiResponse={
+  ok:boolean;
+  items:any[];
+  error?:string;
+};
+
+const S3_ORIGIN="https://lafaek-media.s3.ap-southeast-2.amazonaws.com";
+
+const buildImageUrl=(src?:string)=>{
+  if(!src){return"";}
+  let clean=src.trim();
+  if(clean.startsWith(S3_ORIGIN)){return clean;}
+  if(clean.startsWith("http://")||clean.startsWith("https://")){return clean;}
+  clean=clean.replace(/^\/+/,"");
+  return`${S3_ORIGIN}/${clean}`;
 };
 
 const LAFAEK={
@@ -26,7 +47,6 @@ const LAFAEK={
   blue:"#2F80ED",
   yellow:"#F2C94C",
 };
-
 
 const CODE_LIST=[
   "LBK-02-2023",
@@ -81,7 +101,7 @@ const monthName=(n:string)=>{
     "Novembru",
     "Dezembru",
   ][i]||`Numeru ${n}`);
-  return {en,tet};
+  return{en,tet};
 };
 
 const seriesLabel=(s:Series)=>
@@ -93,21 +113,13 @@ const seriesLabel=(s:Series)=>
     ? {en:"Lafaek Komunidade",tet:"Lafaek Komunidade"}
     : {en:"Lafaek Kiik",tet:"Lafaek Kiik"};
 
-const makeMagazine=(code:string):Magazine=>{
+const makeMagazineBase=(code:string):MagazineBase=>{
   const[series,issue="",year=""]=code.split("-");
   const isMonth=series==="LBK";
   const when=isMonth?monthName(issue):{en:`Issue ${issue}`,tet:`Numeru ${issue}`};
   const s=seriesLabel(series as Series);
 
-  // sample pages: you can later upload real images to S3 and point here.
-  const sampleBase=`/magazines/samples/${code}`;
-  const samplePages:string[]=[
-    `${sampleBase}-p1.jpg`,
-    `${sampleBase}-p2.jpg`,
-    `${sampleBase}-p3.jpg`,
-  ];
-
-  return {
+  return{
     code,
     series:series as Series,
     year,
@@ -116,12 +128,10 @@ const makeMagazine=(code:string):Magazine=>{
       tet:`${s.tet} ${when.tet} ${year}`,
     },
     cover:`/magazines/${code}.jpg`,
-    // keep samplePages optional in case the files don't exist yet
-    samplePages,
   };
 };
 
-const allMagazines:Magazine[]=CODE_LIST.map((code)=>makeMagazine(code));
+const baseMagazines:MagazineBase[]=CODE_LIST.map((code)=>makeMagazineBase(code));
 
 const ui={
   en:{
@@ -135,6 +145,9 @@ const ui={
     close:"Close",
     seriesLabel:"Audience",
     yearLabel:"Year",
+    loadingSamples:"Loading samples…",
+    samplesError:"Could not load sample pages. You can still apply for access.",
+    noSamples:"Sample pages coming soon.",
   },
   tet:{
     title:"Revista Lafaek",
@@ -147,22 +160,79 @@ const ui={
     close:"Taka",
     seriesLabel:"Públiku",
     yearLabel:"Tinan",
+    loadingSamples:"Hakarak kargga pájina amostra…",
+    samplesError:"La bele karga pájina amostra. Ita bele kontinua aplica ba asesu.",
+    noSamples:"Pájina amostra sei mai fali.",
   },
 } as const;
 
 export default function MagazinesLandingPage(){
-  // pick up language from localStorage if you like, but for now default EN
-  const[language]=useState<Lang>("en");
+  const {language}=useLanguage() as {language:Lang; setLanguage:(lang:Lang)=>void};
   const t=ui[language];
 
   const[activeCode,setActiveCode]=useState<string|null>(null);
 
-  const activeMagazine=useMemo(
-    ()=>allMagazines.find((m)=>m.code===activeCode)||null,
-    [activeCode]
+  // map of code -> samplePages (S3 keys)
+  const[samplesMap,setSamplesMap]=useState<Record<string,string[]>>({});
+  const[loadingSamples,setLoadingSamples]=useState<boolean>(true);
+  const[samplesError,setSamplesError]=useState<string|undefined>();
+
+  useEffect(()=>{
+    const load=async()=>{
+      try{
+        setLoadingSamples(true);
+        setSamplesError(undefined);
+        console.log("[magazines] loading sample metadata from /api/admin/magazines/samples");
+        const res=await fetch("/api/admin/magazines/samples",{method:"GET"});
+        console.log("[magazines] GET /api/admin/magazines/samples status",res.status);
+        if(!res.ok){
+          throw new Error(`Failed to load samples: ${res.status}`);
+        }
+        const data:SamplesApiResponse=await res.json();
+        console.log("[magazines] samples payload",data);
+        if(!data.ok){
+          throw new Error(data.error||"Unknown error from API");
+        }
+
+        const map:Record<string,string[]>={};
+        (data.items||[]).forEach((raw:any)=>{
+          const code=String(raw.code??"").trim();
+          if(!code){return;}
+          const pages=Array.isArray(raw.samplePages)
+            ? raw.samplePages
+                .map((p:any)=>String(p??"").trim())
+                .filter((p:string)=>!!p)
+            : [];
+          if(pages.length){
+            map[code]=pages;
+          }
+        });
+
+        setSamplesMap(map);
+      }catch(err:any){
+        console.error("[magazines] error loading sample metadata",err);
+        setSamplesError(err.message||"Error loading magazine samples");
+      }finally{
+        setLoadingSamples(false);
+      }
+    };
+    load();
+  },[]);
+
+  const magazines:Magazine[]=useMemo(
+    ()=>baseMagazines.map((m)=>({
+      ...m,
+      samplePages:samplesMap[m.code],
+    })),
+    [samplesMap]
   );
 
-  return (
+  const activeMagazine=useMemo(
+    ()=>magazines.find((m)=>m.code===activeCode)||null,
+    [magazines,activeCode]
+  );
+
+  return(
     <div className="flex flex-col min-h-screen bg-white">
       {/* Hero / banner */}
       <section className="w-full bg-[#219653] text-white">
@@ -175,13 +245,13 @@ export default function MagazinesLandingPage(){
               {t.intro}
             </p>
             <div className="flex flex-wrap gap-3">
-           <Link
-  href="/magazines/apply"
-  className="inline-flex items-center justify-center px-5 py-2.5 rounded-full font-semibold shadow-sm"
-  style={{background:LAFAEK.yellow,color:"#4F4F4F"}}
->
-  {t.applyButton}
-</Link>
+              <Link
+                href="/magazines/apply"
+                className="inline-flex items-center justify-center px-5 py-2.5 rounded-full font-semibold shadow-sm"
+                style={{background:LAFAEK.yellow,color:"#4F4F4F"}}
+              >
+                {t.applyButton}
+              </Link>
 
               <Link
                 href="/publication/magazines"
@@ -190,10 +260,20 @@ export default function MagazinesLandingPage(){
                 {t.archiveButton}
               </Link>
             </div>
+            {loadingSamples&&(
+              <p className="mt-2 text-xs text-white/80">
+                {t.loadingSamples}
+              </p>
+            )}
+            {samplesError&&!loadingSamples&&(
+              <p className="mt-2 text-xs text-yellow-200">
+                {t.samplesError}
+              </p>
+            )}
           </div>
           <div className="flex-1 flex justify-center">
             <div className="grid grid-cols-3 gap-2 max-w-xs">
-              {allMagazines.slice(0,3).map((m)=>(
+              {magazines.slice(0,3).map((m)=>(
                 <div
                   key={m.code}
                   className="relative w-20 h-28 rounded-lg overflow-hidden shadow-sm border border-white/30 bg-white/10"
@@ -214,7 +294,7 @@ export default function MagazinesLandingPage(){
       {/* Magazine cards */}
       <main className="flex-1 max-w-6xl mx-auto px-4 py-8 md:py-10">
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {allMagazines.map((m)=>(
+          {magazines.map((m)=>(
             <article
               key={m.code}
               className="rounded-2xl overflow-hidden border shadow-sm hover:shadow-md transition bg-white"
@@ -279,7 +359,10 @@ export default function MagazinesLandingPage(){
       {activeMagazine&&(
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
           <div className="bg-white max-w-3xl w-full mx-4 rounded-2xl shadow-xl overflow-hidden">
-            <div className="flex items-center justify-between px-4 py-3 border-b" style={{borderColor:LAFAEK.grayMid}}>
+            <div
+              className="flex items-center justify-between px-4 py-3 border-b"
+              style={{borderColor:LAFAEK.grayMid}}
+            >
               <div>
                 <h2 className="text-lg font-semibold" style={{color:LAFAEK.green}}>
                   {activeMagazine.name[language]}
@@ -305,9 +388,13 @@ export default function MagazinesLandingPage(){
               {activeMagazine.samplePages&&activeMagazine.samplePages.length>0?(
                 <div className="grid gap-3 md:grid-cols-2">
                   {activeMagazine.samplePages.map((src)=>(
-                    <div key={src} className="relative w-full aspect-[3/4] bg-white rounded-xl overflow-hidden border" style={{borderColor:LAFAEK.grayMid}}>
+                    <div
+                      key={src}
+                      className="relative w-full aspect-[3/4] bg-white rounded-xl overflow-hidden border"
+                      style={{borderColor:LAFAEK.grayMid}}
+                    >
                       <Image
-                        src={src}
+                        src={buildImageUrl(src)}
                         alt={activeMagazine.name.en}
                         fill
                         className="object-contain"
@@ -316,13 +403,19 @@ export default function MagazinesLandingPage(){
                   ))}
                 </div>
               ):(
-                <div className="relative w-full aspect-[3/4] bg-white rounded-xl overflow-hidden border flex items-center justify-center" style={{borderColor:LAFAEK.grayMid}}>
+                <div
+                  className="relative w-full aspect-[3/4] bg-white rounded-xl overflow-hidden border flex flex-col items-center justify-center gap-2 px-4 text-center"
+                  style={{borderColor:LAFAEK.grayMid}}
+                >
                   <Image
                     src={activeMagazine.cover}
                     alt={activeMagazine.name.en}
                     fill
-                    className="object-contain opacity-90"
+                    className="object-contain opacity-70"
                   />
+                  <div className="relative z-10 mt-2 rounded-full bg-black/60 px-3 py-1 text-[11px] text-white inline-block">
+                    {t.noSamples}
+                  </div>
                 </div>
               )}
 
@@ -331,7 +424,10 @@ export default function MagazinesLandingPage(){
               </p>
             </div>
 
-            <div className="px-4 py-3 border-t flex justify-end gap-2" style={{borderColor:LAFAEK.grayMid}}>
+            <div
+              className="px-4 py-3 border-t flex justify-end gap-2"
+              style={{borderColor:LAFAEK.grayMid}}
+            >
               <Link
                 href="/magazines/apply"
                 className="px-4 py-2 rounded-lg font-semibold text-sm"
