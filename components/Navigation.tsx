@@ -137,7 +137,7 @@ export function Navigation(){
     {href:"/",label:t.home},
 
     // Direct magazines page
-    {href:"/publication/magazines",label:t.magazines},
+    {href:"/magazines",label:t.magazines},
 
     // Key content: News + Impact Stories
     {href:"/stories/news",label:t.news},
