@@ -2,8 +2,9 @@
 "use client";
 
 import {useEffect,useState}from "react";
-import {useParams,useRouter}from "next/navigation";
+import {useParams}from "next/navigation";
 import Image from "next/image";
+import Link from "next/link";
 import {useLanguage}from "@/lib/LanguageContext";
 
 const S3_ORIGIN="https://lafaek-media.s3.ap-southeast-2.amazonaws.com";
@@ -57,7 +58,6 @@ const buildS3Url=(keyOrUrl?:string)=>{
 
 export default function ImpactDetailPage(){
   const params=useParams();
-  const router=useRouter();
   const rawId=(params as any)?.id;
   const id=Array.isArray(rawId)?rawId[0]:rawId;
 
@@ -70,11 +70,11 @@ export default function ImpactDetailPage(){
 
   const labels={
     en:{
-      back:"← Back",
+      back:"← Back to Impact Stories",
       openPdf:"Open Full Impact Story (PDF)"
     },
     tet:{
-      back:"← Fila fali",
+      back:"← Fila fali ba Istória Impaktu",
       openPdf:"Loke Istória Impaktu Kompletu (PDF)"
     }
   }[L];
@@ -132,15 +132,13 @@ export default function ImpactDetailPage(){
             : undefined;
           const order=typeof raw.order==="number"?raw.order:index+1;
 
-          // 🔑 Robust PDF detection:
-          // 1) look for common field names
+          // Robust PDF detection
           let pdfRaw=(raw.pdfKey
             ??raw.pdf
             ??raw.pdfUrl
             ??raw.pdfFile
-            ??raw.pdfPath) as string|undefined;
+            ??raw.pdfPath)as string|undefined;
 
-          // 2) as a fallback, find any string field that ends with ".pdf"
           if(!pdfRaw){
             const pdfFromAny=Object.values(raw).find((value)=>{
               return typeof value==="string"
@@ -239,22 +237,6 @@ export default function ImpactDetailPage(){
 
     content=(
       <article className="mx-auto max-w-3xl">
-        <div className="mb-4">
-          <button
-            type="button"
-            onClick={()=>{
-              if(typeof window!=="undefined"&&window.history.length>1){
-                router.back();
-              }else{
-                router.push("/stories/impact");
-              }
-            }}
-            className="text-sm font-medium text-[#219653] hover:underline"
-          >
-            {labels.back}
-          </button>
-        </div>
-
         <header className="mb-6">
           {dateLabel&&(
             <div className="mb-2 text-xs text-gray-500">
@@ -303,7 +285,6 @@ export default function ImpactDetailPage(){
           </div>
         )}
 
-        {/* ✅ Only show this if there is NO pdf AND no body text */}
         {!hasPdf&&!hasAnyBody&&(
           <p className="text-gray-600 text-sm bg-gray-50 border border-gray-200 rounded p-4 mt-6">
             No detailed text has been added for this story yet.
@@ -316,6 +297,14 @@ export default function ImpactDetailPage(){
   return(
     <div className="min-h-screen bg-white">
       <main className="mx-auto max-w-7xl px-4 py-10">
+        <div className="mb-4">
+          <Link
+            href="/stories/impact"
+            className="text-sm font-medium text-[#219653] hover:underline"
+          >
+            {labels.back}
+          </Link>
+        </div>
         {content}
       </main>
     </div>

@@ -27,6 +27,7 @@ type PresignResponse={
   error?:string;
 };
 
+// Fallback list (used only if /api/admin/magazines is missing or fails)
 const CODE_LIST=[
   "LBK-02-2023",
   "LBK-03-2023",
@@ -119,6 +120,7 @@ export default function MagazineSamplesAdminPage(){
   const[message,setMessage]=useState<string>("");
 
   const[newCode,setNewCode]=useState<string>("");
+  const[availableCodes,setAvailableCodes]=useState<string[]>([...CODE_LIST]);
 
   useEffect(()=>{
     const load=async()=>{
@@ -126,6 +128,8 @@ export default function MagazineSamplesAdminPage(){
         setLoading(true);
         setError(undefined);
         console.log("[admin/magazines/samples] loading from API");
+
+        // 1) Load existing samples (same as before)
         const res=await fetch("/api/admin/magazines/samples",{method:"GET"});
         console.log("[admin/magazines/samples] GET status",res.status);
         if(!res.ok){
@@ -146,8 +150,38 @@ export default function MagazineSamplesAdminPage(){
         })).filter((i)=>!!i.code);
 
         normalised.sort((a,b)=>a.code.localeCompare(b.code));
-
         setItems(normalised);
+
+        // 2) Try to load magazine codes from /api/admin/magazines
+        try{
+          console.log("[admin/magazines/samples] loading magazine codes from /api/admin/magazines");
+          const magsRes=await fetch("/api/admin/magazines",{method:"GET"});
+          if(magsRes.ok){
+            const magsData:ApiResponse=await magsRes.json();
+            if(magsData.ok&&Array.isArray(magsData.items)){
+              const fromMags=Array.from(
+                new Set(
+                  magsData.items
+                    .map((m:any)=>String(m.code??"").trim())
+                    .filter((c)=>!!c)
+                )
+              );
+              if(fromMags.length){
+                fromMags.sort((a,b)=>a.localeCompare(b));
+                setAvailableCodes(fromMags);
+                console.log("[admin/magazines/samples] using dynamic magazine codes",fromMags);
+              }else{
+                console.log("[admin/magazines/samples] no codes from API, keeping fallback list");
+              }
+            }else{
+              console.log("[admin/magazines/samples] magazines API not ok, keeping fallback list");
+            }
+          }else{
+            console.log("[admin/magazines/samples] magazines API status",magsRes.status,"– keeping fallback list");
+          }
+        }catch(err:any){
+          console.warn("[admin/magazines/samples] error loading magazine codes, using fallback list",err);
+        }
       }catch(err:any){
         console.error("[admin/magazines/samples] load error",err);
         setError(err.message||"Error loading magazine samples");
@@ -339,7 +373,7 @@ export default function MagazineSamplesAdminPage(){
                 className="rounded-md border border-slate-300 px-2 py-1 text-sm"
               >
                 <option value="">Select magazine code</option>
-                {CODE_LIST.map((code)=>(
+                {availableCodes.map((code)=>(
                   <option key={code} value={code}>
                     {code} — {buildHumanName(code)}
                   </option>

@@ -14,7 +14,7 @@ type MagazineBase={
   series:Series;
   year:string;
   name:{en:string;tet:string};
-  cover:string;
+  cover:string; // may be "" for API-driven mags with no explicit cover
 };
 
 type Magazine=MagazineBase&{
@@ -22,6 +22,12 @@ type Magazine=MagazineBase&{
 };
 
 type SamplesApiResponse={
+  ok:boolean;
+  items:any[];
+  error?:string;
+};
+
+type MagazinesApiResponse={
   ok:boolean;
   items:any[];
   error?:string;
@@ -47,27 +53,6 @@ const LAFAEK={
   blue:"#2F80ED",
   yellow:"#F2C94C",
 };
-
-const CODE_LIST=[
-  "LBK-02-2023",
-  "LBK-03-2023",
-  "LK-1-2016",
-  "LK-1-2017",
-  "LK-1-2018",
-  "LK-2-2015",
-  "LK-2-2016",
-  "LK-3-2015",
-  "LK-3-2016",
-  "LM-2-2015",
-  "LM-3-2015",
-  "LP-1-2016",
-  "LP-1-2017",
-  "LP-1-2018",
-  "LP-2-2016",
-  "LP-2-2017",
-  "LP-2-2018",
-  "LP-3-2017",
-] as const;
 
 const monthName=(n:string)=>{
   const i=parseInt(n,10);
@@ -113,26 +98,6 @@ const seriesLabel=(s:Series)=>
     ? {en:"Lafaek Komunidade",tet:"Lafaek Komunidade"}
     : {en:"Lafaek Kiik",tet:"Lafaek Kiik"};
 
-const makeMagazineBase=(code:string):MagazineBase=>{
-  const[series,issue="",year=""]=code.split("-");
-  const isMonth=series==="LBK";
-  const when=isMonth?monthName(issue):{en:`Issue ${issue}`,tet:`Numeru ${issue}`};
-  const s=seriesLabel(series as Series);
-
-  return{
-    code,
-    series:series as Series,
-    year,
-    name:{
-      en:`${s.en} ${when.en} ${year}`,
-      tet:`${s.tet} ${when.tet} ${year}`,
-    },
-    cover:`/magazines/${code}.jpg`,
-  };
-};
-
-const baseMagazines:MagazineBase[]=CODE_LIST.map((code)=>makeMagazineBase(code));
-
 const ui={
   en:{
     title:"Lafaek Magazines",
@@ -148,6 +113,7 @@ const ui={
     loadingSamples:"Loading samples…",
     samplesError:"Could not load sample pages. You can still apply for access.",
     noSamples:"Sample pages coming soon.",
+    noMagazines:"No magazines are available yet. Please check back soon or contact our team.",
   },
   tet:{
     title:"Revista Lafaek",
@@ -163,6 +129,7 @@ const ui={
     loadingSamples:"Hakarak kargga pájina amostra…",
     samplesError:"La bele karga pájina amostra. Ita bele kontinua aplica ba asesu.",
     noSamples:"Pájina amostra sei mai fali.",
+    noMagazines:"Seidauk iha revista atu hatudu. Favór ida koko fali bainhira mai, ka kontaktu ami nia equipa.",
   },
 } as const;
 
@@ -172,13 +139,104 @@ export default function MagazinesLandingPage(){
 
   const[activeCode,setActiveCode]=useState<string|null>(null);
 
+  // Base magazine list – now starts EMPTY, only filled from /api/admin/magazines
+  const[baseMagazines,setBaseMagazines]=useState<MagazineBase[]>([]);
+
   // map of code -> samplePages (S3 keys)
   const[samplesMap,setSamplesMap]=useState<Record<string,string[]>>({});
   const[loadingSamples,setLoadingSamples]=useState<boolean>(true);
   const[samplesError,setSamplesError]=useState<string|undefined>();
 
+  // Load magazine metadata from /api/admin/magazines
   useEffect(()=>{
-    const load=async()=>{
+    const loadMagazines=async()=>{
+      try{
+        console.log("[magazines] loading magazine metadata from /api/admin/magazines");
+        const res=await fetch("/api/admin/magazines",{method:"GET"});
+        console.log("[magazines] GET /api/admin/magazines status",res.status);
+        if(!res.ok){
+          console.warn("[magazines] admin magazines API not OK, leaving baseMagazines empty");
+          return;
+        }
+        const data:MagazinesApiResponse=await res.json();
+        console.log("[magazines] /api/admin/magazines payload",data);
+        if(!data.ok||!Array.isArray(data.items)){
+          console.warn("[magazines] admin magazines API returned not-ok or no items, leaving baseMagazines empty");
+          return;
+        }
+
+        const fromApi:MagazineBase[]=(data.items||[])
+          .map((raw:any)=>{
+            const code=String(raw.code??"").trim();
+            if(!code){return null;}
+
+            const codeParts=code.split("-");
+            const fallbackSeries=codeParts[0]||"LK";
+            const fallbackIssue=codeParts[1]||"";
+            const fallbackYear=codeParts[2]||"";
+
+            const seriesRaw=String(raw.series??fallbackSeries).trim();
+            const series=(
+              seriesRaw==="LK"||
+              seriesRaw==="LBK"||
+              seriesRaw==="LP"||
+              seriesRaw==="LM"
+            )
+              ? (seriesRaw as Series)
+              : (fallbackSeries as Series);
+
+            const year=String(raw.year??fallbackYear??"").trim();
+            const issue=String(raw.issue??fallbackIssue??"").trim();
+
+            const isMonth=series==="LBK";
+            const when=isMonth?monthName(issue):{en:`Issue ${issue}`,tet:`Numeru ${issue}`};
+            const s=seriesLabel(series);
+
+            const titleEn=raw.titleEn
+              ? String(raw.titleEn)
+              : `${s.en} ${when.en} ${year}`.trim();
+            const titleTet=raw.titleTet
+              ? String(raw.titleTet)
+              : `${s.tet} ${when.tet} ${year}`.trim();
+
+            const coverRaw=raw.coverImage
+              ? buildImageUrl(String(raw.coverImage))
+              : "";
+
+            return{
+              code,
+              series,
+              year,
+              name:{en:titleEn,tet:titleTet},
+              cover:coverRaw,
+            } as MagazineBase;
+          })
+          .filter((m:MagazineBase|null):m is MagazineBase=>!!m);
+
+        if(!fromApi.length){
+          console.log("[magazines] no valid magazine records from API, baseMagazines stays empty");
+          return;
+        }
+
+        fromApi.sort((a,b)=>{
+          const ay=parseInt(a.year||"0",10);
+          const by=parseInt(b.year||"0",10);
+          if(by!==ay){return by-ay;}
+          return a.code.localeCompare(b.code);
+        });
+
+        setBaseMagazines(fromApi);
+      }catch(err){
+        console.error("[magazines] error loading admin magazines, baseMagazines stays empty",err);
+      }
+    };
+
+    void loadMagazines();
+  },[]);
+
+  // Load samples map from /api/admin/magazines/samples
+  useEffect(()=>{
+    const loadSamples=async()=>{
       try{
         setLoadingSamples(true);
         setSamplesError(undefined);
@@ -216,7 +274,7 @@ export default function MagazinesLandingPage(){
         setLoadingSamples(false);
       }
     };
-    load();
+    void loadSamples();
   },[]);
 
   const magazines:Magazine[]=useMemo(
@@ -224,7 +282,7 @@ export default function MagazinesLandingPage(){
       ...m,
       samplePages:samplesMap[m.code],
     })),
-    [samplesMap]
+    [baseMagazines,samplesMap]
   );
 
   const activeMagazine=useMemo(
@@ -273,19 +331,33 @@ export default function MagazinesLandingPage(){
           </div>
           <div className="flex-1 flex justify-center">
             <div className="grid grid-cols-3 gap-2 max-w-xs">
-              {magazines.slice(0,3).map((m)=>(
-                <div
-                  key={m.code}
-                  className="relative w-20 h-28 rounded-lg overflow-hidden shadow-sm border border-white/30 bg-white/10"
-                >
-                  <Image
-                    src={m.cover}
-                    alt={m.name.en}
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-              ))}
+              {magazines.length>0?(
+                magazines.slice(0,3).map((m)=>{
+                  const coverSrc=m.samplePages&&m.samplePages.length>0
+                    ? buildImageUrl(m.samplePages[0])
+                    : (m.cover||"/placeholder.svg?width=640&height=720");
+                  return(
+                    <div
+                      key={m.code}
+                      className="relative w-20 h-28 rounded-lg overflow-hidden shadow-sm border border-white/30 bg-white/10"
+                    >
+                      <Image
+                        src={coverSrc}
+                        alt={m.name.en}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                  );
+                })
+              ):(
+                // nice neutral placeholders when no magazines yet
+                <>
+                  <div className="w-20 h-28 rounded-lg border border-white/30 bg-white/10" />
+                  <div className="w-20 h-28 rounded-lg border border-white/30 bg-white/10" />
+                  <div className="w-20 h-28 rounded-lg border border-white/30 bg-white/10" />
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -293,66 +365,78 @@ export default function MagazinesLandingPage(){
 
       {/* Magazine cards */}
       <main className="flex-1 max-w-6xl mx-auto px-4 py-8 md:py-10">
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {magazines.map((m)=>(
-            <article
-              key={m.code}
-              className="rounded-2xl overflow-hidden border shadow-sm hover:shadow-md transition bg-white"
-              style={{borderColor:LAFAEK.grayMid}}
-            >
-              <div
-                className="relative w-full aspect-[3/2]"
-                style={{background:LAFAEK.grayLight}}
-              >
-                <Image
-                  src={m.cover}
-                  alt={m.name.en}
-                  fill
-                  className="object-cover"
-                />
-                <div className="absolute inset-0 flex items-end justify-between p-2">
-                  <span className="text-xs bg-black/50 text-white px-2 py-1 rounded">
-                    {m.code}
-                  </span>
-                  <span className="text-xs bg-black/50 text-white px-2 py-1 rounded">
-                    {m.year}
-                  </span>
-                </div>
-              </div>
-              <div className="p-4 space-y-2">
-                <p
-                  className="text-xs uppercase tracking-wide"
-                  style={{color:LAFAEK.textDark}}
+        {magazines.length===0?(
+          <div className="rounded-xl border border-dashed border-gray-300 bg-gray-50 px-4 py-8 text-center text-sm text-gray-600">
+            {t.noMagazines}
+          </div>
+        ):(
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {magazines.map((m)=>{
+              const coverSrc=m.samplePages&&m.samplePages.length>0
+                ? buildImageUrl(m.samplePages[0])
+                : (m.cover||"/placeholder.svg?width=640&height=720");
+
+              return(
+                <article
+                  key={m.code}
+                  className="rounded-2xl overflow-hidden border shadow-sm hover:shadow-md transition bg-white"
+                  style={{borderColor:LAFAEK.grayMid}}
                 >
-                  {seriesLabel(m.series)[language]} • {m.year}
-                </p>
-                <h2
-                  className="text-base md:text-lg font-semibold"
-                  style={{color:LAFAEK.red}}
-                >
-                  {m.name[language]}
-                </h2>
-                <div className="pt-3 flex flex-col gap-2">
-                  <button
-                    type="button"
-                    onClick={()=>setActiveCode(m.code)}
-                    className="w-full text-center font-semibold py-2.5 rounded-xl transition-colors"
-                    style={{background:LAFAEK.green,color:"#fff"}}
+                  <div
+                    className="relative w-full aspect-[3/2]"
+                    style={{background:LAFAEK.grayLight}}
                   >
-                    {t.sampleButton}
-                  </button>
-                  <Link
-                    href="/magazines/apply"
-                    className="w-full text-center font-semibold py-2.5 rounded-xl border text-sm"
-                    style={{borderColor:LAFAEK.grayMid,color:LAFAEK.textDark}}
-                  >
-                    {t.applyButton}
-                  </Link>
-                </div>
-              </div>
-            </article>
-          ))}
-        </div>
+                    <Image
+                      src={coverSrc}
+                      alt={m.name.en}
+                      fill
+                      className="object-cover"
+                    />
+                    <div className="absolute inset-0 flex items-end justify-between p-2">
+                      <span className="text-xs bg-black/50 text-white px-2 py-1 rounded">
+                        {m.code}
+                      </span>
+                      <span className="text-xs bg-black/50 text-white px-2 py-1 rounded">
+                        {m.year}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="p-4 space-y-2">
+                    <p
+                      className="text-xs uppercase tracking-wide"
+                      style={{color:LAFAEK.textDark}}
+                    >
+                      {seriesLabel(m.series)[language]} • {m.year}
+                    </p>
+                    <h2
+                      className="text-base md:text-lg font-semibold"
+                      style={{color:LAFAEK.red}}
+                    >
+                      {m.name[language]}
+                    </h2>
+                    <div className="pt-3 flex flex-col gap-2">
+                      <button
+                        type="button"
+                        onClick={()=>setActiveCode(m.code)}
+                        className="w-full text-center font-semibold py-2.5 rounded-xl transition-colors"
+                        style={{background:LAFAEK.green,color:"#fff"}}
+                      >
+                        {t.sampleButton}
+                      </button>
+                      <Link
+                        href="/magazines/apply"
+                        className="w-full text-center font-semibold py-2.5 rounded-xl border text-sm"
+                        style={{borderColor:LAFAEK.grayMid,color:LAFAEK.textDark}}
+                      >
+                        {t.applyButton}
+                      </Link>
+                    </div>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        )}
       </main>
 
       {/* Sample preview modal */}
@@ -408,7 +492,7 @@ export default function MagazinesLandingPage(){
                   style={{borderColor:LAFAEK.grayMid}}
                 >
                   <Image
-                    src={activeMagazine.cover}
+                    src={activeMagazine.cover||"/placeholder.svg?width=640&height=720"}
                     alt={activeMagazine.name.en}
                     fill
                     className="object-contain opacity-70"

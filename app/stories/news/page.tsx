@@ -1,3 +1,5 @@
+//app/stories/news
+
 "use client";
 
 import {useEffect,useState}from "react";

@@ -58,12 +58,8 @@ export default function NewsDetailPage(){
   const[error,setError]=useState<string|undefined>();
 
   const labels={
-    en:{
-      back:"← Back to News & Stories"
-    },
-    tet:{
-      back:"← Fila fali ba Notísia & Istória"
-    }
+    en:{back:"← Back to News & Stories"},
+    tet:{back:"← Fila fali ba Notísia & Istória"}
   }[L];
 
   useEffect(()=>{
@@ -134,7 +130,7 @@ export default function NewsDetailPage(){
             visible,
             externalUrl,
             order
-          } as NewsItem;
+          }as NewsItem;
         });
 
         const found=items.find((it)=>it.slug===id||it.id===id);
@@ -199,15 +195,6 @@ export default function NewsDetailPage(){
 
     content=(
       <article className="mx-auto max-w-3xl">
-        <div className="mb-4">
-          <Link
-            href="/stories/news"
-            className="text-sm font-medium text-[#219653] hover:underline"
-          >
-            {labels.back}
-          </Link>
-        </div>
-
         <header className="mb-6">
           {dateLabel&&(
             <div className="mb-2 text-xs text-gray-500">
@@ -249,6 +236,14 @@ export default function NewsDetailPage(){
   return(
     <div className="min-h-screen bg-white">
       <main className="mx-auto max-w-7xl px-4 py-10">
+        <div className="mb-4">
+          <Link
+            href="/stories/news"
+            className="text-sm font-medium text-[#219653] hover:underline"
+          >
+            {labels.back}
+          </Link>
+        </div>
         {content}
       </main>
     </div>

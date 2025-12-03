@@ -4,7 +4,7 @@
 import {useState}from "react"
 import Link from "next/link"
 import Image from "next/image"
-import {Menu, X, ChevronDown}from "lucide-react"
+import {Menu,X,ChevronDown}from "lucide-react"
 import {Button}from "./button"
 import {useLanguage}from "@/lib/LanguageContext"
 
@@ -189,14 +189,14 @@ export function Navigation(){
               {leftNav.map((item)=>{
                 if("mega"in item){
                   return (
-                    <div key={item.label} className="relative group">
+                    <div key={item.label}className="relative group">
                       <button
                         className={`${desktopLinkClass} flex items-center`}
                         aria-haspopup="menu"
                         aria-expanded="false"
                       >
                         {item.label}
-                        <ChevronDown className="ml-1 h-4 w-4" />
+                        <ChevronDown className="ml-1 h-4 w-4"/>
                       </button>
                       <div className="absolute left-0 mt-3 w-[680px] bg-white rounded-xl shadow-lg border border-[#F5F5F5] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
                         <div className="p-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -250,7 +250,7 @@ export function Navigation(){
                 aria-pressed={language==="tet"}
                 className={`px-2 py-1 text-xs font-semibold rounded-md transition ${
                   language==="tet"
-                    ? "bg-white text-[#219653]"
+                    ? "bg-[#F2C94C] text-[#219653]"
                     : "border border-white text-white hover:bg-white/20"
                 }`}
               >
@@ -265,7 +265,7 @@ export function Navigation(){
               className="md:hidden text-white hover:bg-white/20 p-2 rounded-md"
               aria-label="Toggle navigation"
             >
-              {isMenuOpen?<X className="h-5 w-5" />:<Menu className="h-5 w-5" />}
+              {isMenuOpen?<X className="h-5 w-5"/>:<Menu className="h-5 w-5"/>}
             </Button>
           </div>
         </div>
@@ -280,7 +280,7 @@ export function Navigation(){
                   aria-pressed={language==="en"}
                   className={`px-2 py-1 text-xs font-semibold rounded-md transition ${
                     language==="en"
-                      ? "bg-white text-[#219653]"
+                      ? "bg-[#F2C94C] text-[#219653]"
                       : "border border-white text-white hover:bg-white/20"
                   }`}
                 >
@@ -291,7 +291,7 @@ export function Navigation(){
                   aria-pressed={language==="tet"}
                   className={`px-2 py-1 text-xs font-semibold rounded-md transition ${
                     language==="tet"
-                      ? "bg-white text-[#219653]"
+                      ? "bg-[#F2C94C] text-[#219653]"
                       : "border border-white text-white hover:bg-white/20"
                   }`}
                 >
@@ -306,16 +306,14 @@ export function Navigation(){
                 </Link>
               </div>
 
-              <div className="h-px bg-white/20 my-2" />
+              <div className="h-px bg-white/20 my-2"/>
 
               {leftNav.map((item)=>
                 "mega"in item?(
-                  <div key={item.label} className="px-2">
+                  <div key={item.label}className="px-2">
                     <button
                       className="w-full text-left px-2 py-2 text-white font-semibold flex items-center justify-between hover:bg-white/10 rounded-md"
-                      onClick={()=>
-                        setOpenMobileSubmenu((cur)=>cur===item.label?null:item.label)
-                      }
+                      onClick={()=>setOpenMobileSubmenu((cur)=>cur===item.label?null:item.label)}
                       aria-expanded={openMobileSubmenu===item.label}
                     >
                       <span>{item.label}</span>
@@ -331,7 +329,7 @@ export function Navigation(){
                           <Link
                             key={m.href}
                             href={m.href}
-                            className="block px-4 py-2 rounded-md hover:bg:white/10 hover:bg-white/10 transition-colors"
+                            className="block px-4 py-2 rounded-md hover:bg-white/10 transition-colors"
                             onClick={()=>{
                               setIsMenuOpen(false)
                               setOpenMobileSubmenu(null)
@@ -350,7 +348,7 @@ export function Navigation(){
                   <Link
                     key={item.href}
                     href={item.href}
-                    className="py-2 px-4 rounded-md transition-colors text-white hover:text-[#F2C94C] hover:bg-white/10"
+                    className="py-2 px-4 rounded-md transition-colors text-white hover:text-[#F2C94C] hover:bg:white/10 hover:bg-white/10"
                     onClick={()=>setIsMenuOpen(false)}
                   >
                     {item.label}
