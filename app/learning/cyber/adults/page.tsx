@@ -15,43 +15,41 @@ import {
   Router,
   ExternalLink,
 } from "lucide-react";
-import { useLanguage } from "@/lib/LanguageContext";
+import {useLanguage}from "@/lib/LanguageContext";
 
-export default function CyberAdultsPage() {
-  // 🔑 read global language from context (set by your nav buttons)
-  const { language } = useLanguage();
+export default function CyberAdultsPage(){
+  const{language}=useLanguage();
 
-  const t = {
-    en: {
- 
-      title: "Protect Your Children Online",
+  const t={
+    en:{
+      title:"Protect Your Children Online",
       subtitle:
         "Practical steps for parents and carers to secure devices, set healthy rules, and support kids when things go wrong.",
-      heroBadge: "Parents & Carers",
+      heroBadge:"Parents & Carers",
       introLead:
         "You don’t need to be a tech expert. These actions—drawn from government guidance—lock down accounts, reduce risks, and open good conversations at home.",
 
-      learnTitle: "What You'll Learn",
-      learnItems: [
+      learnTitle:"What You'll Learn",
+      learnItems:[
         {
-          icon: <LockKeyhole className="h-6 w-6" />,
-          title: "Secure devices & accounts",
-          desc: "Strong passwords, multi-factor authentication (MFA), updates, and screen locks.",
+          icon:<LockKeyhole className="h-6 w-6" />,
+          title:"Secure devices & accounts",
+          desc:"Strong passwords, multi-factor authentication (MFA), updates, and screen locks.",
         },
         {
-          icon: <Users className="h-6 w-6" />,
-          title: "Family rules & controls",
-          desc: "Simple agreements, age-appropriate apps, and parental controls that actually help.",
+          icon:<Users className="h-6 w-6" />,
+          title:"Family rules & controls",
+          desc:"Simple agreements, age-appropriate apps, and parental controls that actually help.",
         },
         {
-          icon: <Eye className="h-6 w-6" />,
-          title: "Privacy & sharing",
-          desc: "Safer photos, location limits, and settings on social and games.",
+          icon:<Eye className="h-6 w-6" />,
+          title:"Privacy & sharing",
+          desc:"Safer photos, location limits, and settings on social and games.",
         },
       ],
 
-      checklistTitle: "8-Step Parent Checklist",
-      checklist: [
+      checklistTitle:"8-Step Parent Checklist",
+      checklist:[
         "Use unique passphrases for every account; turn on MFA for email, banking, socials and app stores.",
         "Keep devices up to date. Enable automatic updates for phones, tablets, laptops and browsers.",
         "Set a device passcode/biometric and auto-lock (< 1 minute). Add ‘Find my device’.",
@@ -62,38 +60,38 @@ export default function CyberAdultsPage() {
         "Back up important photos and schoolwork. Know how to restore a device if needed.",
       ],
 
-      familyRulesTitle: "Family Tech Agreement — Starter Points",
-      familyRules: [
+      familyRulesTitle:"Family Tech Agreement — Starter Points",
+      familyRules:[
         "Shared spaces for devices (e.g. living room) and no devices in bedrooms overnight.",
         "Ask-before-you-click: links, downloads, and ‘free’ offers need an adult check.",
         "Pause–Think–Tell: if a message feels urgent, secret, or threatening, show an adult.",
         "No sharing personal details (full name, school, address, phone) or live location.",
       ],
 
-      controlsTitle: "Parental Controls — Quick Guide",
+      controlsTitle:"Parental Controls — Quick Guide",
       controlsNote:
         "Controls reduce risk but are not perfect. Combine them with conversations and regular check-ins.",
-      controls: [
-        { icon: <Smartphone className="h-5 w-5" />, text: "Device settings: content filters, app limits, screen time, purchases." },
-        { icon: <KeyRound className="h-5 w-5" />, text: "App store: require approval for installs and in-app purchases." },
-        { icon: <Router className="h-5 w-5" />, text: "Home Wi-Fi/router: family filtering and time schedules where available." },
+      controls:[
+        {icon:<Smartphone className="h-5 w-5" />,text:"Device settings: content filters, app limits, screen time, purchases."},
+        {icon:<KeyRound className="h-5 w-5" />,text:"App store: require approval for installs and in-app purchases."},
+        {icon:<Router className="h-5 w-5" />,text:"Home Wi-Fi/router: family filtering and time schedules where available."},
       ],
 
-      scamsTitle: "Scams, Grooming & ‘Too Good to Be True’",
-      scamsPoints: [
+      scamsTitle:"Scams, Grooming & ‘Too Good to Be True’",
+      scamsPoints:[
         "Beware of sudden money requests, codes, prizes or job offers. Verify via another channel.",
         "Teach kids not to share private images. If pressured (sextortion), stop responding and tell an adult immediately.",
         "Keep evidence (screenshots/URLs). Report in-app and block the account.",
       ],
 
-      wifiTitle: "Public Wi-Fi — Be Careful",
-      wifiList: [
-        { icon: <WifiOff className="h-5 w-5" />, text: "Prefer mobile data hotspot for logins. Avoid banking on café Wi-Fi." },
-        { icon: <ShieldCheck className="h-5 w-5" />, text: "Log out after use and turn off auto-connect on children’s devices." },
+      wifiTitle:"Public Wi-Fi — Be Careful",
+      wifiList:[
+        {icon:<WifiOff className="h-5 w-5" />,text:"Prefer mobile data hotspot for logins. Avoid banking on café Wi-Fi."},
+        {icon:<ShieldCheck className="h-5 w-5" />,text:"Log out after use and turn off auto-connect on children’s devices."},
       ],
 
-      reportTitle: "If Something Goes Wrong",
-      reportSteps: [
+      reportTitle:"If Something Goes Wrong",
+      reportSteps:[
         "Support first. Stay calm, thank your child for telling you.",
         "Collect evidence safely (screenshots, URLs, usernames).",
         "Change passwords; enable MFA; sign out other sessions.",
@@ -101,136 +99,151 @@ export default function CyberAdultsPage() {
         "Seek local help from school or authorities if there are threats or ongoing harm.",
       ],
 
-      resourcesTitle: "Resources & Free Guidance",
+      resourcesTitle:"Resources & Free Guidance",
       resourcesIntro:
         "These official guides show step-by-step settings and talking points for families.",
-      resources: [
+      resources:[
         {
-          text: "Protect your children online — Australian Cyber Security Centre (ACSC)",
-          href: "https://www.cyber.gov.au/protect-yourself/staying-secure-online/protecting-your-family/protect-your-children-online",
+          text:"Protect your children online — Australian Cyber Security Centre (ACSC)",
+          href:"https://www.cyber.gov.au/protect-yourself/staying-secure-online/protecting-your-family/protect-your-children-online",
         },
         {
-          text: "Secure your user account (incl. parental controls) — ACSC",
-          href: "https://www.cyber.gov.au/protect-yourself/securing-your-devices/how-secure-your-device/secure-your-user-account",
+          text:"Secure your user account (incl. parental controls) — ACSC",
+          href:"https://www.cyber.gov.au/protect-yourself/securing-your-devices/how-secure-your-device/secure-your-user-account",
         },
         {
-          text: "eSafety Guide — how to secure common apps, games & sites",
-          href: "https://www.esafety.gov.au/key-topics/esafety-guide",
+          text:"eSafety Guide — how to secure common apps, games & sites",
+          href:"https://www.esafety.gov.au/key-topics/esafety-guide",
         },
       ],
-      posterCta: "Download a home poster/checklist (coming soon)",
-      note: "This page provides original Lafaek guidance and links to ACSC/eSafety for optional deeper steps.",
+      posterCta:"Download a home poster/checklist (coming soon)",
+      note:"This page provides original Lafaek guidance and links to ACSC/eSafety for optional deeper steps.",
     },
 
-    tet: {
-      breadcrumbHome: "Uma",
-      breadcrumbCyber: "Seguransa Sibernétika",
-      breadcrumbAdults: "Adultu / Pais",
-      title: "Proteje Ita Nia Labarik Online",
+    tet:{
+      breadcrumbHome:"Uma",
+      breadcrumbCyber:"Seguransa Sibernétika",
+      breadcrumbAdults:"Inan-Aman & Kuidadór sira",
+      title:"Proteje Ita-boot nia oan sira online",
       subtitle:
-        "Passu praktiku ba pais no kuidadór atu hadia seguransa dispozitivu, halo regra saudável, no ajuda labarik bainhira iha problema.",
-      heroBadge: "Pais & Kuidadór",
+        "Etapa prátiku sira ba inan-aman no kuidadu-na'in sira atu asegura dispozitivu sira, estabelese regra saudavel sira, no apoia labarik sira bainhira buat ruma la'o laloos.",
+      heroBadge:"Inan-Aman & Kuidadór sira",
       introLead:
-        "Labele sai eksperte. Medida simple sira—tuir guia governu—bele tranka konta, hamenus risku no fó oportunidade koalia di’ak iha uma.",
+        "Ita la presiza sai peritu teknolojia nian. Asaun sira-ne'e—ne'ebé foti hosi orientasaun governu nian—trava konta sira, hamenus risku sira, no loke konversa di'ak sira iha uma.",
 
-      learnTitle: "Sá mak Ita Aprende",
-      learnItems: [
+      learnTitle:"Saida maka Ita-boot sei aprende",
+      learnItems:[
         {
-          icon: <LockKeyhole className="h-6 w-6" />,
-          title: "Seguransa dispositivo & konta",
-          desc: "Password forte, MFA, atualizasaun no tranku ekrã.",
+          icon:<LockKeyhole className="h-6 w-6" />,
+          title:"Seguru dispozitivu sira & konta sira",
+          desc:"Senha sira ne'ebé forte, autentikasaun multi-fatór (MFA), atualizasaun sira, no xave ekran nian.",
         },
         {
-          icon: <Users className="h-6 w-6" />,
-          title: "Regras família & kontrolu",
-          desc: "Akordu simple, aplikasaun tuir idade no parental controls ne’ebé ajuda de’it.",
+          icon:<Users className="h-6 w-6" />,
+          title:"Regra no kontrolu sira família nian",
+          desc:"Akordu simples sira, aplikasaun sira ne'ebé apropriadu ba idade, no kontrolu inan-aman nian ne'ebé ajuda duni.",
         },
         {
-          icon: <Eye className="h-6 w-6" />,
-          title: "Privasidade & partilha",
-          desc: "Foto ho seguru, limita lokasaun no definisaun iha redes sosial no jogu.",
+          icon:<Eye className="h-6 w-6" />,
+          title:"Privasidade & fahe",
+          desc:"Foto sira ne'ebé seguru liu, limite lokalizasaun nian, no konfigurasaun sira iha sosiál no jogu sira.",
         },
       ],
 
-      checklistTitle: "Checklist Pais iha 8 Passu",
-      checklist: [
-        "Uza passphrase diferente ba konta hotu; ativa MFA ba email, banku, redes sosial no app store.",
-        "Atualiza dispozitivu hotu. Ativa auto-update ba telemóvel, tablet, laptop no nabegadór.",
-        "Tau passcode/biometria no auto-lock (< 1 minutu). Ativa ‘Haan ita nia dispozitivu/Find my device’.",
-        "Halo Acordu Teknologia Família: ne’ebé/horas uza dispozitivu no saida atu halo se sente la di’ak.",
-        "Tau parental controls tuir idade iha dispozitivu, app store no aplikasaun prinsipal. Reviza kada semána.",
-        "Hadrek privasidade iha redes sosial. Limita ema bele mensajen/tag ka haree story; taka precise location.",
-        "Koalia sedu no regular kona-ba scam, grooming, bulian no presáun atu partilha imajen. Mantén koalia lakanek.",
-        "Fó backup ba foto importante no serbisu escola. Hatene oinsá atu restaura dispositivo se precisa.",
+      checklistTitle:"Lista Verifikasaun Inan-Aman ho Etapa 8",
+      checklist:[
+        "Uza fraze-xave úniku sira ba konta ida-idak; loke MFA ba email, banku, sosiál sira no loja aplikasaun sira.",
+        "Mantein dispozitivu sira atualizadu. Habilita atualizasaun automátika sira ba telefone, tablet, laptop no browser sira.",
+        "Hatur kódigu-pasajen/biométriku ba dispozitivu no trava automátika (< minutu 1). Hatama ‘Buska ha'u nia dispozitivu’.",
+        "Kria Akordu Teknolojia Família nian ne'ebé simples: iha ne'ebé/bainhira uza dispozitivu sira, saida maka atu halo se buat ruma sente laloos.",
+        "Hatur kontrolu inan-aman nian ne'ebé apropriadu ba idade iha dispozitivu sira, loja aplikasaun sira no aplikasaun xave sira. Halo revizaun semana-semana—labarik sira sai boot lalais.",
+        "Hametin privasidade iha aplikasaun sosiál sira. Limita sé maka bele haruka mensajen, marka, ka haree istória sira; desliga fatin ne'ebé loos.",
+        "Ko'alia sedu no beibeik kona-ba bosok sira, hamoos an, intimidasaun no presaun atu fahe imajen sira. Mantein konversa sira nakloke.",
+        "Halo backup ba foto importante sira no serbisu eskola nian. Hatene oinsá atu restaura dispozitivu ida se presiza.",
       ],
 
-      familyRulesTitle: "Akorudu Teknologia Família — Puntu Inísiu",
-      familyRules: [
-        "Uza dispozitivu iha fatin kompartilha (sala estar) no la iha kamar iha kalan.",
-        "Husu antes klik: link, download no ‘gratis’ tenke haree ho adultu.",
-        "Para–Hanoin–Dize: se mensajen sente urgentu, sekretu ka ameasa, hatudu ba adultu.",
-        "Labele fahe detalhe privadu (naran kompletu, eskola, alamat, númeru) no lokasaun direto.",
+      familyRulesTitle:"Akordu Teknolojia Família nian — Pontu sira Inísiu nian",
+      familyRules:[
+        "Fatin fahe ba dispozitivu sira (ezemplu, sala-vizitante) no laiha dispozitivu iha kuartu sira durante kalan.",
+        "Husu-molok-ita-klik: ligasaun sira, download sira, no oferta sira 'gratuita' presiza verifikasaun adultu nian.",
+        "Pauza–Hanoin–Hatete: se mensajen ida sente urjente, segredu, ka ameasadu, hatudu ba ema adultu ida.",
+        "Labele fahe detalle pesoál sira (naran kompletu, eskola, enderesu, telefone) ka fatin moris nian.",
       ],
 
-      controlsTitle: "Parental Controls — Guia Badak",
+      controlsTitle:"Kontrolu Inan-Aman nian — Matadalan Lalais",
       controlsNote:
-        "Kontrolu sira hatun risku maibé la perfeito. Hatudu hamutuk ho dialogu no vizita regular.",
-      controls: [
-        { icon: <Smartphone className="h-5 w-5" />, text: "Iha dispositivu: filtru konténudu, limitu aplikasaun/tempu, compra." },
-        { icon: <KeyRound className="h-5 w-5" />, text: "Iha app store: presiza aprovasaun ba instala no compra sira." },
-        { icon: <Router className="h-5 w-5" />, text: "Iha Wi-Fi/roteador: filtrajen família no oráriu uza se disponivel." },
+        "Kontrolu sira hamenus risku maibé la perfeitu. Kombina sira ho konversa sira no check-in regulár sira.",
+      controls:[
+        {
+          icon:<Smartphone className="h-5 w-5" />,
+          text:"Konfigurasaun dispozitivu nian: filtru konteúdu sira, limite sira aplikasaun nian, tempu ekran nian, kompras sira.",
+        },
+        {
+          icon:<KeyRound className="h-5 w-5" />,
+          text:"Loja aplikasaun: presiza aprovasaun ba instalasaun no kompras iha aplikasaun.",
+        },
+        {
+          icon:<Router className="h-5 w-5" />,
+          text:"Wi-Fi/router uma nian: filtrajen família nian no oráriu sira bainhira disponivel.",
+        },
       ],
 
-      scamsTitle: "Scam, Grooming & ‘Di’ak Liu Tebes’",
-      scamsPoints: [
-        "Atensaun ba pedidu osan, kódigu, prémio ka oferta servisu. Konfirma liu husi kanal seluk.",
-        "Hanorin labarik labele partilha imajen privadu. Se iha presáun (sextortion), labele responde no hatete lalais.",
-        "Rai evidénsia (screenshot/URL). Reporta iha plataforma no blokea konta.",
+      scamsTitle:"Scams, Grooming & 'Di'ak liu atu sai loos'",
+      scamsPoints:[
+        "Kuidadu ho pedidu osan, kódigu, prémiu ka oferta serbisu ne'ebé derepente. Verifika liuhosi kanál seluk.",
+        "Hanorin labarik sira atu labele fahe imajen privadu sira. Se hetan presaun (sekstorsaun), para atu hatán no hatete kedas ba ema adultu ida.",
+        "Rai evidénsia (screenshot/URL sira). Relata iha aplikasaun no blokeia konta.",
       ],
 
-      wifiTitle: "Wi-Fi Públiku — Keta Atensaun",
-      wifiList: [
-        { icon: <WifiOff className="h-5 w-5" />, text: "Di’ak liu uza hotspot ba login. Labele halo banku iha Wi-Fi café." },
-        { icon: <ShieldCheck className="h-5 w-5" />, text: "Sai login depois no taka auto-connect iha dispozitivu labarik." },
+      wifiTitle:"Wi-Fi Públiku — Kuidadu",
+      wifiList:[
+        {
+          icon:<WifiOff className="h-5 w-5" />,
+          text:"Prefere hotspot dadus móvel nian ba login sira. Evita banku iha Wi-Fi kafé nian.",
+        },
+        {
+          icon:<ShieldCheck className="h-5 w-5" />,
+          text:"Sai hafoin uza no hamate auto-ligasaun iha dispozitivu labarik sira nian.",
+        },
       ],
 
-      reportTitle: "Se Sai Problema",
-      reportSteps: [
-        "Apoiu primeiro. Hamriik ho di’ak, obrigadu tanba hatete.",
-        "Kole evidénsia ho seguru (screenshot, URL, naran uza).",
-        "Troka password; ativa MFA; sai husi sesaun sira seluk.",
-        "Blokea/report iha plataforma. Kontaktu telkom ka banku se partilha dadus/osan.",
-        "Buka ajuda lokál hosi escola ka autoridade se iha ameasa ka kontinua danos.",
+      reportTitle:"Se buat ruma la'o sala",
+      reportSteps:[
+        "Suporta uluk. Hakmatek, agradese ba ita-boot nia oan tanba nia hatete ba ita-boot.",
+        "Halibur evidénsia ho seguru (screenshot, URL, naran utilizadór).",
+        "Troka senha sira; ativa MFA; sai hosi sesaun sira seluk.",
+        "Blokeia/relata iha aplikasaun/plataforma. Konsidera kontaktu ita-boot nia telekomunikasaun ka banku se osan/detallu sira fahe ona.",
+        "Buka tulun lokál hosi eskola ka autoridade sira karik iha ameasa ka prejuízu ne'ebé la'o hela.",
       ],
 
-      resourcesTitle: "Rekursu & Orientasaun Gratis",
+      resourcesTitle:"Rekursu sira & Orientasaun Gratuita",
       resourcesIntro:
-        "Guia ofisiál sira hatudu passu-ba-passu no tópiku atu diskute ho familia.",
-      resources: [
+        "Matadalan ofisiál sira-ne'e hatudu konfigurasaun etapa-ba-etapa no pontu sira ko'alia nian ba família sira.",
+      resources:[
         {
-          text: "Protect your children online — Australian Cyber Security Centre (ACSC)",
-          href: "https://www.cyber.gov.au/protect-yourself/staying-secure-online/protecting-your-family/protect-your-children-online",
+          text:"Protect your children online — Sentru Seguransa Sibernétiku Austrália nian (ACSC)",
+          href:"https://www.cyber.gov.au/protect-yourself/staying-secure-online/protecting-your-family/protect-your-children-online",
         },
         {
-          text: "Secure your user account (inklui parental controls) — ACSC",
-          href: "https://www.cyber.gov.au/protect-yourself/securing-your-devices/how-secure-your-device/secure-your-user-account",
+          text:"Asegura ita-boot nia konta utilizadór (inklui kontrolu inan-aman nian) — ACSC",
+          href:"https://www.cyber.gov.au/protect-yourself/securing-your-devices/how-secure-your-device/secure-your-user-account",
         },
         {
-          text: "eSafety Guide — hadia seguransa iha aplikasaun, jogu no website komun",
-          href: "https://www.esafety.gov.au/key-topics/esafety-guide",
+          text:"Matadalan eSafety — oinsá atu asegura aplikasaun, jogu no sítiu komún sira",
+          href:"https://www.esafety.gov.au/key-topics/esafety-guide",
         },
       ],
-      posterCta: "Download póster/checklist ba uma (tuir mai)",
-      note: "Pájina ida ne’e konténudu orijinal Lafaek, ho link ba ACSC/eSafety ba passu detalhadu.",
+      posterCta:"Download poster/lista verifikasaun uma nian (sei mai iha tempu badak)",
+      note:
+        "Rekursu sira ne'e fornese orientasaun orijinál Lafaek nian no ligasaun sira ba ACSC/eSafety ba etapa opsionál sira ne'ebé kle'an liu.",
     },
   }[language];
 
-  return (
+  return(
     <main className="min-h-screen bg-white">
       {/* Header / Hero */}
       <section className="bg-[#219653] text-white">
         <div className="max-w-6xl mx-auto px-4 py-6">
-
           <div className="flex items-start justify-between gap-4">
             <div>
               <h1 className="text-3xl md:text-4xl font-extrabold">{t.title}</h1>
@@ -253,7 +266,7 @@ export default function CyberAdultsPage() {
           <p className="mt-3 text-[#4F4F4F]">{t.introLead}</p>
 
           <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-            {t.learnItems.map((item, idx) => (
+            {t.learnItems.map((item,idx)=>(
               <div
                 key={idx}
                 className="rounded-xl border border-[#E5E7EB] bg-white p-4 shadow-sm hover:shadow transition"
@@ -275,7 +288,7 @@ export default function CyberAdultsPage() {
       <section className="max-w-6xl mx-auto px-4 py-4">
         <h3 className="text-2xl font-bold text-[#4F4F4F]">{t.checklistTitle}</h3>
         <ul className="mt-4 grid gap-3">
-          {t.checklist.map((m, i) => (
+          {t.checklist.map((m,i)=>(
             <li key={i} className="bg-white border border-[#E5E7EB] rounded-xl p-3">
               <span className="text-[#4F4F4F]">{m}</span>
             </li>
@@ -288,11 +301,11 @@ export default function CyberAdultsPage() {
         <div className="rounded-2xl border-2 border-[#F2C94C] p-5">
           <h3 className="text-2xl font-bold text-[#4F4F4F]">{t.familyRulesTitle}</h3>
           <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-            {t.familyRules.map((s, idx) => (
+            {t.familyRules.map((s,idx)=>(
               <div key={idx} className="rounded-xl bg-[#FFF9E6] border border-[#F2C94C] p-4">
                 <div className="flex items-center gap-2">
                   <span className="inline-block bg-[#F2C94C] text-[#333] text-xs font-bold px-2 py-0.5 rounded">
-                    {idx + 1}
+                    {idx+1}
                   </span>
                   <CheckCircle2 className="h-5 w-5 text-[#219653]" />
                 </div>
@@ -308,8 +321,11 @@ export default function CyberAdultsPage() {
       <section className="max-w-6xl mx-auto px-4 py-4">
         <h3 className="text-2xl font-bold text-[#4F4F4F]">{t.controlsTitle}</h3>
         <ul className="mt-3 grid gap-2 md:grid-cols-2">
-          {t.controls.map((row, i) => (
-            <li key={i} className="flex items-start gap-2 bg-white border border-[#E5E7EB] rounded-xl p-3">
+          {t.controls.map((row,i)=>(
+            <li
+              key={i}
+              className="flex items-start gap-2 bg-white border border-[#E5E7EB] rounded-xl p-3"
+            >
               <span className="mt-0.5 text-[#219653]">{row.icon}</span>
               <span className="text-[#4F4F4F]">{row.text}</span>
             </li>
@@ -321,7 +337,7 @@ export default function CyberAdultsPage() {
       <section className="max-w-6xl mx-auto px-4 py-4">
         <h3 className="text-2xl font-bold text-[#4F4F4F]">{t.scamsTitle}</h3>
         <ul className="mt-3 grid gap-2">
-          {t.scamsPoints.map((p, i) => (
+          {t.scamsPoints.map((p,i)=>(
             <li key={i} className="bg-white border border-[#E5E7EB] rounded-xl p-3 text-[#4F4F4F]">
               {p}
             </li>
@@ -333,8 +349,11 @@ export default function CyberAdultsPage() {
       <section className="max-w-6xl mx-auto px-4 py-4">
         <h3 className="text-2xl font-bold text-[#4F4F4F]">{t.wifiTitle}</h3>
         <ul className="mt-3 grid gap-2 md:grid-cols-2">
-          {t.wifiList.map((row, i) => (
-            <li key={i} className="flex items-start gap-2 bg-white border border-[#E5E7EB] rounded-xl p-3">
+          {t.wifiList.map((row,i)=>(
+            <li
+              key={i}
+              className="flex items-start gap-2 bg-white border border-[#E5E7EB] rounded-xl p-3"
+            >
               <span className="mt-0.5 text-[#219653]">{row.icon}</span>
               <span className="text-[#4F4F4F]">{row.text}</span>
             </li>
@@ -347,7 +366,7 @@ export default function CyberAdultsPage() {
         <div className="rounded-2xl border border-[#E5E7EB] p-5 bg-white">
           <h3 className="text-xl font-bold text-[#4F4F4F]">{t.reportTitle}</h3>
           <ol className="mt-2 list-decimal pl-5 space-y-1">
-            {t.reportSteps.map((s, i) => (
+            {t.reportSteps.map((s,i)=>(
               <li key={i} className="text-[#4F4F4F]">
                 {s}
               </li>
@@ -362,7 +381,7 @@ export default function CyberAdultsPage() {
           <h3 className="text-xl font-bold text-[#4F4F4F]">{t.resourcesTitle}</h3>
           <p className="mt-2 text-[#4F4F4F]">{t.resourcesIntro}</p>
           <ul className="mt-3 space-y-2">
-            {t.resources.map((r, i) => (
+            {t.resources.map((r,i)=>(
               <li key={i}>
                 <a
                   href={r.href}
@@ -383,9 +402,7 @@ export default function CyberAdultsPage() {
       {/* Poster CTA */}
       <section className="max-w-6xl mx-auto px-4 pb-8">
         <div className="rounded-2xl border-2 border-dashed border-[#BDBDBD] p-6 text-center bg-[#F5F5F5]">
-          <p className="font-semibold text-[#4F4F4F]">{
-            language === "en" ? "Download a home poster/checklist (coming soon)" : "Download póster/checklist ba uma (tuir mai)"
-          }</p>
+          <p className="font-semibold text-[#4F4F4F]">{t.posterCta}</p>
         </div>
       </section>
     </main>

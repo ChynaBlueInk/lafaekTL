@@ -98,6 +98,174 @@ const seriesLabel=(s:Series)=>
     ? {en:"Lafaek Komunidade",tet:"Lafaek Komunidade"}
     : {en:"Lafaek Kiik",tet:"Lafaek Kiik"};
 
+// New: detailed explanations for each magazine series (EN + Tetun)
+const seriesInfo:Record<
+  Series,
+  {
+    en:{title:string;body:string};
+    tet:{title:string;body:string};
+  }
+>={
+  LK:{
+    en:{
+      title:"Lafaek Kiik",
+      body:
+        "Lafaek Kiik\n\n" +
+        "Audience: Preschool to Year 2 (ages roughly 4–8)\n" +
+        "Languages: Tetun (simple, early literacy level)\n\n" +
+        "Purpose\n" +
+        "To help young learners build foundational reading, counting, thinking, and social skills using fun, culturally relevant stories and activities.\n\n" +
+        "What It Covers\n" +
+        "• Short, easy-to-read stories featuring familiar Timorese settings\n" +
+        "• Basic literacy and numeracy activities\n" +
+        "• Colouring-in pages and matching games\n" +
+        "• Early science and discovery (seasons, animals, nature)\n" +
+        "• Social–emotional learning (friendship, sharing, kindness)\n" +
+        "• Hygiene and health basics (handwashing, safety, brushing teeth)\n\n" +
+        "Tone\n" +
+        "Friendly, playful, visual, highly illustrated. Designed to help students gain confidence in reading and school routines.",
+    },
+    tet:{
+      title:"Lafaek Kiik",
+      body:
+        "Lafaek Kiik\n\n" +
+        "Audiénsia: Pré-eskolár to'o Tinan 2 (idade maizumenus 4-8)\n" +
+        "Lian sira: Tetun (simple, nível alfabetizasaun inisiál)\n\n" +
+        "Objetivu\n" +
+        "Atu ajuda kanorin foin-sa'e sira harii abilidade fundamentál sira kona-ba lee, sura, hanoin, no sosiál sira uza istória no atividade sira ne'ebé divertidu no relevante ba kultura.\n\n" +
+        "Saida mak ida-ne'e kobre\n" +
+        "• Istória badak sira ho ambiente Timor-oan ne'ebé familia\n" +
+        "• Atividade alfabetizasaun no numerasia báziku\n" +
+        "• Páijina koloridu no joga kombinasaun sira\n" +
+        "• Siénsia no deskobre inisiál (epoka tempu, animál, natureza)\n" +
+        "• Aprende sosial–emozionál (amizade, partilha, bondade)\n" +
+        "• Báziku higiene no saúde (hamoos liman, seguransa, fa'an nehan)\n\n" +
+        "Ton\n" +
+        "Amigavel, halimar, vizuál, ilustradu tebes. Dezeña atu ajuda estudante sira hetan konfiansa iha leitura no rutina eskola nian.",
+    },
+  },
+  LP:{
+    en:{
+      title:"Lafaek Prima",
+      body:
+        "Lafaek Prima\n\n" +
+        "Audience: Year 3 to Year 6 (ages roughly 8–12)\n" +
+        "Languages: Tetun + Portuguese, with small introductions to English and Korean\n\n" +
+        "Purpose\n" +
+        "To support core learning for upper primary students by combining educational articles, problem-solving tasks, and interactive activities.\n\n" +
+        "What It Covers\n" +
+        "• Reading comprehension texts\n" +
+        "• Mathematics puzzles, logic problems, and practice questions\n" +
+        "• Environmental themes (forests, oceans, recycling, climate action)\n" +
+        "• Science and technology (experiments, health topics, basic physics)\n" +
+        "• Timor-Leste history, culture, and geography\n" +
+        "• Articles promoting curiosity and critical thinking\n" +
+        "• Stories aimed at pre-teens learning independence and responsibility\n\n" +
+        "Tone\n" +
+        "Educational but engaging, with a mix of short articles, illustrations, and exercises. Strong link to the school curriculum.",
+    },
+    tet:{
+      title:"Lafaek Prima",
+      body:
+        "Lafaek Prima\n\n" +
+        "Audiénsia: Tinan 3 to'o Tinan 6 (idade maizumenus 8-12)\n" +
+        "Lian sira: Tetun + Portugés, ho introdusaun ki'ik sira ba Inglés no Koreanu\n\n" +
+        "Objetivu\n" +
+        "Atu suporta aprendizajen sentrál ba estudante sira ensinu primáriu superiór nian liuhosi kombina artigu edukasionál sira, tarefa sira rezolusaun problema nian, no atividade interativu sira.\n\n" +
+        "Saida mak ida-ne'e kobre\n" +
+        "• Testu sira komprensaun lee nian\n" +
+        "• Enigma matemátika, problema lójika, no pergunta prátika sira\n" +
+        "• Tema ambientál sira (ai-laran, tasi, resiklajen, asaun klimátika)\n" +
+        "• Siénsia no teknolojia (esperimentu sira, tópiku saúde nian, fízika báziku)\n" +
+        "• Timor-Leste nia istória, kultura, no jeografia\n" +
+        "• Artigu sira ne'ebé promove kuriozidade no hanoin krítiku\n" +
+        "• Istória sira ne'ebé diriji ba adolexente sira ne'ebé aprende independénsia no responsabilidade\n\n" +
+        "Ton\n" +
+        "Edukasaun maibé envolve, ho mistura artigu badak sira, ilustrasaun sira, no ezersísiu sira. Iha ligasaun forte ba kurríkulu eskolár.",
+    },
+  },
+  LM:{
+    en:{
+      title:"Lafaek Manorin",
+      body:
+        "Lafaek Manorin\n\n" +
+        "Audience: Teachers\n" +
+        "Languages: Tetun + Portuguese, with some English/Korean explanation where relevant\n\n" +
+        "Purpose\n" +
+        "To help teachers strengthen classroom practice, access ready-to-use activities, and introduce new teaching approaches, especially in low-resource contexts.\n\n" +
+        "What It Covers\n" +
+        "• Classroom management ideas\n" +
+        "• Lesson plans and activity sheets\n" +
+        "• Teaching strategies for literacy, numeracy, and science\n" +
+        "• Behaviour support and inclusive education guidance\n" +
+        "• Assessment tips and practical examples\n" +
+        "• Articles on pedagogy, learner wellbeing, and reflective practice\n" +
+        "• Case studies from real Timor-Leste school communities\n\n" +
+        "Tone\n" +
+        "Professional but practical. Focused on simple, low-cost methods teachers can use immediately.",
+    },
+    tet:{
+      title:"Lafaek Manorin",
+      body:
+        "Lafaek Manorin\n\n" +
+        "Audiénsia: Profesór sira\n" +
+        "Lian sira: Tetun + Portugés, ho esplikasaun Inglés/Koreia balun bainhira relevante\n\n" +
+        "Objetivu\n" +
+        "Atu ajuda profesór sira hametin prátika iha klase laran, asesu ba atividade sira ne'ebé prontu atu uza, no introdús aprosimasaun hanorin foun, liuliu iha kontestu sira ho rekursu ki'ik.\n\n" +
+        "Saida mak ida-ne'e kobre\n" +
+        "• Ideia sira kona-ba jestaun klase nian\n" +
+        "• Planu lisaun no folha atividade sira\n" +
+        "• Estratéjia sira hanorin nian ba alfabetizasaun, numerasia, no siénsia\n" +
+        "• Apoiu ba hahalok no orientasaun edukasaun inkluzivu\n" +
+        "• Dika sira avaliasaun nian no ezemplu prátiku sira\n" +
+        "• Artigu sira kona-ba pedagojia, moris-di'ak kanorin nian, no prátika refletivu\n" +
+        "• Estudu kazu husi komunidade eskolár Timor-Leste reál sira\n\n" +
+        "Ton\n" +
+        "Profisionál maibé prátiku. Foka ba métodu simples, ho kustu ki'ik ne'ebé profesór sira bele uza kedas.",
+    },
+  },
+  LBK:{
+    en:{
+      title:"Lafaek Komunidade",
+      body:
+        "Lafaek Komunidade\n\n" +
+        "Audience: Parents, caregivers, and community members (low–high literacy levels)\n" +
+        "Languages: Tetun + Portuguese\n\n" +
+        "Purpose\n" +
+        "To support families in helping their children learn, stay healthy, and stay connected to school. It bridges home and school life.\n\n" +
+        "What It Covers\n" +
+        "• Parenting tips (positive discipline, routines, child development)\n" +
+        "• Health and wellbeing (nutrition, safety, hygiene, early childhood care)\n" +
+        "• Community stories that highlight local role models\n" +
+        "• School engagement messages (importance of attendance, reading at home)\n" +
+        "• Financial literacy basics (saving, small business ideas)\n" +
+        "• Disability inclusion and support\n" +
+        "• Articles written simply for all literacy levels\n\n" +
+        "Tone\n" +
+        "Supportive, encouraging, practical. Aims to empower families to take an active role in their children’s learning.",
+    },
+    tet:{
+      title:"Lafaek Komunidade",
+      body:
+        "Lafaek Komunidade\n\n" +
+        "Audiénsia: Inan-aman, kuidadu-na'in sira, no membru komunidade sira (nivel alfabetizasaun ki'ik-aas)\n" +
+        "Lian sira: Tetun + Portugés\n\n" +
+        "Objetivu\n" +
+        "Atu suporta família sira hodi ajuda sira nia oan sira aprende, saudavel nafatin, no ligadu nafatin ba eskola. Ida-ne'e liga uma no moris eskola nian.\n\n" +
+        "Saida mak ida-ne'e kobre\n" +
+        "• Dika sira kona-ba inan-aman (dixiplina pozitivu, rutina sira, dezenvolvimentu labarik nian)\n" +
+        "• Saúde no moris-di'ak (nutrisaun, seguransa, ijiene, kuidadu infánsia)\n" +
+        "• Istória komunidade nian ne'ebé destaka modelu lokál sira\n" +
+        "• Mensajen sira kona-ba envolvimentu eskolár (importánsia hosi prezensa, lee iha uma)\n" +
+        "• Báziku sira literasia finanseira nian (poupa, ideia sira negósiu ki'ik nian)\n" +
+        "• Inkluzaun no apoiu ba defisiénsia\n" +
+        "• Artigu sira ne'ebé hakerek simplemente ba nivel alfabetizasaun hotu-hotu\n\n" +
+        "Ton\n" +
+        "Apoiu, enkorajamentu, prátiku. Ho objetivu atu kapasita família sira atu hola papél ativu iha sira nia oan sira nia aprendizajen.",
+    },
+  },
+};
+
 const ui={
   en:{
     title:"Lafaek Magazines",
@@ -114,6 +282,7 @@ const ui={
     samplesError:"Could not load sample pages. You can still apply for access.",
     noSamples:"Sample pages coming soon.",
     noMagazines:"No magazines are available yet. Please check back soon or contact our team.",
+    seriesInfoButton:"About this magazine series",
   },
   tet:{
     title:"Revista Lafaek",
@@ -130,6 +299,7 @@ const ui={
     samplesError:"La bele karga pájina amostra. Ita bele kontinua aplica ba asesu.",
     noSamples:"Pájina amostra sei mai fali.",
     noMagazines:"Seidauk iha revista atu hatudu. Favór ida koko fali bainhira mai, ka kontaktu ami nia equipa.",
+    seriesInfoButton:"Kona-ba série revista ida-ne'e",
   },
 } as const;
 
@@ -138,6 +308,7 @@ export default function MagazinesLandingPage(){
   const t=ui[language];
 
   const[activeCode,setActiveCode]=useState<string|null>(null);
+  const[infoSeries,setInfoSeries]=useState<Series|null>(null); // NEW: which series info modal is open
 
   // Base magazine list – now starts EMPTY, only filled from /api/admin/magazines
   const[baseMagazines,setBaseMagazines]=useState<MagazineBase[]>([]);
@@ -290,6 +461,8 @@ export default function MagazinesLandingPage(){
     [magazines,activeCode]
   );
 
+  const currentSeriesInfo=infoSeries?seriesInfo[infoSeries][language]:null;
+
   return(
     <div className="flex flex-col min-h-screen bg-white">
       {/* Hero / banner */}
@@ -351,7 +524,6 @@ export default function MagazinesLandingPage(){
                   );
                 })
               ):(
-                // nice neutral placeholders when no magazines yet
                 <>
                   <div className="w-20 h-28 rounded-lg border border-white/30 bg-white/10" />
                   <div className="w-20 h-28 rounded-lg border border-white/30 bg-white/10" />
@@ -430,6 +602,15 @@ export default function MagazinesLandingPage(){
                       >
                         {t.applyButton}
                       </Link>
+                      {/* NEW: series explanation button */}
+                      <button
+                        type="button"
+                        onClick={()=>setInfoSeries(m.series)}
+                        className="w-full text-center font-semibold py-2 rounded-xl text-xs md:text-sm border border-dashed"
+                        style={{borderColor:LAFAEK.grayMid,color:LAFAEK.textDark}}
+                      >
+                        {t.seriesInfoButton}
+                      </button>
                     </div>
                   </div>
                 </article>
@@ -439,7 +620,7 @@ export default function MagazinesLandingPage(){
         )}
       </main>
 
-      {/* Sample preview modal */}
+      {/* Sample preview modal (unchanged) */}
       {activeMagazine&&(
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
           <div className="bg-white max-w-3xl w-full mx-4 rounded-2xl shadow-xl overflow-hidden">
@@ -527,6 +708,34 @@ export default function MagazinesLandingPage(){
               >
                 {t.close}
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* NEW: Series info modal */}
+      {currentSeriesInfo&&(
+        <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+          <div className="bg-white max-w-xl w-full mx-4 rounded-2xl shadow-xl overflow-hidden">
+            <div
+              className="flex items-center justify-between px-4 py-3 border-b"
+              style={{borderColor:LAFAEK.grayMid}}
+            >
+              <h2 className="text-lg font-semibold" style={{color:LAFAEK.green}}>
+                {currentSeriesInfo.title}
+              </h2>
+              <button
+                type="button"
+                onClick={()=>setInfoSeries(null)}
+                className="px-3 py-1.5 rounded-lg text-sm font-semibold hover:bg-gray-100"
+              >
+                {t.close}
+              </button>
+            </div>
+            <div className="max-h-[70vh] overflow-y-auto px-4 py-4 bg-[#F5F5F5]">
+              <pre className="whitespace-pre-wrap text-sm text-gray-800">
+                {currentSeriesInfo.body}
+              </pre>
             </div>
           </div>
         </div>

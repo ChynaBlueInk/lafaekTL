@@ -96,20 +96,20 @@ export default function HomePage(){
     },
     tet:{
       hero:{
-        title:"Bemvindu ba Lafaek Learning Media",
-        subtitle:"Empodera Timor-Leste liuhosi edukasaun no istória sira",
+        title:"Benvindu mai iha Media Lafaek Aprendizazen",
+        subtitle:"Empodera Timor-Leste liuhusi Edukasaun & Istoria sira",
         supportText:
-          "Ita bele suporta Lafaek hodi sosa revista no produtu sira, patrosina kontentu edukativu, halo anunsiu ho ami, ka kontrata ekipa ami ne’ebé iha talentu iha área hakerek, ilustrasaun no videografia."
+          "Itaboot bele suporta Lafaek lihusi sosa ami nia Revista no produtu sira, sponsor konteudu edukasaun, halo publisidade iha ami nia Revista, ou bele aluga/selu ami nia ekipa hakerek nain, Ilustrador no videografer."
       },
       news:{title:"Notísia Foun",subtitle:"Saida mak akontese iha Lafaek?",viewAll:"Haree hotu notísia"},
       socialEnterprise:{
-        title:"Empreza Sosial Lafaek",
-        subtitle:"Husi inisiativa komunidade ba organizasaun Timor-oan",
+        title:"Lafaek Enmpreza Social",
+        subtitle:"Husi Inisiativa Komunidade to'o Impaktu Organizasaun Timor-Oan.",
         stats:[
-          {number:"25+",label:"Tinan impaktu"},
-          {number:"1M+",label:"Revista distribui / tinan"},
-          {number:"1,500+",label:"Eskola apoiadu"},
-          {number:"100%",label:"Nudar nia Timor-oan"}
+          {number:"25+",label:"Ninia impaktu liu tinan 25"},
+          {number:"1M+",label:"Kada tinan ami distriubui Revista liu Miliaun 1"},
+          {number:"1,500+",label:"Suporta Eskola liu 1500 iha Timor-Leste laran tomak."},
+          {number:"100%",label:"100% Timor Oan mak na'in"}
         ]
       },
       products:{
@@ -283,7 +283,7 @@ export default function HomePage(){
                 </h3>
                 <p className="text-gray-600 mb-4">
                   {language==="tet"
-                    ?"Haree konténu behind-the-scenes, istória, no vídeu sira husi terenu."
+                    ?"Deskobre ami-nia konteúdu, istória no vídeo sira husi kampu."
                     :"Discover our behind-the-scenes content, stories, and videos from the field."}
                 </p>
                 <a
@@ -444,40 +444,43 @@ export default function HomePage(){
           </div>
         </section>
 
-        {/* Donors & Sponsors */}
-        <section className="bg-gray-50 border-t border-gray-200 py-12" aria-labelledby="sponsors">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 id="sponsors" className="text-4xl font-bold text-[#219653] mb-8">
-              Our Donors & Sponsors
-            </h2>
-            <div className="flex flex-wrap justify-center items-center gap-10">
-              <div className="relative h-16 w-40">
-                <Image
-                  src="/sponsors/care.png"
-                  alt="Care International"
-                  fill
-                  className="object-contain"
-                />
-              </div>
-              <div className="relative h-16 w-40">
-                <Image
-                  src="/sponsors/nz-mfat.png"
-                  alt="New Zealand Ministry of Foreign Affairs & Trade"
-                  fill
-                  className="object-contain"
-                />
-              </div>
-              <div className="relative h-16 w-40">
-                <Image
-                  src="/sponsors/timor-education.png"
-                  alt="Timor-Leste Ministry of Education"
-                  fill
-                  className="object-contain"
-                />
-              </div>
-            </div>
-          </div>
-        </section>
+      {/* Donors & Sponsors */}
+<section className="bg-gray-50 border-t border-gray-200 py-12" aria-labelledby="sponsors">
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+    <h2 id="sponsors" className="text-4xl font-bold text-[#219653] mb-8">
+      {language==="tet" ? "Ami nia Doador/Sponsor" : "Our Donors & Sponsors"}
+    </h2>
+
+    <div className="flex flex-wrap justify-center items-center gap-10">
+      <div className="relative h-16 w-40">
+        <Image
+          src="/sponsors/care.png"
+          alt="Care International"
+          fill
+          className="object-contain"
+        />
+      </div>
+
+      <div className="relative h-16 w-40">
+        <Image
+          src="/sponsors/nz-mfat.png"
+          alt="New Zealand Ministry of Foreign Affairs & Trade"
+          fill
+          className="object-contain"
+        />
+      </div>
+
+      <div className="relative h-16 w-40">
+        <Image
+          src="/sponsors/timor-education.png"
+          alt="Timor-Leste Ministry of Education"
+          fill
+          className="object-contain"
+        />
+      </div>
+    </div>
+  </div>
+</section>
       </main>
     </div>
   );

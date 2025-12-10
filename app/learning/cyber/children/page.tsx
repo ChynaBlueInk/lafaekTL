@@ -97,95 +97,108 @@ export default function CyberChildrenPage() {
       moduleHref: "https://cyber.org/learning-modules/module-2/#/",
       note: "We provide original guidance here and link to CYBER.ORG for deeper lesson planning.",
     },
-    tet: {
-      breadcrumbHome: "Uma",
-      breadcrumbCyber: "Seguransa Sibernétika",
-      breadcrumbChildren: "Labarik",
-      title: "Seguransa Online ba Labarik",
-      subtitle:
-        "Hanorin simple no amigável atu ajuda labarik tinan ~7–10 uza internet ho seguru iha eskola, uma no telemóvel.",
-      heroBadge: "Idade ~7–10",
-      introLead:
-        "Internet di’ak tebes — joga, haree vídeo no aprende! Maibé tenke uza ho seguru. Regrasis ne’e ajuda ita para, hanoin, no husu ajuda ba adultu.",
-      learnTitle: "Sá mak Ita Aprende",
-      learnItems: [
-        {
-          icon: <AlertTriangle className="h-6 w-6" />,
-          title: "Haree perigo online",
-          desc: "Hatene pop-up, prémio la loos, no ema estranu ne’ebé husu dadus privadu.",
-        },
-        {
-          icon: <LockKeyhole className="h-6 w-6" />,
-          title: "Proteje informasaun privadu",
-          desc: "Labele fahe naran kompletu, alamat, eskola, númeru telemóvel no password.",
-        },
-        {
-          icon: <ShieldCheck className="h-6 w-6" />,
-          title: "Uza habitus seguru",
-          desc: "Husu liu-husi, uza naran-funan/avatár, no visita de’it sira-ne’ebé adultu aprova.",
-        },
-      ],
-      ruleTitle: "10 Regra Simple Seguransa Online",
-      rules: [
-        "Labele fahe naran kompletu, alamat, eskola, telemóvel ka password online.",
-        "Husu adultu antes klik link sira, loke mensajen, ka download aplikasaun/ficheru.",
-        "Uza naran-funan ka avatár iha jogu — la’ós foto ne’ebé loos ita nia.",
-        "Se buat rasan estranhus, hakfodak ka di’ak liu tebes — para no hatete adultu.",
-        "Labele koalia privadu ho ema estranu ka hamutuk atu hasoru ema ne’ebé ita de’it konese online.",
-        "Uza de’it website, jogu no aplikasaun sira-ne’ebé adultu hatete apropriadus ba ita nia idade.",
-        "Preserva password sekreto. Husu adultu atu ajuda halo password forte.",
-        "Bein di’ak online. Se ema halo bulian, tama screenshot no hatete adultu.",
-        "Labele akredita buat hotu — imajen no vídeo bele edita ka buat hakerek de’it.",
-        "Se halo sala, labele subar. Hatete ba adultu konfiadu atu bele ajuda.",
-      ],
-      stopThinkAskTitle: "PARA — HANOÍN — HUSU",
-      stopThinkAsk: [
-        { step: "PARA", text: "Labele klik lalais. Sosa an dahuluk." },
-        {
-          step: "HANOÍN",
-          text: "Mensajen husu saida? Informasaun privadu ka lae? Husi ema konese ka lae?",
-        },
-        {
-          step: "HUSU",
-          text: "Konsulta ho adultu konfiadu (pais, kuidadór, mestra) antes kontinua.",
-        },
-      ],
-      activityTitle: "Atividade Badak",
-      activities: [
-        {
-          title: "Jogu Password",
-          desc: "Halo fraze sekreto hamutuk (hanesan: animál favoritu + númeru). Labele uza naran ka data moris.",
-        },
-        {
-          title: "Privadu ka Públiku?",
-          desc: "Dividi karta sira iha duas pilha: LOLOS atu fahe (kór favoritu) vs. PRIVADU (alamat).",
-        },
-        {
-          title: "Komentáriu Di’ak",
-          desc: "Prátika hakerek komentáriu di’ak. Hatudu saida atu halo se ema halo bulian.",
-        },
-      ],
-      trustedAdultsTitle: "Adultu Konfiadu",
-      trustedAdultsText:
-        "Adultu konfiadu mak ema ne’ebé rona no ajuda: pais, kuidadór, mestra sira, konseléru eskola, ka membru família ne’ebé ita konese loos.",
-      reportTitle: "Se Sai Problema",
-      reportSteps: [
-        "Para uza dispozitivu.",
-        "Tama screenshot se seguru no legal.",
-        "Hatete lalais ba adultu konfiadu.",
-        "Blokea, reporta, ka mute hamutuk ho adultu.",
-        "Haré fila fali konfigurasaun privasidade ho adultu.",
-      ],
-      posterCta: "Download póster imprimível (tuir mai)",
-      furtherLearningTitle: "Estudu tan (ba mestra & kuidadór)",
-      furtherLearningDesc:
-        "Ami inspira hosi CYBER.ORG “Online Safety – Keys to Cybersecurity” ba kláse 3–5. Iha ne’e dokumentu estrutura liasaun no atividade:",
-      furtherLearningLinkText: "Online Safety – Keys to Cybersecurity (CYBER.ORG)",
-      furtherLearningHref: "https://cyber.org/find-curricula/online-safety-keys-cybersecurity",
-      moduleLinkText: "Estrutura ezemplu: Learning Module 2",
-      moduleHref: "https://cyber.org/learning-modules/module-2/#/",
-      note: "Konténudu iha ne’e orijinal hosi Lafaek; ami fó link ba CYBER.ORG ba planu liasaun profundu liu.",
+tet: {
+  breadcrumbHome: "Uma",
+  breadcrumbCyber: "Seguransa Siber",
+  breadcrumbChildren: "Labarik",
+  title: "Seguransa Online ba Labarik",
+  subtitle:
+    "Sujestaun simples no amigavel atu ajuda labarik sira ho idade tinan 7–10 nafatin seguru online iha eskola, uma, no wainhira uza telemovel.",
+  heroBadge: "Idade ~7–10",
+
+  introLead:
+    "Internét ne'e di'ak tebes — jogu, vídeo, no aprende! Maibé tenke uza ho seguru. Regra sira-ne'e ajuda ita para, hanoin, no husu ajuda ba ema boot konfiadu.",
+
+  learnTitle: "Saida deit maka imi sei aprende",
+  learnItems: [
+    {
+      icon: <AlertTriangle className="h-6 w-6" />,
+      title: "Buat ne'ebe perigu iha online",
+      desc: "Rekoñese pop-up, prémiu falsu, no ema estranjeiru ne'ebé husu informasaun pesoál.",
     },
+    {
+      icon: <LockKeyhole className="h-6 w-6" />,
+      title: "Proteje informasaun privadu",
+      desc: "Asegura ita-nia naran, hela-fatin, eskola, numeru telefone no liafuan-xave.",
+    },
+    {
+      icon: <ShieldCheck className="h-6 w-6" />,
+      title: "Hábito seguru",
+      desc: "Husu uluk, uza naran-boot/avatár, no visita de'it fatin sira ne'ebé ema boot aprova.",
+    },
+  ],
+
+  ruleTitle: "10 Regra Simples ba Seguransa Online",
+  rules: [
+    "Keta fahe ita-nia naran, hela-fatin, eskola, numeru telefone, ka liafuan-xave online.",
+    "Husu ema-boot molok klik ligasaun, loke mensajen, ka download aplikasaun/ficheru.",
+    "Uza naran-boot ka avatar iha jogu — labele uza ita-nia foto loloos.",
+    "Se sente estranhu, ta'uk, ka di'ak liu tebes — para no fó-hatene ba ema-boot.",
+    "Keta ko'alia privadu ho ema estranjeiru ka konkorda atu hasoru ema ne'ebé ita hatene de'it online.",
+    "Uza de'it sítiu, jogu, no aplikasaun sira ne'ebé ema-boot hatete di'ak ba ita-nia idade.",
+    "Rai liafuan-xave sekreto. Husu ema-boot atu ajuda halo liafuan-xave ne'ebé forte.",
+    "Hatudu laran-di'ak iha online. Se ema halo bulian, foti screenshot no fó-hatene ba ema-boot.",
+    "Labele fiar buat hotu — foto no vídeo bele edita ka halo de'it atu hanorin.",
+    "Se halo sala, keta subar. Fó-hatene ba ema-boot konfiadu atu bele ajuda.",
+  ],
+
+  stopThinkAskTitle: "PARA — HANOÍN — HUSU",
+  stopThinkAsk: [
+    { step: "PARA", text: "Labele klik lai. Dada isu lai." },
+    {
+      step: "HANOÍN",
+      text: "Mensajen husu saida? Ne'e privadu ka lae? Husi ema ne'ebé ita hatene ka lae?",
+    },
+    {
+      step: "HUSU",
+      text: "Haree ho ema-boot konfiadu (inan-aman, kuidadór, mestra) molok imi kontinua.",
+    },
+  ],
+
+  activityTitle: "Atividade Badak",
+  activities: [
+    {
+      title: "Jogu Lia-fuan Xave",
+      desc: "Kria liafuan-xave segredu hamutuk (hanesan: animál favoritu + númeru). Keta uza ita-nia naran ka data moris.",
+    },
+    {
+      title: "Privadu ka Públiku?",
+      desc: "Fahe karta iha pilha rua: LOLOS atu fahe (kór favoritu) vs. PRIVADU (hela-fatin).",
+    },
+    {
+      title: "Komentáriu Di’ak",
+      desc: "Prátika hakerek komentáriu di'ak. Ko'alia kona ba saida atu halo se ema halo bulian.",
+    },
+  ],
+
+  trustedAdultsTitle: "Ema-boot Konfiadu",
+  trustedAdultsText:
+    "Ema-boot konfiadu mak ema ne'ebé rona no ajuda: ita-nia inan-aman, kuidadór, mestra sira, konseléru eskola, ka membru família ne'ebé ita hatene di'ak.",
+
+  reportTitle: "Se Sai Problema",
+  reportSteps: [
+    "Para uza dispozitivu.",
+    "Foti screenshot se seguru no legál atu halo.",
+    "Fó-hatene kedas ba ema-boot konfiadu.",
+    "Blokeia, reporta, ka mute hamutuk ho ema-boot.",
+    "Haree fila fali konfigurasaun privasidade hamutuk ho ema-boot.",
+  ],
+
+  posterCta: "Download póster imprimível (tuir mai)",
+
+  furtherLearningTitle: "Aprende liután (ba mestra no kuidador)",
+  furtherLearningDesc:
+    "Ami hetan inspirasaun husi CYBER.ORG nia “Online Safety – Keys to Cybersecurity” ba klase 3–5. Esplora estrutura lisaun no atividade:",
+  furtherLearningLinkText:
+    "Seguransa online – Xave importante ba Cybersecurity (CYBER.ORG)",
+  furtherLearningHref:
+    "https://cyber.org/find-curricula/online-safety-keys-cybersecurity",
+  moduleLinkText: "Ezemplu estrutura: Modulu Aprendizajen 2",
+  moduleHref: "https://cyber.org/learning-modules/module-2/#/",
+  note:
+    "Konteúdu iha ne’e mak orijinal hosi Lafaek; ami fó link ba CYBER.ORG atu ajuda ba planeamentu lisaun ne'ebé boot liután.",
+},
+
   }[language];
 
   return (

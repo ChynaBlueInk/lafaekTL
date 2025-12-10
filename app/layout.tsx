@@ -22,7 +22,7 @@ export default function RootLayout({children}:{children:React.ReactNode}){
             <Navigation />
 
             {/* Page content */}
-            <main className="pt-24 md:pt-28">
+            <main className="">
               {children}
             </main>
 
