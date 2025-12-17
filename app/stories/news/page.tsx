@@ -1,5 +1,4 @@
-//app/stories/news
-
+// app/stories/news/page.tsx
 "use client";
 
 import {useEffect,useState}from "react";
@@ -27,6 +26,7 @@ type NewsItem={
   date:string;
   image?:string;
   images?:string[];
+  document?:string; // ✅ NEW
   visible?:boolean;
   externalUrl?:string;
   order?:number;
@@ -39,6 +39,16 @@ const buildImageUrl=(src?:string)=>{
   }
   let clean=src.trim();
   if(clean.startsWith("http://")||clean.startsWith("https://")){
+    return clean;
+  }
+  clean=clean.replace(/^\/+/,"");
+  return`${S3_ORIGIN}/${clean}`;
+};
+
+const buildFileUrl=(src?:string)=>{
+  if(!src){return"";}
+  let clean=src.trim();
+  if(clean.startsWith("http://")||clean.startsWith("https://")||clean.startsWith(S3_ORIGIN)){
     return clean;
   }
   clean=clean.replace(/^\/+/,"");
@@ -61,6 +71,7 @@ export default function NewsPage(){
       heading:"News & Stories",
       intro:"Stay updated with the latest news and inspiring stories from our work across Timor-Leste.",
       readMore:"Read more",
+      viewPdf:"View PDF",
       searchPlaceholder:"Search news...",
       sortLabel:"Sort by",
       sortLatest:"Latest first",
@@ -71,6 +82,7 @@ export default function NewsPage(){
       heading:"Notísia & Istória",
       intro:"Hatudu informasaun foun no istória inspirativu hosi ami-nia servisu iha Timor-Leste.",
       readMore:"Lee liu tan",
+      viewPdf:"Haree PDF",
       searchPlaceholder:"Buka notísia...",
       sortLabel:"Ordena tuir",
       sortLatest:"Foun liu ba leten",
@@ -126,6 +138,10 @@ export default function NewsPage(){
               : undefined;
             const order=typeof raw.order==="number"?raw.order:index+1;
 
+            const document=typeof raw.document==="string"&&raw.document.trim()
+              ? raw.document.trim()
+              : undefined;
+
             return{
               ...raw,
               id,
@@ -139,6 +155,7 @@ export default function NewsPage(){
               date,
               image:primaryImage,
               images:rawImages,
+              document,
               slug,
               externalUrl,
               order
@@ -165,11 +182,9 @@ export default function NewsPage(){
     return String(base||"").toLowerCase();
   };
 
-  // ── derive filtered + sorted items for display ──
   const filteredAndSortedItems=(()=>{
     let list=[...items];
 
-    // text search across titles/excerpts/body EN + Tet
     const term=searchTerm.trim().toLowerCase();
     if(term){
       list=list.filter((item)=>{
@@ -188,7 +203,6 @@ export default function NewsPage(){
       });
     }
 
-    // sort
     list.sort((a,b)=>{
       const da=a.date?new Date(a.date).getTime():0;
       const db=b.date?new Date(b.date).getTime():0;
@@ -196,7 +210,6 @@ export default function NewsPage(){
       const ob=b.order??0;
 
       if(sortMode==="latest"){
-        // newest date first; fall back to order as tie-breaker
         if(da!==db){
           return db-da;
         }
@@ -211,14 +224,12 @@ export default function NewsPage(){
         const tb=getDisplayTitle(b);
         if(ta<tb){return-1;}
         if(ta>tb){return 1;}
-        // if titles are equal, fall back to newest date
         if(da!==db){
           return db-da;
         }
         return 0;
       }
 
-      // custom: admin order first, newest date as tie-breaker
       if(oa!==ob){
         return oa-ob;
       }
@@ -239,7 +250,6 @@ export default function NewsPage(){
           <p className="mt-2 text-gray-600">{labels.intro}</p>
         </header>
 
-        {/* Controls: search + sort */}
         <div className="mb-8 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div className="w-full md:max-w-sm">
             <input
@@ -300,6 +310,8 @@ export default function NewsPage(){
                 ? item.externalUrl
                 : `/stories/news/${internalIdOrSlug}`;
 
+              const pdfUrl=item.document?buildFileUrl(item.document):"";
+
               let dateLabel="";
               if(item.date){
                 const d=new Date(item.date);
@@ -336,14 +348,27 @@ export default function NewsPage(){
                     </p>
                   )}
 
-                  <Link
-                    href={href}
-                    className="inline-block font-semibold text-[#219653] hover:underline"
-                    target={item.externalUrl?"_blank":undefined}
-                    rel={item.externalUrl?"noopener noreferrer":undefined}
-                  >
-                    {labels.readMore}
-                  </Link>
+                  <div className="flex flex-wrap items-center gap-3">
+                    <Link
+                      href={href}
+                      className="inline-block font-semibold text-[#219653] hover:underline"
+                      target={item.externalUrl?"_blank":undefined}
+                      rel={item.externalUrl?"noopener noreferrer":undefined}
+                    >
+                      {labels.readMore}
+                    </Link>
+
+                    {pdfUrl&&(
+                      <a
+                        href={pdfUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-block font-semibold text-blue-700 hover:underline"
+                      >
+                        {labels.viewPdf}
+                      </a>
+                    )}
+                  </div>
                 </article>
               );
             })}

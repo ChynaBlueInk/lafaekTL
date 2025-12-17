@@ -27,6 +27,7 @@ type NewsItem={
   date:string;
   image?:string;
   images?:string[];
+  document?:string; // ✅ NEW
   visible?:boolean;
   externalUrl?:string;
   order?:number;
@@ -39,6 +40,16 @@ const buildImageUrl=(src?:string)=>{
   }
   let clean=src.trim();
   if(clean.startsWith("http://")||clean.startsWith("https://")){
+    return clean;
+  }
+  clean=clean.replace(/^\/+/,"");
+  return`${S3_ORIGIN}/${clean}`;
+};
+
+const buildFileUrl=(src?:string)=>{
+  if(!src){return"";}
+  let clean=src.trim();
+  if(clean.startsWith("http://")||clean.startsWith("https://")||clean.startsWith(S3_ORIGIN)){
     return clean;
   }
   clean=clean.replace(/^\/+/,"");
@@ -58,8 +69,14 @@ export default function NewsDetailPage(){
   const[error,setError]=useState<string|undefined>();
 
   const labels={
-    en:{back:"← Back to News & Stories"},
-    tet:{back:"← Fila fali ba Notísia & Istória"}
+    en:{
+      back:"← Back to News & Stories",
+      viewPdf:"View PDF"
+    },
+    tet:{
+      back:"← Fila fali ba Notísia & Istória",
+      viewPdf:"Haree PDF"
+    }
   }[L];
 
   useEffect(()=>{
@@ -108,6 +125,10 @@ export default function NewsDetailPage(){
             ? rawImages[0]
             : undefined;
 
+          const document=typeof raw.document==="string"&&raw.document.trim()
+            ? raw.document.trim()
+            : undefined;
+
           const visible=raw.visible!==false;
           const externalUrl=typeof raw.externalUrl==="string"&&raw.externalUrl.trim()
             ? raw.externalUrl.trim()
@@ -127,6 +148,7 @@ export default function NewsDetailPage(){
             date,
             image:primaryImage,
             images:rawImages,
+            document,
             visible,
             externalUrl,
             order
@@ -185,6 +207,8 @@ export default function NewsDetailPage(){
     const heroImage=item.image||(Array.isArray(item.images)&&item.images[0])||undefined;
     const imageSrc=buildImageUrl(heroImage);
 
+    const pdfUrl=item.document?buildFileUrl(item.document):"";
+
     let dateLabel="";
     if(item.date){
       const d=new Date(item.date);
@@ -208,6 +232,19 @@ export default function NewsDetailPage(){
             <p className="mt-3 text-gray-700">
               {excerpt}
             </p>
+          )}
+
+          {pdfUrl&&(
+            <div className="mt-4">
+              <a
+                href={pdfUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center rounded-md border border-blue-200 bg-blue-50 px-3 py-2 text-sm font-semibold text-blue-800 hover:bg-blue-100"
+              >
+                {labels.viewPdf}
+              </a>
+            </div>
           )}
         </header>
 
