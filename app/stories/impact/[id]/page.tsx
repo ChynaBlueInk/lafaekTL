@@ -30,7 +30,7 @@ type ImpactItem={
   visible?:boolean;
   externalUrl?:string;
   order?:number;
-  pdfKey?:string;
+  document?:string; // ✅ canonical PDF field
   [key:string]:any;
 };
 
@@ -46,7 +46,7 @@ const buildImageUrl=(src?:string)=>{
   return`${S3_ORIGIN}/${clean}`;
 };
 
-const buildS3Url=(keyOrUrl?:string)=>{
+const buildFileUrl=(keyOrUrl?:string)=>{
   if(!keyOrUrl){return"";}
   let clean=keyOrUrl.trim();
   if(clean.startsWith("http://")||clean.startsWith("https://")){
@@ -132,8 +132,9 @@ export default function ImpactDetailPage(){
             : undefined;
           const order=typeof raw.order==="number"?raw.order:index+1;
 
-          // Robust PDF detection
-          let pdfRaw=(raw.pdfKey
+          // ✅ Prefer the new field first, but support legacy fields too
+          let pdfRaw=(raw.document
+            ??raw.pdfKey
             ??raw.pdf
             ??raw.pdfUrl
             ??raw.pdfFile
@@ -147,7 +148,7 @@ export default function ImpactDetailPage(){
             pdfRaw=pdfFromAny;
           }
 
-          const pdfKey=typeof pdfRaw==="string"&&pdfRaw.trim()?pdfRaw.trim():undefined;
+          const document=typeof pdfRaw==="string"&&pdfRaw.trim()?pdfRaw.trim():undefined;
 
           const item:ImpactItem={
             ...raw,
@@ -165,7 +166,7 @@ export default function ImpactDetailPage(){
             visible,
             externalUrl,
             order,
-            pdfKey
+            document
           };
           return item;
         });
@@ -213,6 +214,7 @@ export default function ImpactDetailPage(){
     const title=L==="tet"
       ? item.titleTet||item.titleEn
       : item.titleEn;
+
     const excerpt=L==="tet"
       ? item.excerptTet||item.excerptEn
       : item.excerptEn;
@@ -233,7 +235,7 @@ export default function ImpactDetailPage(){
     }
 
     const hasAnyBody=Boolean(item.bodyEn)||Boolean(item.bodyTet);
-    const hasPdf=Boolean(item.pdfKey);
+    const hasPdf=Boolean(item.document);
 
     content=(
       <article className="mx-auto max-w-3xl">
@@ -267,10 +269,10 @@ export default function ImpactDetailPage(){
         {hasPdf&&(
           <div className="mt-6">
             <a
-              href={buildS3Url(item.pdfKey)}
+              href={buildFileUrl(item.document)}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white font-medium rounded hover:bg-emerald-700"
+              className="inline-flex items-center gap-2 rounded bg-emerald-600 px-4 py-2 font-medium text-white hover:bg-emerald-700"
             >
               📄 {labels.openPdf}
             </a>
@@ -278,7 +280,7 @@ export default function ImpactDetailPage(){
         )}
 
         {body&&(
-          <div className="prose max-w-none text-gray-800 prose-p:mb-3 prose-headings:mt-6 mt-8">
+          <div className="prose mt-8 max-w-none text-gray-800 prose-p:mb-3 prose-headings:mt-6">
             {body.split(/\n{2,}/).map((para,index)=>(
               <p key={index}>{para}</p>
             ))}
@@ -286,7 +288,7 @@ export default function ImpactDetailPage(){
         )}
 
         {!hasPdf&&!hasAnyBody&&(
-          <p className="text-gray-600 text-sm bg-gray-50 border border-gray-200 rounded p-4 mt-6">
+          <p className="mt-6 rounded border border-gray-200 bg-gray-50 p-4 text-sm text-gray-600">
             No detailed text has been added for this story yet.
           </p>
         )}

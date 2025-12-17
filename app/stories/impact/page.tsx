@@ -91,41 +91,62 @@ export default function ImpactStoriesPage(){
           throw new Error(data.error||"Unknown error from Impact API");
         }
 
-        const normalised:ImpactItem[]=(data.items||[]).map((raw:any,index:number)=>{
-          const id=typeof raw.id==="string"&&raw.id.trim()
-            ? raw.id.trim()
-            : `impact-${index}`;
-          const visible=raw.visible!==false;
-          const titleEn=String(raw.titleEn??"Untitled");
-          const titleTet=typeof raw.titleTet==="string"?raw.titleTet:undefined;
-          const excerptEn=String(raw.excerptEn??"");
-          const excerptTet=typeof raw.excerptTet==="string"?raw.excerptTet:undefined;
-          const bodyEn=typeof raw.bodyEn==="string"?raw.bodyEn:undefined;
-          const bodyTet=typeof raw.bodyTet==="string"?raw.bodyTet:undefined;
-          const date=String(raw.date??"");
-          const image=(raw.image as string)||(raw.imageUrl as string)||"";
-          const imageUrl=(raw.imageUrl as string)||"";
-          const document=typeof raw.document==="string"?raw.document:undefined;
-          const order=typeof raw.order==="number"?raw.order:index+1;
+        const normalised:ImpactItem[]=(data.items||[])
+          .map((raw:any,index:number)=>{
+            const id=typeof raw.id==="string"&&raw.id.trim()
+              ? raw.id.trim()
+              : `impact-${index}`;
 
-          return{
-            ...raw,
-            id,
-            visible,
-            titleEn,
-            titleTet,
-            excerptEn,
-            excerptTet,
-            bodyEn,
-            bodyTet,
-            date,
-            image,
-            imageUrl,
-            document,
-            order
-          } as ImpactItem;
-        })
-        .filter((item)=>item.visible!==false);
+            const visible=raw.visible!==false;
+            const titleEn=String(raw.titleEn??"Untitled");
+            const titleTet=typeof raw.titleTet==="string"?raw.titleTet:undefined;
+            const excerptEn=String(raw.excerptEn??"");
+            const excerptTet=typeof raw.excerptTet==="string"?raw.excerptTet:undefined;
+            const bodyEn=typeof raw.bodyEn==="string"?raw.bodyEn:undefined;
+            const bodyTet=typeof raw.bodyTet==="string"?raw.bodyTet:undefined;
+            const date=String(raw.date??"");
+
+            const image=(raw.image as string)||(raw.imageUrl as string)||"";
+            const imageUrl=(raw.imageUrl as string)||"";
+
+            // Robust PDF detection (new + legacy support)
+            let pdfRaw=(raw.document
+              ??raw.pdfKey
+              ??raw.pdf
+              ??raw.pdfUrl
+              ??raw.pdfFile
+              ??raw.pdfPath)as string|undefined;
+
+            if(!pdfRaw){
+              const pdfFromAny=Object.values(raw).find((value)=>{
+                return typeof value==="string"
+                  && value.trim().toLowerCase().endsWith(".pdf");
+              })as string|undefined;
+              pdfRaw=pdfFromAny;
+            }
+
+            const document=typeof pdfRaw==="string"&&pdfRaw.trim()?pdfRaw.trim():undefined;
+
+            const order=typeof raw.order==="number"?raw.order:index+1;
+
+            return{
+              ...raw,
+              id,
+              visible,
+              titleEn,
+              titleTet,
+              excerptEn,
+              excerptTet,
+              bodyEn,
+              bodyTet,
+              date,
+              image,
+              imageUrl,
+              document,
+              order
+            } as ImpactItem;
+          })
+          .filter((item)=>item.visible!==false);
 
         // newest first
         normalised.sort((a,b)=>{
@@ -179,6 +200,7 @@ export default function ImpactStoriesPage(){
               const title=L==="tet"
                 ? item.titleTet||item.titleEn
                 : item.titleEn;
+
               const excerpt=L==="tet"
                 ? item.excerptTet||item.excerptEn
                 : item.excerptEn;

@@ -33,6 +33,7 @@ type ImpactItemRecord={
   images?:string[];
   order?:number;
   visible?:boolean;
+  document?:string; // ✅ NEW
   externalUrl?:string;
   [key:string]:any;
 };
@@ -52,6 +53,13 @@ function normaliseImages(raw:any):{image?:string;images?:string[]}{
     image:primaryImage,
     images:rawImages&&rawImages.length>0?rawImages:undefined
   };
+}
+
+function normaliseDocument(raw:any):string|undefined{
+  const d=raw?.document;
+  if(typeof d!=="string"){return undefined;}
+  const clean=d.trim();
+  return clean?clean:undefined;
 }
 
 async function readImpactJsonFromS3():Promise<ImpactItemRecord[]>{
@@ -119,6 +127,7 @@ async function readImpactJsonFromS3():Promise<ImpactItemRecord[]>{
 
   const records:ImpactItemRecord[]=arr.map((raw:any,index:number)=>{
     const{image,images}=normaliseImages(raw);
+    const document=normaliseDocument(raw);
 
     const base:ImpactItemRecord={
       id:typeof raw.id==="string"&&raw.id.trim()?raw.id.trim():`impact-${index}`,
@@ -134,6 +143,7 @@ async function readImpactJsonFromS3():Promise<ImpactItemRecord[]>{
       images,
       order:typeof raw.order==="number"?raw.order:index+1,
       visible:raw.visible!==false,
+      document,
       externalUrl:typeof raw.externalUrl==="string"&&raw.externalUrl.trim()
         ? raw.externalUrl.trim()
         : undefined
@@ -143,15 +153,12 @@ async function readImpactJsonFromS3():Promise<ImpactItemRecord[]>{
       ...raw,
       ...base,
       image:base.image,
-      images:base.images
+      images:base.images,
+      document:base.document
     };
   });
 
-  console.log("[api/admin/impact] loaded impact items from S3",{
-    count:records.length,
-    key:IMPACT_JSON_KEY
-  });
-
+  records.sort((a,b)=>(a.order||0)-(b.order||0));
   return records;
 }
 
@@ -204,6 +211,7 @@ export async function PUT(req:Request){
 
     const cleaned:ImpactItemRecord[]=incoming.map((raw:any,index:number)=>{
       const{image,images}=normaliseImages(raw);
+      const document=normaliseDocument(raw);
 
       const base:ImpactItemRecord={
         id:typeof raw.id==="string"&&raw.id.trim()?raw.id.trim():`impact-${index}`,
@@ -219,6 +227,7 @@ export async function PUT(req:Request){
         images,
         order:typeof raw.order==="number"?raw.order:index+1,
         visible:raw.visible!==false,
+        document,
         externalUrl:typeof raw.externalUrl==="string"&&raw.externalUrl.trim()
           ? raw.externalUrl.trim()
           : undefined
@@ -228,7 +237,8 @@ export async function PUT(req:Request){
         ...raw,
         ...base,
         image:base.image,
-        images:base.images
+        images:base.images,
+        document:base.document
       };
     });
 

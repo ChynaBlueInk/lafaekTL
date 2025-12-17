@@ -95,7 +95,6 @@ export default function ImpactAdminPage(){
   const[query,setQuery]=useState<string>("");
   const[showKeys,setShowKeys]=useState<boolean>(false);
 
-  // -------- LOAD DATA --------
   useEffect(()=>{
     const load=async()=>{
       console.log("[admin/impact] loading items from /api/admin/impact");
@@ -133,7 +132,6 @@ export default function ImpactAdminPage(){
         });
 
         normalised.sort((a,b)=>a.order-b.order);
-        console.log("[admin/impact] normalised items",normalised);
         setItems(normalised);
         setError(undefined);
       }catch(err:any){
@@ -148,12 +146,10 @@ export default function ImpactAdminPage(){
 
   const markChanged=()=>{
     if(!hasChanges){
-      console.log("[admin/impact] changes detected");
       setHasChanges(true);
     }
   };
 
-  // -------- FIELD EDITS --------
   const handleFieldChange=(id:string,field:keyof ImpactItem,value:string|boolean|number)=>{
     setItems((prev)=>{
       const next=[...prev];
@@ -161,8 +157,7 @@ export default function ImpactAdminPage(){
       if(index===-1){return prev;}
       const current=next[index];
       if(!current){return prev;}
-      const updated={...current,[field]:value} as ImpactItem;
-      next[index]=updated;
+      next[index]={...current,[field]:value} as ImpactItem;
       return next;
     });
     markChanged();
@@ -187,7 +182,6 @@ export default function ImpactAdminPage(){
     markChanged();
   };
 
-  // -------- ADD / DELETE --------
   const handleAddNew=()=>{
     setNewItem(emptyItem());
     setShowAddModal(true);
@@ -202,7 +196,6 @@ export default function ImpactAdminPage(){
         id:`impact-temp-${Date.now()}`,
         order:maxOrder+1
       } as ImpactItem;
-      console.log("[admin/impact] adding new item",itemToAdd);
       return[...prev,itemToAdd];
     });
     setShowAddModal(false);
@@ -215,41 +208,64 @@ export default function ImpactAdminPage(){
     markChanged();
   };
 
-  // -------- SAVE TO API --------
   const handleSaveChanges=async()=>{
     try{
       setSaving(true);
       setMessage("");
       const payload={items};
-      console.log("[admin/impact] saving changes",payload);
       const res=await fetch("/api/admin/impact",{
         method:"PUT",
         headers:{"Content-Type":"application/json"},
         body:JSON.stringify(payload)
       });
-      console.log("[admin/impact] PUT /api/admin/impact status",res.status);
       if(!res.ok){
         throw new Error(`Failed to save: ${res.status}`);
       }
       const data=await res.json();
-      console.log("[admin/impact] PUT response payload",data);
       if(!data.ok){
         throw new Error(data.error||"Unknown error from Impact API");
       }
       setHasChanges(false);
       setMessage("Changes saved successfully.");
     }catch(err:any){
-      console.error("[admin/impact] save error",err);
       setMessage(err.message||"Error saving changes");
     }finally{
       setSaving(false);
     }
   };
 
-  // -------- IMAGE UPLOAD --------
+  const handleRemoveImage=(id:string)=>{
+    if(!window.confirm("Remove the image from this story?")){return;}
+    setItems((prev)=>{
+      const next=[...prev];
+      const index=next.findIndex((i)=>i.id===id);
+      if(index===-1){return prev;}
+      const current=next[index];
+      if(!current){return prev;}
+      next[index]={...current,image:"",imageUrl:""} as ImpactItem;
+      return next;
+    });
+    markChanged();
+    setMessage("Image removed. Remember to Save Changes.");
+  };
+
+  const handleRemoveDocument=(id:string)=>{
+    if(!window.confirm("Remove the PDF from this story?")){return;}
+    setItems((prev)=>{
+      const next=[...prev];
+      const index=next.findIndex((i)=>i.id===id);
+      if(index===-1){return prev;}
+      const current=next[index];
+      if(!current){return prev;}
+      next[index]={...current,document:""} as ImpactItem;
+      return next;
+    });
+    markChanged();
+    setMessage("PDF removed. Remember to Save Changes.");
+  };
+
   const handleImageUpload=async(id:string,file:File)=>{
     try{
-      console.log("[admin/impact] starting image upload",{id,fileName:file.name,fileType:file.type});
       setUploadingId(id);
       setMessage("");
 
@@ -268,7 +284,6 @@ export default function ImpactAdminPage(){
       }
 
       const presignData:PresignResponse=await presignRes.json();
-
       if(presignData.error){
         throw new Error(presignData.error);
       }
@@ -287,11 +302,7 @@ export default function ImpactAdminPage(){
       });
       formData.append("file",file);
 
-      const uploadRes=await fetch(url,{
-        method:"POST",
-        body:formData
-      });
-
+      const uploadRes=await fetch(url,{method:"POST",body:formData});
       if(!uploadRes.ok){
         throw new Error(`Upload failed with status ${uploadRes.status}`);
       }
@@ -302,13 +313,12 @@ export default function ImpactAdminPage(){
         if(index===-1){return prev;}
         const current=next[index];
         if(!current){return prev;}
-        next[index]={...current,image:s3Key} as ImpactItem;
+        next[index]={...current,image:s3Key,imageUrl:""} as ImpactItem;
         return next;
       });
       markChanged();
       setMessage("Image uploaded. Remember to Save Changes.");
     }catch(err:any){
-      console.error("[admin/impact] image upload error",err);
       setMessage(err.message||"Error uploading image");
     }finally{
       setUploadingId(undefined);
@@ -325,7 +335,6 @@ export default function ImpactAdminPage(){
     evt.target.value="";
   };
 
-  // -------- DOCUMENT UPLOAD (PDF) --------
   const handleDocumentUpload=async(id:string,file:File)=>{
     try{
       setUploadingDocId(id);
@@ -346,7 +355,6 @@ export default function ImpactAdminPage(){
       }
 
       const presignData:PresignResponse=await presignRes.json();
-
       if(presignData.error){
         throw new Error(presignData.error);
       }
@@ -365,11 +373,7 @@ export default function ImpactAdminPage(){
       });
       formData.append("file",file);
 
-      const uploadRes=await fetch(url,{
-        method:"POST",
-        body:formData
-      });
-
+      const uploadRes=await fetch(url,{method:"POST",body:formData});
       if(!uploadRes.ok){
         throw new Error(`Document upload failed with status ${uploadRes.status}`);
       }
@@ -384,10 +388,9 @@ export default function ImpactAdminPage(){
         return next;
       });
       markChanged();
-      setMessage("Document uploaded. Remember to Save Changes.");
+      setMessage("PDF uploaded. Remember to Save Changes.");
     }catch(err:any){
-      console.error("[admin/impact] document upload error",err);
-      setMessage(err.message||"Error uploading document");
+      setMessage(err.message||"Error uploading PDF");
     }finally{
       setUploadingDocId(undefined);
     }
@@ -413,7 +416,6 @@ export default function ImpactAdminPage(){
     });
   },[items,query]);
 
-  // -------- RENDER --------
   return(
     <div className="min-h-screen bg-slate-50 px-4 py-8">
       <div className="mx-auto max-w-7xl">
@@ -493,7 +495,7 @@ export default function ImpactAdminPage(){
 
         {!loading&&filteredItems.length>0&&(
           <div className="space-y-4">
-            {filteredItems.map((item,index)=>{
+            {filteredItems.map((item)=>{
               const imageSrc=buildImageUrl(item.image||item.imageUrl);
               const documentUrl=buildFileUrl(item.document);
 
@@ -632,6 +634,7 @@ export default function ImpactAdminPage(){
                         <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-600">
                           Image
                         </div>
+
                         {imageSrc?(
                           <img
                             src={imageSrc}
@@ -643,21 +646,35 @@ export default function ImpactAdminPage(){
                             No image
                           </div>
                         )}
-                        <label className="mt-2 inline-flex w-full cursor-pointer items-center justify-center rounded-md border border-slate-300 px-2 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">
-                          <input
-                            type="file"
-                            accept="image/*"
-                            className="hidden"
-                            onChange={(e)=>handleFileInputChange(item.id,e)}
-                          />
-                          {uploadingId===item.id?"Uploading...":"Upload image"}
-                        </label>
+
+                        <div className="mt-2 grid grid-cols-1 gap-2">
+                          <label className="inline-flex w-full cursor-pointer items-center justify-center rounded-md border border-slate-300 px-2 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">
+                            <input
+                              type="file"
+                              accept="image/*"
+                              className="hidden"
+                              onChange={(e)=>handleFileInputChange(item.id,e)}
+                            />
+                            {uploadingId===item.id?"Uploading...":"Upload image"}
+                          </label>
+
+                          {imageSrc&&(
+                            <button
+                              type="button"
+                              onClick={()=>handleRemoveImage(item.id)}
+                              className="rounded-md border border-slate-300 px-2 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
+                            >
+                              Remove image
+                            </button>
+                          )}
+                        </div>
                       </div>
 
                       <div className="rounded-md border border-slate-200 bg-white p-3">
                         <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-600">
-                          Document (PDF)
+                          PDF (optional)
                         </div>
+
                         {item.document?(
                           <a
                             href={documentUrl}
@@ -669,18 +686,31 @@ export default function ImpactAdminPage(){
                           </a>
                         ):(
                           <div className="text-sm text-slate-400">
-                            No document
+                            No PDF attached
                           </div>
                         )}
-                        <label className="mt-2 inline-flex w-full cursor-pointer items-center justify-center rounded-md border border-slate-300 px-2 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">
-                          <input
-                            type="file"
-                            accept="application/pdf"
-                            className="hidden"
-                            onChange={(e)=>handleDocumentInputChange(item.id,e)}
-                          />
-                          {uploadingDocId===item.id?"Uploading...":"Upload PDF"}
-                        </label>
+
+                        <div className="mt-2 grid grid-cols-1 gap-2">
+                          <label className="inline-flex w-full cursor-pointer items-center justify-center rounded-md border border-slate-300 px-2 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">
+                            <input
+                              type="file"
+                              accept="application/pdf"
+                              className="hidden"
+                              onChange={(e)=>handleDocumentInputChange(item.id,e)}
+                            />
+                            {uploadingDocId===item.id?"Uploading...":"Upload PDF"}
+                          </label>
+
+                          {item.document&&(
+                            <button
+                              type="button"
+                              onClick={()=>handleRemoveDocument(item.id)}
+                              className="rounded-md border border-slate-300 px-2 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
+                            >
+                              Remove PDF
+                            </button>
+                          )}
+                        </div>
                       </div>
 
                       <button
@@ -715,63 +745,51 @@ export default function ImpactAdminPage(){
                   ✕
                 </button>
               </div>
+
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <label className="block text-xs font-medium text-slate-700">
-                    Title (English)
-                  </label>
+                  <label className="block text-xs font-medium text-slate-700">Title (English)</label>
                   <input
                     type="text"
                     className="w-full rounded border border-slate-300 px-2 py-1 text-xs"
                     value={newItem.titleEn}
                     onChange={(e)=>setNewItem({...newItem,titleEn:e.target.value})}
                   />
-                  <label className="block text-xs font-medium text-slate-700">
-                    Title (Tetun)
-                  </label>
+                  <label className="block text-xs font-medium text-slate-700">Title (Tetun)</label>
                   <input
                     type="text"
                     className="w-full rounded border border-slate-300 px-2 py-1 text-xs"
                     value={newItem.titleTet}
                     onChange={(e)=>setNewItem({...newItem,titleTet:e.target.value})}
                   />
-                  <label className="block text-xs font-medium text-slate-700">
-                    Excerpt (English)
-                  </label>
+                  <label className="block text-xs font-medium text-slate-700">Excerpt (English)</label>
                   <textarea
                     className="h-20 w-full rounded border border-slate-300 px-2 py-1 text-xs"
                     value={newItem.excerptEn}
                     onChange={(e)=>setNewItem({...newItem,excerptEn:e.target.value})}
                   />
-                  <label className="block text-xs font-medium text-slate-700">
-                    Excerpt (Tetun)
-                  </label>
+                  <label className="block text-xs font-medium text-slate-700">Excerpt (Tetun)</label>
                   <textarea
                     className="h-20 w-full rounded border border-slate-300 px-2 py-1 text-xs"
                     value={newItem.excerptTet}
                     onChange={(e)=>setNewItem({...newItem,excerptTet:e.target.value})}
                   />
                 </div>
+
                 <div className="space-y-2">
-                  <label className="block text-xs font-medium text-slate-700">
-                    Body (English)
-                  </label>
+                  <label className="block text-xs font-medium text-slate-700">Body (English)</label>
                   <textarea
                     className="h-24 w-full rounded border border-slate-300 px-2 py-1 text-xs"
                     value={newItem.bodyEn}
                     onChange={(e)=>setNewItem({...newItem,bodyEn:e.target.value})}
                   />
-                  <label className="block text-xs font-medium text-slate-700">
-                    Body (Tetun)
-                  </label>
+                  <label className="block text-xs font-medium text-slate-700">Body (Tetun)</label>
                   <textarea
                     className="h-24 w-full rounded border border-slate-300 px-2 py-1 text-xs"
                     value={newItem.bodyTet}
                     onChange={(e)=>setNewItem({...newItem,bodyTet:e.target.value})}
                   />
-                  <label className="mt-2 block text-xs font-medium text-slate-700">
-                    Date
-                  </label>
+                  <label className="mt-2 block text-xs font-medium text-slate-700">Date</label>
                   <input
                     type="date"
                     className="w-40 rounded border border-slate-300 px-2 py-1 text-xs"
@@ -788,10 +806,11 @@ export default function ImpactAdminPage(){
                     Visible
                   </label>
                   <div className="mt-3 text-xs text-slate-500">
-                    Images and PDF documents can be uploaded after saving.
+                    Images and PDF can be uploaded after saving.
                   </div>
                 </div>
               </div>
+
               <div className="mt-6 flex justify-end gap-3">
                 <button
                   type="button"
