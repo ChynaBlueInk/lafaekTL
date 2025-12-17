@@ -29,10 +29,12 @@ type NewsItemRecord={
   bodyEn:string;
   bodyTet?:string;
   date:string;
-  image?:string;      // primary/hero image
-  images?:string[];   // optional gallery of images, including hero
+  image?:string;
+  images?:string[];
   order?:number;
   visible?:boolean;
+  document?:string; // NEW
+  externalUrl?:string;
   [key:string]:any;
 };
 
@@ -53,6 +55,13 @@ function normaliseImages(raw:any):{image?:string;images?:string[]}{
   };
 }
 
+function normaliseDocument(raw:any):string|undefined{
+  const d=raw?.document;
+  if(typeof d!=="string"){return undefined;}
+  const clean=d.trim();
+  return clean?clean:undefined;
+}
+
 async function readNewsJsonFromS3():Promise<NewsItemRecord[]>{
   if(!BUCKET){
     console.warn("[api/admin/news] AWS_S3_BUCKET not set, returning empty items list");
@@ -68,7 +77,6 @@ async function readNewsJsonFromS3():Promise<NewsItemRecord[]>{
   try{
     res=await s3.send(cmd);
   }catch(err:any){
-    // If the file doesn't exist yet, treat as empty list
     if(err?.name==="NoSuchKey"||err?.Code==="NoSuchKey"||err?.$metadata?.httpStatusCode===404){
       console.warn("[api/admin/news] news.json not found, returning empty items list");
       return [];
@@ -77,7 +85,7 @@ async function readNewsJsonFromS3():Promise<NewsItemRecord[]>{
     throw err;
   }
 
-  const body=await (async ()=>{
+  const body=await (async()=>{
     const b=res.Body as any;
     if(!b)return "";
     if(typeof b.transformToString==="function"){
@@ -92,7 +100,6 @@ async function readNewsJsonFromS3():Promise<NewsItemRecord[]>{
   })();
 
   if(!body){
-    console.log("[api/admin/news] news.json body empty, returning []");
     return [];
   }
 
@@ -112,13 +119,9 @@ async function readNewsJsonFromS3():Promise<NewsItemRecord[]>{
     ? parsed.news
     : [];
 
-  if(!arr.length){
-    console.log("[api/admin/news] parsed news.json but found no items, returning []");
-    return [];
-  }
-
   const records:NewsItemRecord[]=arr.map((raw:any,index:number)=>{
     const{image,images}=normaliseImages(raw);
+    const document=normaliseDocument(raw);
 
     const base:NewsItemRecord={
       id:typeof raw.id==="string"&&raw.id.trim()?raw.id.trim():`news-${index}`,
@@ -133,22 +136,23 @@ async function readNewsJsonFromS3():Promise<NewsItemRecord[]>{
       image,
       images,
       order:typeof raw.order==="number"?raw.order:index+1,
-      visible:raw.visible!==false
+      visible:raw.visible!==false,
+      document,
+      externalUrl:typeof raw.externalUrl==="string"&&raw.externalUrl.trim()
+        ? raw.externalUrl.trim()
+        : undefined
     };
 
     return{
       ...raw,
       ...base,
       image:base.image,
-      images:base.images
+      images:base.images,
+      document:base.document
     };
   });
 
-  console.log("[api/admin/news] loaded news items from S3",{
-    count:records.length,
-    key:NEWS_JSON_KEY
-  });
-
+  records.sort((a,b)=>(a.order||0)-(b.order||0));
   return records;
 }
 
@@ -167,16 +171,7 @@ async function writeNewsJsonToS3(items:NewsItemRecord[]):Promise<void>{
   });
 
   await s3.send(cmd);
-
-  console.log("[api/admin/news] wrote news items to S3",{
-    count:items.length,
-    key:NEWS_JSON_KEY
-  });
 }
-
-// ─────────────────────────────────────────────
-// GET: return raw records for admin
-// ─────────────────────────────────────────────
 
 export async function GET(){
   try{
@@ -190,10 +185,6 @@ export async function GET(){
     );
   }
 }
-
-// ─────────────────────────────────────────────
-// PUT: accept edited items and write to S3
-// ─────────────────────────────────────────────
 
 export async function PUT(req:Request){
   try{
@@ -209,6 +200,7 @@ export async function PUT(req:Request){
 
     const cleaned:NewsItemRecord[]=incoming.map((raw:any,index:number)=>{
       const{image,images}=normaliseImages(raw);
+      const document=normaliseDocument(raw);
 
       const base:NewsItemRecord={
         id:typeof raw.id==="string"&&raw.id.trim()?raw.id.trim():`news-${index}`,
@@ -223,14 +215,19 @@ export async function PUT(req:Request){
         image,
         images,
         order:typeof raw.order==="number"?raw.order:index+1,
-        visible:raw.visible!==false
+        visible:raw.visible!==false,
+        document,
+        externalUrl:typeof raw.externalUrl==="string"&&raw.externalUrl.trim()
+          ? raw.externalUrl.trim()
+          : undefined
       };
 
       return{
         ...raw,
         ...base,
         image:base.image,
-        images:base.images
+        images:base.images,
+        document:base.document
       };
     });
 

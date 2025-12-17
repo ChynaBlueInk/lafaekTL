@@ -18,6 +18,7 @@ type NewsItem={
   date:string; // ISO date: YYYY-MM-DD
   image?:string;
   imageUrl?:string;
+  document?:string; // S3 key for uploaded PDF
 };
 
 type ApiResponse={
@@ -52,6 +53,16 @@ const buildImageUrl=(src?:string)=>{
   return`${S3_ORIGIN}/${clean}`;
 };
 
+const buildFileUrl=(src?:string)=>{
+  if(!src){return"";}
+  let clean=src.trim();
+  if(clean.startsWith("http://")||clean.startsWith("https://")||clean.startsWith(S3_ORIGIN)){
+    return clean;
+  }
+  clean=clean.replace(/^\/+/,"");
+  return`${S3_ORIGIN}/${clean}`;
+};
+
 const emptyItem=():NewsItem=>({
   id:`temp-${Date.now()}`,
   order:0,
@@ -63,7 +74,8 @@ const emptyItem=():NewsItem=>({
   bodyEn:"",
   bodyTet:"",
   date:new Date().toISOString().slice(0,10),
-  image:""
+  image:"",
+  document:""
 });
 
 export default function NewsAdminPage(){
@@ -76,7 +88,8 @@ export default function NewsAdminPage(){
   const[showAddModal,setShowAddModal]=useState<boolean>(false);
   const[newItem,setNewItem]=useState<NewsItem>(emptyItem());
 
-  const[uploadingId,setUploadingId]=useState<string|undefined>();
+  const[uploadingId,setUploadingId]=useState<string|undefined>(); // image
+  const[uploadingDocId,setUploadingDocId]=useState<string|undefined>(); // pdf
   const[message,setMessage]=useState<string>("");
 
   const[query,setQuery]=useState<string>("");
@@ -113,13 +126,13 @@ export default function NewsAdminPage(){
             bodyTet:(raw.bodyTet as string)||"",
             date:(raw.date as string)||new Date().toISOString().slice(0,10),
             image:(raw.image as string)||(raw.imageUrl as string)||"",
-            imageUrl:(raw.imageUrl as string)||""
+            imageUrl:(raw.imageUrl as string)||"",
+            document:(raw.document as string)||""
           };
           return item;
         });
 
         normalised.sort((a,b)=>a.order-b.order);
-        console.log("[admin/news] normalised items",normalised);
         setItems(normalised);
         setError(undefined);
       }catch(err:any){
@@ -134,7 +147,6 @@ export default function NewsAdminPage(){
 
   const markChanged=()=>{
     if(!hasChanges){
-      console.log("[admin/news] changes detected");
       setHasChanges(true);
     }
   };
@@ -147,8 +159,7 @@ export default function NewsAdminPage(){
       if(index===-1){return prev;}
       const current=next[index];
       if(!current){return prev;}
-      const updated={...current,[field]:value} as NewsItem;
-      next[index]=updated;
+      next[index]={...current,[field]:value} as NewsItem;
       return next;
     });
     markChanged();
@@ -188,7 +199,6 @@ export default function NewsAdminPage(){
         id:`temp-${Date.now()}`,
         order:maxOrder+1
       } as NewsItem;
-      console.log("[admin/news] adding new item",itemToAdd);
       return[...prev,itemToAdd];
     });
     setShowAddModal(false);
@@ -207,25 +217,21 @@ export default function NewsAdminPage(){
       setSaving(true);
       setMessage("");
       const payload={items};
-      console.log("[admin/news] saving changes",payload);
       const res=await fetch("/api/admin/news",{
         method:"PUT",
         headers:{"Content-Type":"application/json"},
         body:JSON.stringify(payload)
       });
-      console.log("[admin/news] PUT /api/admin/news status",res.status);
       if(!res.ok){
         throw new Error(`Failed to save: ${res.status}`);
       }
       const data=await res.json();
-      console.log("[admin/news] PUT response payload",data);
       if(!data.ok){
         throw new Error(data.error||"Unknown error from API");
       }
       setHasChanges(false);
       setMessage("Changes saved successfully.");
     }catch(err:any){
-      console.error("[admin/news] save error",err);
       setMessage(err.message||"Error saving changes");
     }finally{
       setSaving(false);
@@ -235,7 +241,6 @@ export default function NewsAdminPage(){
   // -------- IMAGE UPLOAD --------
   const handleImageUpload=async(id:string,file:File)=>{
     try{
-      console.log("[admin/news] starting image upload",{id,fileName:file.name,fileType:file.type});
       setUploadingId(id);
       setMessage("");
 
@@ -254,7 +259,6 @@ export default function NewsAdminPage(){
       }
 
       const presignData:PresignResponse=await presignRes.json();
-
       if(presignData.error){
         throw new Error(presignData.error);
       }
@@ -273,11 +277,7 @@ export default function NewsAdminPage(){
       });
       formData.append("file",file);
 
-      const uploadRes=await fetch(url,{
-        method:"POST",
-        body:formData
-      });
-
+      const uploadRes=await fetch(url,{method:"POST",body:formData});
       if(!uploadRes.ok){
         throw new Error(`Upload failed with status ${uploadRes.status}`);
       }
@@ -294,7 +294,6 @@ export default function NewsAdminPage(){
       markChanged();
       setMessage("Image uploaded. Remember to Save Changes.");
     }catch(err:any){
-      console.error("[admin/news] image upload error",err);
       setMessage(err.message||"Error uploading image");
     }finally{
       setUploadingId(undefined);
@@ -308,6 +307,78 @@ export default function NewsAdminPage(){
       return;
     }
     void handleImageUpload(id,file);
+    evt.target.value="";
+  };
+
+  // -------- DOCUMENT UPLOAD (PDF) --------
+  const handleDocumentUpload=async(id:string,file:File)=>{
+    try{
+      setUploadingDocId(id);
+      setMessage("");
+
+      const presignRes=await fetch("/api/uploads/s3/presign",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({
+          folder:"news",
+          fileName:file.name,
+          contentType:file.type
+        })
+      });
+
+      if(!presignRes.ok){
+        throw new Error(`Failed to get presigned data for document: ${presignRes.status}`);
+      }
+
+      const presignData:PresignResponse=await presignRes.json();
+      if(presignData.error){
+        throw new Error(presignData.error);
+      }
+
+      const url=presignData.url;
+      const fields=presignData.fields;
+      const s3Key=presignData.key||fields.key;
+
+      if(!url||!fields||!s3Key){
+        throw new Error("Invalid presign response from server (document)");
+      }
+
+      const formData=new FormData();
+      Object.entries(fields).forEach(([k,v])=>{
+        formData.append(k,v);
+      });
+      formData.append("file",file);
+
+      const uploadRes=await fetch(url,{method:"POST",body:formData});
+      if(!uploadRes.ok){
+        throw new Error(`Document upload failed with status ${uploadRes.status}`);
+      }
+
+      setItems((prev)=>{
+        const next=[...prev];
+        const index=next.findIndex((i)=>i.id===id);
+        if(index===-1){return prev;}
+        const current=next[index];
+        if(!current){return prev;}
+        next[index]={...current,document:s3Key} as NewsItem;
+        return next;
+      });
+      markChanged();
+      setMessage("PDF uploaded. Remember to Save Changes.");
+    }catch(err:any){
+      setMessage(err.message||"Error uploading PDF");
+    }finally{
+      setUploadingDocId(undefined);
+    }
+  };
+
+  const handleDocumentInputChange=(id:string,evt:ChangeEvent<HTMLInputElement>)=>{
+    const file=evt.target.files?.[0];
+    if(!file){
+      evt.target.value="";
+      return;
+    }
+    void handleDocumentUpload(id,file);
     evt.target.value="";
   };
 
@@ -352,7 +423,7 @@ export default function NewsAdminPage(){
         </div>
 
         <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <div className="flex w-full flex-col gap-2 md:w-[34rem] md:flex-row md:items-center">
+          <div className="flex w-full flex-col gap-2 md:w-[40rem] md:flex-row md:items-center">
             <input
               type="text"
               className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm"
@@ -401,8 +472,9 @@ export default function NewsAdminPage(){
 
         {!loading&&filteredItems.length>0&&(
           <div className="space-y-4">
-            {filteredItems.map((item,index)=>{
+            {filteredItems.map((item)=>{
               const imageSrc=buildImageUrl(item.image||item.imageUrl);
+              const documentUrl=buildFileUrl(item.document);
 
               return(
                 <div key={item.id} className="rounded-lg border border-slate-200 bg-white shadow-sm">
@@ -529,11 +601,12 @@ export default function NewsAdminPage(){
                         <div className="rounded-md border border-slate-200 bg-white px-3 py-2 text-xs text-slate-600">
                           <div className="break-all"><span className="font-semibold">ID:</span> {item.id}</div>
                           {item.image&&(<div className="break-all"><span className="font-semibold">Image key:</span> {item.image}</div>)}
+                          {item.document&&(<div className="break-all"><span className="font-semibold">PDF key:</span> {item.document}</div>)}
                         </div>
                       )}
                     </div>
 
-                    <div className="flex w-full flex-col gap-3 md:w-64">
+                    <div className="flex w-full flex-col gap-3 md:w-72">
                       <div className="rounded-md border border-slate-200 bg-white p-3">
                         <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-600">
                           Image
@@ -557,6 +630,35 @@ export default function NewsAdminPage(){
                             onChange={(e)=>handleFileInputChange(item.id,e)}
                           />
                           {uploadingId===item.id?"Uploading...":"Upload image"}
+                        </label>
+                      </div>
+
+                      <div className="rounded-md border border-slate-200 bg-white p-3">
+                        <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-600">
+                          PDF (optional)
+                        </div>
+                        {item.document?(
+                          <a
+                            href={documentUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="block max-w-full break-all text-sm text-blue-700 underline"
+                          >
+                            {item.document}
+                          </a>
+                        ):(
+                          <div className="text-sm text-slate-400">
+                            No PDF attached
+                          </div>
+                        )}
+                        <label className="mt-2 inline-flex w-full cursor-pointer items-center justify-center rounded-md border border-slate-300 px-2 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">
+                          <input
+                            type="file"
+                            accept="application/pdf"
+                            className="hidden"
+                            onChange={(e)=>handleDocumentInputChange(item.id,e)}
+                          />
+                          {uploadingDocId===item.id?"Uploading...":"Upload PDF"}
                         </label>
                       </div>
 
@@ -665,7 +767,7 @@ export default function NewsAdminPage(){
                     Visible
                   </label>
                   <div className="mt-3 text-xs text-slate-500">
-                    Images can be uploaded after saving.
+                    Image and PDF can be uploaded after saving.
                   </div>
                 </div>
               </div>
