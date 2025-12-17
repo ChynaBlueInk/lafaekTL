@@ -1,6 +1,7 @@
+//app/admin/impact/page.tsx
 "use client";
 
-import {useEffect,useState,ChangeEvent}from "react";
+import {useEffect,useMemo,useState,ChangeEvent}from "react";
 
 const S3_ORIGIN="https://lafaek-media.s3.ap-southeast-2.amazonaws.com";
 
@@ -90,6 +91,9 @@ export default function ImpactAdminPage(){
   const[uploadingId,setUploadingId]=useState<string|undefined>(); // image
   const[uploadingDocId,setUploadingDocId]=useState<string|undefined>(); // document
   const[message,setMessage]=useState<string>("");
+
+  const[query,setQuery]=useState<string>("");
+  const[showKeys,setShowKeys]=useState<boolean>(false);
 
   // -------- LOAD DATA --------
   useEffect(()=>{
@@ -249,12 +253,6 @@ export default function ImpactAdminPage(){
       setUploadingId(id);
       setMessage("");
 
-      console.log("[admin/impact] requesting presign for",{
-        folder:"impact",
-        fileName:file.name,
-        contentType:file.type
-      });
-
       const presignRes=await fetch("/api/uploads/s3/presign",{
         method:"POST",
         headers:{"Content-Type":"application/json"},
@@ -265,14 +263,11 @@ export default function ImpactAdminPage(){
         })
       });
 
-      console.log("[admin/impact] presign response status",presignRes.status);
-
       if(!presignRes.ok){
         throw new Error(`Failed to get presigned data: ${presignRes.status}`);
       }
 
       const presignData:PresignResponse=await presignRes.json();
-      console.log("[admin/impact] presignData",presignData);
 
       if(presignData.error){
         throw new Error(presignData.error);
@@ -283,11 +278,8 @@ export default function ImpactAdminPage(){
       const s3Key=presignData.key||fields.key;
 
       if(!url||!fields||!s3Key){
-        console.error("[admin/impact] invalid presign response",presignData);
         throw new Error("Invalid presign response from server");
       }
-
-      console.log("[admin/impact] preparing S3 upload",{url,key:s3Key,fields});
 
       const formData=new FormData();
       Object.entries(fields).forEach(([k,v])=>{
@@ -300,13 +292,9 @@ export default function ImpactAdminPage(){
         body:formData
       });
 
-      console.log("[admin/impact] S3 upload response status",uploadRes.status);
-
       if(!uploadRes.ok){
         throw new Error(`Upload failed with status ${uploadRes.status}`);
       }
-
-      console.log("[admin/impact] upload success, updating item image",{id,s3Key});
 
       setItems((prev)=>{
         const next=[...prev];
@@ -314,9 +302,7 @@ export default function ImpactAdminPage(){
         if(index===-1){return prev;}
         const current=next[index];
         if(!current){return prev;}
-        const updated={...current,image:s3Key} as ImpactItem;
-        next[index]=updated;
-        console.log("[admin/impact] updated item after upload",updated);
+        next[index]={...current,image:s3Key} as ImpactItem;
         return next;
       });
       markChanged();
@@ -325,18 +311,12 @@ export default function ImpactAdminPage(){
       console.error("[admin/impact] image upload error",err);
       setMessage(err.message||"Error uploading image");
     }finally{
-      console.log("[admin/impact] upload finished, resetting uploadingId");
       setUploadingId(undefined);
     }
   };
 
   const handleFileInputChange=(id:string,evt:ChangeEvent<HTMLInputElement>)=>{
     const file=evt.target.files?.[0];
-    console.log("[admin/impact] file selected for upload (image)",{
-      id,
-      fileName:file?.name,
-      fileType:file?.type
-    });
     if(!file){
       evt.target.value="";
       return;
@@ -348,15 +328,8 @@ export default function ImpactAdminPage(){
   // -------- DOCUMENT UPLOAD (PDF) --------
   const handleDocumentUpload=async(id:string,file:File)=>{
     try{
-      console.log("[admin/impact] starting document upload",{id,fileName:file.name,fileType:file.type});
       setUploadingDocId(id);
       setMessage("");
-
-      console.log("[admin/impact] requesting presign for document",{
-        folder:"impact",
-        fileName:file.name,
-        contentType:file.type
-      });
 
       const presignRes=await fetch("/api/uploads/s3/presign",{
         method:"POST",
@@ -368,14 +341,11 @@ export default function ImpactAdminPage(){
         })
       });
 
-      console.log("[admin/impact] presign response status (document)",presignRes.status);
-
       if(!presignRes.ok){
         throw new Error(`Failed to get presigned data for document: ${presignRes.status}`);
       }
 
       const presignData:PresignResponse=await presignRes.json();
-      console.log("[admin/impact] presignData (document)",presignData);
 
       if(presignData.error){
         throw new Error(presignData.error);
@@ -386,11 +356,8 @@ export default function ImpactAdminPage(){
       const s3Key=presignData.key||fields.key;
 
       if(!url||!fields||!s3Key){
-        console.error("[admin/impact] invalid presign response for document",presignData);
         throw new Error("Invalid presign response from server (document)");
       }
-
-      console.log("[admin/impact] preparing S3 upload for document",{url,key:s3Key,fields});
 
       const formData=new FormData();
       Object.entries(fields).forEach(([k,v])=>{
@@ -403,13 +370,9 @@ export default function ImpactAdminPage(){
         body:formData
       });
 
-      console.log("[admin/impact] S3 upload response status (document)",uploadRes.status);
-
       if(!uploadRes.ok){
         throw new Error(`Document upload failed with status ${uploadRes.status}`);
       }
-
-      console.log("[admin/impact] document upload success, updating item document",{id,s3Key});
 
       setItems((prev)=>{
         const next=[...prev];
@@ -417,9 +380,7 @@ export default function ImpactAdminPage(){
         if(index===-1){return prev;}
         const current=next[index];
         if(!current){return prev;}
-        const updated={...current,document:s3Key} as ImpactItem;
-        next[index]=updated;
-        console.log("[admin/impact] updated item after document upload",updated);
+        next[index]={...current,document:s3Key} as ImpactItem;
         return next;
       });
       markChanged();
@@ -428,18 +389,12 @@ export default function ImpactAdminPage(){
       console.error("[admin/impact] document upload error",err);
       setMessage(err.message||"Error uploading document");
     }finally{
-      console.log("[admin/impact] document upload finished, resetting uploadingDocId");
       setUploadingDocId(undefined);
     }
   };
 
   const handleDocumentInputChange=(id:string,evt:ChangeEvent<HTMLInputElement>)=>{
     const file=evt.target.files?.[0];
-    console.log("[admin/impact] file selected for upload (document)",{
-      id,
-      fileName:file?.name,
-      fileType:file?.type
-    });
     if(!file){
       evt.target.value="";
       return;
@@ -447,6 +402,16 @@ export default function ImpactAdminPage(){
     void handleDocumentUpload(id,file);
     evt.target.value="";
   };
+
+  const filteredItems=useMemo(()=>{
+    const q=query.trim().toLowerCase();
+    if(!q){return items;}
+    return items.filter((i)=>{
+      const a=(i.titleEn||"").toLowerCase();
+      const b=(i.titleTet||"").toLowerCase();
+      return a.includes(q)||b.includes(q);
+    });
+  },[items,query]);
 
   // -------- RENDER --------
   return(
@@ -478,6 +443,32 @@ export default function ImpactAdminPage(){
           </div>
         </div>
 
+        <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <div className="flex w-full flex-col gap-2 md:w-[34rem] md:flex-row md:items-center">
+            <input
+              type="text"
+              className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm"
+              placeholder="Search by title (English or Tetun)…"
+              value={query}
+              onChange={(e)=>setQuery(e.target.value)}
+            />
+            <label className="inline-flex items-center gap-2 text-sm text-slate-700">
+              <input
+                type="checkbox"
+                className="h-4 w-4 rounded border-slate-300"
+                checked={showKeys}
+                onChange={(e)=>setShowKeys(e.target.checked)}
+              />
+              Show S3 keys
+            </label>
+          </div>
+          {hasChanges&&(
+            <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+              Unsaved changes
+            </div>
+          )}
+        </div>
+
         {message&&(
           <div className="mb-4 rounded-md border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 shadow-sm">
             {message}
@@ -494,39 +485,24 @@ export default function ImpactAdminPage(){
           </div>
         )}
 
-        {!loading&&items.length===0&&!error&&(
+        {!loading&&filteredItems.length===0&&!error&&(
           <div className="rounded-md border border-dashed border-slate-300 bg-white px-4 py-6 text-center text-sm text-slate-500">
-            No impact stories yet. Click &ldquo;Add New&rdquo; to create your first item.
+            No impact stories match your search.
           </div>
         )}
 
-        {!loading&&items.length>0&&(
-          <div className="overflow-x-auto rounded-md border border-slate-200 bg-white shadow-sm">
-            <table className="min-w-full border-collapse text-left text-sm">
-              <thead className="bg-slate-100">
-                <tr>
-                  <th className="border-b border-slate-200 px-3 py-2 text-xs font-semibold uppercase tracking-wide text-slate-600">Order</th>
-                  <th className="border-b border-slate-200 px-3 py-2 text-xs font-semibold uppercase tracking-wide text-slate-600">Visible</th>
-                  <th className="border-b border-slate-200 px-3 py-2 text-xs font-semibold uppercase tracking-wide text-slate-600">Title (EN)</th>
-                  <th className="border-b border-slate-200 px-3 py-2 text-xs font-semibold uppercase tracking-wide text-slate-600">Title (Tet)</th>
-                  <th className="border-b border-slate-200 px-3 py-2 text-xs font-semibold uppercase tracking-wide text-slate-600">Excerpt (EN)</th>
-                  <th className="border-b border-slate-200 px-3 py-2 text-xs font-semibold uppercase tracking-wide text-slate-600">Excerpt (Tet)</th>
-                  <th className="border-b border-slate-200 px-3 py-2 text-xs font-semibold uppercase tracking-wide text-slate-600">Body (EN)</th>
-                  <th className="border-b border-slate-200 px-3 py-2 text-xs font-semibold uppercase tracking-wide text-slate-600">Body (Tet)</th>
-                  <th className="border-b border-slate-200 px-3 py-2 text-xs font-semibold uppercase tracking-wide text-slate-600">Date</th>
-                  <th className="border-b border-slate-200 px-3 py-2 text-xs font-semibold uppercase tracking-wide text-slate-600">Image</th>
-                  <th className="border-b border-slate-200 px-3 py-2 text-xs font-semibold uppercase tracking-wide text-slate-600">Document</th>
-                  <th className="border-b border-slate-200 px-3 py-2 text-xs font-semibold uppercase tracking-wide text-slate-600">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {items.map((item,index)=>{
-                  const imageSrc=buildImageUrl(item.image||item.imageUrl);
-                  const documentUrl=buildFileUrl(item.document);
-                  return(
-                    <tr key={item.id} className={index%2===0?"bg-white":"bg-slate-50"}>
-                      <td className="border-b border-slate-200 px-3 py-2 align-top">
-                        <div className="flex items-center gap-2">
+        {!loading&&filteredItems.length>0&&(
+          <div className="space-y-4">
+            {filteredItems.map((item,index)=>{
+              const imageSrc=buildImageUrl(item.image||item.imageUrl);
+              const documentUrl=buildFileUrl(item.document);
+
+              return(
+                <div key={item.id} className="rounded-lg border border-slate-200 bg-white shadow-sm">
+                  <div className="flex flex-col gap-3 p-4 md:flex-row md:items-start md:justify-between">
+                    <div className="flex flex-1 flex-col gap-3">
+                      <div className="flex flex-wrap items-center gap-3">
+                        <div className="inline-flex items-center gap-2">
                           <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-slate-100 text-xs font-medium text-slate-700">
                             {item.order}
                           </span>
@@ -547,9 +523,8 @@ export default function ImpactAdminPage(){
                             </button>
                           </div>
                         </div>
-                      </td>
-                      <td className="border-b border-slate-200 px-3 py-2 align-top">
-                        <label className="inline-flex items-center gap-2 text-xs text-slate-700">
+
+                        <label className="inline-flex items-center gap-2 text-sm text-slate-700">
                           <input
                             type="checkbox"
                             className="h-4 w-4 rounded border-slate-300"
@@ -558,129 +533,172 @@ export default function ImpactAdminPage(){
                           />
                           <span>Visible</span>
                         </label>
-                      </td>
-                      <td className="border-b border-slate-200 px-3 py-2 align-top">
-                        <input
-                          type="text"
-                          className="w-56 rounded border border-slate-300 px-2 py-1 text-xs"
-                          value={item.titleEn}
-                          onChange={(e)=>handleFieldChange(item.id,"titleEn",e.target.value)}
-                        />
-                      </td>
-                      <td className="border-b border-slate-200 px-3 py-2 align-top">
-                        <input
-                          type="text"
-                          className="w-56 rounded border border-slate-300 px-2 py-1 text-xs"
-                          value={item.titleTet}
-                          onChange={(e)=>handleFieldChange(item.id,"titleTet",e.target.value)}
-                        />
-                      </td>
-                      <td className="border-b border-slate-200 px-3 py-2 align-top">
-                        <textarea
-                          className="h-20 w-64 rounded border border-slate-300 px-2 py-1 text-xs"
-                          value={item.excerptEn}
-                          onChange={(e)=>handleFieldChange(item.id,"excerptEn",e.target.value)}
-                        />
-                      </td>
-                      <td className="border-b border-slate-200 px-3 py-2 align-top">
-                        <textarea
-                          className="h-20 w-64 rounded border border-slate-300 px-2 py-1 text-xs"
-                          value={item.excerptTet}
-                          onChange={(e)=>handleFieldChange(item.id,"excerptTet",e.target.value)}
-                        />
-                      </td>
-                      <td className="border-b border-slate-200 px-3 py-2 align-top">
-                        <textarea
-                          className="h-24 w-72 rounded border border-slate-300 px-2 py-1 text-xs"
-                          value={item.bodyEn}
-                          onChange={(e)=>handleFieldChange(item.id,"bodyEn",e.target.value)}
-                        />
-                      </td>
-                      <td className="border-b border-slate-200 px-3 py-2 align-top">
-                        <textarea
-                          className="h-24 w-72 rounded border border-slate-300 px-2 py-1 text-xs"
-                          value={item.bodyTet}
-                          onChange={(e)=>handleFieldChange(item.id,"bodyTet",e.target.value)}
-                        />
-                      </td>
-                      <td className="border-b border-slate-200 px-3 py-2 align-top">
-                        <input
-                          type="date"
-                          className="rounded border border-slate-300 px-2 py-1 text-xs"
-                          value={item.date?item.date.slice(0,10):""}
-                          onChange={(e)=>handleFieldChange(item.id,"date",e.target.value)}
-                        />
-                      </td>
-                      <td className="border-b border-slate-200 px-3 py-2 align-top">
-                        <div className="flex flex-col items-start gap-2">
-                          {imageSrc?(
-                            <img
-                              src={imageSrc}
-                              alt={item.titleEn||"Impact image"}
-                              className="h-16 w-24 rounded border border-slate-200 object-cover"
-                            />
-                          ):(
-                            <div className="flex h-16 w-24 items-center justify-center rounded border border-dashed border-slate-300 bg-slate-50 text-center text-[10px] text-slate-400">
-                              No image
-                            </div>
-                          )}
-                          <label className="inline-flex cursor-pointer items-center rounded-md border border-slate-300 px-2 py-1 text-[11px] font-medium text-slate-700 hover:bg-slate-100">
-                            <input
-                              type="file"
-                              accept="image/*"
-                              className="hidden"
-                              onChange={(e)=>handleFileInputChange(item.id,e)}
-                            />
-                            {uploadingId===item.id?"Uploading...":"Upload image"}
-                          </label>
-                          {item.image&&(
-                            <p className="max-w-[10rem] break-all text-[10px] text-slate-500">
-                              {item.image}
-                            </p>
-                          )}
+
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-slate-500">Date</span>
+                          <input
+                            type="date"
+                            className="rounded border border-slate-300 px-2 py-1 text-sm"
+                            value={item.date?item.date.slice(0,10):""}
+                            onChange={(e)=>handleFieldChange(item.id,"date",e.target.value)}
+                          />
                         </div>
-                      </td>
-                      <td className="border-b border-slate-200 px-3 py-2 align-top">
-                        <div className="flex flex-col items-start gap-2">
-                          {item.document?(
-                            <a
-                              href={documentUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="max-w-[12rem] break-all text-[11px] text-blue-700 underline"
-                            >
-                              {item.document}
-                            </a>
-                          ):(
-                            <span className="text-[11px] text-slate-400">
-                              No document
-                            </span>
-                          )}
-                          <label className="inline-flex cursor-pointer items-center rounded-md border border-slate-300 px-2 py-1 text-[11px] font-medium text-slate-700 hover:bg-slate-100">
-                            <input
-                              type="file"
-                              accept="application/pdf"
-                              className="hidden"
-                              onChange={(e)=>handleDocumentInputChange(item.id,e)}
-                            />
-                            {uploadingDocId===item.id?"Uploading...":"Upload PDF"}
+                      </div>
+
+                      <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                        <div>
+                          <label className="mb-1 block text-xs font-medium text-slate-700">
+                            Title (English)
                           </label>
+                          <input
+                            type="text"
+                            className="w-full rounded border border-slate-300 px-2 py-2 text-sm"
+                            value={item.titleEn}
+                            onChange={(e)=>handleFieldChange(item.id,"titleEn",e.target.value)}
+                          />
                         </div>
-                      </td>
-                      <td className="border-b border-slate-200 px-3 py-2 align-top">
-                        <button
-                          type="button"
-                          onClick={()=>handleDelete(item.id)}
-                          className="rounded-md border border-red-300 px-2 py-1 text-[11px] font-medium text-red-700 hover:bg-red-50"
-                        >
-                          Delete
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                        <div>
+                          <label className="mb-1 block text-xs font-medium text-slate-700">
+                            Title (Tetun)
+                          </label>
+                          <input
+                            type="text"
+                            className="w-full rounded border border-slate-300 px-2 py-2 text-sm"
+                            value={item.titleTet}
+                            onChange={(e)=>handleFieldChange(item.id,"titleTet",e.target.value)}
+                          />
+                        </div>
+                      </div>
+
+                      <details className="rounded-md border border-slate-200 bg-slate-50">
+                        <summary className="cursor-pointer select-none px-3 py-2 text-sm font-medium text-slate-800">
+                          Edit story text (Excerpts + Bodies)
+                        </summary>
+                        <div className="grid grid-cols-1 gap-3 p-3 md:grid-cols-2">
+                          <div>
+                            <label className="mb-1 block text-xs font-medium text-slate-700">
+                              Excerpt (English)
+                            </label>
+                            <textarea
+                              className="h-24 w-full rounded border border-slate-300 px-2 py-2 text-sm"
+                              value={item.excerptEn}
+                              onChange={(e)=>handleFieldChange(item.id,"excerptEn",e.target.value)}
+                            />
+                          </div>
+                          <div>
+                            <label className="mb-1 block text-xs font-medium text-slate-700">
+                              Excerpt (Tetun)
+                            </label>
+                            <textarea
+                              className="h-24 w-full rounded border border-slate-300 px-2 py-2 text-sm"
+                              value={item.excerptTet}
+                              onChange={(e)=>handleFieldChange(item.id,"excerptTet",e.target.value)}
+                            />
+                          </div>
+                          <div>
+                            <label className="mb-1 block text-xs font-medium text-slate-700">
+                              Body (English)
+                            </label>
+                            <textarea
+                              className="h-40 w-full rounded border border-slate-300 px-2 py-2 text-sm"
+                              value={item.bodyEn}
+                              onChange={(e)=>handleFieldChange(item.id,"bodyEn",e.target.value)}
+                            />
+                          </div>
+                          <div>
+                            <label className="mb-1 block text-xs font-medium text-slate-700">
+                              Body (Tetun)
+                            </label>
+                            <textarea
+                              className="h-40 w-full rounded border border-slate-300 px-2 py-2 text-sm"
+                              value={item.bodyTet}
+                              onChange={(e)=>handleFieldChange(item.id,"bodyTet",e.target.value)}
+                            />
+                          </div>
+                        </div>
+                      </details>
+
+                      {showKeys&&(
+                        <div className="rounded-md border border-slate-200 bg-white px-3 py-2 text-xs text-slate-600">
+                          <div className="break-all"><span className="font-semibold">ID:</span> {item.id}</div>
+                          {item.image&&(<div className="break-all"><span className="font-semibold">Image key:</span> {item.image}</div>)}
+                          {item.document&&(<div className="break-all"><span className="font-semibold">PDF key:</span> {item.document}</div>)}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="flex w-full flex-col gap-3 md:w-64">
+                      <div className="rounded-md border border-slate-200 bg-white p-3">
+                        <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-600">
+                          Image
+                        </div>
+                        {imageSrc?(
+                          <img
+                            src={imageSrc}
+                            alt={item.titleEn||"Impact image"}
+                            className="h-28 w-full rounded border border-slate-200 object-cover"
+                          />
+                        ):(
+                          <div className="flex h-28 w-full items-center justify-center rounded border border-dashed border-slate-300 bg-slate-50 text-center text-xs text-slate-400">
+                            No image
+                          </div>
+                        )}
+                        <label className="mt-2 inline-flex w-full cursor-pointer items-center justify-center rounded-md border border-slate-300 px-2 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={(e)=>handleFileInputChange(item.id,e)}
+                          />
+                          {uploadingId===item.id?"Uploading...":"Upload image"}
+                        </label>
+                      </div>
+
+                      <div className="rounded-md border border-slate-200 bg-white p-3">
+                        <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-600">
+                          Document (PDF)
+                        </div>
+                        {item.document?(
+                          <a
+                            href={documentUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="block break-all text-sm text-blue-700 underline"
+                          >
+                            Open PDF
+                          </a>
+                        ):(
+                          <div className="text-sm text-slate-400">
+                            No document
+                          </div>
+                        )}
+                        <label className="mt-2 inline-flex w-full cursor-pointer items-center justify-center rounded-md border border-slate-300 px-2 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">
+                          <input
+                            type="file"
+                            accept="application/pdf"
+                            className="hidden"
+                            onChange={(e)=>handleDocumentInputChange(item.id,e)}
+                          />
+                          {uploadingDocId===item.id?"Uploading...":"Upload PDF"}
+                        </label>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={()=>handleDelete(item.id)}
+                        className="rounded-md border border-red-300 px-3 py-2 text-sm font-medium text-red-700 hover:bg-red-50"
+                      >
+                        Delete story
+                      </button>
+
+                      <div className="text-xs text-slate-500">
+                        Tip: Uploads don’t auto-save. Use “Save Changes” after edits.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         )}
 
@@ -770,7 +788,7 @@ export default function ImpactAdminPage(){
                     Visible
                   </label>
                   <div className="mt-3 text-xs text-slate-500">
-                    Images and PDF documents can be uploaded after saving using the table.
+                    Images and PDF documents can be uploaded after saving.
                   </div>
                 </div>
               </div>
