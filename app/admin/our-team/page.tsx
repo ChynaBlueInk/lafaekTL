@@ -1,7 +1,7 @@
 // app/admin/our-team/page.tsx
 "use client"
 
-import {useEffect,useState,ChangeEvent} from "react"
+import {useEffect,useState,ChangeEvent}from "react"
 
 type TeamMember={
   id?:string
@@ -42,25 +42,27 @@ const emptyMember=(nextOrder:number):TeamMember=>({
 const S3_ORIGIN="https://lafaek-media.s3.ap-southeast-2.amazonaws.com"
 
 const normalizeS3Url=(src?:string)=>{
-  if(!src){return ""}
+  if(!src){return""}
   let clean=src.trim()
   if(clean.startsWith(S3_ORIGIN)){
     clean=clean.slice(S3_ORIGIN.length)
   }
-  clean=clean.replace(/^\/+/, "")
-  return `${S3_ORIGIN}/${clean}`
+  clean=clean.replace(/^\/+/,"")
+  return`${S3_ORIGIN}/${clean}`
 }
 
 export default function OurTeamAdminPage(){
-  const [members,setMembers]=useState<TeamMember[]>([])
-  const [status,setStatus]=useState<ApiState>("idle")
-  const [error,setError]=useState<string|undefined>()
-  const [uploading,setUploading]=useState<boolean>(false)
-  const [editingId,setEditingId]=useState<string|null>(null)
+  const[members,setMembers]=useState<TeamMember[]>([])
+  const[status,setStatus]=useState<ApiState>("idle")
+  const[error,setError]=useState<string|undefined>()
+  const[uploading,setUploading]=useState<boolean>(false)
+  const[editingId,setEditingId]=useState<string|null>(null)
 
   // state for add-member modal
-  const [isAddModalOpen,setIsAddModalOpen]=useState<boolean>(false)
-  const [newMemberDraft,setNewMemberDraft]=useState<TeamMember|null>(null)
+  const[isAddModalOpen,setIsAddModalOpen]=useState<boolean>(false)
+  const[newMemberDraft,setNewMemberDraft]=useState<TeamMember|null>(null)
+
+  const actionsDisabled=status==="saving"||status==="loading"||uploading
 
   // Load members from API on mount
   useEffect(()=>{
@@ -238,8 +240,6 @@ export default function OurTeamAdminPage(){
         throw new Error(`Upload failed with status ${uploadRes.status}`)
       }
 
-      console.log("S3 upload success",uploadRes.status,responseText)
-
       const cleanUrl=normalizeS3Url(publicUrl)
 
       setMembers(prev=>{
@@ -262,7 +262,7 @@ export default function OurTeamAdminPage(){
   const handleNewMemberFieldChange=(field:keyof TeamMember,value:any)=>{
     setNewMemberDraft(prev=>{
       if(!prev){return prev}
-      return {...prev,[field]:value}
+      return{...prev,[field]:value}
     })
   }
 
@@ -299,7 +299,7 @@ export default function OurTeamAdminPage(){
     setNewMemberDraft(null)
   }
 
-  return (
+  return(
     <div className="min-h-screen bg-slate-50 px-4 py-8">
       <div className="mx-auto max-w-6xl">
         <header className="mb-6 flex items-center justify-between gap-4">
@@ -309,16 +309,28 @@ export default function OurTeamAdminPage(){
               Stage Two editor for <code>content/team.json</code>. This page is hidden from public navigation.
             </p>
           </div>
+
           <div className="flex items-center gap-2">
             <button
+              type="button"
+              onClick={handleAddMember}
+              disabled={actionsDisabled}
+              className="rounded border border-slate-300 bg-white px-4 py-1.5 text-sm font-medium text-slate-800 hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              + Add team member
+            </button>
+
+            <button
               onClick={handleReload}
-              className="rounded border border-slate-300 px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-100"
+              disabled={actionsDisabled}
+              className="rounded border border-slate-300 px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-60"
             >
               Reload
             </button>
+
             <button
               onClick={handleSave}
-              disabled={status==="saving" || status==="loading" || uploading}
+              disabled={actionsDisabled}
               className="rounded bg-emerald-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {status==="saving"?"Saving...":uploading?"Uploading...":"Save Changes"}
@@ -326,25 +338,25 @@ export default function OurTeamAdminPage(){
           </div>
         </header>
 
-        {status==="loading" && (
+        {status==="loading"&&(
           <div className="mb-4 rounded-md bg-blue-50 px-4 py-3 text-sm text-blue-800">
             Loading team members from server...
           </div>
         )}
 
-        {status==="success" && (
+        {status==="success"&&(
           <div className="mb-4 rounded-md bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
             Changes saved successfully.
           </div>
         )}
 
-        {status==="error" && error && (
+        {status==="error"&&error&&(
           <div className="mb-4 rounded-md bg-red-50 px-4 py-3 text-sm text-red-800">
             {error}
           </div>
         )}
 
-        {uploading && (
+        {uploading&&(
           <div className="mb-4 rounded-md bg-sky-50 px-4 py-3 text-xs text-sky-800">
             Uploading image to S3… please wait until it finishes before saving.
           </div>
@@ -373,7 +385,7 @@ export default function OurTeamAdminPage(){
                 const rowKey=m.id || m.slug || String(index)
                 const isEditing=editingId===rowKey
 
-                return (
+                return(
                   <tr key={rowKey} className={index%2===0?"bg-white":"bg-slate-50"}>
                     <td className="px-3 py-2 align-top text-xs text-slate-700">
                       {index+1}
@@ -464,7 +476,7 @@ export default function OurTeamAdminPage(){
                             disabled={!isEditing}
                           />
                         </label>
-                        {m.photo && (
+                        {m.photo&&(
                           <a
                             href={normalizeS3Url(m.photo)}
                             target="_blank"
@@ -496,7 +508,7 @@ export default function OurTeamAdminPage(){
                             disabled={!isEditing}
                           />
                         </label>
-                        {m.sketch && (
+                        {m.sketch&&(
                           <a
                             href={normalizeS3Url(m.sketch)}
                             target="_blank"
@@ -569,14 +581,20 @@ export default function OurTeamAdminPage(){
           </table>
         </div>
 
-        <div className="mt-4">
+        {/* Bottom Add button (kept) */}
+        <div className="mt-4 flex items-center justify-between gap-2">
           <button
             type="button"
             onClick={handleAddMember}
-            className="rounded border border-slate-300 px-4 py-1.5 text-sm text-slate-800 hover:bg-slate-100"
+            disabled={actionsDisabled}
+            className="rounded border border-slate-300 bg-white px-4 py-1.5 text-sm text-slate-800 hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-60"
           >
             + Add team member
           </button>
+
+          <div className="text-xs text-slate-500">
+            Tip: Click <span className="font-semibold">Edit</span> on a row to enable fields, then <span className="font-semibold">Save Changes</span>.
+          </div>
         </div>
 
         <section className="mt-8 rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-xs text-amber-900">
@@ -611,7 +629,7 @@ export default function OurTeamAdminPage(){
                     // keep both nameEn and nameTet in sync for now
                     setNewMemberDraft(prev=>{
                       if(!prev){return prev}
-                      return {...prev,nameEn:val,nameTet:val}
+                      return{...prev,nameEn:val,nameTet:val}
                     })
                   }}
                   placeholder="e.g. Maria Soares"
