@@ -217,7 +217,7 @@ export default function AdminMagazinesPage(){
       issue,
       titleEn:newTitleEn.trim()||undefined,
       titleTet:newTitleTet.trim()||undefined,
-      visible:true,
+      visible:false,
       createdAt:now,
       updatedAt:now
     };

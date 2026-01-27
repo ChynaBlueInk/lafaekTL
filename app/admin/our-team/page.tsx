@@ -34,7 +34,7 @@ const emptyMember=(nextOrder:number):TeamMember=>({
   photo:"",
   sketch:"",
   started:"",
-  visible:true,
+  visible:false,
   order:nextOrder
 })
 

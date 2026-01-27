@@ -66,7 +66,7 @@ const buildFileUrl=(src?:string)=>{
 const emptyItem=():NewsItem=>({
   id:`temp-${Date.now()}`,
   order:0,
-  visible:true,
+  visible:false,
   titleEn:"",
   titleTet:"",
   excerptEn:"",

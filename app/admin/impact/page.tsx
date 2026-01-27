@@ -66,7 +66,7 @@ const buildFileUrl=(src?:string)=>{
 const emptyItem=():ImpactItem=>({
   id:`impact-temp-${Date.now()}`,
   order:0,
-  visible:true,
+  visible:false,
   titleEn:"",
   titleTet:"",
   excerptEn:"",
