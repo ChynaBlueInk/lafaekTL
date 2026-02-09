@@ -6,6 +6,7 @@ import ChatWidget from "@/components/ChatWidget"
 import {LanguageProvider}from "@/lib/LanguageContext"
 import Navigation from "@/components/Navigation"
 import {Footer}from "@/components/Footer"
+import Providers from "./providers"
 
 export const metadata:Metadata={
   title:"Lafaek Learning Media",
@@ -16,23 +17,25 @@ export default function RootLayout({children}:{children:React.ReactNode}){
   return (
     <html lang="en">
       <body className="min-h-screen bg-white">
-        <ClientLayoutShell>
-          <LanguageProvider>
-            {/* Global nav */}
-            <Navigation />
+        <Providers>
+          <ClientLayoutShell>
+            <LanguageProvider>
+              {/* Global nav */}
+              <Navigation />
 
-            {/* Page content */}
-            <main className="">
-              {children}
-            </main>
+              {/* Page content */}
+              <main className="">
+                {children}
+              </main>
 
-            {/* Global footer */}
-            <Footer />
+              {/* Global footer */}
+              <Footer />
 
-            {/* Floating chat widget */}
-            <ChatWidget />
-          </LanguageProvider>
-        </ClientLayoutShell>
+              {/* Floating chat widget */}
+              <ChatWidget />
+            </LanguageProvider>
+          </ClientLayoutShell>
+        </Providers>
       </body>
     </html>
   )
