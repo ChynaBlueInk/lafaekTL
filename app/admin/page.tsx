@@ -4,6 +4,7 @@
 import {useMemo,useState}from "react";
 import Link from "next/link";
 import {useLanguage}from "@/lib/LanguageContext";
+import AdminGuard from "@/components/AdminGuard";
 
 type AdminKey="team"|"magazines"|"news"|"impact";
 
@@ -31,7 +32,6 @@ export default function AdminHubPage(){
 
   const[openKey,setOpenKey]=useState<AdminKey|null>(null);
 
-  // ✅ Edit these hrefs to match your real routes.
   const links:AdminLink[]=useMemo(()=>[
     {
       key:"team",
@@ -67,7 +67,7 @@ export default function AdminHubPage(){
     }
   ],[]);
 
-  const instructions:Record<AdminKey,InstructionBlock>=useMemo(()=>({
+  const instructions:Record<AdminKey,InstructionBlock>=useMemo(() => ({
     team:{
       titleEn:"How to update Our Team",
       titleTet:"Oinsá atu atualiza Ekipamentu Ami Nian",
@@ -220,116 +220,120 @@ export default function AdminHubPage(){
   }[L];
 
   return(
-    <div className="min-h-screen bg-slate-50">
-      <main className="mx-auto max-w-6xl px-4 py-10">
-        <header className="mb-8">
-          <h1 className="text-3xl font-bold text-slate-900">{labels.heading}</h1>
-          <p className="mt-2 text-slate-600">{labels.intro}</p>
-        </header>
+    <AdminGuard allowedRoles={["Admin"]}>
+      <div className="min-h-screen bg-slate-50">
+        <main className="mx-auto max-w-6xl px-4 py-10">
+          <header className="mb-8">
+            <h1 className="text-3xl font-bold text-slate-900">{labels.heading}</h1>
+            <p className="mt-2 text-slate-600">{labels.intro}</p>
+          </header>
 
-        <section className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          {links.map((link)=>{
-            const title=L==="tet"?link.titleTet:link.titleEn;
-            const desc=L==="tet"?link.descTet:link.descEn;
+          <section className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            {links.map((link)=>{
+              const title=L==="tet"?link.titleTet:link.titleEn;
+              const desc=L==="tet"?link.descTet:link.descEn;
 
-            return(
-              <div key={link.key} className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-                <div className="mb-3">
-                  <h2 className="text-lg font-semibold text-slate-900">{title}</h2>
-                  <p className="mt-1 text-sm text-slate-600">{desc}</p>
-                </div>
-
-                <div className="flex flex-wrap gap-2">
-                  <Link
-                    href={link.href}
-                    className="inline-flex items-center justify-center rounded-md bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700"
-                  >
-                    {labels.open}
-                  </Link>
-
-                  <button
-                    type="button"
-                    onClick={()=>setOpenKey(link.key)}
-                    className="inline-flex items-center justify-center rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-800 hover:bg-slate-50"
-                  >
-                    {labels.instructions}
-                  </button>
-                </div>
-
-                <div className="mt-3 text-xs text-slate-500 break-all">
-                  {link.href}
-                </div>
-              </div>
-            );
-          })}
-        </section>
-
-        {openKey&&modal&&(
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-            <div className="w-full max-w-3xl rounded-xl bg-white shadow-xl">
-              <div className="flex items-start justify-between gap-4 border-b border-slate-200 p-5">
-                <div>
-                  <h3 className="text-lg font-bold text-slate-900">
-                    {L==="tet"?modal.titleTet:modal.titleEn}
-                  </h3>
-                  <p className="mt-1 text-sm text-slate-600">
-                    {L==="tet"
-                      ? "Favor lee tuir passos sira iha okos."
-                      : "Please follow the steps below."}
-                  </p>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={()=>setOpenKey(null)}
-                  className="rounded-md px-2 py-1 text-sm font-semibold text-slate-600 hover:bg-slate-100"
-                  aria-label={labels.close}
-                >
-                  ✕
-                </button>
-              </div>
-
-              <div className="p-5">
-                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                  <div>
-                    <div className="mb-2 text-xs font-bold uppercase tracking-wide text-slate-500">
-                      {L==="tet"?"Passus":"Steps"}
-                    </div>
-                    <ol className="list-decimal space-y-2 pl-5 text-sm text-slate-800">
-                      {(L==="tet"?modal.stepsTet:modal.stepsEn).map((s,idx)=>(
-                        <li key={idx}>{s}</li>
-                      ))}
-                    </ol>
+              return(
+                <div key={link.key} className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+                  <div className="mb-3">
+                    <h2 className="text-lg font-semibold text-slate-900">{title}</h2>
+                    <p className="mt-1 text-sm text-slate-600">{desc}</p>
                   </div>
 
-                  <div>
-                    <div className="mb-2 text-xs font-bold uppercase tracking-wide text-slate-500">
-                      {L==="tet"?"Dica sira":"Tips"}
-                    </div>
-                    <ul className="list-disc space-y-2 pl-5 text-sm text-slate-800">
-                      {((L==="tet"?modal.tipsTet:modal.tipsEn)||[
-                        L==="tet"?"Keta haluha klik “Save Changes” molok sai.":"Don’t forget to click “Save Changes” before leaving."
-                      ]).map((s,idx)=>(
-                        <li key={idx}>{s}</li>
-                      ))}
-                    </ul>
+                  <div className="flex flex-wrap gap-2">
+                    <Link
+                      href={link.href}
+                      className="inline-flex items-center justify-center rounded-md bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700"
+                    >
+                      {labels.open}
+                    </Link>
+
+                    <button
+                      type="button"
+                      onClick={()=>setOpenKey(link.key)}
+                      className="inline-flex items-center justify-center rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-800 hover:bg-slate-50"
+                    >
+                      {labels.instructions}
+                    </button>
+                  </div>
+
+                  <div className="mt-3 break-all text-xs text-slate-500">
+                    {link.href}
                   </div>
                 </div>
+              );
+            })}
+          </section>
 
-                <div className="mt-6 flex justify-end gap-2">
+          {openKey&&modal&&(
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+              <div className="w-full max-w-3xl rounded-xl bg-white shadow-xl">
+                <div className="flex items-start justify-between gap-4 border-b border-slate-200 p-5">
+                  <div>
+                    <h3 className="text-lg font-bold text-slate-900">
+                      {L==="tet"?modal.titleTet:modal.titleEn}
+                    </h3>
+                    <p className="mt-1 text-sm text-slate-600">
+                      {L==="tet"
+                        ? "Favor lee tuir passos sira iha okos."
+                        : "Please follow the steps below."}
+                    </p>
+                  </div>
+
                   <button
                     type="button"
                     onClick={()=>setOpenKey(null)}
-                    className="rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-800 hover:bg-slate-50"
+                    className="rounded-md px-2 py-1 text-sm font-semibold text-slate-600 hover:bg-slate-100"
+                    aria-label={labels.close}
                   >
-                    {labels.close}
+                    ✕
                   </button>
+                </div>
+
+                <div className="p-5">
+                  <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                    <div>
+                      <div className="mb-2 text-xs font-bold uppercase tracking-wide text-slate-500">
+                        {L==="tet"?"Passus":"Steps"}
+                      </div>
+                      <ol className="list-decimal space-y-2 pl-5 text-sm text-slate-800">
+                        {(L==="tet"?modal.stepsTet:modal.stepsEn).map((s,idx)=>(
+                          <li key={idx}>{s}</li>
+                        ))}
+                      </ol>
+                    </div>
+
+                    <div>
+                      <div className="mb-2 text-xs font-bold uppercase tracking-wide text-slate-500">
+                        {L==="tet"?"Dica sira":"Tips"}
+                      </div>
+                      <ul className="list-disc space-y-2 pl-5 text-sm text-slate-800">
+                        {((L==="tet"?modal.tipsTet:modal.tipsEn)||[
+                          L==="tet"
+                            ? "Keta haluha klik “Save Changes” molok sai."
+                            : "Don’t forget to click “Save Changes” before leaving."
+                        ]).map((s,idx)=>(
+                          <li key={idx}>{s}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+
+                  <div className="mt-6 flex justify-end gap-2">
+                    <button
+                      type="button"
+                      onClick={()=>setOpenKey(null)}
+                      className="rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-800 hover:bg-slate-50"
+                    >
+                      {labels.close}
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        )}
-      </main>
-    </div>
+          )}
+        </main>
+      </div>
+    </AdminGuard>
   );
 }

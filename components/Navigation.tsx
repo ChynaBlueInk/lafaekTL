@@ -7,6 +7,7 @@ import Image from "next/image"
 import {Menu,X,ChevronDown}from "lucide-react"
 import {Button}from "./button"
 import {useLanguage}from "@/lib/LanguageContext"
+import {useAuth}from "react-oidc-context"
 
 type MegaItem={href:string;title:string;description?:string}
 type NavItem=
@@ -18,6 +19,42 @@ export function Navigation(){
   const[openMobileSubmenu,setOpenMobileSubmenu]=useState<string|null>(null)
 
   const{language,setLanguage}=useLanguage()
+  const auth=useAuth()
+
+  const isSignedIn=!!auth.user
+  const profile=auth.user?.profile as any
+  const signedInLabel=
+    profile?.name||
+    profile?.given_name||
+    profile?.email||
+    "User"
+
+  const handleSignOut=async()=>{
+    const cognitoDomain=(process.env.NEXT_PUBLIC_COGNITO_DOMAIN||"").replace(/\/$/,"")
+    const clientId=auth.settings?.client_id||""
+    const logoutUri=
+      auth.settings?.post_logout_redirect_uri||
+      (typeof window!=="undefined"?window.location.origin:"")
+
+    try{
+      await auth.removeUser()
+    }finally{
+      try{
+        sessionStorage.clear()
+      }catch{}
+      setIsMenuOpen(false)
+      setOpenMobileSubmenu(null)
+
+      if(cognitoDomain&&clientId&&logoutUri){
+        const logoutUrl=
+          `${cognitoDomain}/logout?client_id=${encodeURIComponent(clientId)}&logout_uri=${encodeURIComponent(logoutUri)}`
+        window.location.href=logoutUrl
+        return
+      }
+
+      window.location.href="/"
+    }
+  }
 
   const t={
     en:{
@@ -71,6 +108,8 @@ export function Navigation(){
       friends:"Friends of Lafaek",
       contact:"Contact",
       loginSignup:"Login / Signup",
+      signOut:"Sign out",
+      signedInAs:"Signed in as",
       en:"EN",
       tet:"TET",
     },
@@ -125,6 +164,8 @@ export function Navigation(){
       friends:"Kolega Lafaek",
       contact:"Kontakt",
       loginSignup:"Tama / Rejistu",
+      signOut:"Sai",
+      signedInAs:"Tama ho",
       en:"EN",
       tet:"TET",
     },
@@ -168,7 +209,6 @@ export function Navigation(){
     <nav className="bg-[#219653]/90 backdrop-blur-sm border-b-2 border-[#F2C94C] sticky top-0 z-50 w-full">
       <div className="max-w-7xl mx-auto px-4 py-3">
         <div className="flex items-center justify-between gap-4">
-          {/* LEFT: Logo + main menu */}
           <div className="flex items-center gap-6">
             <Link href="/" className="flex items-center gap-3">
               <div className="relative h-14 w-14 md:h-16 md:w-16">
@@ -184,7 +224,6 @@ export function Navigation(){
               <span className="text-2xl md:text-3xl font-bold text-white">{t.brand}</span>
             </Link>
 
-            {/* Desktop main nav */}
             <div className="hidden md:flex items-center gap-3">
               {leftNav.map((item)=>{
                 if("mega"in item){
@@ -231,7 +270,6 @@ export function Navigation(){
             </div>
           </div>
 
-          {/* RIGHT: language + auth + mobile toggle */}
           <div className="flex items-center gap-2">
             <div className="hidden md:flex items-center gap-3">
               <Button
@@ -256,10 +294,27 @@ export function Navigation(){
               >
                 {t.tet}
               </Button>
-              <Link href="/auth" className="text-white hover:text-[#F2C94C] font-medium transition-colors">
-                {t.loginSignup}
-              </Link>
+
+              {isSignedIn?(
+                <>
+                  <span className="text-white/90 text-sm hidden lg:inline">
+                    {t.signedInAs} {signedInLabel}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleSignOut}
+                    className="text-white hover:text-[#F2C94C] font-medium transition-colors"
+                  >
+                    {t.signOut}
+                  </button>
+                </>
+              ):(
+                <Link href="/auth" className="text-white hover:text-[#F2C94C] font-medium transition-colors">
+                  {t.loginSignup}
+                </Link>
+              )}
             </div>
+
             <Button
               onClick={()=>setIsMenuOpen((v)=>!v)}
               className="md:hidden text-white hover:bg-white/20 p-2 rounded-md"
@@ -270,7 +325,6 @@ export function Navigation(){
           </div>
         </div>
 
-        {/* MOBILE MENU */}
         {isMenuOpen&&(
           <div className="md:hidden mt-4 pb-4">
             <div className="flex flex-col space-y-2 pt-2">
@@ -297,14 +351,31 @@ export function Navigation(){
                 >
                   {t.tet}
                 </Button>
-                <Link
-                  href="/auth"
-                  className="ml-auto text-white hover:text-[#F2C94C] font-medium transition-colors"
-                  onClick={()=>setIsMenuOpen(false)}
-                >
-                  {t.loginSignup}
-                </Link>
+
+                {isSignedIn?(
+                  <button
+                    type="button"
+                    onClick={handleSignOut}
+                    className="ml-auto text-white hover:text-[#F2C94C] font-medium transition-colors"
+                  >
+                    {t.signOut}
+                  </button>
+                ):(
+                  <Link
+                    href="/auth"
+                    className="ml-auto text-white hover:text-[#F2C94C] font-medium transition-colors"
+                    onClick={()=>setIsMenuOpen(false)}
+                  >
+                    {t.loginSignup}
+                  </Link>
+                )}
               </div>
+
+              {isSignedIn&&(
+                <div className="px-4 text-white/80 text-sm">
+                  {t.signedInAs} {signedInLabel}
+                </div>
+              )}
 
               <div className="h-px bg-white/20 my-2"/>
 
@@ -348,7 +419,7 @@ export function Navigation(){
                   <Link
                     key={item.href}
                     href={item.href}
-                    className="py-2 px-4 rounded-md transition-colors text-white hover:text-[#F2C94C] hover:bg:white/10 hover:bg-white/10"
+                    className="py-2 px-4 rounded-md transition-colors text-white hover:text-[#F2C94C] hover:bg-white/10"
                     onClick={()=>setIsMenuOpen(false)}
                   >
                     {item.label}
