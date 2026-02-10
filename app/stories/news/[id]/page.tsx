@@ -1,7 +1,7 @@
 // app/stories/news/[id]/page.tsx
 "use client";
 
-import {useEffect,useState}from "react";
+import {useEffect,useMemo,useState}from "react";
 import {useParams}from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -27,7 +27,7 @@ type NewsItem={
   date:string;
   image?:string;
   images?:string[];
-  document?:string; // ✅ NEW
+  document?:string;
   visible?:boolean;
   externalUrl?:string;
   order?:number;
@@ -56,6 +56,30 @@ const buildFileUrl=(src?:string)=>{
   return`${S3_ORIGIN}/${clean}`;
 };
 
+const normaliseImages=(raw:any)=>{
+  const rawImages:Array<string>=Array.isArray(raw?.images)
+    ? (raw.images as Array<unknown>)
+      .filter((img):img is string=>typeof img==="string"&&img.trim().length>0)
+      .map((x:string)=>x.trim())
+    : [];
+
+  const primaryImage=typeof raw?.image==="string"&&raw.image.trim()
+    ? raw.image.trim()
+    : rawImages.length>0
+    ? rawImages[0]
+    : undefined;
+
+  const gallery=primaryImage
+    ? [primaryImage,...rawImages.filter((x:string)=>x!==primaryImage)]
+    : rawImages;
+
+  return{
+    primaryImage,
+    gallery
+  };
+};
+
+
 export default function NewsDetailPage(){
   const params=useParams();
   const rawId=(params as any)?.id;
@@ -68,14 +92,19 @@ export default function NewsDetailPage(){
   const[loading,setLoading]=useState<boolean>(true);
   const[error,setError]=useState<string|undefined>();
 
+  const[lightboxOpen,setLightboxOpen]=useState<boolean>(false);
+  const[lightboxIndex,setLightboxIndex]=useState<number>(0);
+
   const labels={
     en:{
       back:"← Back to News & Stories",
-      viewPdf:"View PDF"
+      viewPdf:"View PDF",
+      photos:"Photos"
     },
     tet:{
       back:"← Fila fali ba Notísia & Istória",
-      viewPdf:"Haree PDF"
+      viewPdf:"Haree PDF",
+      photos:"Foto sira"
     }
   }[L];
 
@@ -90,10 +119,8 @@ export default function NewsDetailPage(){
       try{
         setLoading(true);
         setError(undefined);
-        console.log("[stories/news/[id]] loading item",id);
 
-        const res=await fetch("/api/admin/news",{method:"GET"});
-        console.log("[stories/news/[id]] /api/admin/news status",res.status);
+        const res=await fetch("/api/admin/news",{method:"GET",cache:"no-store"});
         if(!res.ok){
           throw new Error(`Failed to load news: ${res.status}`);
         }
@@ -106,33 +133,32 @@ export default function NewsDetailPage(){
           const recId=typeof raw.id==="string"&&raw.id.trim()
             ? raw.id.trim()
             : `news-${index}`;
+
           const slug=typeof raw.slug==="string"&&raw.slug.trim()?raw.slug.trim():undefined;
+
           const titleEn=String(raw.titleEn??"Untitled");
           const titleTet=typeof raw.titleTet==="string"?raw.titleTet:undefined;
+
           const excerptEn=String(raw.excerptEn??"");
           const excerptTet=typeof raw.excerptTet==="string"?raw.excerptTet:undefined;
+
           const bodyEn=String(raw.bodyEn??"");
           const bodyTet=typeof raw.bodyTet==="string"?raw.bodyTet:undefined;
+
           const date=String(raw.date??"");
 
-          const rawImages=Array.isArray(raw.images)
-            ? raw.images.filter((img:any)=>typeof img==="string"&&img.trim())
-            : undefined;
-
-          const primaryImage=typeof raw.image==="string"&&raw.image.trim()
-            ? raw.image.trim()
-            : rawImages&&rawImages.length>0
-            ? rawImages[0]
-            : undefined;
+          const{primaryImage,gallery}=normaliseImages(raw);
 
           const document=typeof raw.document==="string"&&raw.document.trim()
             ? raw.document.trim()
             : undefined;
 
           const visible=raw.visible!==false;
+
           const externalUrl=typeof raw.externalUrl==="string"&&raw.externalUrl.trim()
             ? raw.externalUrl.trim()
             : undefined;
+
           const order=typeof raw.order==="number"?raw.order:index+1;
 
           return{
@@ -147,7 +173,7 @@ export default function NewsDetailPage(){
             bodyTet,
             date,
             image:primaryImage,
-            images:rawImages,
+            images:gallery,
             document,
             visible,
             externalUrl,
@@ -164,7 +190,6 @@ export default function NewsDetailPage(){
           setItem(found);
         }
       }catch(err:any){
-        console.error("[stories/news/[id]] load error",err);
         setError(err.message||"Error loading story");
       }finally{
         setLoading(false);
@@ -173,6 +198,33 @@ export default function NewsDetailPage(){
 
     load();
   },[id]);
+
+  const gallery=useMemo(()=>{
+    const g=(item?.images||[]).filter(Boolean);
+    return g;
+  },[item]);
+
+  useEffect(()=>{
+    if(!lightboxOpen){return;}
+
+    const onKeyDown=(e:KeyboardEvent)=>{
+      if(e.key==="Escape"){
+        setLightboxOpen(false);
+        return;
+      }
+      if(e.key==="ArrowRight"){
+        setLightboxIndex((prev)=>gallery.length?((prev+1)%gallery.length):prev);
+        return;
+      }
+      if(e.key==="ArrowLeft"){
+        setLightboxIndex((prev)=>gallery.length?((prev-1+gallery.length)%gallery.length):prev);
+        return;
+      }
+    };
+
+    window.addEventListener("keydown",onKeyDown);
+    return()=>window.removeEventListener("keydown",onKeyDown);
+  },[lightboxOpen,gallery.length]);
 
   let content;
   if(loading){
@@ -197,9 +249,11 @@ export default function NewsDetailPage(){
     const title=L==="tet"
       ? item.titleTet||item.titleEn
       : item.titleEn;
+
     const body=L==="tet"
       ? item.bodyTet||item.bodyEn||""
       : item.bodyEn||"";
+
     const excerpt=L==="tet"
       ? item.excerptTet||item.excerptEn
       : item.excerptEn;
@@ -249,14 +303,57 @@ export default function NewsDetailPage(){
         </header>
 
         {heroImage&&(
-          <div className="relative mb-8 h-64 w-full overflow-hidden rounded-lg border border-gray-200">
+          <button
+            type="button"
+            className="relative mb-8 h-64 w-full overflow-hidden rounded-lg border border-gray-200"
+            onClick={()=>{
+              setLightboxIndex(0);
+              setLightboxOpen(true);
+            }}
+            aria-label="Open photos"
+          >
             <Image
               src={imageSrc}
               alt={title}
               fill
               className="object-cover"
             />
-          </div>
+          </button>
+        )}
+
+        {gallery.length>1&&(
+          <section className="mb-10">
+            <div className="mb-3 flex items-center justify-between">
+              <h2 className="text-lg font-semibold text-gray-900">
+                {labels.photos}
+              </h2>
+              <div className="text-sm text-gray-600">
+                {gallery.length} {L==="tet"?"foto":"photos"}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+              {gallery.map((src,index)=>(
+                <button
+                  key={`${src}-${index}`}
+                  type="button"
+                  className="relative h-28 w-full overflow-hidden rounded-md border border-gray-200 bg-gray-50 hover:opacity-95"
+                  onClick={()=>{
+                    setLightboxIndex(index);
+                    setLightboxOpen(true);
+                  }}
+                  aria-label={`Open photo ${index+1}`}
+                >
+                  <Image
+                    src={buildImageUrl(src)}
+                    alt=""
+                    fill
+                    className="object-cover"
+                  />
+                </button>
+              ))}
+            </div>
+          </section>
         )}
 
         {body&&(
@@ -264,6 +361,68 @@ export default function NewsDetailPage(){
             {body.split(/\n{2,}/).map((para,index)=>(
               <p key={index}>{para}</p>
             ))}
+          </div>
+        )}
+
+        {/* Lightbox */}
+        {lightboxOpen&&gallery.length>0&&(
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
+            onMouseDown={(e)=>{
+              if(e.target===e.currentTarget){
+                setLightboxOpen(false);
+              }
+            }}
+          >
+            <div className="relative w-full max-w-5xl">
+              <button
+                type="button"
+                onClick={()=>setLightboxOpen(false)}
+                className="absolute right-2 top-2 z-10 rounded-md bg-white/90 px-3 py-2 text-sm font-semibold text-gray-800 shadow hover:bg-white"
+              >
+                ✕ Close
+              </button>
+
+              <button
+                type="button"
+                onClick={()=>{
+                  setLightboxIndex((prev)=>gallery.length?((prev-1+gallery.length)%gallery.length):prev);
+                }}
+                className="absolute left-2 top-1/2 z-10 -translate-y-1/2 rounded-md bg-white/90 px-3 py-2 text-sm font-semibold text-gray-800 shadow hover:bg-white"
+              >
+                ←
+              </button>
+
+              <button
+                type="button"
+                onClick={()=>{
+                  setLightboxIndex((prev)=>gallery.length?((prev+1)%gallery.length):prev);
+                }}
+                className="absolute right-2 top-1/2 z-10 -translate-y-1/2 rounded-md bg-white/90 px-3 py-2 text-sm font-semibold text-gray-800 shadow hover:bg-white"
+              >
+                →
+              </button>
+
+              <div className="rounded-lg bg-white p-3 shadow-xl">
+                <div className="relative h-[65vh] w-full overflow-hidden rounded-md bg-gray-100">
+                  <Image
+                    src={buildImageUrl(gallery[lightboxIndex])}
+                    alt=""
+                    fill
+                    className="object-contain"
+                  />
+                </div>
+
+                <div className="mt-3 flex items-center justify-between text-sm text-gray-700">
+                  <div>
+                    {lightboxIndex+1} / {gallery.length}
+                  </div>
+                  <div className="text-gray-500">
+                    ESC to close • ← → to navigate
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         )}
       </article>

@@ -26,7 +26,7 @@ type NewsItem={
   date:string;
   image?:string;
   images?:string[];
-  document?:string; // ✅ NEW
+  document?:string;
   visible?:boolean;
   externalUrl?:string;
   order?:number;
@@ -55,6 +55,22 @@ const buildFileUrl=(src?:string)=>{
   return`${S3_ORIGIN}/${clean}`;
 };
 
+const normaliseImages=(raw:any)=>{
+  const rawImages=Array.isArray(raw?.images)
+    ? raw.images.filter((img:any)=>typeof img==="string"&&img.trim()).map((x:string)=>x.trim())
+    : [];
+  const primaryImage=typeof raw?.image==="string"&&raw.image.trim()
+    ? raw.image.trim()
+    : rawImages.length>0
+    ? rawImages[0]
+    : undefined;
+
+  return{
+    primaryImage,
+    images:rawImages
+  };
+};
+
 export default function NewsPage(){
   const{language}=useLanguage();
   const L=language==="tet"?"tet":"en";
@@ -76,7 +92,8 @@ export default function NewsPage(){
       sortLabel:"Sort by",
       sortLatest:"Latest first",
       sortAZ:"Title A–Z",
-      sortCustom:"Editor order (featured first)"
+      sortCustom:"Editor order (featured first)",
+      morePhotos:(n:number)=>`+ ${n} more photos`
     },
     tet:{
       heading:"Notísia & Istória",
@@ -87,7 +104,8 @@ export default function NewsPage(){
       sortLabel:"Ordena tuir",
       sortLatest:"Foun liu ba leten",
       sortAZ:"Titulu A–Z",
-      sortCustom:"Ordem editor (artigu destakadu leten)"
+      sortCustom:"Ordem editor (artigu destakadu leten)",
+      morePhotos:(n:number)=>`+ foto seluk ${n}`
     }
   }[L];
 
@@ -96,14 +114,11 @@ export default function NewsPage(){
       try{
         setLoading(true);
         setError(undefined);
-        console.log("[stories/news] fetching /api/admin/news");
-        const res=await fetch("/api/admin/news",{method:"GET"});
-        console.log("[stories/news] /api/admin/news status",res.status);
+        const res=await fetch("/api/admin/news",{method:"GET",cache:"no-store"});
         if(!res.ok){
           throw new Error(`Failed to load news: ${res.status}`);
         }
         const data:ApiResponse=await res.json();
-        console.log("[stories/news] payload",data);
         if(!data.ok){
           throw new Error(data.error||"Unknown error from API");
         }
@@ -113,29 +128,27 @@ export default function NewsPage(){
             const id=typeof raw.id==="string"&&raw.id.trim()
               ? raw.id.trim()
               : `news-${index}`;
+
             const visible=raw.visible!==false;
+
             const titleEn=String(raw.titleEn??"Untitled");
             const titleTet=typeof raw.titleTet==="string"?raw.titleTet:undefined;
+
             const excerptEn=String(raw.excerptEn??"");
             const excerptTet=typeof raw.excerptTet==="string"?raw.excerptTet:undefined;
+
             const bodyEn=typeof raw.bodyEn==="string"?raw.bodyEn:undefined;
             const bodyTet=typeof raw.bodyTet==="string"?raw.bodyTet:undefined;
+
             const date=String(raw.date??"");
 
-            const rawImages=Array.isArray(raw.images)
-              ? raw.images.filter((img:any)=>typeof img==="string"&&img.trim())
-              : undefined;
-
-            const primaryImage=typeof raw.image==="string"&&raw.image.trim()
-              ? raw.image.trim()
-              : rawImages&&rawImages.length>0
-              ? rawImages[0]
-              : undefined;
+            const{primaryImage,images}=normaliseImages(raw);
 
             const slug=typeof raw.slug==="string"&&raw.slug.trim()?raw.slug.trim():undefined;
             const externalUrl=typeof raw.externalUrl==="string"&&raw.externalUrl.trim()
               ? raw.externalUrl.trim()
               : undefined;
+
             const order=typeof raw.order==="number"?raw.order:index+1;
 
             const document=typeof raw.document==="string"&&raw.document.trim()
@@ -154,7 +167,7 @@ export default function NewsPage(){
               bodyTet,
               date,
               image:primaryImage,
-              images:rawImages,
+              images,
               document,
               slug,
               externalUrl,
@@ -165,7 +178,6 @@ export default function NewsPage(){
 
         setItems(normalised);
       }catch(err:any){
-        console.error("[stories/news] load error",err);
         setError(err.message||"Error loading news items");
       }finally{
         setLoading(false);
@@ -210,12 +222,8 @@ export default function NewsPage(){
       const ob=b.order??0;
 
       if(sortMode==="latest"){
-        if(da!==db){
-          return db-da;
-        }
-        if(oa!==ob){
-          return oa-ob;
-        }
+        if(da!==db){return db-da;}
+        if(oa!==ob){return oa-ob;}
         return 0;
       }
 
@@ -224,18 +232,12 @@ export default function NewsPage(){
         const tb=getDisplayTitle(b);
         if(ta<tb){return-1;}
         if(ta>tb){return 1;}
-        if(da!==db){
-          return db-da;
-        }
+        if(da!==db){return db-da;}
         return 0;
       }
 
-      if(oa!==ob){
-        return oa-ob;
-      }
-      if(da!==db){
-        return db-da;
-      }
+      if(oa!==ob){return oa-ob;}
+      if(da!==db){return db-da;}
       return 0;
     });
 
@@ -298,12 +300,18 @@ export default function NewsPage(){
               const title=L==="tet"
                 ? item.titleTet||item.titleEn
                 : item.titleEn;
+
               const excerpt=L==="tet"
                 ? item.excerptTet||item.excerptEn
                 : item.excerptEn;
 
               const heroImage=item.image||(Array.isArray(item.images)&&item.images[0])||undefined;
               const imageSrc=buildImageUrl(heroImage);
+
+              const gallery=(item.images||[]).filter(Boolean);
+              const extraCount=heroImage
+                ? Math.max(0,gallery.length-1)
+                : gallery.length;
 
               const internalIdOrSlug=item.slug||item.id;
               const href=item.externalUrl
@@ -320,6 +328,10 @@ export default function NewsPage(){
                 }
               }
 
+              const stripThumbs=gallery
+                .filter((src)=>src!==heroImage)
+                .slice(0,3);
+
               return(
                 <article
                   key={item.id}
@@ -333,6 +345,26 @@ export default function NewsPage(){
                       className="rounded object-cover"
                     />
                   </div>
+
+                  {extraCount>0&&(
+                    <div className="mb-3 flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-2">
+                        {stripThumbs.map((src)=>(
+                          <div key={src} className="relative h-8 w-10 overflow-hidden rounded border border-gray-200 bg-white">
+                            <Image
+                              src={buildImageUrl(src)}
+                              alt=""
+                              fill
+                              className="object-cover"
+                            />
+                          </div>
+                        ))}
+                      </div>
+                      <div className="text-xs font-medium text-gray-600">
+                        {labels.morePhotos(extraCount)}
+                      </div>
+                    </div>
+                  )}
 
                   {dateLabel&&(
                     <div className="mb-3 text-xs text-gray-500">
