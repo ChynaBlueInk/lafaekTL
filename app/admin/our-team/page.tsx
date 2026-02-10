@@ -1,7 +1,7 @@
 // app/admin/our-team/page.tsx
 "use client"
 
-import {useEffect,useState,ChangeEvent}from "react"
+import {useEffect,useMemo,useState,ChangeEvent}from "react"
 
 type TeamMember={
   id?:string
@@ -21,6 +21,8 @@ type TeamMember={
 }
 
 type ApiState="idle"|"loading"|"saving"|"error"|"success"
+
+type ModalMode="view"|"edit"|"create"
 
 const emptyMember=(nextOrder:number):TeamMember=>({
   id:`temp-${Date.now()}-${Math.random().toString(16).slice(2)}`,
@@ -51,18 +53,35 @@ const normalizeS3Url=(src?:string)=>{
   return`${S3_ORIGIN}/${clean}`
 }
 
+const safeText=(v:any)=>typeof v==="string"?v:""
+
+const makeRowKey=(m:TeamMember,index:number)=>{
+  return m.id || m.slug || String(index)
+}
+
 export default function OurTeamAdminPage(){
   const[members,setMembers]=useState<TeamMember[]>([])
   const[status,setStatus]=useState<ApiState>("idle")
   const[error,setError]=useState<string|undefined>()
   const[uploading,setUploading]=useState<boolean>(false)
-  const[editingId,setEditingId]=useState<string|null>(null)
 
-  // state for add-member modal
-  const[isAddModalOpen,setIsAddModalOpen]=useState<boolean>(false)
-  const[newMemberDraft,setNewMemberDraft]=useState<TeamMember|null>(null)
+  // modal state (single modal for create/view/edit)
+  const[isModalOpen,setIsModalOpen]=useState(false)
+  const[modalMode,setModalMode]=useState<ModalMode>("view")
+  const[modalIndex,setModalIndex]=useState<number|null>(null)
+  const[modalDraft,setModalDraft]=useState<TeamMember|null>(null)
 
   const actionsDisabled=status==="saving"||status==="loading"||uploading
+
+  const canEdit=modalMode==="edit"||modalMode==="create"
+
+  const nextOrder=useMemo(()=>{
+    const maxOrder=members.reduce((max,m)=>{
+      const o=typeof m.order==="number"?m.order:0
+      return o>max?o:max
+    },0)
+    return maxOrder+1
+  },[members])
 
   // Load members from API on mount
   useEffect(()=>{
@@ -78,6 +97,7 @@ export default function OurTeamAdminPage(){
         if(!data || !Array.isArray(data.members)){
           throw new Error("Invalid response format from /api/admin/our-team")
         }
+
         const sorted=[...data.members]
           .sort((a:TeamMember,b:TeamMember)=>{
             const oa=typeof a.order==="number"?a.order:0
@@ -99,63 +119,6 @@ export default function OurTeamAdminPage(){
     }
     load()
   },[])
-
-  const handleFieldChange=(index:number,field:keyof TeamMember,value:any)=>{
-    setMembers(prev=>{
-      if(index<0 || index>=prev.length){return prev}
-      const copy=[...prev]
-      const existing=copy[index]
-      if(!existing){return prev}
-      copy[index]={...existing,[field]:value}
-      return copy
-    })
-  }
-
-  const handleToggleVisible=(index:number)=>{
-    setMembers(prev=>{
-      if(index<0 || index>=prev.length){return prev}
-      const copy=[...prev]
-      const existing=copy[index]
-      if(!existing){return prev}
-      copy[index]={...existing,visible:existing.visible!==false?false:true}
-      return copy
-    })
-  }
-
-  // open add-member modal with a fresh draft
-  const handleAddMember=()=>{
-    const maxOrder=members.reduce((max,m)=>{
-      const o=typeof m.order==="number"?m.order:0
-      return o>max?o:max
-    },0)
-    const draft=emptyMember(maxOrder+1)
-    setNewMemberDraft(draft)
-    setIsAddModalOpen(true)
-    setEditingId(null)
-  }
-
-  const handleMove=(index:number,direction:-1|1)=>{
-    setMembers(prev=>{
-      const newArr=[...prev]
-      const targetIndex=index+direction
-      if(index<0 || index>=newArr.length){return prev}
-      if(targetIndex<0 || targetIndex>=newArr.length){return prev}
-      const current=newArr[index]
-      const target=newArr[targetIndex]
-      if(!current || !target){return prev}
-      newArr[index]=target
-      newArr[targetIndex]=current
-      return newArr.map((m,i)=>({...m,order:i+1}))
-    })
-  }
-
-  const handleDeleteRow=(index:number)=>{
-    if(!window.confirm("Remove this member from the team list?")){return}
-    setMembers(prev=>{
-      const filtered=prev.filter((_,i)=>i!==index)
-      return filtered.map((m,i)=>({...m,order:i+1}))
-    })
-  }
 
   const handleReload=()=>{
     window.location.reload()
@@ -187,7 +150,6 @@ export default function OurTeamAdminPage(){
       }
 
       setStatus("success")
-      setEditingId(null)
       setTimeout(()=>{setStatus("idle")},1500)
     }catch(err:any){
       console.error("Error saving team members",err)
@@ -196,10 +158,114 @@ export default function OurTeamAdminPage(){
     }
   }
 
-  const handleFileUpload=async (e:ChangeEvent<HTMLInputElement>,index:number,field:"photo"|"sketch")=>{
+  const handleMove=(index:number,direction:-1|1)=>{
+    setMembers(prev=>{
+      const newArr=[...prev]
+      const targetIndex=index+direction
+      if(index<0 || index>=newArr.length){return prev}
+      if(targetIndex<0 || targetIndex>=newArr.length){return prev}
+      const current=newArr[index]
+      const target=newArr[targetIndex]
+      if(!current || !target){return prev}
+      newArr[index]=target
+      newArr[targetIndex]=current
+      return newArr.map((m,i)=>({...m,order:i+1}))
+    })
+  }
+
+  const handleDeleteRow=(index:number)=>{
+    if(!window.confirm("Remove this member from the team list?")){return}
+    setMembers(prev=>{
+      const filtered=prev.filter((_,i)=>i!==index)
+      return filtered.map((m,i)=>({...m,order:i+1}))
+    })
+  }
+
+  const openCreateModal=()=>{
+    setError(undefined)
+    setModalMode("create")
+    setModalIndex(null)
+    setModalDraft(emptyMember(nextOrder))
+    setIsModalOpen(true)
+  }
+
+  const openViewModal=(index:number)=>{
+    setError(undefined)
+    const m=members[index]
+    if(!m){return}
+    setModalMode("view")
+    setModalIndex(index)
+    setModalDraft({...m})
+    setIsModalOpen(true)
+  }
+
+  const openEditModal=(index:number)=>{
+    setError(undefined)
+    const m=members[index]
+    if(!m){return}
+    setModalMode("edit")
+    setModalIndex(index)
+    setModalDraft({...m})
+    setIsModalOpen(true)
+  }
+
+  const closeModal=()=>{
+    setIsModalOpen(false)
+    setModalDraft(null)
+    setModalIndex(null)
+    setModalMode("view")
+  }
+
+  const updateDraftField=(field:keyof TeamMember,value:any)=>{
+    setModalDraft(prev=>{
+      if(!prev){return prev}
+      return {...prev,[field]:value}
+    })
+  }
+
+  const applyModalChanges=()=>{
+    if(!modalDraft){return}
+
+    const trimmedNameEn=modalDraft.nameEn?.trim() ?? ""
+    const trimmedNameTet=modalDraft.nameTet?.trim() ?? ""
+
+    if(!trimmedNameEn || !trimmedNameTet){
+      setError("Each member must have both English and Tetun names.")
+      return
+    }
+
+    const cleaned:TeamMember={
+      ...modalDraft,
+      nameEn:trimmedNameEn,
+      nameTet:trimmedNameTet
+    }
+
+    if(modalMode==="create"){
+      setMembers(prev=>{
+        const updated=[...prev,cleaned]
+        return updated.map((m,i)=>({...m,order:i+1}))
+      })
+      closeModal()
+      return
+    }
+
+    if(modalMode==="edit" && modalIndex!==null){
+      setMembers(prev=>{
+        if(modalIndex<0 || modalIndex>=prev.length){return prev}
+        const copy=[...prev]
+        const existing=copy[modalIndex]
+        if(!existing){return prev}
+        copy[modalIndex]={...existing,...cleaned}
+        return copy
+      })
+      closeModal()
+    }
+  }
+
+  const handleModalUpload=async (e:ChangeEvent<HTMLInputElement>,field:"photo"|"sketch")=>{
     const file=e.target.files?.[0]
     e.target.value=""
-    if(!file){return}
+    if(!file || !modalDraft){return}
 
     try{
       setUploading(true)
@@ -241,14 +307,9 @@ export default function OurTeamAdminPage(){
       }
 
       const cleanUrl=normalizeS3Url(publicUrl)
-
-      setMembers(prev=>{
-        if(index<0 || index>=prev.length){return prev}
-        const copy=[...prev]
-        const existing=copy[index]
-        if(!existing){return prev}
-        copy[index]={...existing,[field]:cleanUrl}
-        return copy
+      setModalDraft(prev=>{
+        if(!prev){return prev}
+        return {...prev,[field]:cleanUrl}
       })
     }catch(err:any){
       console.error("Error uploading file",err)
@@ -256,47 +317,6 @@ export default function OurTeamAdminPage(){
     }finally{
       setUploading(false)
     }
-  }
-
-  // handlers for the add-member modal
-  const handleNewMemberFieldChange=(field:keyof TeamMember,value:any)=>{
-    setNewMemberDraft(prev=>{
-      if(!prev){return prev}
-      return{...prev,[field]:value}
-    })
-  }
-
-  const handleCreateMember=()=>{
-    if(!newMemberDraft){return}
-
-    const trimmedNameEn=newMemberDraft.nameEn?.trim() ?? ""
-    const trimmedNameTet=newMemberDraft.nameTet?.trim() ?? ""
-
-    if(!trimmedNameEn || !trimmedNameTet){
-      setError("New member needs a name (we store it for both English and Tetun).")
-      return
-    }
-
-    const draftWithTrim:TeamMember={
-      ...newMemberDraft,
-      nameEn:trimmedNameEn,
-      nameTet:trimmedNameTet
-    }
-
-    setMembers(prev=>{
-      const updated=[...prev,draftWithTrim]
-      return updated.map((m,i)=>({...m,order:i+1}))
-    })
-
-    const newId=draftWithTrim.id || draftWithTrim.slug || null
-    setEditingId(newId)
-    setIsAddModalOpen(false)
-    setNewMemberDraft(null)
-  }
-
-  const handleCancelNewMember=()=>{
-    setIsAddModalOpen(false)
-    setNewMemberDraft(null)
   }
 
   return(
@@ -313,7 +333,7 @@ export default function OurTeamAdminPage(){
           <div className="flex items-center gap-2">
             <button
               type="button"
-              onClick={handleAddMember}
+              onClick={openCreateModal}
               disabled={actionsDisabled}
               className="rounded border border-slate-300 bg-white px-4 py-1.5 text-sm font-medium text-slate-800 hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-60"
             >
@@ -362,18 +382,21 @@ export default function OurTeamAdminPage(){
           </div>
         )}
 
+        {!!error && status!=="error" && (
+          <div className="mb-4 rounded-md bg-amber-50 px-4 py-3 text-sm text-amber-900">
+            {error}
+          </div>
+        )}
+
         <div className="overflow-x-auto rounded-md border border-slate-200 bg-white">
           <table className="min-w-full text-left text-sm align-top">
             <thead className="bg-slate-100">
               <tr>
                 <th className="px-3 py-2 text-xs font-semibold uppercase tracking-wide text-slate-600">#</th>
                 <th className="px-3 py-2 text-xs font-semibold uppercase tracking-wide text-slate-600">Visible</th>
-                <th className="px-3 py-2 text-xs font-semibold uppercase tracking-wide text-slate-600">Name (EN)</th>
-                <th className="px-3 py-2 text-xs font-semibold uppercase tracking-wide text-slate-600">Name (Tet)</th>
-                <th className="px-3 py-2 text-xs font-semibold uppercase tracking-wide text-slate-600">Role (EN)</th>
-                <th className="px-3 py-2 text-xs font-semibold uppercase tracking-wide text-slate-600">Role (Tet)</th>
-                <th className="px-3 py-2 text-xs font-semibold uppercase tracking-wide text-slate-600">Bio (EN)</th>
-                <th className="px-3 py-2 text-xs font-semibold uppercase tracking-wide text-slate-600">Bio (Tet)</th>
+                <th className="px-3 py-2 text-xs font-semibold uppercase tracking-wide text-slate-600">Name</th>
+                <th className="px-3 py-2 text-xs font-semibold uppercase tracking-wide text-slate-600">Role</th>
+                <th className="px-3 py-2 text-xs font-semibold uppercase tracking-wide text-slate-600">Started</th>
                 <th className="px-3 py-2 text-xs font-semibold uppercase tracking-wide text-slate-600">Photo</th>
                 <th className="px-3 py-2 text-xs font-semibold uppercase tracking-wide text-slate-600">Sketch</th>
                 <th className="px-3 py-2 text-xs font-semibold uppercase tracking-wide text-slate-600">Move</th>
@@ -382,143 +405,58 @@ export default function OurTeamAdminPage(){
             </thead>
             <tbody>
               {members.map((m,index)=>{
-                const rowKey=m.id || m.slug || String(index)
-                const isEditing=editingId===rowKey
+                const rowKey=makeRowKey(m,index)
+                const visible=m.visible!==false
+                const name=safeText(m.nameEn)||safeText(m.nameTet)||"(no name)"
+                const role=safeText(m.roleEn)||safeText(m.roleTet)||""
+                const started=safeText(m.started)||""
+                const hasPhoto=!!safeText(m.photo)
+                const hasSketch=!!safeText(m.sketch)
 
                 return(
                   <tr key={rowKey} className={index%2===0?"bg-white":"bg-slate-50"}>
-                    <td className="px-3 py-2 align-top text-xs text-slate-700">
-                      {index+1}
-                    </td>
-                    <td className="px-3 py-2 align-top text-center">
-                      <input
-                        type="checkbox"
-                        checked={m.visible!==false}
-                        onChange={()=>handleToggleVisible(index)}
-                        disabled={!isEditing}
-                      />
+                    <td className="px-3 py-2 align-top text-xs text-slate-700">{index+1}</td>
+                    <td className="px-3 py-2 align-top">
+                      <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold ${visible?"bg-emerald-50 text-emerald-800":"bg-slate-200 text-slate-700"}`}>
+                        {visible?"Visible":"Hidden"}
+                      </span>
                     </td>
                     <td className="px-3 py-2 align-top">
-                      <input
-                        type="text"
-                        className={`w-full rounded border border-slate-300 px-2 py-1 text-xs ${!isEditing?"bg-slate-100 cursor-not-allowed":""}`}
-                        value={m.nameEn ?? ""}
-                        onChange={(e)=>handleFieldChange(index,"nameEn",e.target.value)}
-                        placeholder="Name (English)"
-                        readOnly={!isEditing}
-                      />
+                      <div className="font-semibold text-slate-900">{name}</div>
+                      <div className="text-xs text-slate-600">{safeText(m.nameTet) && m.nameTet!==m.nameEn ? m.nameTet : ""}</div>
                     </td>
                     <td className="px-3 py-2 align-top">
-                      <input
-                        type="text"
-                        className={`w-full rounded border border-slate-300 px-2 py-1 text-xs ${!isEditing?"bg-slate-100 cursor-not-allowed":""}`}
-                        value={m.nameTet ?? ""}
-                        onChange={(e)=>handleFieldChange(index,"nameTet",e.target.value)}
-                        placeholder="Naran (Tetun)"
-                        readOnly={!isEditing}
-                      />
+                      <div className="text-slate-800">{role}</div>
+                      <div className="text-xs text-slate-600">{safeText(m.roleTet) && m.roleTet!==m.roleEn ? m.roleTet : ""}</div>
+                    </td>
+                    <td className="px-3 py-2 align-top text-slate-700">{started}</td>
+                    <td className="px-3 py-2 align-top">
+                      {hasPhoto?(
+                        <a
+                          href={normalizeS3Url(m.photo)}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-xs text-sky-700 underline"
+                        >
+                          View
+                        </a>
+                      ):(
+                        <span className="text-xs text-slate-500">—</span>
+                      )}
                     </td>
                     <td className="px-3 py-2 align-top">
-                      <input
-                        type="text"
-                        className={`w-full rounded border border-slate-300 px-2 py-1 text-xs ${!isEditing?"bg-slate-100 cursor-not-allowed":""}`}
-                        value={m.roleEn ?? ""}
-                        onChange={(e)=>handleFieldChange(index,"roleEn",e.target.value)}
-                        placeholder="Role (English)"
-                        readOnly={!isEditing}
-                      />
-                    </td>
-                    <td className="px-3 py-2 align-top">
-                      <input
-                        type="text"
-                        className={`w-full rounded border border-slate-300 px-2 py-1 text-xs ${!isEditing?"bg-slate-100 cursor-not-allowed":""}`}
-                        value={m.roleTet ?? ""}
-                        onChange={(e)=>handleFieldChange(index,"roleTet",e.target.value)}
-                        placeholder="Kargo (Tetun)"
-                        readOnly={!isEditing}
-                      />
-                    </td>
-                    <td className="px-3 py-2 align-top">
-                      <textarea
-                        className={`h-20 w-full rounded border border-slate-300 px-2 py-1 text-xs ${!isEditing?"bg-slate-100 cursor-not-allowed":""}`}
-                        value={m.bioEn ?? ""}
-                        onChange={(e)=>handleFieldChange(index,"bioEn",e.target.value)}
-                        placeholder="Short bio in English"
-                        readOnly={!isEditing}
-                      />
-                    </td>
-                    <td className="px-3 py-2 align-top">
-                      <textarea
-                        className={`h-20 w-full rounded border border-slate-300 px-2 py-1 text-xs ${!isEditing?"bg-slate-100 cursor-not-allowed":""}`}
-                        value={m.bioTet ?? ""}
-                        onChange={(e)=>handleFieldChange(index,"bioTet",e.target.value)}
-                        placeholder="Bio iha Tetun"
-                        readOnly={!isEditing}
-                      />
-                    </td>
-                    <td className="px-3 py-2 align-top">
-                      <div className="flex flex-col gap-1">
-                        <input
-                          type="text"
-                          className={`w-full rounded border border-slate-300 px-2 py-1 text-xs ${!isEditing?"bg-slate-100 cursor-not-allowed":""}`}
-                          value={m.photo ?? ""}
-                          onChange={(e)=>handleFieldChange(index,"photo",e.target.value)}
-                          placeholder="https://.../photo.jpg"
-                          readOnly={!isEditing}
-                        />
-                        <label className={`w-full cursor-pointer rounded border border-dashed border-slate-300 px-2 py-1 text-center text-xs text-slate-600 hover:bg-slate-100 ${!isEditing?"opacity-50 cursor-not-allowed hover:bg-white":""}`}>
-                          Upload photo
-                          <input
-                            type="file"
-                            accept="image/*"
-                            className="hidden"
-                            onChange={(e)=>handleFileUpload(e,index,"photo")}
-                            disabled={!isEditing}
-                          />
-                        </label>
-                        {m.photo&&(
-                          <a
-                            href={normalizeS3Url(m.photo)}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="text-[10px] text-sky-700 underline"
-                          >
-                            View current photo
-                          </a>
-                        )}
-                      </div>
-                    </td>
-                    <td className="px-3 py-2 align-top">
-                      <div className="flex flex-col gap-1">
-                        <input
-                          type="text"
-                          className={`w-full rounded border border-slate-300 px-2 py-1 text-xs ${!isEditing?"bg-slate-100 cursor-not-allowed":""}`}
-                          value={m.sketch ?? ""}
-                          onChange={(e)=>handleFieldChange(index,"sketch",e.target.value)}
-                          placeholder="https://.../sketch.png"
-                          readOnly={!isEditing}
-                        />
-                        <label className={`w-full cursor-pointer rounded border border-dashed border-slate-300 px-2 py-1 text-center text-xs text-slate-600 hover:bg-slate-100 ${!isEditing?"opacity-50 cursor-not-allowed hover:bg-white":""}`}>
-                          Upload sketch
-                          <input
-                            type="file"
-                            accept="image/*"
-                            className="hidden"
-                            onChange={(e)=>handleFileUpload(e,index,"sketch")}
-                            disabled={!isEditing}
-                          />
-                        </label>
-                        {m.sketch&&(
-                          <a
-                            href={normalizeS3Url(m.sketch)}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="text-[10px] text-sky-700 underline"
-                          >
-                            View current sketch
-                          </a>
-                        )}
-                      </div>
+                      {hasSketch?(
+                        <a
+                          href={normalizeS3Url(m.sketch)}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-xs text-sky-700 underline"
+                        >
+                          View
+                        </a>
+                      ):(
+                        <span className="text-xs text-slate-500">—</span>
+                      )}
                     </td>
                     <td className="px-3 py-2 align-top">
                       <div className="flex flex-col items-center gap-1">
@@ -526,7 +464,7 @@ export default function OurTeamAdminPage(){
                           type="button"
                           onClick={()=>handleMove(index,-1)}
                           className="rounded border border-slate-300 px-2 py-0.5 text-xs hover:bg-slate-100"
-                          disabled={status==="saving" || uploading}
+                          disabled={actionsDisabled}
                         >
                           ↑
                         </button>
@@ -534,7 +472,7 @@ export default function OurTeamAdminPage(){
                           type="button"
                           onClick={()=>handleMove(index,1)}
                           className="rounded border border-slate-300 px-2 py-0.5 text-xs hover:bg-slate-100"
-                          disabled={status==="saving" || uploading}
+                          disabled={actionsDisabled}
                         >
                           ↓
                         </button>
@@ -544,23 +482,25 @@ export default function OurTeamAdminPage(){
                       <div className="flex flex-col gap-1">
                         <button
                           type="button"
-                          onClick={()=>{
-                            if(isEditing){
-                              setEditingId(null)
-                            }else{
-                              setEditingId(rowKey)
-                            }
-                          }}
+                          onClick={()=>openViewModal(index)}
                           className="rounded border border-slate-300 px-2 py-1 text-xs text-slate-800 hover:bg-slate-100"
-                          disabled={status==="saving" || uploading}
+                          disabled={actionsDisabled}
                         >
-                          {isEditing?"Done":"Edit"}
+                          View
+                        </button>
+                        <button
+                          type="button"
+                          onClick={()=>openEditModal(index)}
+                          className="rounded border border-slate-300 px-2 py-1 text-xs text-slate-800 hover:bg-slate-100"
+                          disabled={actionsDisabled}
+                        >
+                          Edit
                         </button>
                         <button
                           type="button"
                           onClick={()=>handleDeleteRow(index)}
                           className="rounded border border-red-300 px-2 py-1 text-xs text-red-700 hover:bg-red-50"
-                          disabled={status==="saving" || uploading}
+                          disabled={actionsDisabled}
                         >
                           Remove
                         </button>
@@ -572,7 +512,7 @@ export default function OurTeamAdminPage(){
 
               {members.length===0 && status!=="loading" && (
                 <tr>
-                  <td colSpan={12} className="px-3 py-6 text-center text-sm text-slate-500">
+                  <td colSpan={9} className="px-3 py-6 text-center text-sm text-slate-500">
                     No team members found yet. Click &quot;Add team member&quot; to create the first one.
                   </td>
                 </tr>
@@ -581,11 +521,10 @@ export default function OurTeamAdminPage(){
           </table>
         </div>
 
-        {/* Bottom Add button (kept) */}
         <div className="mt-4 flex items-center justify-between gap-2">
           <button
             type="button"
-            onClick={handleAddMember}
+            onClick={openCreateModal}
             disabled={actionsDisabled}
             className="rounded border border-slate-300 bg-white px-4 py-1.5 text-sm text-slate-800 hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-60"
           >
@@ -593,7 +532,7 @@ export default function OurTeamAdminPage(){
           </button>
 
           <div className="text-xs text-slate-500">
-            Tip: Click <span className="font-semibold">Edit</span> on a row to enable fields, then <span className="font-semibold">Save Changes</span>.
+            Tip: Use <span className="font-semibold">View</span> for checking details, and <span className="font-semibold">Edit</span> to update in a single form. Don’t forget <span className="font-semibold">Save Changes</span>.
           </div>
         </div>
 
@@ -603,113 +542,268 @@ export default function OurTeamAdminPage(){
             <li>Bio fields are stored as <code>bioEn</code> and <code>bioTet</code> in <code>content/team.json</code>.</li>
             <li>Photo and sketch URLs are stored as <code>photo</code> and <code>sketch</code>, matching the public loader in <code>lib/content-team.ts</code>.</li>
             <li>Uploads use the existing <code>/api/uploads/s3/presign</code> route with the <code>our-team</code> folder.</li>
-            <li>Use the Edit button per row to enable changes, then Save Changes to persist to S3.</li>
+            <li>Make edits in the modal, then click <code>Save Changes</code> on this page to persist to S3.</li>
           </ul>
         </section>
       </div>
 
-      {/* Add-member modal */}
-      {isAddModalOpen && newMemberDraft && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
-          <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl">
-            <h2 className="text-lg font-semibold text-slate-900 mb-1">Add new team member</h2>
-            <p className="text-xs text-slate-600 mb-4">
-              Enter the main details. The name will be used for both English and Tetun. You can refine roles, bios and images later in the table.
-            </p>
+      {/* Single modal for Create / View / Edit */}
+      {isModalOpen && modalDraft && (
+<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4 py-6">
+<div className="w-full max-w-3xl rounded-2xl bg-white shadow-2xl max-h-[90vh] flex flex-col overflow-hidden">
+<div className="flex items-start justify-between gap-4 border-b border-slate-200 p-5 bg-white sticky top-0 z-10">
+              <div>
+                <h2 className="text-lg font-semibold text-slate-900">
+                  {modalMode==="create"?"Add team member":modalMode==="edit"?"Edit team member":"View team member"}
+                </h2>
+                <p className="mt-1 text-xs text-slate-600">
+                  {modalMode==="create"
+                    ? "Fill in details and click Create. You still need to Save Changes on the page to publish to S3."
+                    : modalMode==="edit"
+                    ? "Make updates and click Apply. You still need to Save Changes on the page to publish to S3."
+                    : "Read-only view. Click Edit if you need to change anything."}
+                </p>
+              </div>
 
-            <div className="grid grid-cols-1 gap-3">
-              <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">Name</label>
-                <input
-                  type="text"
-                  className="w-full rounded border border-slate-300 px-2 py-1 text-xs"
-                  value={newMemberDraft.nameEn}
-                  onChange={(e)=>{
-                    const val=e.target.value
-                    // keep both nameEn and nameTet in sync for now
-                    setNewMemberDraft(prev=>{
-                      if(!prev){return prev}
-                      return{...prev,nameEn:val,nameTet:val}
-                    })
-                  }}
-                  placeholder="e.g. Maria Soares"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">Role (English)</label>
-                <input
-                  type="text"
-                  className="w-full rounded border border-slate-300 px-2 py-1 text-xs"
-                  value={newMemberDraft.roleEn ?? ""}
-                  onChange={(e)=>handleNewMemberFieldChange("roleEn",e.target.value)}
-                  placeholder="e.g. Graphic Designer"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">Kargo (Tetun)</label>
-                <input
-                  type="text"
-                  className="w-full rounded border border-slate-300 px-2 py-1 text-xs"
-                  value={newMemberDraft.roleTet ?? ""}
-                  onChange={(e)=>handleNewMemberFieldChange("roleTet",e.target.value)}
-                  placeholder="e.g. Dezenhador Gráfiku"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">Bio (English)</label>
-                <textarea
-                  className="w-full rounded border border-slate-300 px-2 py-1 text-xs h-20"
-                  value={newMemberDraft.bioEn ?? ""}
-                  onChange={(e)=>handleNewMemberFieldChange("bioEn",e.target.value)}
-                  placeholder="Short bio in English"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">Bio (Tetun)</label>
-                <textarea
-                  className="w-full rounded border border-slate-300 px-2 py-1 text-xs h-20"
-                  value={newMemberDraft.bioTet ?? ""}
-                  onChange={(e)=>handleNewMemberFieldChange("bioTet",e.target.value)}
-                  placeholder="Bio iha Tetun"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">Started (optional)</label>
-                <input
-                  type="text"
-                  className="w-full rounded border border-slate-300 px-2 py-1 text-xs"
-                  value={newMemberDraft.started ?? ""}
-                  onChange={(e)=>handleNewMemberFieldChange("started",e.target.value)}
-                  placeholder="e.g. 2020"
-                />
-              </div>
-              <div>
-                <label className="inline-flex items-center gap-2 text-xs text-slate-700">
-                  <input
-                    type="checkbox"
-                    checked={newMemberDraft.visible!==false}
-                    onChange={(e)=>handleNewMemberFieldChange("visible",e.target.checked)}
-                  />
-                  Show on public Our Team page
-                </label>
-              </div>
+              <button
+                type="button"
+                onClick={closeModal}
+                className="rounded-md px-2 py-1 text-sm font-semibold text-slate-600 hover:bg-slate-100"
+                aria-label="Close"
+              >
+                ✕
+              </button>
             </div>
 
-            <div className="mt-5 flex justify-end gap-2">
-              <button
-                type="button"
-                onClick={handleCancelNewMember}
-                className="rounded border border-slate-300 px-3 py-1.5 text-xs text-slate-800 hover:bg-slate-100"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={handleCreateMember}
-                className="rounded bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-700"
-              >
-                Create member
-              </button>
+<div className="p-5 overflow-y-auto">
+              <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+                <div className="space-y-3">
+                  <div className="grid grid-cols-1 gap-3">
+                    <div>
+                      <label className="block text-xs font-medium text-slate-700 mb-1">Name (English)</label>
+                      <input
+                        type="text"
+                        className={`w-full rounded border border-slate-300 px-2 py-1 text-xs ${!canEdit?"bg-slate-100 cursor-not-allowed":""}`}
+                        value={modalDraft.nameEn ?? ""}
+                        onChange={(e)=>updateDraftField("nameEn",e.target.value)}
+                        readOnly={!canEdit}
+                        placeholder="e.g. Maria Soares"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-medium text-slate-700 mb-1">Name (Tetun)</label>
+                      <input
+                        type="text"
+                        className={`w-full rounded border border-slate-300 px-2 py-1 text-xs ${!canEdit?"bg-slate-100 cursor-not-allowed":""}`}
+                        value={modalDraft.nameTet ?? ""}
+                        onChange={(e)=>updateDraftField("nameTet",e.target.value)}
+                        readOnly={!canEdit}
+                        placeholder="Naran iha Tetun"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-medium text-slate-700 mb-1">Role (English)</label>
+                      <input
+                        type="text"
+                        className={`w-full rounded border border-slate-300 px-2 py-1 text-xs ${!canEdit?"bg-slate-100 cursor-not-allowed":""}`}
+                        value={modalDraft.roleEn ?? ""}
+                        onChange={(e)=>updateDraftField("roleEn",e.target.value)}
+                        readOnly={!canEdit}
+                        placeholder="e.g. Graphic Designer"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-medium text-slate-700 mb-1">Kargo (Tetun)</label>
+                      <input
+                        type="text"
+                        className={`w-full rounded border border-slate-300 px-2 py-1 text-xs ${!canEdit?"bg-slate-100 cursor-not-allowed":""}`}
+                        value={modalDraft.roleTet ?? ""}
+                        onChange={(e)=>updateDraftField("roleTet",e.target.value)}
+                        readOnly={!canEdit}
+                        placeholder="e.g. Dezenhador Gráfiku"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-medium text-slate-700 mb-1">Started (optional)</label>
+                      <input
+                        type="text"
+                        className={`w-full rounded border border-slate-300 px-2 py-1 text-xs ${!canEdit?"bg-slate-100 cursor-not-allowed":""}`}
+                        value={modalDraft.started ?? ""}
+                        onChange={(e)=>updateDraftField("started",e.target.value)}
+                        readOnly={!canEdit}
+                        placeholder="e.g. 2020"
+                      />
+                    </div>
+
+                    <div>
+                      <label className={`inline-flex items-center gap-2 text-xs text-slate-700 ${!canEdit?"opacity-70":""}`}>
+                        <input
+                          type="checkbox"
+                          checked={modalDraft.visible!==false}
+                          onChange={(e)=>updateDraftField("visible",e.target.checked)}
+                          disabled={!canEdit}
+                        />
+                        Show on public Our Team page
+                      </label>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-medium text-slate-700 mb-1">Bio (English)</label>
+                    <textarea
+                      className={`w-full rounded border border-slate-300 px-2 py-1 text-xs h-24 ${!canEdit?"bg-slate-100 cursor-not-allowed":""}`}
+                      value={modalDraft.bioEn ?? ""}
+                      onChange={(e)=>updateDraftField("bioEn",e.target.value)}
+                      readOnly={!canEdit}
+                      placeholder="Short bio in English"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-medium text-slate-700 mb-1">Bio (Tetun)</label>
+                    <textarea
+                      className={`w-full rounded border border-slate-300 px-2 py-1 text-xs h-24 ${!canEdit?"bg-slate-100 cursor-not-allowed":""}`}
+                      value={modalDraft.bioTet ?? ""}
+                      onChange={(e)=>updateDraftField("bioTet",e.target.value)}
+                      readOnly={!canEdit}
+                      placeholder="Bio iha Tetun"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="rounded-xl border border-slate-200 p-4">
+                    <div className="text-xs font-semibold text-slate-700 mb-2">Photo</div>
+                    <div className="grid grid-cols-1 gap-3">
+                      <div className="rounded-lg bg-slate-50 border border-slate-200 p-3 flex items-center justify-center">
+                        {modalDraft.photo?(
+                          <img
+                            src={normalizeS3Url(modalDraft.photo)}
+                            alt="Photo preview"
+                            className="max-h-56 w-full object-contain"
+                          />
+                        ):(
+                          <div className="text-xs text-slate-500">No photo yet</div>
+                        )}
+                      </div>
+
+                      <input
+                        type="text"
+                        className={`w-full rounded border border-slate-300 px-2 py-1 text-xs ${!canEdit?"bg-slate-100 cursor-not-allowed":""}`}
+                        value={modalDraft.photo ?? ""}
+                        onChange={(e)=>updateDraftField("photo",e.target.value)}
+                        readOnly={!canEdit}
+                        placeholder="https://.../photo.jpg"
+                      />
+
+                      <label className={`w-full cursor-pointer rounded border border-dashed border-slate-300 px-2 py-2 text-center text-xs text-slate-700 hover:bg-slate-100 ${!canEdit?"opacity-50 cursor-not-allowed hover:bg-white":""}`}>
+                        Upload photo
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e)=>handleModalUpload(e,"photo")}
+                          disabled={!canEdit}
+                        />
+                      </label>
+                    </div>
+                  </div>
+
+                  <div className="rounded-xl border border-slate-200 p-4">
+                    <div className="text-xs font-semibold text-slate-700 mb-2">Sketch</div>
+                    <div className="grid grid-cols-1 gap-3">
+                      <div className="rounded-lg bg-slate-50 border border-slate-200 p-3 flex items-center justify-center">
+                        {modalDraft.sketch?(
+                          <img
+                            src={normalizeS3Url(modalDraft.sketch)}
+                            alt="Sketch preview"
+                            className="max-h-56 w-full object-contain"
+                          />
+                        ):(
+                          <div className="text-xs text-slate-500">No sketch yet</div>
+                        )}
+                      </div>
+
+                      <input
+                        type="text"
+                        className={`w-full rounded border border-slate-300 px-2 py-1 text-xs ${!canEdit?"bg-slate-100 cursor-not-allowed":""}`}
+                        value={modalDraft.sketch ?? ""}
+                        onChange={(e)=>updateDraftField("sketch",e.target.value)}
+                        readOnly={!canEdit}
+                        placeholder="https://.../sketch.png"
+                      />
+
+                      <label className={`w-full cursor-pointer rounded border border-dashed border-slate-300 px-2 py-2 text-center text-xs text-slate-700 hover:bg-slate-100 ${!canEdit?"opacity-50 cursor-not-allowed hover:bg-white":""}`}>
+                        Upload sketch
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e)=>handleModalUpload(e,"sketch")}
+                          disabled={!canEdit}
+                        />
+                      </label>
+                    </div>
+                  </div>
+
+                  {modalDraft.slug!==undefined && (
+                    <div className="rounded-xl border border-slate-200 p-4">
+                      <div className="text-xs font-semibold text-slate-700 mb-2">Slug (optional)</div>
+                      <input
+                        type="text"
+                        className={`w-full rounded border border-slate-300 px-2 py-1 text-xs ${!canEdit?"bg-slate-100 cursor-not-allowed":""}`}
+                        value={modalDraft.slug ?? ""}
+                        onChange={(e)=>updateDraftField("slug",e.target.value)}
+                        readOnly={!canEdit}
+                        placeholder="e.g. maria-soares"
+                      />
+                      <div className="mt-2 text-[11px] text-slate-500">
+                        Tip: If blank, the system will auto-generate a fallback slug when saving.
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="mt-6 flex justify-end gap-2 border-t border-slate-200 pt-4">
+                <button
+                  type="button"
+                  onClick={closeModal}
+                  className="rounded border border-slate-300 px-3 py-1.5 text-xs text-slate-800 hover:bg-slate-100"
+                >
+                  Close
+                </button>
+
+                {modalMode==="view"&&(
+                  <button
+                    type="button"
+                    onClick={()=>{if(modalIndex!==null){openEditModal(modalIndex)}}}
+                    className="rounded bg-slate-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-slate-950"
+                    disabled={actionsDisabled}
+                  >
+                    Edit
+                  </button>
+                )}
+
+                {modalMode!=="view"&&(
+                  <button
+                    type="button"
+                    onClick={applyModalChanges}
+                    className="rounded bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-700"
+                    disabled={actionsDisabled}
+                  >
+                    {modalMode==="create"?"Create":"Apply"}
+                  </button>
+                )}
+              </div>
+
+              <div className="px-5 pb-5 text-[11px] text-slate-500">
+                Note: Applying changes updates the table state. You still need to click <span className="font-semibold">Save Changes</span> on the main page to write to S3.
+              </div>
             </div>
           </div>
         </div>
