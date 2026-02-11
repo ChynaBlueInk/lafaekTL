@@ -231,24 +231,24 @@ export default function HomePage(){
 
         {/* Social + CTA Block */}
         <section className="bg-gray-50 py-12 px-4" aria-labelledby="social-and-cta">
-          <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {/* Facebook */}
             <div className="bg-white border border-gray-300 rounded-lg shadow overflow-hidden flex flex-col">
-              <div className="relative w-full h-48 bg-gray-100">
+              <div className="relative w-full h-40 bg-gray-100">
                 <Image
                   src="/HomePage/LafaekFacebook.png"
                   alt="Lafaek Facebook"
                   fill
-                  sizes="(min-width:1024px) 33vw, 100vw"
+                  sizes="(min-width:1024px) 25vw, 100vw"
                   className="object-cover"
                   priority
                 />
               </div>
-              <div className="p-6 flex flex-col flex-grow">
-                <h3 className="text-2xl font-bold text-blue-700 mb-2">
+              <div className="p-5 flex flex-col flex-grow">
+                <h3 className="text-xl font-bold text-blue-700 mb-2">
                   {language==="tet"?"Segue ami iha Facebook":"Follow us on Facebook"}
                 </h3>
-                <p className="text-gray-600 mb-4">
+                <p className="text-gray-600 mb-4 text-sm">
                   {language==="tet"
                     ?"Hahú hatene notísia foun no eventu komunitáriu sira."
                     :"Stay updated with our latest stories and community events."}
@@ -265,23 +265,57 @@ export default function HomePage(){
               </div>
             </div>
 
+            {/* Instagram */}
+            <div className="bg-white border border-gray-300 rounded-lg shadow overflow-hidden flex flex-col">
+              
+<div className="relative w-full h-40 bg-gray-100">
+  <Image
+    src="/HomePage/LafaekInstagram.png"
+    alt="Lafaek Instagram"
+    fill
+    sizes="(min-width:1024px) 25vw, 100vw"
+    className="object-contain p-6"
+  />
+</div>
+
+              <div className="p-5 flex flex-col flex-grow">
+                <h3 className="text-xl font-bold text-[#EB5757] mb-2">
+                  {language==="tet"?"Haree ami iha Instagram":"See us on Instagram"}
+                </h3>
+                <p className="text-gray-600 mb-4 text-sm">
+                  {language==="tet"
+                    ?"Haree foto, istória badinas no atividade sira iha kampu."
+                    :"Photos, short stories, and field updates from our work."}
+                </p>
+                <a
+                  href="https://www.instagram.com/revistalafaek/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-[#EB5757] hover:bg-red-600 text-white font-bold text-center py-3 px-6 rounded-full mt-auto"
+                  aria-label="Visit our Instagram page (opens in a new tab)"
+                >
+                  {language==="tet"?"Vizita Instagram":"Visit Instagram"}
+                </a>
+              </div>
+            </div>
+
             {/* YouTube */}
             <div className="bg-white border border-gray-300 rounded-lg shadow overflow-hidden flex flex-col">
-              <div className="relative w-full h-48 bg-gray-100">
+              <div className="relative w-full h-40 bg-gray-100">
                 <Image
                   src="/HomePage/LafaekWebsite.png"
                   alt="Lafaek YouTube"
                   fill
-                  sizes="(min-width:1024px) 33vw, 100vw"
+                  sizes="(min-width:1024px) 25vw, 100vw"
                   className="object-cover"
                   priority
                 />
               </div>
-              <div className="p-6 flex flex-col flex-grow">
-                <h3 className="text-2xl font-bold text-red-600 mb-2">
+              <div className="p-5 flex flex-col flex-grow">
+                <h3 className="text-xl font-bold text-red-600 mb-2">
                   {language==="tet"?"Haree ami iha YouTube":"Watch us on YouTube"}
                 </h3>
-                <p className="text-gray-600 mb-4">
+                <p className="text-gray-600 mb-4 text-sm">
                   {language==="tet"
                     ?"Deskobre ami-nia konteúdu, istória no vídeo sira husi kampu."
                     :"Discover our behind-the-scenes content, stories, and videos from the field."}
@@ -299,10 +333,10 @@ export default function HomePage(){
             </div>
 
             {/* CTA */}
-            <div className="bg-gradient-to-br from-purple-500 to-blue-500 text-white rounded-lg shadow-lg flex flex-col items-center justify-center p-8">
-              <h2 className="text-3xl font-bold mb-4">{t.cta.title}</h2>
-              <p className="text-lg mb-6 text-center">{t.cta.subtitle}</p>
-              <div className="flex flex-col gap-4 w-full">
+            <div className="bg-gradient-to-br from-purple-500 to-blue-500 text-white rounded-lg shadow-lg flex flex-col items-center justify-center p-6">
+              <h2 className="text-2xl font-bold mb-3 text-center">{t.cta.title}</h2>
+              <p className="text-sm mb-5 text-center">{t.cta.subtitle}</p>
+              <div className="flex flex-col gap-3 w-full">
                 <Link
                   href="/get-involved#volunteer"
                   className="w-full text-center bg-white text-purple-600 font-bold py-3 px-6 rounded-full shadow hover:bg-gray-100"
@@ -444,43 +478,43 @@ export default function HomePage(){
           </div>
         </section>
 
-      {/* Donors & Sponsors */}
-<section className="bg-gray-50 border-t border-gray-200 py-12" aria-labelledby="sponsors">
-  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-    <h2 id="sponsors" className="text-4xl font-bold text-[#219653] mb-8">
-      {language==="tet" ? "Ami nia Doador/Sponsor" : "Our Donors & Sponsors"}
-    </h2>
+        {/* Donors & Sponsors */}
+        <section className="bg-gray-50 border-t border-gray-200 py-12" aria-labelledby="sponsors">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 id="sponsors" className="text-4xl font-bold text-[#219653] mb-8">
+              {language==="tet" ? "Ami nia Doador/Sponsor" : "Our Donors & Sponsors"}
+            </h2>
 
-    <div className="flex flex-wrap justify-center items-center gap-10">
-      <div className="relative h-16 w-40">
-        <Image
-          src="/sponsors/care.png"
-          alt="Care International"
-          fill
-          className="object-contain"
-        />
-      </div>
+            <div className="flex flex-wrap justify-center items-center gap-10">
+              <div className="relative h-16 w-40">
+                <Image
+                  src="/sponsors/care.png"
+                  alt="Care International"
+                  fill
+                  className="object-contain"
+                />
+              </div>
 
-      <div className="relative h-16 w-40">
-        <Image
-          src="/sponsors/nz-mfat.png"
-          alt="New Zealand Ministry of Foreign Affairs & Trade"
-          fill
-          className="object-contain"
-        />
-      </div>
+              <div className="relative h-16 w-40">
+                <Image
+                  src="/sponsors/nz-mfat.png"
+                  alt="New Zealand Ministry of Foreign Affairs & Trade"
+                  fill
+                  className="object-contain"
+                />
+              </div>
 
-      <div className="relative h-16 w-40">
-        <Image
-          src="/sponsors/timor-education.png"
-          alt="Timor-Leste Ministry of Education"
-          fill
-          className="object-contain"
-        />
-      </div>
-    </div>
-  </div>
-</section>
+              <div className="relative h-16 w-40">
+                <Image
+                  src="/sponsors/timor-education.png"
+                  alt="Timor-Leste Ministry of Education"
+                  fill
+                  className="object-contain"
+                />
+              </div>
+            </div>
+          </div>
+        </section>
       </main>
     </div>
   );
