@@ -477,6 +477,20 @@ export default function HomePage(){
             </div>
           </div>
         </section>
+{/* Lafaek Logo Banner */}
+<section className="py-12 bg-white">
+  <div className="max-w-7xl mx-auto px-4 flex justify-center">
+    <div className="relative w-full max-w-md h-40">
+      <Image
+        src="/logo/lafaek-logo2.png"
+        alt="Lafaek Logo"
+        fill
+        className="object-contain"
+        priority
+      />
+    </div>
+  </div>
+</section>
 
         {/* Donors & Sponsors */}
         <section className="bg-gray-50 border-t border-gray-200 py-12" aria-labelledby="sponsors">

@@ -58,7 +58,7 @@ export function Navigation(){
 
   const t={
     en:{
-      brand:"Lafaek",
+      brand:"Revista Lafaek",
       home:"Home",
 
       publication:"Publication",
@@ -114,7 +114,7 @@ export function Navigation(){
       tet:"TET",
     },
     tet:{
-      brand:"Lafaek",
+      brand:"Revista Lafaek",
       home:"Uma",
 
       publication:"Publikasaun",
