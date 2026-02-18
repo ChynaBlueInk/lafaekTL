@@ -21,6 +21,7 @@ const s3=new S3Client({
 
 type ImpactItemRecord={
   id:string;
+  status?:"draft"|"published"|"hidden"|"archived";
   slug?:string;
   titleEn:string;
   titleTet?:string;
@@ -33,10 +34,11 @@ type ImpactItemRecord={
   images?:string[];
   order?:number;
   visible?:boolean;
-  document?:string; // ✅ NEW
+  document?:string;
   externalUrl?:string;
   [key:string]:any;
 };
+
 
 function normaliseImages(raw:any):{image?:string;images?:string[]}{
   const rawImages=Array.isArray(raw?.images)
@@ -62,68 +64,56 @@ function normaliseDocument(raw:any):string|undefined{
   return clean?clean:undefined;
 }
 
-async function readImpactJsonFromS3():Promise<ImpactItemRecord[]>{
+async function streamToString(body:any){
+  if(!body)return "";
+  if(typeof body.transformToString==="function"){
+    return body.transformToString("utf-8");
+  }
+  return await new Promise<string>((resolve,reject)=>{
+    const chunks:Buffer[]=[];
+    body.on("data",(chunk:Buffer)=>chunks.push(chunk));
+    body.on("end",()=>resolve(Buffer.concat(chunks).toString("utf-8")));
+    body.on("error",reject);
+  });
+}
+
+function pickArray(parsed:any):any[]{
+  if(Array.isArray(parsed))return parsed;
+  if(parsed&&typeof parsed==="object"&&Array.isArray(parsed.items))return parsed.items;
+  if(parsed&&typeof parsed==="object"&&Array.isArray(parsed.stories))return parsed.stories;
+  return [];
+}
+
+function getUtcStamp(){
+  const d=new Date();
+  const pad=(n:number)=>String(n).padStart(2,"0");
+  return `${d.getUTCFullYear()}-${pad(d.getUTCMonth()+1)}-${pad(d.getUTCDate())}T${pad(d.getUTCHours())}${pad(d.getUTCMinutes())}${pad(d.getUTCSeconds())}Z`;
+}
+
+async function readImpactRawFromS3():Promise<any>{
   if(!BUCKET){
-    console.warn("[api/admin/impact] AWS_S3_BUCKET not set, returning empty items list");
+    console.warn("[api/admin/impact] AWS_S3_BUCKET not set, returning empty raw");
     return [];
   }
 
-  const cmd=new GetObjectCommand({
-    Bucket:BUCKET,
-    Key:IMPACT_JSON_KEY
-  });
-
-  let res;
   try{
-    res=await s3.send(cmd);
+    const res=await s3.send(new GetObjectCommand({Bucket:BUCKET,Key:IMPACT_JSON_KEY}));
+    const text=await streamToString(res.Body as any);
+    if(!text||!text.trim())return [];
+    return JSON.parse(text);
   }catch(err:any){
     if(err?.name==="NoSuchKey"||err?.Code==="NoSuchKey"||err?.$metadata?.httpStatusCode===404){
-      console.warn("[api/admin/impact] impact.json not found, returning empty items list");
+      console.warn("[api/admin/impact] impact.json not found, returning empty raw");
       return [];
     }
     console.error("[api/admin/impact] S3 GetObject error",err);
     throw err;
   }
+}
 
-  const body=await (async ()=>{
-    const b=res.Body as any;
-    if(!b)return "";
-    if(typeof b.transformToString==="function"){
-      return b.transformToString("utf-8");
-    }
-    return await new Promise<string>((resolve,reject)=>{
-      const chunks:Buffer[]=[];
-      b.on("data",(chunk:Buffer)=>chunks.push(chunk));
-      b.on("end",()=>resolve(Buffer.concat(chunks).toString("utf-8")));
-      b.on("error",reject);
-    });
-  })();
-
-  if(!body){
-    console.log("[api/admin/impact] impact.json body empty, returning []");
-    return [];
-  }
-
-  let parsed:any;
-  try{
-    parsed=JSON.parse(body);
-  }catch(err){
-    console.error("[api/admin/impact] Invalid JSON in impact.json",err);
-    throw new Error("Failed to parse impact.json");
-  }
-
-  const arr:Array<any>=Array.isArray(parsed)
-    ? parsed
-    : Array.isArray(parsed?.items)
-    ? parsed.items
-    : Array.isArray(parsed?.stories)
-    ? parsed.stories
-    : [];
-
-  if(!arr.length){
-    console.log("[api/admin/impact] parsed impact.json but found no items, returning []");
-    return [];
-  }
+async function readImpactJsonFromS3():Promise<ImpactItemRecord[]>{
+  const parsed=await readImpactRawFromS3();
+  const arr=pickArray(parsed);
 
   const records:ImpactItemRecord[]=arr.map((raw:any,index:number)=>{
     const{image,images}=normaliseImages(raw);
@@ -131,6 +121,7 @@ async function readImpactJsonFromS3():Promise<ImpactItemRecord[]>{
 
     const base:ImpactItemRecord={
       id:typeof raw.id==="string"&&raw.id.trim()?raw.id.trim():`impact-${index}`,
+      status: typeof raw.status==="string"?raw.status:"draft",
       slug:typeof raw.slug==="string"&&raw.slug.trim()?raw.slug.trim():undefined,
       titleEn:String(raw.titleEn??"Untitled"),
       titleTet:typeof raw.titleTet==="string"?raw.titleTet:undefined,
@@ -162,23 +153,22 @@ async function readImpactJsonFromS3():Promise<ImpactItemRecord[]>{
   return records;
 }
 
-async function writeImpactJsonToS3(items:ImpactItemRecord[]):Promise<void>{
+async function writeJsonToS3(key:string,data:any):Promise<void>{
   if(!BUCKET){
     throw new Error("AWS_S3_BUCKET is not configured");
   }
-
-  const payload={items};
-
-  const cmd=new PutObjectCommand({
+  await s3.send(new PutObjectCommand({
     Bucket:BUCKET,
-    Key:IMPACT_JSON_KEY,
-    Body:JSON.stringify(payload,null,2),
+    Key:key,
+    Body:JSON.stringify(data,null,2),
     ContentType:"application/json"
-  });
+  }));
+}
 
-  await s3.send(cmd);
-
-  console.log("[api/admin/impact] wrote impact items to S3",{
+async function writeImpactArrayToS3(items:ImpactItemRecord[]):Promise<void>{
+  // ✅ ALWAYS store as an ARRAY to avoid shape flips
+  await writeJsonToS3(IMPACT_JSON_KEY,items);
+  console.log("[api/admin/impact] wrote impact items to S3 (array)",{
     count:items.length,
     key:IMPACT_JSON_KEY
   });
@@ -200,14 +190,20 @@ export async function GET(){
 export async function PUT(req:Request){
   try{
     const body=await req.json().catch(()=>null);
-    if(!body||!Array.isArray(body.items)){
+
+    // ✅ accept either {items:[...]} or [...]
+    const incoming:any[]=Array.isArray(body)
+      ? body
+      : body&&typeof body==="object"&&Array.isArray(body.items)
+      ? body.items
+      : [];
+
+    if(!incoming.length&&!(Array.isArray(body)||Array.isArray(body?.items))){
       return NextResponse.json(
-        {ok:false,error:"Request body must be {items:[...]}"},
+        {ok:false,error:"Request body must be an array or {items:[...]}"},
         {status:400}
       );
     }
-
-    const incoming:any[]=body.items;
 
     const cleaned:ImpactItemRecord[]=incoming.map((raw:any,index:number)=>{
       const{image,images}=normaliseImages(raw);
@@ -215,6 +211,7 @@ export async function PUT(req:Request){
 
       const base:ImpactItemRecord={
         id:typeof raw.id==="string"&&raw.id.trim()?raw.id.trim():`impact-${index}`,
+        status: typeof raw.status==="string"?raw.status:"draft",
         slug:typeof raw.slug==="string"&&raw.slug.trim()?raw.slug.trim():undefined,
         titleEn:String(raw.titleEn??"Untitled"),
         titleTet:typeof raw.titleTet==="string"?raw.titleTet:undefined,
@@ -242,7 +239,12 @@ export async function PUT(req:Request){
       };
     });
 
-    await writeImpactJsonToS3(cleaned);
+    // ✅ backup whatever is currently in S3 before overwriting
+    const rawExisting=await readImpactRawFromS3();
+    const stamp=getUtcStamp();
+    await writeJsonToS3(`backups/impact/admin-impact-${stamp}.json`,rawExisting);
+
+    await writeImpactArrayToS3(cleaned);
 
     return NextResponse.json({ok:true,items:cleaned});
   }catch(err:any){

@@ -4,6 +4,7 @@
 import {useEffect,useMemo,useState,ChangeEvent}from "react";
 
 const S3_ORIGIN="https://lafaek-media.s3.ap-southeast-2.amazonaws.com";
+const ACTION_BAR_TOP=96; // adjust if your site navbar is taller/shorter
 
 type NewsItem={
   id:string;
@@ -49,7 +50,6 @@ const buildS3Url=(src?:string)=>{
   clean=clean.replace(/^\/+/,"");
   return`${S3_ORIGIN}/${clean}`;
 };
-const ACTION_BAR_TOP=96; // adjust if your site navbar is taller/shorter
 
 const safeArray=(v:any)=>{
   if(!Array.isArray(v)){return undefined;}
@@ -93,6 +93,14 @@ export default function NewsAdminPage(){
 
   const[query,setQuery]=useState<string>("");
   const[showKeys,setShowKeys]=useState<boolean>(false);
+
+  // Filters + sorting
+  const[filterMode,setFilterMode]=useState<"all"|"visible"|"hidden">("all");
+  const[dateFrom,setDateFrom]=useState<string>("");
+  const[dateTo,setDateTo]=useState<string>("");
+  const[sortMode,setSortMode]=useState<"editor"|"latest"|"oldest"|"az">("editor");
+  const[onlyWithImage,setOnlyWithImage]=useState<boolean>(false);
+  const[onlyWithPdf,setOnlyWithPdf]=useState<boolean>(false);
 
   useEffect(()=>{
     const load=async()=>{
@@ -332,7 +340,6 @@ export default function NewsAdminPage(){
         const current=next[index];
         if(!current){return prev;}
 
-        // also ensure it appears in gallery if gallery exists
         const gallery=[...(current.images||[])];
         if(s3Key && !gallery.includes(s3Key)){
           gallery.unshift(s3Key);
@@ -377,7 +384,6 @@ export default function NewsAdminPage(){
           gallery.push(s3Key);
         }
 
-        // If there is no cover yet, use the first uploaded gallery image as cover
         const cover=(current.image||current.imageUrl||"").trim();
         const nextCover=cover?cover:s3Key;
 
@@ -412,7 +418,6 @@ export default function NewsAdminPage(){
 
       const gallery=(current.images||[]).filter((x)=>x!==src);
 
-      // If the removed image is the cover, pick a new cover (first gallery image) or blank
       const cover=(current.image||"").trim();
       const nextCover=cover===src
         ? (gallery[0]||"")
@@ -473,431 +478,596 @@ export default function NewsAdminPage(){
   };
 
   const filteredItems=useMemo(()=>{
+    let list=[...items];
+
     const q=query.trim().toLowerCase();
-    if(!q){return items;}
-    return items.filter((i)=>{
-      const a=(i.titleEn||"").toLowerCase();
-      const b=(i.titleTet||"").toLowerCase();
-      return a.includes(q)||b.includes(q);
+    if(q){
+      list=list.filter((i)=>{
+        const fields=[
+          i.titleEn,
+          i.titleTet,
+          i.excerptEn,
+          i.excerptTet,
+          i.bodyEn,
+          i.bodyTet
+        ]
+          .filter(Boolean)
+          .map((x)=>String(x).toLowerCase());
+
+        return fields.some((f)=>f.includes(q));
+      });
+    }
+
+    if(filterMode==="visible"){
+      list=list.filter((i)=>i.visible===true);
+    }else if(filterMode==="hidden"){
+      list=list.filter((i)=>i.visible===false);
+    }
+
+    if(onlyWithImage){
+      list=list.filter((i)=>{
+        const cover=(i.image||i.imageUrl||"").trim();
+        const gallery=(i.images||[]).filter(Boolean);
+        return !!cover || gallery.length>0;
+      });
+    }
+
+    if(onlyWithPdf){
+      list=list.filter((i)=>!!(i.document&&i.document.trim()));
+    }
+
+    if(dateFrom){
+      const fromTime=new Date(`${dateFrom}T00:00:00`).getTime();
+      list=list.filter((i)=>{
+        const t=i.date?new Date(`${i.date.slice(0,10)}T00:00:00`).getTime():0;
+        return t>=fromTime;
+      });
+    }
+
+    if(dateTo){
+      const toTime=new Date(`${dateTo}T23:59:59`).getTime();
+      list=list.filter((i)=>{
+        const t=i.date?new Date(`${i.date.slice(0,10)}T00:00:00`).getTime():0;
+        return t<=toTime;
+      });
+    }
+
+    list.sort((a,b)=>{
+      const da=a.date?new Date(a.date).getTime():0;
+      const db=b.date?new Date(b.date).getTime():0;
+
+      if(sortMode==="latest"){
+        if(da!==db){return db-da;}
+        return (a.order??0)-(b.order??0);
+      }
+
+      if(sortMode==="oldest"){
+        if(da!==db){return da-db;}
+        return (a.order??0)-(b.order??0);
+      }
+
+      if(sortMode==="az"){
+        const ta=String(a.titleEn||"").toLowerCase();
+        const tb=String(b.titleEn||"").toLowerCase();
+        if(ta<tb){return-1;}
+        if(ta>tb){return 1;}
+        return db-da;
+      }
+
+      return (a.order??0)-(b.order??0);
     });
-  },[items,query]);
 
- return(
-  <div className="min-h-screen bg-slate-50">
-   <div className="mx-auto max-w-7xl px-4 py-8">
-  {/* Fixed Action Bar (Save + Search always visible) */}
-  <div
-    className="fixed left-0 right-0 z-40 border-b border-slate-200 bg-slate-50/95 backdrop-blur"
-    style={{top:ACTION_BAR_TOP}}
-  >
-    <div className="mx-auto max-w-7xl px-4 py-3">
-      <div className="flex flex-col justify-between gap-3 md:flex-row md:items-center">
-        <div>
-          <h1 className="text-2xl font-semibold text-slate-900">News Admin</h1>
-          <p className="mt-1 text-sm text-slate-600">
-            Create and edit News items. Each item can have a cover image, plus optional gallery images.
-          </p>
+    return list;
+  },[items,query,filterMode,dateFrom,dateTo,sortMode,onlyWithImage,onlyWithPdf]);
+
+  return(
+    <div className="min-h-screen bg-slate-50">
+      <div className="mx-auto max-w-7xl px-4 py-8">
+
+        {/* Fixed Action Bar (Save + Search + Filters always visible) */}
+        <div
+          className="fixed left-0 right-0 z-40 border-b border-slate-200 bg-slate-50/95 backdrop-blur"
+          style={{top:ACTION_BAR_TOP}}
+        >
+          <div className="mx-auto max-w-7xl px-4 py-3">
+            <div className="flex flex-col justify-between gap-3 md:flex-row md:items-center">
+              <div>
+                <h1 className="text-2xl font-semibold text-slate-900">News Admin</h1>
+                <p className="mt-1 text-sm text-slate-600">
+                  Create and edit News items. Each item can have a cover image, plus optional gallery images.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={handleAddNew}
+                  className="rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-emerald-700 disabled:opacity-60"
+                >
+                  + Add New
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSaveChanges}
+                  disabled={!hasChanges||saving}
+                  className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 disabled:opacity-50"
+                >
+                  {saving?"Saving...":"Save Changes"}
+                </button>
+              </div>
+            </div>
+
+            <div className="mt-3 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+              <div className="flex w-full flex-col gap-2 md:w-[44rem] md:flex-row md:items-center">
+                <input
+                  type="text"
+                  className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm"
+                  placeholder="Search title, excerpt, or body (English/Tetun)…"
+                  value={query}
+                  onChange={(e)=>setQuery(e.target.value)}
+                />
+                <label className="inline-flex items-center gap-2 text-sm text-slate-700">
+                  <input
+                    type="checkbox"
+                    className="h-4 w-4 rounded border-slate-300"
+                    checked={showKeys}
+                    onChange={(e)=>setShowKeys(e.target.checked)}
+                  />
+                  Show S3 keys
+                </label>
+              </div>
+
+              {hasChanges&&(
+                <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+                  Unsaved changes
+                </div>
+              )}
+            </div>
+
+            <div className="mt-3 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+              <div className="flex flex-wrap items-center gap-3 text-sm text-slate-700">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-slate-500">Show</span>
+                  <select
+                    className="rounded-md border border-slate-300 bg-white px-2 py-2 text-sm"
+                    value={filterMode}
+                    onChange={(e)=>setFilterMode(e.target.value as "all"|"visible"|"hidden")}
+                  >
+                    <option value="all">All</option>
+                    <option value="visible">Visible only</option>
+                    <option value="hidden">Hidden only</option>
+                  </select>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-slate-500">From</span>
+                  <input
+                    type="date"
+                    className="rounded-md border border-slate-300 bg-white px-2 py-2 text-sm"
+                    value={dateFrom}
+                    onChange={(e)=>setDateFrom(e.target.value)}
+                  />
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-slate-500">To</span>
+                  <input
+                    type="date"
+                    className="rounded-md border border-slate-300 bg-white px-2 py-2 text-sm"
+                    value={dateTo}
+                    onChange={(e)=>setDateTo(e.target.value)}
+                  />
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-slate-500">Sort</span>
+                  <select
+                    className="rounded-md border border-slate-300 bg-white px-2 py-2 text-sm"
+                    value={sortMode}
+                    onChange={(e)=>setSortMode(e.target.value as "editor"|"latest"|"oldest"|"az")}
+                  >
+                    <option value="editor">Editor order</option>
+                    <option value="latest">Latest first</option>
+                    <option value="oldest">Oldest first</option>
+                    <option value="az">Title A–Z</option>
+                  </select>
+                </div>
+
+                <label className="inline-flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    className="h-4 w-4 rounded border-slate-300"
+                    checked={onlyWithImage}
+                    onChange={(e)=>setOnlyWithImage(e.target.checked)}
+                  />
+                  With image
+                </label>
+
+                <label className="inline-flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    className="h-4 w-4 rounded border-slate-300"
+                    checked={onlyWithPdf}
+                    onChange={(e)=>setOnlyWithPdf(e.target.checked)}
+                  />
+                  With PDF
+                </label>
+              </div>
+
+              <button
+                type="button"
+                onClick={()=>{
+                  setQuery("");
+                  setFilterMode("all");
+                  setDateFrom("");
+                  setDateTo("");
+                  setSortMode("editor");
+                  setOnlyWithImage(false);
+                  setOnlyWithPdf(false);
+                }}
+                className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 hover:bg-slate-100"
+              >
+                Clear filters
+              </button>
+            </div>
+          </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={handleAddNew}
-            className="rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-emerald-700 disabled:opacity-60"
-          >
-            + Add New
-          </button>
-          <button
-            type="button"
-            onClick={handleSaveChanges}
-            disabled={!hasChanges||saving}
-            className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 disabled:opacity-50"
-          >
-            {saving?"Saving...":"Save Changes"}
-          </button>
-        </div>
-      </div>
+        {/* Spacer so content doesn't hide under fixed bar */}
+        <div className="h-72 md:h-52" />
 
-      <div className="mt-3 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-        <div className="flex w-full flex-col gap-2 md:w-[44rem] md:flex-row md:items-center">
-          <input
-            type="text"
-            className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm"
-            placeholder="Search by title (English or Tetun)…"
-            value={query}
-            onChange={(e)=>setQuery(e.target.value)}
-          />
-          <label className="inline-flex items-center gap-2 text-sm text-slate-700">
-            <input
-              type="checkbox"
-              className="h-4 w-4 rounded border-slate-300"
-              checked={showKeys}
-              onChange={(e)=>setShowKeys(e.target.checked)}
-            />
-            Show S3 keys
-          </label>
-        </div>
-
-        {hasChanges&&(
-          <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
-            Unsaved changes
+        {message&&(
+          <div className="mb-4 rounded-md border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 shadow-sm">
+            {message}
           </div>
         )}
-      </div>
-    </div>
-  </div>
 
-  {/* Spacer so content doesn't hide under fixed bar */}
-  <div className="h-44 md:h-32" />
+        {loading&&(
+          <div className="text-sm text-slate-600">Loading news items...</div>
+        )}
 
-  {message&&(
-    <div className="mb-4 rounded-md border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 shadow-sm">
-      {message}
-    </div>
-  )}
+        {error&&!loading&&(
+          <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            {error}
+          </div>
+        )}
 
-  {/* everything else below stays exactly the same */}
+        {!loading&&filteredItems.length===0&&!error&&(
+          <div className="rounded-md border border-dashed border-slate-300 bg-white px-4 py-6 text-center text-sm text-slate-500">
+            No news items match your filters.
+          </div>
+        )}
 
+        {!loading&&filteredItems.length>0&&(
+          <div className="space-y-4">
+            {filteredItems.map((item)=>{
+              const coverSrc=buildS3Url((item.image||item.imageUrl||"").trim());
+              const documentUrl=buildS3Url(item.document);
+              const gallery=(item.images||[]).filter(Boolean);
 
-      {loading&&(
-        <div className="text-sm text-slate-600">Loading news items...</div>
-      )}
+              const missingCover=item.visible && !coverSrc;
 
-      {error&&!loading&&(
-        <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-          {error}
-        </div>
-      )}
-
-      {!loading&&filteredItems.length===0&&!error&&(
-        <div className="rounded-md border border-dashed border-slate-300 bg-white px-4 py-6 text-center text-sm text-slate-500">
-          No news items match your search.
-        </div>
-      )}
-
-      {!loading&&filteredItems.length>0&&(
-        <div className="space-y-4">
-          {filteredItems.map((item)=>{
-            const coverSrc=buildS3Url((item.image||item.imageUrl||"").trim());
-            const documentUrl=buildS3Url(item.document);
-            const gallery=(item.images||[]).filter(Boolean);
-
-            const missingCover=item.visible && !coverSrc;
-
-            return(
-              <div key={item.id} className="rounded-lg border border-slate-200 bg-white shadow-sm">
-                <div className="flex flex-col gap-3 p-4 md:flex-row md:items-start md:justify-between">
-                  <div className="flex flex-1 flex-col gap-3">
-                    <div className="flex flex-wrap items-center gap-3">
-                      <div className="inline-flex items-center gap-2">
-                        <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-slate-100 text-xs font-medium text-slate-700">
-                          {item.order}
-                        </span>
-                        <div className="flex flex-col gap-1">
-                          <button
-                            type="button"
-                            className="rounded border border-slate-300 px-1 text-[10px] leading-tight hover:bg-slate-100"
-                            onClick={()=>handleReorder(item.id,-1)}
-                          >
-                            ↑
-                          </button>
-                          <button
-                            type="button"
-                            className="rounded border border-slate-300 px-1 text-[10px] leading-tight hover:bg-slate-100"
-                            onClick={()=>handleReorder(item.id,1)}
-                          >
-                            ↓
-                          </button>
-                        </div>
-                      </div>
-
-                      <label className="inline-flex items-center gap-2 text-sm text-slate-700">
-                        <input
-                          type="checkbox"
-                          className="h-4 w-4 rounded border-slate-300"
-                          checked={item.visible}
-                          onChange={(e)=>handleFieldChange(item.id,"visible",e.target.checked)}
-                        />
-                        <span>Visible</span>
-                      </label>
-
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-slate-500">Date</span>
-                        <input
-                          type="date"
-                          className="rounded border border-slate-300 px-2 py-1 text-sm"
-                          value={item.date?item.date.slice(0,10):""}
-                          onChange={(e)=>handleFieldChange(item.id,"date",e.target.value)}
-                        />
-                      </div>
-
-                      {missingCover&&(
-                        <div className="rounded-md border border-amber-200 bg-amber-50 px-2 py-1 text-xs text-amber-900">
-                          Visible item has no cover image
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                      <div>
-                        <label className="mb-1 block text-xs font-medium text-slate-700">
-                          Title (English)
-                        </label>
-                        <input
-                          type="text"
-                          className="w-full rounded border border-slate-300 px-2 py-2 text-sm"
-                          value={item.titleEn}
-                          onChange={(e)=>handleFieldChange(item.id,"titleEn",e.target.value)}
-                        />
-                      </div>
-                      <div>
-                        <label className="mb-1 block text-xs font-medium text-slate-700">
-                          Title (Tetun)
-                        </label>
-                        <input
-                          type="text"
-                          className="w-full rounded border border-slate-300 px-2 py-2 text-sm"
-                          value={item.titleTet}
-                          onChange={(e)=>handleFieldChange(item.id,"titleTet",e.target.value)}
-                        />
-                      </div>
-                    </div>
-
-                    <details className="rounded-md border border-slate-200 bg-slate-50">
-                      <summary className="cursor-pointer select-none px-3 py-2 text-sm font-medium text-slate-800">
-                        Edit news text (Excerpts + Bodies)
-                      </summary>
-                      <div className="grid grid-cols-1 gap-3 p-3 md:grid-cols-2">
-                        <div>
-                          <label className="mb-1 block text-xs font-medium text-slate-700">
-                            Excerpt (English)
-                          </label>
-                          <textarea
-                            className="h-24 w-full rounded border border-slate-300 px-2 py-2 text-sm"
-                            value={item.excerptEn}
-                            onChange={(e)=>handleFieldChange(item.id,"excerptEn",e.target.value)}
-                          />
-                        </div>
-                        <div>
-                          <label className="mb-1 block text-xs font-medium text-slate-700">
-                            Excerpt (Tetun)
-                          </label>
-                          <textarea
-                            className="h-24 w-full rounded border border-slate-300 px-2 py-2 text-sm"
-                            value={item.excerptTet}
-                            onChange={(e)=>handleFieldChange(item.id,"excerptTet",e.target.value)}
-                          />
-                        </div>
-                        <div>
-                          <label className="mb-1 block text-xs font-medium text-slate-700">
-                            Body (English)
-                          </label>
-                          <textarea
-                            className="h-40 w-full rounded border border-slate-300 px-2 py-2 text-sm"
-                            value={item.bodyEn}
-                            onChange={(e)=>handleFieldChange(item.id,"bodyEn",e.target.value)}
-                          />
-                        </div>
-                        <div>
-                          <label className="mb-1 block text-xs font-medium text-slate-700">
-                            Body (Tetun)
-                          </label>
-                          <textarea
-                            className="h-40 w-full rounded border border-slate-300 px-2 py-2 text-sm"
-                            value={item.bodyTet}
-                            onChange={(e)=>handleFieldChange(item.id,"bodyTet",e.target.value)}
-                          />
-                        </div>
-                      </div>
-                    </details>
-
-                    {showKeys&&(
-                      <div className="rounded-md border border-slate-200 bg-white px-3 py-2 text-xs text-slate-600">
-                        <div className="break-all"><span className="font-semibold">ID:</span> {item.id}</div>
-                        {item.image&&(<div className="break-all"><span className="font-semibold">Cover key:</span> {item.image}</div>)}
-                        {gallery.length>0&&(
-                          <div className="break-all">
-                            <span className="font-semibold">Gallery:</span> {gallery.join(", ")}
+              return(
+                <div key={item.id} className="rounded-lg border border-slate-200 bg-white shadow-sm">
+                  <div className="flex flex-col gap-3 p-4 md:flex-row md:items-start md:justify-between">
+                    <div className="flex flex-1 flex-col gap-3">
+                      <div className="flex flex-wrap items-center gap-3">
+                        <div className="inline-flex items-center gap-2">
+                          <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-slate-100 text-xs font-medium text-slate-700">
+                            {item.order}
+                          </span>
+                          <div className="flex flex-col gap-1">
+                            <button
+                              type="button"
+                              className="rounded border border-slate-300 px-1 text-[10px] leading-tight hover:bg-slate-100"
+                              onClick={()=>handleReorder(item.id,-1)}
+                            >
+                              ↑
+                            </button>
+                            <button
+                              type="button"
+                              className="rounded border border-slate-300 px-1 text-[10px] leading-tight hover:bg-slate-100"
+                              onClick={()=>handleReorder(item.id,1)}
+                            >
+                              ↓
+                            </button>
                           </div>
-                        )}
-                        {item.document&&(<div className="break-all"><span className="font-semibold">PDF key:</span> {item.document}</div>)}
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="flex w-full flex-col gap-3 md:w-80">
-                    {/* COVER IMAGE */}
-                    <div className="rounded-md border border-slate-200 bg-white p-3">
-                      <div className="mb-2 flex items-center justify-between">
-                        <div className="text-xs font-semibold uppercase tracking-wide text-slate-600">
-                          Cover Image
                         </div>
-                        {item.visible&&(
-                          <div className="text-[11px] text-slate-500">
-                            (Used on the News card)
+
+                        <label className="inline-flex items-center gap-2 text-sm text-slate-700">
+                          <input
+                            type="checkbox"
+                            className="h-4 w-4 rounded border-slate-300"
+                            checked={item.visible}
+                            onChange={(e)=>handleFieldChange(item.id,"visible",e.target.checked)}
+                          />
+                          <span>Visible</span>
+                        </label>
+
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-slate-500">Date</span>
+                          <input
+                            type="date"
+                            className="rounded border border-slate-300 px-2 py-1 text-sm"
+                            value={item.date?item.date.slice(0,10):""}
+                            onChange={(e)=>handleFieldChange(item.id,"date",e.target.value)}
+                          />
+                        </div>
+
+                        {missingCover&&(
+                          <div className="rounded-md border border-amber-200 bg-amber-50 px-2 py-1 text-xs text-amber-900">
+                            Visible item has no cover image
                           </div>
                         )}
                       </div>
 
-                      {coverSrc?(
-                        <img
-                          src={coverSrc}
-                          alt={item.titleEn||"News cover"}
-                          className="h-40 w-full rounded border border-slate-200 object-cover"
-                        />
-                      ):(
-                        <div className="flex h-40 w-full items-center justify-center rounded border border-dashed border-slate-300 bg-slate-50 text-center text-xs text-slate-400">
-                          No cover image
+                      <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                        <div>
+                          <label className="mb-1 block text-xs font-medium text-slate-700">
+                            Title (English)
+                          </label>
+                          <input
+                            type="text"
+                            className="w-full rounded border border-slate-300 px-2 py-2 text-sm"
+                            value={item.titleEn}
+                            onChange={(e)=>handleFieldChange(item.id,"titleEn",e.target.value)}
+                          />
                         </div>
-                      )}
+                        <div>
+                          <label className="mb-1 block text-xs font-medium text-slate-700">
+                            Title (Tetun)
+                          </label>
+                          <input
+                            type="text"
+                            className="w-full rounded border border-slate-300 px-2 py-2 text-sm"
+                            value={item.titleTet}
+                            onChange={(e)=>handleFieldChange(item.id,"titleTet",e.target.value)}
+                          />
+                        </div>
+                      </div>
 
-                      <label className="mt-2 inline-flex w-full cursor-pointer items-center justify-center rounded-md border border-slate-300 px-2 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">
-                        <input
-                          type="file"
-                          accept="image/*"
-                          className="hidden"
-                          onChange={(e)=>handleCoverInputChange(item.id,e)}
-                        />
-                        {uploadingId===item.id?"Uploading...":"Upload cover image"}
-                      </label>
+                      <details className="rounded-md border border-slate-200 bg-slate-50">
+                        <summary className="cursor-pointer select-none px-3 py-2 text-sm font-medium text-slate-800">
+                          Edit news text (Excerpts + Bodies)
+                        </summary>
+                        <div className="grid grid-cols-1 gap-3 p-3 md:grid-cols-2">
+                          <div>
+                            <label className="mb-1 block text-xs font-medium text-slate-700">
+                              Excerpt (English)
+                            </label>
+                            <textarea
+                              className="h-24 w-full rounded border border-slate-300 px-2 py-2 text-sm"
+                              value={item.excerptEn}
+                              onChange={(e)=>handleFieldChange(item.id,"excerptEn",e.target.value)}
+                            />
+                          </div>
+                          <div>
+                            <label className="mb-1 block text-xs font-medium text-slate-700">
+                              Excerpt (Tetun)
+                            </label>
+                            <textarea
+                              className="h-24 w-full rounded border border-slate-300 px-2 py-2 text-sm"
+                              value={item.excerptTet}
+                              onChange={(e)=>handleFieldChange(item.id,"excerptTet",e.target.value)}
+                            />
+                          </div>
+                          <div>
+                            <label className="mb-1 block text-xs font-medium text-slate-700">
+                              Body (English)
+                            </label>
+                            <textarea
+                              className="h-40 w-full rounded border border-slate-300 px-2 py-2 text-sm"
+                              value={item.bodyEn}
+                              onChange={(e)=>handleFieldChange(item.id,"bodyEn",e.target.value)}
+                            />
+                          </div>
+                          <div>
+                            <label className="mb-1 block text-xs font-medium text-slate-700">
+                              Body (Tetun)
+                            </label>
+                            <textarea
+                              className="h-40 w-full rounded border border-slate-300 px-2 py-2 text-sm"
+                              value={item.bodyTet}
+                              onChange={(e)=>handleFieldChange(item.id,"bodyTet",e.target.value)}
+                            />
+                          </div>
+                        </div>
+                      </details>
 
-                      {(item.image||item.imageUrl)&&(
-                        <button
-                          type="button"
-                          onClick={()=>handleRemoveImage(item.id)}
-                          className="mt-2 w-full rounded-md border border-red-300 px-2 py-2 text-sm font-medium text-red-700 hover:bg-red-50"
-                        >
-                          Remove cover image
-                        </button>
+                      {showKeys&&(
+                        <div className="rounded-md border border-slate-200 bg-white px-3 py-2 text-xs text-slate-600">
+                          <div className="break-all"><span className="font-semibold">ID:</span> {item.id}</div>
+                          {(item.image||item.imageUrl)&&(
+                            <div className="break-all">
+                              <span className="font-semibold">Cover key:</span> {(item.image||item.imageUrl)||""}
+                            </div>
+                          )}
+                          {gallery.length>0&&(
+                            <div className="break-all">
+                              <span className="font-semibold">Gallery:</span> {gallery.join(", ")}
+                            </div>
+                          )}
+                          {item.document&&(
+                            <div className="break-all">
+                              <span className="font-semibold">PDF key:</span> {item.document}
+                            </div>
+                          )}
+                        </div>
                       )}
                     </div>
 
-                    {/* GALLERY */}
-                    <div className="rounded-md border border-slate-200 bg-white p-3">
-                      <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-600">
-                        Gallery (optional)
+                    <div className="flex w-full flex-col gap-3 md:w-80">
+                      {/* COVER IMAGE */}
+                      <div className="rounded-md border border-slate-200 bg-white p-3">
+                        <div className="mb-2 flex items-center justify-between">
+                          <div className="text-xs font-semibold uppercase tracking-wide text-slate-600">
+                            Cover Image
+                          </div>
+                          {item.visible&&(
+                            <div className="text-[11px] text-slate-500">
+                              (Used on the News card)
+                            </div>
+                          )}
+                        </div>
+
+                        {coverSrc?(
+                          <img
+                            src={coverSrc}
+                            alt={item.titleEn||"News cover"}
+                            className="h-40 w-full rounded border border-slate-200 object-cover"
+                          />
+                        ):(
+                          <div className="flex h-40 w-full items-center justify-center rounded border border-dashed border-slate-300 bg-slate-50 text-center text-xs text-slate-400">
+                            No cover image
+                          </div>
+                        )}
+
+                        <label className="mt-2 inline-flex w-full cursor-pointer items-center justify-center rounded-md border border-slate-300 px-2 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={(e)=>handleCoverInputChange(item.id,e)}
+                          />
+                          {uploadingId===item.id?"Uploading...":"Upload cover image"}
+                        </label>
+
+                        {(item.image||item.imageUrl)&&(
+                          <button
+                            type="button"
+                            onClick={()=>handleRemoveImage(item.id)}
+                            className="mt-2 w-full rounded-md border border-red-300 px-2 py-2 text-sm font-medium text-red-700 hover:bg-red-50"
+                          >
+                            Remove cover image
+                          </button>
+                        )}
                       </div>
 
-                      {gallery.length>0?(
-                        <div className="grid grid-cols-4 gap-2">
-                          {gallery.map((src)=>{
-                            const url=buildS3Url(src);
-                            const isCover=(item.image||"").trim()===src;
-
-                            return(
-                              <div key={src} className="relative rounded border border-slate-200 bg-white">
-                                <img
-                                  src={url}
-                                  alt="Gallery"
-                                  className="h-16 w-full rounded object-cover"
-                                />
-
-                                <button
-                                  type="button"
-                                  onClick={()=>handleRemoveGalleryImage(item.id,src)}
-                                  className="absolute right-1 top-1 rounded bg-white/90 px-1.5 py-0.5 text-[10px] font-semibold text-slate-700 shadow hover:bg-white"
-                                  title="Remove"
-                                >
-                                  ✕
-                                </button>
-
-                                <button
-                                  type="button"
-                                  onClick={()=>handleSetAsCover(item.id,src)}
-                                  className={`w-full rounded-b px-1 py-1 text-[10px] font-semibold ${
-                                    isCover
-                                      ? "bg-emerald-600 text-white"
-                                      : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-                                  }`}
-                                  title="Set as cover"
-                                >
-                                  {isCover?"Cover":"Set cover"}
-                                </button>
-                              </div>
-                            );
-                          })}
+                      {/* GALLERY */}
+                      <div className="rounded-md border border-slate-200 bg-white p-3">
+                        <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-600">
+                          Gallery (optional)
                         </div>
-                      ):(
-                        <div className="text-sm text-slate-400">
-                          No extra photos yet
+
+                        {gallery.length>0?(
+                          <div className="grid grid-cols-4 gap-2">
+                            {gallery.map((src)=>{
+                              const url=buildS3Url(src);
+                              const isCover=(item.image||"").trim()===src;
+
+                              return(
+                                <div key={src} className="relative rounded border border-slate-200 bg-white">
+                                  <img
+                                    src={url}
+                                    alt="Gallery"
+                                    className="h-16 w-full rounded object-cover"
+                                  />
+
+                                  <button
+                                    type="button"
+                                    onClick={()=>handleRemoveGalleryImage(item.id,src)}
+                                    className="absolute right-1 top-1 rounded bg-white/90 px-1.5 py-0.5 text-[10px] font-semibold text-slate-700 shadow hover:bg-white"
+                                    title="Remove"
+                                  >
+                                    ✕
+                                  </button>
+
+                                  <button
+                                    type="button"
+                                    onClick={()=>handleSetAsCover(item.id,src)}
+                                    className={`w-full rounded-b px-1 py-1 text-[10px] font-semibold ${
+                                      isCover
+                                        ? "bg-emerald-600 text-white"
+                                        : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                                    }`}
+                                    title="Set as cover"
+                                  >
+                                    {isCover?"Cover":"Set cover"}
+                                  </button>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        ):(
+                          <div className="text-sm text-slate-400">
+                            No extra photos yet
+                          </div>
+                        )}
+
+                        <label className="mt-2 inline-flex w-full cursor-pointer items-center justify-center rounded-md border border-slate-300 px-2 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={(e)=>handleGalleryInputChange(item.id,e)}
+                          />
+                          {uploadingGalleryId===item.id?"Uploading...":"Upload gallery image"}
+                        </label>
+
+                        <div className="mt-2 text-xs text-slate-500">
+                          Tip: Use gallery images for activity shots. Keep it curated — 3–8 is plenty.
                         </div>
-                      )}
-
-                      <label className="mt-2 inline-flex w-full cursor-pointer items-center justify-center rounded-md border border-slate-300 px-2 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">
-                        <input
-                          type="file"
-                          accept="image/*"
-                          className="hidden"
-                          onChange={(e)=>handleGalleryInputChange(item.id,e)}
-                        />
-                        {uploadingGalleryId===item.id?"Uploading...":"Upload gallery image"}
-                      </label>
-
-                      <div className="mt-2 text-xs text-slate-500">
-                        Tip: Use gallery images for activity shots. Keep it curated — 3–8 is plenty.
                       </div>
-                    </div>
 
-                    {/* PDF */}
-                    <div className="rounded-md border border-slate-200 bg-white p-3">
-                      <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-600">
-                        PDF (optional)
-                      </div>
-                      {item.document?(
-                        <a
-                          href={documentUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="block max-w-full break-all text-sm text-blue-700 underline"
-                        >
-                          View PDF
-                        </a>
-                      ):(
-                        <div className="text-sm text-slate-400">
-                          No PDF attached
+                      {/* PDF */}
+                      <div className="rounded-md border border-slate-200 bg-white p-3">
+                        <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-600">
+                          PDF (optional)
                         </div>
-                      )}
+                        {item.document?(
+                          <a
+                            href={documentUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="block max-w-full break-all text-sm text-blue-700 underline"
+                          >
+                            View PDF
+                          </a>
+                        ):(
+                          <div className="text-sm text-slate-400">
+                            No PDF attached
+                          </div>
+                        )}
 
-                      <label className="mt-2 inline-flex w-full cursor-pointer items-center justify-center rounded-md border border-slate-300 px-2 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">
-                        <input
-                          type="file"
-                          accept="application/pdf"
-                          className="hidden"
-                          onChange={(e)=>handleDocumentInputChange(item.id,e)}
-                        />
-                        {uploadingDocId===item.id?"Uploading...":"Upload PDF"}
-                      </label>
+                        <label className="mt-2 inline-flex w-full cursor-pointer items-center justify-center rounded-md border border-slate-300 px-2 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">
+                          <input
+                            type="file"
+                            accept="application/pdf"
+                            className="hidden"
+                            onChange={(e)=>handleDocumentInputChange(item.id,e)}
+                          />
+                          {uploadingDocId===item.id?"Uploading...":"Upload PDF"}
+                        </label>
 
-                      {item.document&&(
-                        <button
-                          type="button"
-                          onClick={()=>handleRemovePdf(item.id)}
-                          className="mt-2 w-full rounded-md border border-red-300 px-2 py-2 text-sm font-medium text-red-700 hover:bg-red-50"
-                        >
-                          Remove PDF
-                        </button>
-                      )}
-                    </div>
+                        {item.document&&(
+                          <button
+                            type="button"
+                            onClick={()=>handleRemovePdf(item.id)}
+                            className="mt-2 w-full rounded-md border border-red-300 px-2 py-2 text-sm font-medium text-red-700 hover:bg-red-50"
+                          >
+                            Remove PDF
+                          </button>
+                        )}
+                      </div>
 
-                    <button
-                      type="button"
-                      onClick={()=>handleDelete(item.id)}
-                      className="rounded-md border border-red-300 px-3 py-2 text-sm font-medium text-red-700 hover:bg-red-50"
-                    >
-                      Delete news item
-                    </button>
+                      <button
+                        type="button"
+                        onClick={()=>handleDelete(item.id)}
+                        className="rounded-md border border-red-300 px-3 py-2 text-sm font-medium text-red-700 hover:bg-red-50"
+                      >
+                        Delete news item
+                      </button>
 
-                    <div className="text-xs text-slate-500">
-                      Tip: Uploads don’t auto-save. Use “Save Changes” after edits.
+                      <div className="text-xs text-slate-500">
+                        Tip: Uploads don’t auto-save. Use “Save Changes” after edits.
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
-
+              );
+            })}
+          </div>
+        )}
 
         {showAddModal&&(
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
@@ -912,6 +1082,7 @@ export default function NewsAdminPage(){
                   ✕
                 </button>
               </div>
+
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div className="space-y-2">
                   <label className="block text-xs font-medium text-slate-700">
@@ -923,6 +1094,7 @@ export default function NewsAdminPage(){
                     value={newItem.titleEn}
                     onChange={(e)=>setNewItem({...newItem,titleEn:e.target.value})}
                   />
+
                   <label className="block text-xs font-medium text-slate-700">
                     Title (Tetun)
                   </label>
@@ -932,6 +1104,7 @@ export default function NewsAdminPage(){
                     value={newItem.titleTet}
                     onChange={(e)=>setNewItem({...newItem,titleTet:e.target.value})}
                   />
+
                   <label className="block text-xs font-medium text-slate-700">
                     Excerpt (English)
                   </label>
@@ -940,6 +1113,7 @@ export default function NewsAdminPage(){
                     value={newItem.excerptEn}
                     onChange={(e)=>setNewItem({...newItem,excerptEn:e.target.value})}
                   />
+
                   <label className="block text-xs font-medium text-slate-700">
                     Excerpt (Tetun)
                   </label>
@@ -949,6 +1123,7 @@ export default function NewsAdminPage(){
                     onChange={(e)=>setNewItem({...newItem,excerptTet:e.target.value})}
                   />
                 </div>
+
                 <div className="space-y-2">
                   <label className="block text-xs font-medium text-slate-700">
                     Body (English)
@@ -958,6 +1133,7 @@ export default function NewsAdminPage(){
                     value={newItem.bodyEn}
                     onChange={(e)=>setNewItem({...newItem,bodyEn:e.target.value})}
                   />
+
                   <label className="block text-xs font-medium text-slate-700">
                     Body (Tetun)
                   </label>
@@ -966,6 +1142,7 @@ export default function NewsAdminPage(){
                     value={newItem.bodyTet}
                     onChange={(e)=>setNewItem({...newItem,bodyTet:e.target.value})}
                   />
+
                   <label className="mt-2 block text-xs font-medium text-slate-700">
                     Date
                   </label>
@@ -975,6 +1152,7 @@ export default function NewsAdminPage(){
                     value={newItem.date?newItem.date.slice(0,10):""}
                     onChange={(e)=>setNewItem({...newItem,date:e.target.value})}
                   />
+
                   <label className="mt-2 inline-flex items-center gap-2 text-xs text-slate-700">
                     <input
                       type="checkbox"
@@ -984,11 +1162,13 @@ export default function NewsAdminPage(){
                     />
                     Visible
                   </label>
+
                   <div className="mt-3 text-xs text-slate-500">
                     Cover + gallery images and PDF can be uploaded after saving.
                   </div>
                 </div>
               </div>
+
               <div className="mt-6 flex justify-end gap-3">
                 <button
                   type="button"
@@ -1008,6 +1188,7 @@ export default function NewsAdminPage(){
             </div>
           </div>
         )}
+
       </div>
     </div>
   );
