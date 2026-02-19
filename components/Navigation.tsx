@@ -105,13 +105,14 @@ export function Navigation(){
 
       careers:"Careers",
       getInvolved:"Get involved",
-      friends:"Friends of Lafaek",
       contact:"Contact",
       loginSignup:"Login / Signup",
       signOut:"Sign out",
       signedInAs:"Signed in as",
       en:"EN",
       tet:"TET",
+            friends:"Friends of Lafaek",
+
     },
     tet:{
       brand:"Revista Lafaek",
@@ -161,13 +162,14 @@ export function Navigation(){
 
       careers:"Empregu/Vaga",
       getInvolved:"Partisipa",
-      friends:"Kolega Lafaek",
       contact:"Kontakt",
       loginSignup:"Tama / Rejistu",
       signOut:"Sai",
       signedInAs:"Tama ho",
       en:"EN",
       tet:"TET",
+            friends:"Kolega Lafaek",
+
     },
   }[language]
 
@@ -180,17 +182,9 @@ export function Navigation(){
     {href:"/magazines",label:t.magazines},
     {href:"/stories/news",label:t.news},
     {href:"/stories/impact",label:t.communityStories},
-    {href:"/friends",label:t.friends},
 
-    {
-      label:t.learning,
-      mega:[
-        {href:"/learning/cyber/children",title:t.cyberChildren,description:t.cyberChildrenDesc},
-        {href:"/learning/cyber/youth",title:t.cyberYouth,description:t.cyberYouthDesc},
-        {href:"/learning/cyber/adults",title:t.cyberAdults,description:t.cyberAdultsDesc},
-        {href:"/learning/guides",title:t.guides,description:t.guidesDesc},
-      ],
-    },
+    // ✅ Learning is now a simple link to /learning (no dropdown)
+    {href:"/learning",label:t.learning},
 
     {
       label:t.about,
@@ -203,9 +197,11 @@ export function Navigation(){
     },
 
     {href:"/contact",label:t.contact},
+        {href:"/friends",label:t.friends},
+
   ]
 
-  return (
+  return(
     <nav className="bg-[#219653]/90 backdrop-blur-sm border-b-2 border-[#F2C94C] sticky top-0 z-50 w-full">
       <div className="max-w-7xl mx-auto px-4 py-3">
         <div className="flex items-center justify-between gap-4">
@@ -227,8 +223,8 @@ export function Navigation(){
             <div className="hidden md:flex items-center gap-3">
               {leftNav.map((item)=>{
                 if("mega"in item){
-                  return (
-                    <div key={item.label}className="relative group">
+                  return(
+                    <div key={item.label} className="relative group">
                       <button
                         className={`${desktopLinkClass} flex items-center`}
                         aria-haspopup="menu"
@@ -257,7 +253,7 @@ export function Navigation(){
                   )
                 }
 
-                return (
+                return(
                   <Link
                     key={item.href}
                     href={item.href}
@@ -381,7 +377,7 @@ export function Navigation(){
 
               {leftNav.map((item)=>
                 "mega"in item?(
-                  <div key={item.label}className="px-2">
+                  <div key={item.label} className="px-2">
                     <button
                       className="w-full text-left px-2 py-2 text-white font-semibold flex items-center justify-between hover:bg-white/10 rounded-md"
                       onClick={()=>setOpenMobileSubmenu((cur)=>cur===item.label?null:item.label)}
