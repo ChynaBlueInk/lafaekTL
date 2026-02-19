@@ -9,6 +9,7 @@ export default function CyberChildrenPage() {
   // 🔑 read global language from context (set by your nav buttons)
   const { language } = useLanguage();
 
+
   const t = {
     en: {
 
@@ -16,6 +17,7 @@ export default function CyberChildrenPage() {
       subtitle:
         "Simple, friendly tips to help kids aged 7–10 stay safe online at school, at home, and on mobiles.",
       heroBadge: "Ages ~7–10",
+      
       introLead:
         "The internet is fun — games, videos, and learning! But we must use it safely. These rules help you know when to stop, think, and ask an adult.",
       learnTitle: "What You'll Learn",
@@ -209,15 +211,26 @@ tet: {
           {/* Breadcrumbs */}
  
 
-        <div className="flex items-start justify-between gap-4">
-            <div>
-              <h1 className="text-3xl md:text-4xl font-extrabold">{t.title}</h1>
-              <p className="mt-2 text-white/90 max-w-2xl">{t.subtitle}</p>
-            </div>
-            <span className="hidden sm:inline-block bg-[#F2C94C] text-[#333] px-3 py-1 rounded-full font-semibold">
-              {t.heroBadge}
-            </span>
-          </div>
+    <div className="flex items-start justify-between gap-4">
+  <div>
+    <h1 className="text-3xl md:text-4xl font-extrabold">{t.title}</h1>
+    <p className="mt-2 text-white/90 max-w-2xl">{t.subtitle}</p>
+
+    <div className="mt-4">
+      <Link
+        href="/learning/cyber/children/game"
+        className="inline-flex items-center justify-center bg-white text-[#219653] font-extrabold px-5 py-3 rounded-lg hover:opacity-90"
+      >
+        {language==="tet"?"Halimar Jogu Cyber Kingdom 🏰":"Play the Cyber Kingdom Game 🏰"}
+      </Link>
+    </div>
+  </div>
+
+  <span className="hidden sm:inline-block bg-[#F2C94C] text-[#333] px-3 py-1 rounded-full font-semibold">
+    {t.heroBadge}
+  </span>
+</div>
+
         </div>
       </section>
 

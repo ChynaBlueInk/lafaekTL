@@ -1,4 +1,4 @@
-// app/cyber/youth/page.tsx
+// app/learning/cyber/youth/page.tsx
 "use client";
 
 import Link from "next/link";
@@ -14,11 +14,12 @@ import {
   Fingerprint,
   Brain,
   ExternalLink,
+  Gamepad2,
 } from "lucide-react";
 import {useLanguage}from "@/lib/LanguageContext";
 
 export default function CyberYouthPage(){
-  const{language}=useLanguage();
+  const {language}=useLanguage();
 
   const t={
     en:{
@@ -46,6 +47,9 @@ export default function CyberYouthPage(){
           desc:"Tighten social settings, limit location, and reduce oversharing.",
         },
       ],
+      gameTitle:"Cyber Vanguard Game",
+      gameDesc:"Want to practice this stuff in mission mode? Try the interactive game.",
+      gameCta:"Play Cyber Vanguard",
       movesTitle:"8 Key Moves for Everyday Safety",
       moves:[
         "Use a unique password for every account; turn on 2-factor (prefer app/biometrics, not SMS if possible).",
@@ -141,6 +145,9 @@ export default function CyberYouthPage(){
           desc:"Hadrek setting sosiál, limita lokasaun no labele fahe buat barak liu.",
         },
       ],
+      gameTitle:"Jogu Cyber Vanguard",
+      gameDesc:"Hakarak aprende liu husi missãun? Hahu jogu interativu ida-ne'e.",
+      gameCta:"Hahu Cyber Vanguard",
       movesTitle:"8 Pontu importante ba loron-loron nian",
       moves:[
         "Uza password ida ne'ebé úniku ba kada konta; liga verifikasaun fator-2 (di'ak liu via app/biometria, la'ós SMS se bele).",
@@ -239,8 +246,6 @@ export default function CyberYouthPage(){
       {/* Header / Hero */}
       <section className="bg-[#219653] text-white">
         <div className="max-w-6xl mx-auto px-4 py-6">
-          {/* Breadcrumbs (add later if needed) */}
-
           <div className="flex items-start justify-between gap-4">
             <div>
               <h1 className="text-3xl md:text-4xl font-extrabold">{t.title}</h1>
@@ -253,8 +258,32 @@ export default function CyberYouthPage(){
         </div>
       </section>
 
-      {/* Intro / Learn */}
+      {/* Game CTA */}
       <section className="max-w-6xl mx-auto px-4 py-8">
+        <div className="rounded-2xl border border-[#E5E7EB] bg-white shadow-sm overflow-hidden">
+          <div className="p-5 md:p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div className="flex items-start gap-3">
+              <div className="w-12 h-12 rounded-full bg-[#EAF2FF] text-[#2F80ED] flex items-center justify-center">
+                <Gamepad2 className="h-6 w-6" />
+              </div>
+              <div>
+                <div className="text-xl font-extrabold text-[#333333]">{t.gameTitle}</div>
+                <div className="mt-1 text-[#4F4F4F]">{t.gameDesc}</div>
+              </div>
+            </div>
+
+            <Link
+              href="/learning/cyber/youth/game"
+              className="inline-flex items-center justify-center bg-[#2F80ED] text-white font-bold px-5 py-3 rounded-xl hover:opacity-90 transition"
+            >
+              {t.gameCta}
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Intro / Learn */}
+      <section className="max-w-6xl mx-auto px-4 pb-8">
         <div className="bg-[#F5F5F5] border border-[#BDBDBD] rounded-2xl p-5">
           <div className="flex items-center gap-3">
             <ShieldCheck className="h-6 w-6 text-[#2F80ED]" />
