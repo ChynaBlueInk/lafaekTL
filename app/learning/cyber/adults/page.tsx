@@ -14,6 +14,8 @@ import {
   WifiOff,
   Router,
   ExternalLink,
+  MessageCircle,
+  BookOpenCheck,
 } from "lucide-react";
 import {useLanguage}from "@/lib/LanguageContext";
 
@@ -28,6 +30,11 @@ export default function CyberAdultsPage(){
       heroBadge:"Parents & Carers",
       introLead:
         "You don’t need to be a tech expert. These actions—drawn from government guidance—lock down accounts, reduce risks, and open good conversations at home.",
+
+      interactiveTitle:"Interactive: Parent & Guardian Guides",
+      interactiveDesc:
+        "Practice real conversations: passwords, privacy settings, boundaries, oversharing, and what to do if someone asks for images or to meet up.",
+      interactiveBtn:"Open the interactive guide",
 
       learnTitle:"What You'll Learn",
       learnItems:[
@@ -118,18 +125,21 @@ export default function CyberAdultsPage(){
       ],
       posterCta:"Download a home poster/checklist (coming soon)",
       note:"This page provides original Lafaek guidance and links to ACSC/eSafety for optional deeper steps.",
+      back:"← Back to Cyber Learning",
     },
 
     tet:{
-      breadcrumbHome:"Uma",
-      breadcrumbCyber:"Seguransa Sibernétika",
-      breadcrumbAdults:"Inan-Aman & Kuidadór sira",
       title:"Proteje Ita-boot nia oan sira online",
       subtitle:
         "Etapa prátiku sira ba inan-aman no kuidadu-na'in sira atu asegura dispozitivu sira, estabelese regra saudavel sira, no apoia labarik sira bainhira buat ruma la'o laloos.",
       heroBadge:"Inan-Aman & Kuidadór sira",
       introLead:
         "Ita la presiza sai peritu teknolojia nian. Asaun sira-ne'e—ne'ebé foti hosi orientasaun governu nian—trava konta sira, hamenus risku sira, no loke konversa di'ak sira iha uma.",
+
+      interactiveTitle:"Interativu: Matadalan Inan-Aman & Kuidadór",
+      interactiveDesc:
+        "Prátika konversa loos: senha, setting privasidade, limita/boundary, la fahe informasaun barak, no saida atu halo se ema husu imajen ka husu atu hasoru.",
+      interactiveBtn:"Loke matadalan interativu",
 
       learnTitle:"Saida maka Ita-boot sei aprende",
       learnItems:[
@@ -156,9 +166,9 @@ export default function CyberAdultsPage(){
         "Mantein dispozitivu sira atualizadu. Habilita atualizasaun automátika sira ba telefone, tablet, laptop no browser sira.",
         "Hatur kódigu-pasajen/biométriku ba dispozitivu no trava automátika (< minutu 1). Hatama ‘Buska ha'u nia dispozitivu’.",
         "Kria Akordu Teknolojia Família nian ne'ebé simples: iha ne'ebé/bainhira uza dispozitivu sira, saida maka atu halo se buat ruma sente laloos.",
-        "Hatur kontrolu inan-aman nian ne'ebé apropriadu ba idade iha dispozitivu sira, loja aplikasaun sira no aplikasaun xave sira. Halo revizaun semana-semana—labarik sira sai boot lalais.",
+        "Hatur kontrolu inan-aman nian ne'ebé apropriadu ba idade iha dispozitivu sira, loja aplikasaun sira no aplikasaun xave sira. Halo revizaun semana-semana.",
         "Hametin privasidade iha aplikasaun sosiál sira. Limita sé maka bele haruka mensajen, marka, ka haree istória sira; desliga fatin ne'ebé loos.",
-        "Ko'alia sedu no beibeik kona-ba bosok sira, hamoos an, intimidasaun no presaun atu fahe imajen sira. Mantein konversa sira nakloke.",
+        "Ko'alia sedu no beibeik kona-ba bosok sira, grooming, intimidasaun no presaun atu fahe imajen sira.",
         "Halo backup ba foto importante sira no serbisu eskola nian. Hatene oinsá atu restaura dispozitivu ida se presiza.",
       ],
 
@@ -174,18 +184,9 @@ export default function CyberAdultsPage(){
       controlsNote:
         "Kontrolu sira hamenus risku maibé la perfeitu. Kombina sira ho konversa sira no check-in regulár sira.",
       controls:[
-        {
-          icon:<Smartphone className="h-5 w-5" />,
-          text:"Konfigurasaun dispozitivu nian: filtru konteúdu sira, limite sira aplikasaun nian, tempu ekran nian, kompras sira.",
-        },
-        {
-          icon:<KeyRound className="h-5 w-5" />,
-          text:"Loja aplikasaun: presiza aprovasaun ba instalasaun no kompras iha aplikasaun.",
-        },
-        {
-          icon:<Router className="h-5 w-5" />,
-          text:"Wi-Fi/router uma nian: filtrajen família nian no oráriu sira bainhira disponivel.",
-        },
+        {icon:<Smartphone className="h-5 w-5" />,text:"Konfigurasaun dispozitivu nian: filtru konteúdu sira, limite sira aplikasaun nian, tempu ekran nian, kompras sira."},
+        {icon:<KeyRound className="h-5 w-5" />,text:"Loja aplikasaun: presiza aprovasaun ba instalasaun no kompras iha aplikasaun."},
+        {icon:<Router className="h-5 w-5" />,text:"Wi-Fi/router uma nian: filtrajen família nian no oráriu sira bainhira disponivel."},
       ],
 
       scamsTitle:"Scams, Grooming & 'Di'ak liu atu sai loos'",
@@ -197,14 +198,8 @@ export default function CyberAdultsPage(){
 
       wifiTitle:"Wi-Fi Públiku — Kuidadu",
       wifiList:[
-        {
-          icon:<WifiOff className="h-5 w-5" />,
-          text:"Prefere hotspot dadus móvel nian ba login sira. Evita banku iha Wi-Fi kafé nian.",
-        },
-        {
-          icon:<ShieldCheck className="h-5 w-5" />,
-          text:"Sai hafoin uza no hamate auto-ligasaun iha dispozitivu labarik sira nian.",
-        },
+        {icon:<WifiOff className="h-5 w-5" />,text:"Prefere hotspot dadus móvel nian ba login sira. Evita banku iha Wi-Fi kafé nian."},
+        {icon:<ShieldCheck className="h-5 w-5" />,text:"Sai hafoin uza no hamate auto-ligasaun iha dispozitivu labarik sira nian."},
       ],
 
       reportTitle:"Se buat ruma la'o sala",
@@ -212,7 +207,7 @@ export default function CyberAdultsPage(){
         "Suporta uluk. Hakmatek, agradese ba ita-boot nia oan tanba nia hatete ba ita-boot.",
         "Halibur evidénsia ho seguru (screenshot, URL, naran utilizadór).",
         "Troka senha sira; ativa MFA; sai hosi sesaun sira seluk.",
-        "Blokeia/relata iha aplikasaun/plataforma. Konsidera kontaktu ita-boot nia telekomunikasaun ka banku se osan/detallu sira fahe ona.",
+        "Blokeia/relata iha aplikasaun/plataforma. Konsidera kontaktu telekomunikasaun ka banku se osan/detallu sira fahe ona.",
         "Buka tulun lokál hosi eskola ka autoridade sira karik iha ameasa ka prejuízu ne'ebé la'o hela.",
       ],
 
@@ -225,7 +220,7 @@ export default function CyberAdultsPage(){
           href:"https://www.cyber.gov.au/protect-yourself/staying-secure-online/protecting-your-family/protect-your-children-online",
         },
         {
-          text:"Asegura ita-boot nia konta utilizadór (inklui kontrolu inan-aman nian) — ACSC",
+          text:"Asegura ita-boot nia konta utilizadór — ACSC",
           href:"https://www.cyber.gov.au/protect-yourself/securing-your-devices/how-secure-your-device/secure-your-user-account",
         },
         {
@@ -235,20 +230,30 @@ export default function CyberAdultsPage(){
       ],
       posterCta:"Download poster/lista verifikasaun uma nian (sei mai iha tempu badak)",
       note:
-        "Rekursu sira ne'e fornese orientasaun orijinál Lafaek nian no ligasaun sira ba ACSC/eSafety ba etapa opsionál sira ne'ebé kle'an liu.",
+        "Rekursu sira ne'e fornese orientasaun orijinál Lafaek nian no ligasaun sira ba ACSC/eSafety ba etapa opsionál sira.",
+      back:"← Fila ba Seguransa Sibernétika",
     },
   }[language];
 
   return(
     <main className="min-h-screen bg-white">
-      {/* Header / Hero */}
       <section className="bg-[#219653] text-white">
         <div className="max-w-6xl mx-auto px-4 py-6">
           <div className="flex items-start justify-between gap-4">
             <div>
               <h1 className="text-3xl md:text-4xl font-extrabold">{t.title}</h1>
               <p className="mt-2 text-white/90 max-w-3xl">{t.subtitle}</p>
+
+              <div className="mt-4">
+                <Link
+                  href="/learning/cyber"
+                  className="text-sm text-white/90 hover:text-white underline underline-offset-4"
+                >
+                  {t.back}
+                </Link>
+              </div>
             </div>
+
             <span className="hidden sm:inline-block bg-[#F2C94C] text-[#333] px-3 py-1 rounded-full font-semibold">
               {t.heroBadge}
             </span>
@@ -256,8 +261,35 @@ export default function CyberAdultsPage(){
         </div>
       </section>
 
-      {/* Intro / Learn */}
+      {/* NEW: Interactive CTA */}
       <section className="max-w-6xl mx-auto px-4 py-8">
+        <div className="rounded-2xl border-2 border-[#2F80ED] bg-[#F5F9FF] p-5">
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 rounded-full bg-[#2F80ED]/10 text-[#2F80ED] flex items-center justify-center">
+              <MessageCircle className="h-5 w-5" />
+            </div>
+            <div className="flex-1">
+              <h2 className="text-xl font-bold text-[#4F4F4F] flex items-center gap-2">
+                <BookOpenCheck className="h-5 w-5 text-[#2F80ED]" />
+                {t.interactiveTitle}
+              </h2>
+              <p className="mt-1 text-[#4F4F4F]">{t.interactiveDesc}</p>
+
+              <div className="mt-4">
+                <Link
+                  href="/learning/cyber/adults/guardians"
+                  className="inline-flex items-center justify-center bg-[#2F80ED] hover:bg-[#1C6ED6] text-white font-semibold px-4 py-2 rounded-lg transition"
+                >
+                  {t.interactiveBtn}
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Intro / Learn */}
+      <section className="max-w-6xl mx-auto px-4 pb-2">
         <div className="bg-[#F5F5F5] border border-[#BDBDBD] rounded-2xl p-5">
           <div className="flex items-center gap-3">
             <ShieldCheck className="h-6 w-6 text-[#2F80ED]" />

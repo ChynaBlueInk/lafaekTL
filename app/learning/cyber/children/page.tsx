@@ -15,8 +15,8 @@ export default function CyberChildrenPage() {
 
       title: "Cyber Safety for Children",
       subtitle:
-        "Simple, friendly tips to help kids aged 7–10 stay safe online at school, at home, and on mobiles.",
-      heroBadge: "Ages ~7–10",
+        "Simple, friendly tips to help kids aged 7–15 stay safe online at school, at home, and on mobiles.",
+      heroBadge: "Ages ~7–15",
       
       introLead:
         "The internet is fun — games, videos, and learning! But we must use it safely. These rules help you know when to stop, think, and ask an adult.",
@@ -105,8 +105,8 @@ tet: {
   breadcrumbChildren: "Labarik",
   title: "Seguransa Online ba Labarik",
   subtitle:
-    "Sujestaun simples no amigavel atu ajuda labarik sira ho idade tinan 7–10 nafatin seguru online iha eskola, uma, no wainhira uza telemovel.",
-  heroBadge: "Idade ~7–10",
+    "Sujestaun simples no amigavel atu ajuda labarik sira ho idade tinan 7–15 nafatin seguru online iha eskola, uma, no wainhira uza telemovel.",
+  heroBadge: "Idade ~7–15",
 
   introLead:
     "Internét ne'e di'ak tebes — jogu, vídeo, no aprende! Maibé tenke uza ho seguru. Regra sira-ne'e ajuda ita para, hanoin, no husu ajuda ba ema boot konfiadu.",
