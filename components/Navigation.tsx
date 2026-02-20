@@ -23,11 +23,21 @@ export function Navigation(){
 
   const isSignedIn=!!auth.user
   const profile=auth.user?.profile as any
+
   const signedInLabel=
     profile?.name||
     profile?.given_name||
     profile?.email||
     "User"
+
+  // --- Admin visibility (Cognito groups) ---
+  const groupsRaw=profile?.["cognito:groups"]
+  const groups:Array<string>=Array.isArray(groupsRaw)
+    ? groupsRaw
+    : (typeof groupsRaw==="string"&&groupsRaw.length>0?groupsRaw.split(",").map((s)=>s.trim()):[])
+
+  const adminGroups=["admin","contenteditor","impactstorycontributor","magazineadmin"]
+  const canAccessAdmin=isSignedIn&&groups.some((g)=>adminGroups.includes(String(g).toLowerCase()))
 
   const handleSignOut=async()=>{
     const cognitoDomain=(process.env.NEXT_PUBLIC_COGNITO_DOMAIN||"").replace(/\/$/,"")
@@ -109,10 +119,10 @@ export function Navigation(){
       loginSignup:"Login / Signup",
       signOut:"Sign out",
       signedInAs:"Signed in as",
+      admin:"Admin",
       en:"EN",
       tet:"TET",
-            friends:"Friends of Lafaek",
-
+      friends:"Friends of Lafaek",
     },
     tet:{
       brand:"Revista Lafaek",
@@ -166,10 +176,10 @@ export function Navigation(){
       loginSignup:"Tama / Rejistu",
       signOut:"Sai",
       signedInAs:"Tama ho",
+      admin:"Admin",
       en:"EN",
       tet:"TET",
-            friends:"Kolega Lafaek",
-
+      friends:"Kolega Lafaek",
     },
   }[language]
 
@@ -183,7 +193,6 @@ export function Navigation(){
     {href:"/stories/news",label:t.news},
     {href:"/stories/impact",label:t.communityStories},
 
-    // ✅ Learning is now a simple link to /learning (no dropdown)
     {href:"/learning",label:t.learning},
 
     {
@@ -197,8 +206,7 @@ export function Navigation(){
     },
 
     {href:"/contact",label:t.contact},
-        {href:"/friends",label:t.friends},
-
+    {href:"/friends",label:t.friends},
   ]
 
   return(
@@ -263,6 +271,13 @@ export function Navigation(){
                   </Link>
                 )
               })}
+
+              {/* Admin link (desktop left nav area) */}
+              {canAccessAdmin&&(
+                <Link href="/admin" className={`${desktopLinkClass} border border-white/30`}>
+                  {t.admin}
+                </Link>
+              )}
             </div>
           </div>
 
@@ -374,6 +389,20 @@ export function Navigation(){
               )}
 
               <div className="h-px bg-white/20 my-2"/>
+
+              {/* Admin link (mobile) */}
+              {canAccessAdmin&&(
+                <Link
+                  href="/admin"
+                  className="py-2 px-4 rounded-md transition-colors text-white hover:text-[#F2C94C] hover:bg-white/10"
+                  onClick={()=>{
+                    setIsMenuOpen(false)
+                    setOpenMobileSubmenu(null)
+                  }}
+                >
+                  {t.admin}
+                </Link>
+              )}
 
               {leftNav.map((item)=>
                 "mega"in item?(
