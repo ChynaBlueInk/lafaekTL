@@ -1,3 +1,4 @@
+//app/provider.tsx
 "use client"
 
 import {AuthProvider} from "react-oidc-context"
