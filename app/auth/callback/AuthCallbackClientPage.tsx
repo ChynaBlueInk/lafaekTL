@@ -1,14 +1,12 @@
-// app/auth/callback/AuthCallbackClientPage.tsx
 "use client"
 
 import {useEffect,useRef,useState}from "react"
-import {useRouter,useSearchParams}from "next/navigation"
+import {useSearchParams}from "next/navigation"
 import {useAuth}from "react-oidc-context"
 import {useLanguage}from "@/lib/LanguageContext"
 
 export default function AuthCallbackClientPage(){
   const auth=useAuth()
-  const router=useRouter()
   const sp=useSearchParams()
   const lang=useLanguage()
 
@@ -57,7 +55,7 @@ export default function AuthCallbackClientPage(){
         const res=await fetch("/api/auth/session",{
           method:"POST",
           headers:{"content-type":"application/json"},
-          body:JSON.stringify({idToken})
+          body:JSON.stringify({idToken}),
         })
 
         if(!res.ok){
@@ -65,12 +63,16 @@ export default function AuthCallbackClientPage(){
           throw new Error(data?.error||"Failed to set session cookie")
         }
 
-        router.replace(next)
+        // Give the browser a moment to commit Set-Cookie before we hit middleware-protected routes.
+        await new Promise((r)=>setTimeout(r,120))
+
+        // Use a hard navigation so the next request definitely includes cookies for middleware.
+        window.location.assign(next)
       }catch(err:any){
         setSessionError(err?.message||t.sessionFail)
       }
     })()
-  },[auth.isAuthenticated,router,sp,t.sessionFail])
+  },[auth.isAuthenticated,sp,t.sessionFail])
 
   if(auth.isLoading){
     return (
