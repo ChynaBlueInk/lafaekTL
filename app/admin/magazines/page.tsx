@@ -2,10 +2,17 @@
 "use client";
 
 import {useEffect,useMemo,useState,ChangeEvent}from "react";
+import {getUserDisplayName,getUserEmail}from "@/lib/auth";
 
 const S3_ORIGIN="https://lafaek-media.s3.ap-southeast-2.amazonaws.com";
 
 type Series="LK"|"LBK"|"LP"|"LM";
+
+type AuditUser={
+  sub?:string;
+  email?:string;
+  fullName?:string;
+};
 
 type AdminMagazine={
   id:string;
@@ -18,8 +25,14 @@ type AdminMagazine={
   coverImage?:string; // S3 key or full URL
   pdfKey?:string;     // S3 key for full PDF
   visible?:boolean;
+
   createdAt?:string;
+  createdBy?:AuditUser;
+
   updatedAt?:string;
+  updatedBy?:AuditUser;
+  updatedByGroups?:string[];
+
   [key:string]:any;
 };
 
@@ -81,6 +94,47 @@ const buildFileUrl=(keyOrUrl?:string)=>{
   return`${S3_ORIGIN}/${clean}`;
 };
 
+function getOidcProfile(){
+  if(typeof window==="undefined"){return null;}
+  try{
+    const authority="https://cognito-idp.ap-southeast-2.amazonaws.com/ap-southeast-2_a70kol0sr";
+    const clientId="30g26p9ts1baddag42g747snp3";
+    const key=`oidc.user:${authority}:${clientId}`;
+    const raw=sessionStorage.getItem(key);
+    if(!raw){return null;}
+    const parsed=JSON.parse(raw);
+    return parsed?.profile||null;
+  }catch{
+    return null;
+  }
+}
+
+function getUserSub(){
+  const p=getOidcProfile();
+  return typeof p?.sub==="string"?p.sub:"";
+}
+
+function getUserGroups(){
+  const p=getOidcProfile();
+  const raw=p?.["cognito:groups"];
+  if(Array.isArray(raw)){return raw.map((x)=>String(x));}
+  if(typeof raw==="string"&&raw.trim()){return raw.split(",").map((s)=>s.trim()).filter(Boolean);}
+  return [];
+}
+
+function formatLastUpdated(m:AdminMagazine){
+  const name=typeof m.updatedBy?.fullName==="string"?m.updatedBy.fullName.trim():"";
+  const email=typeof m.updatedBy?.email==="string"?m.updatedBy.email.trim():"";
+  const who=name||email;
+
+  const stampRaw=typeof m.updatedAt==="string"?m.updatedAt:"";
+  const stamp=stampRaw?new Date(stampRaw).toLocaleString():"";
+
+  if(!who&&!stamp){return"";}
+  if(who&&stamp){return`${who} • ${stamp}`;}
+  return who||stamp;
+}
+
 export default function AdminMagazinesPage(){
   const[items,setItems]=useState<AdminMagazine[]>([]);
   const[loading,setLoading]=useState<boolean>(true);
@@ -95,6 +149,8 @@ export default function AdminMagazinesPage(){
   const[newTitleEn,setNewTitleEn]=useState<string>("");
   const[newTitleTet,setNewTitleTet]=useState<string>("");
 
+  const[dirtyIds,setDirtyIds]=useState<Set<string>>(new Set());
+
   useEffect(()=>{
     const load=async()=>{
       try{
@@ -102,7 +158,7 @@ export default function AdminMagazinesPage(){
         setError(undefined);
         setMessage("");
 
-        const res=await fetch("/api/admin/magazines",{method:"GET"});
+        const res=await fetch("/api/admin/magazines",{method:"GET",cache:"no-store"});
         if(!res.ok){
           throw new Error(`Failed to load magazines: ${res.status}`);
         }
@@ -125,7 +181,7 @@ export default function AdminMagazinesPage(){
             ? seriesRaw
             : "LK";
 
-          return{
+          const item:AdminMagazine={
             id:String(raw.id||`mag-${index}`),
             code,
             series,
@@ -136,9 +192,18 @@ export default function AdminMagazinesPage(){
             coverImage:raw.coverImage?String(raw.coverImage):undefined,
             pdfKey:raw.pdfKey?String(raw.pdfKey):undefined,
             visible:raw.visible!==false,
+
             createdAt:raw.createdAt?String(raw.createdAt):undefined,
+            createdBy:raw.createdBy,
+
             updatedAt:raw.updatedAt?String(raw.updatedAt):undefined,
-            ...raw
+            updatedBy:raw.updatedBy,
+            updatedByGroups:Array.isArray(raw.updatedByGroups)?raw.updatedByGroups:undefined
+          };
+
+          return{
+            ...raw,
+            ...item
           } as AdminMagazine;
         }).filter((m)=>!!m.code);
 
@@ -161,9 +226,16 @@ export default function AdminMagazinesPage(){
     void load();
   },[]);
 
-  const markChanged=()=>{
+  const markChanged=(id?:string)=>{
     if(!hasChanges){
       setHasChanges(true);
+    }
+    if(id){
+      setDirtyIds((prev)=>{
+        const next=new Set(prev);
+        next.add(id);
+        return next;
+      });
     }
   };
 
@@ -179,7 +251,7 @@ export default function AdminMagazinesPage(){
         [field]:value
       };
     }));
-    markChanged();
+    markChanged(id);
   };
 
   const handleToggleVisible=(id:string)=>{
@@ -191,7 +263,7 @@ export default function AdminMagazinesPage(){
         visible:!currentVisible
       };
     }));
-    markChanged();
+    markChanged(id);
   };
 
   const handleAddMagazine=()=>{
@@ -209,6 +281,11 @@ export default function AdminMagazinesPage(){
     const{series,issue,year}=deriveFromCode(code);
     const now=new Date().toISOString();
 
+    const fullName=getUserDisplayName();
+    const email=getUserEmail();
+    const sub=getUserSub();
+    const groups=getUserGroups();
+
     const mag:AdminMagazine={
       id:`temp-${Date.now()}`,
       code,
@@ -218,8 +295,21 @@ export default function AdminMagazinesPage(){
       titleEn:newTitleEn.trim()||undefined,
       titleTet:newTitleTet.trim()||undefined,
       visible:false,
+
       createdAt:now,
-      updatedAt:now
+      createdBy:{
+        sub:sub||"",
+        email:email||"",
+        fullName:fullName||""
+      },
+
+      updatedAt:now,
+      updatedBy:{
+        sub:sub||"",
+        email:email||"",
+        fullName:fullName||""
+      },
+      updatedByGroups:groups.length?groups:undefined
     };
 
     setItems((prev)=>{
@@ -236,7 +326,7 @@ export default function AdminMagazinesPage(){
     setNewCode("");
     setNewTitleEn("");
     setNewTitleTet("");
-    markChanged();
+    markChanged(mag.id);
     setMessage("Magazine created. Remember to upload a cover and PDF, then Save Changes.");
   };
 
@@ -245,7 +335,7 @@ export default function AdminMagazinesPage(){
       return;
     }
     setItems((prev)=>prev.filter((m)=>m.id!==id));
-    markChanged();
+    markChanged(id);
   };
 
   const handleFileInputChange=(
@@ -321,7 +411,7 @@ export default function AdminMagazinesPage(){
           pdfKey:s3Key
         };
       }));
-      markChanged();
+      markChanged(id);
       setMessage(
         kind==="cover"
           ? "Cover image uploaded. Remember to Save Changes."
@@ -341,17 +431,37 @@ export default function AdminMagazinesPage(){
       setSaving(true);
       setMessage("");
 
+      const now=new Date().toISOString();
+      const fullName=getUserDisplayName();
+      const email=getUserEmail();
+      const sub=getUserSub();
+      const groups=getUserGroups();
+
       const payloadItems=items.map((m)=>{
         const cleanYear=m.year?.toString().trim()||"";
         const cleanIssue=m.issue?.toString().trim()||"";
-        const now=new Date().toISOString();
+
+        if(dirtyIds.has(m.id)){
+          return{
+            ...m,
+            year:cleanYear,
+            issue:cleanIssue,
+            visible:m.visible!==false,
+            updatedAt:now,
+            updatedBy:{
+              sub:sub||m.updatedBy?.sub||"",
+              email:email||m.updatedBy?.email||"",
+              fullName:fullName||m.updatedBy?.fullName||""
+            },
+            updatedByGroups:groups.length?groups:m.updatedByGroups
+          };
+        }
 
         return{
           ...m,
           year:cleanYear,
           issue:cleanIssue,
-          visible:m.visible!==false,
-          updatedAt:now
+          visible:m.visible!==false
         };
       });
 
@@ -374,6 +484,7 @@ export default function AdminMagazinesPage(){
       const saved:AdminMagazine[]=(data.items||[]) as AdminMagazine[];
       setItems(saved);
       setHasChanges(false);
+      setDirtyIds(new Set());
       setMessage("Changes saved successfully.");
     }catch(err:any){
       console.error("[admin/magazines] save error",err);
@@ -529,6 +640,9 @@ export default function AdminMagazinesPage(){
                     Status
                   </th>
                   <th className="border-b border-slate-200 px-3 py-2 font-semibold uppercase tracking-wide text-slate-600">
+                    Last updated
+                  </th>
+                  <th className="border-b border-slate-200 px-3 py-2 font-semibold uppercase tracking-wide text-slate-600">
                     Actions
                   </th>
                 </tr>
@@ -539,6 +653,7 @@ export default function AdminMagazinesPage(){
                   const coverUrl=buildFileUrl(m.coverImage);
                   const pdfUrl=buildFileUrl(m.pdfKey);
                   const hasPdf=Boolean(m.pdfKey);
+                  const lastUpdated=formatLastUpdated(m);
 
                   return(
                     <tr
@@ -705,6 +820,24 @@ export default function AdminMagazinesPage(){
                         >
                           {visible?"Visible":"Hidden"}
                         </button>
+                      </td>
+
+                      {/* LAST UPDATED */}
+                      <td className="border-b border-slate-200 px-3 py-2 align-top">
+                        {lastUpdated?(
+                          <div className="text-[11px] text-slate-700">
+                            {lastUpdated}
+                            {Array.isArray(m.updatedByGroups)&&m.updatedByGroups.length>0&&(
+                              <div className="mt-1 text-[10px] text-slate-500">
+                                Groups: {m.updatedByGroups.join(", ")}
+                              </div>
+                            )}
+                          </div>
+                        ):(
+                          <div className="text-[11px] text-slate-400">
+                            —
+                          </div>
+                        )}
                       </td>
 
                       {/* ACTIONS */}

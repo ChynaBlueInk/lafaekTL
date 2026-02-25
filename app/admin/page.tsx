@@ -5,6 +5,12 @@ import {useMemo,useState}from "react";
 import Link from "next/link";
 import {useLanguage}from "@/lib/LanguageContext";
 import AdminGuard from "@/components/AdminGuard";
+import {
+  canAccessAdminOurTeam,
+  canAccessAdminMagazines,
+  canAccessAdminNews,
+  canAccessAdminImpact
+}from "@/lib/auth";
 
 type AdminKey="team"|"magazines"|"news"|"impact";
 
@@ -15,6 +21,7 @@ type AdminLink={
   titleTet:string;
   descEn:string;
   descTet:string;
+  allowed:()=>boolean;
 };
 
 type InstructionBlock={
@@ -39,7 +46,8 @@ export default function AdminHubPage(){
       titleEn:"Our Team",
       titleTet:"Ekipamentu Ami Nian",
       descEn:"Update staff profiles, roles, and photos.",
-      descTet:"Atualiza perfil ekipa, funsaun, no foto."
+      descTet:"Atualiza perfil ekipa, funsaun, no foto.",
+      allowed:canAccessAdminOurTeam
     },
     {
       key:"magazines",
@@ -47,7 +55,8 @@ export default function AdminHubPage(){
       titleEn:"Magazines",
       titleTet:"Revista sira",
       descEn:"Upload magazine cover images, sample pages, and PDFs.",
-      descTet:"Upload capa, pájina amostra, no PDF revista."
+      descTet:"Upload capa, pájina amostra, no PDF revista.",
+      allowed:canAccessAdminMagazines
     },
     {
       key:"news",
@@ -55,7 +64,8 @@ export default function AdminHubPage(){
       titleEn:"News",
       titleTet:"Notísia",
       descEn:"Add and publish news stories (English/Tetun).",
-      descTet:"Hatama no publika notísia (Inglés/Tetun)."
+      descTet:"Hatama no publika notísia (Inglés/Tetun).",
+      allowed:canAccessAdminNews
     },
     {
       key:"impact",
@@ -63,9 +73,15 @@ export default function AdminHubPage(){
       titleEn:"Impact Stories",
       titleTet:"Istória Impaktu",
       descEn:"Add impact stories and attach PDFs if needed.",
-      descTet:"Hatama istória impaktu no tau PDF se presiza."
+      descTet:"Hatama istória impaktu no tau PDF se presiza.",
+      allowed:canAccessAdminImpact
     }
   ],[]);
+
+  const visibleLinks=useMemo(
+    ()=>links.filter((l)=>l.allowed()),
+    [links]
+  );
 
   const instructions:Record<AdminKey,InstructionBlock>=useMemo(() => ({
     team:{
@@ -208,19 +224,23 @@ export default function AdminHubPage(){
       intro:"Quick links to update content. Use the instructions button for staff guidance.",
       instructions:"Instructions",
       open:"Open page",
-      close:"Close"
+      close:"Close",
+      noAccessTitle:"No pages available",
+      noAccessBody:"Your account can access the Admin hub, but doesn’t have permission to edit content yet. Please contact an Admin."
     },
     tet:{
       heading:"Hub Upload Admin",
       intro:"Link lalais atu atualiza kontentu. Uza butaun instrusaun atu orienta staf.",
       instructions:"Instrusaun",
       open:"Loke pájina",
-      close:"Taka"
+      close:"Taka",
+      noAccessTitle:"Laiha pájina disponivel",
+      noAccessBody:"Ita bele tama ba Admin hub, maibé seidauk iha lisensa atu edit kontentu. Favór kontaktu Admin."
     }
   }[L];
 
   return(
-    <AdminGuard allowedRoles={["Admin"]}>
+    <AdminGuard allowedRoles={["Admin","ContentEditor","MagazineAdmin","Communications","ImpactStoryContributor"]}>
       <div className="min-h-screen bg-slate-50">
         <main className="mx-auto max-w-6xl px-4 py-10">
           <header className="mb-8">
@@ -228,42 +248,49 @@ export default function AdminHubPage(){
             <p className="mt-2 text-slate-600">{labels.intro}</p>
           </header>
 
-          <section className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            {links.map((link)=>{
-              const title=L==="tet"?link.titleTet:link.titleEn;
-              const desc=L==="tet"?link.descTet:link.descEn;
+          {visibleLinks.length===0?(
+            <div className="rounded-xl border border-slate-200 bg-white p-6 text-slate-700 shadow-sm">
+              <div className="text-lg font-semibold text-slate-900">{labels.noAccessTitle}</div>
+              <p className="mt-2 text-sm text-slate-600">{labels.noAccessBody}</p>
+            </div>
+          ):(
+            <section className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              {visibleLinks.map((link)=>{
+                const title=L==="tet"?link.titleTet:link.titleEn;
+                const desc=L==="tet"?link.descTet:link.descEn;
 
-              return(
-                <div key={link.key} className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-                  <div className="mb-3">
-                    <h2 className="text-lg font-semibold text-slate-900">{title}</h2>
-                    <p className="mt-1 text-sm text-slate-600">{desc}</p>
+                return(
+                  <div key={link.key} className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+                    <div className="mb-3">
+                      <h2 className="text-lg font-semibold text-slate-900">{title}</h2>
+                      <p className="mt-1 text-sm text-slate-600">{desc}</p>
+                    </div>
+
+                    <div className="flex flex-wrap gap-2">
+                      <Link
+                        href={link.href}
+                        className="inline-flex items-center justify-center rounded-md bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700"
+                      >
+                        {labels.open}
+                      </Link>
+
+                      <button
+                        type="button"
+                        onClick={()=>setOpenKey(link.key)}
+                        className="inline-flex items-center justify-center rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-800 hover:bg-slate-50"
+                      >
+                        {labels.instructions}
+                      </button>
+                    </div>
+
+                    <div className="mt-3 break-all text-xs text-slate-500">
+                      {link.href}
+                    </div>
                   </div>
-
-                  <div className="flex flex-wrap gap-2">
-                    <Link
-                      href={link.href}
-                      className="inline-flex items-center justify-center rounded-md bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700"
-                    >
-                      {labels.open}
-                    </Link>
-
-                    <button
-                      type="button"
-                      onClick={()=>setOpenKey(link.key)}
-                      className="inline-flex items-center justify-center rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-800 hover:bg-slate-50"
-                    >
-                      {labels.instructions}
-                    </button>
-                  </div>
-
-                  <div className="mt-3 break-all text-xs text-slate-500">
-                    {link.href}
-                  </div>
-                </div>
-              );
-            })}
-          </section>
+                );
+              })}
+            </section>
+          )}
 
           {openKey&&modal&&(
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">

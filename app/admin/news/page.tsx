@@ -2,6 +2,7 @@
 "use client";
 
 import {useEffect,useMemo,useState,ChangeEvent}from "react";
+import {getUserDisplayName,getUserEmail}from "@/lib/auth";
 
 const S3_ORIGIN="https://lafaek-media.s3.ap-southeast-2.amazonaws.com";
 const ACTION_BAR_TOP=96; // adjust if your site navbar is taller/shorter
@@ -21,6 +22,15 @@ type NewsItem={
   imageUrl?:string;       // legacy support
   images?:string[];       // optional gallery (S3 keys or full URLs)
   document?:string;       // S3 key or full URL
+
+  // audit fields (S3)
+  createdAt?:string;
+  createdBy?:{sub?:string;email?:string;fullName?:string};
+  updatedAt?:string;
+  updatedBy?:{sub?:string;email?:string;fullName?:string};
+  updatedByGroups?:string[];
+
+  [key:string]:any;
 };
 
 type ApiResponse={
@@ -76,6 +86,47 @@ const emptyItem=():NewsItem=>({
   document:""
 });
 
+function formatLastUpdated(item:NewsItem){
+  const name=typeof item.updatedBy?.fullName==="string"?item.updatedBy.fullName.trim():"";
+  const email=typeof item.updatedBy?.email==="string"?item.updatedBy.email.trim():"";
+  const who=name||email;
+
+  const stampRaw=typeof item.updatedAt==="string"?item.updatedAt:"";
+  const stamp=stampRaw?new Date(stampRaw).toLocaleString():"";
+
+  if(!who&&!stamp){return"";}
+  if(who&&stamp){return`${who} • ${stamp}`;}
+  return who||stamp;
+}
+
+function getOidcProfile(){
+  if(typeof window==="undefined"){return null;}
+  try{
+    const authority="https://cognito-idp.ap-southeast-2.amazonaws.com/ap-southeast-2_a70kol0sr";
+    const clientId="30g26p9ts1baddag42g747snp3";
+    const key=`oidc.user:${authority}:${clientId}`;
+    const raw=sessionStorage.getItem(key);
+    if(!raw){return null;}
+    const parsed=JSON.parse(raw);
+    return parsed?.profile||null;
+  }catch{
+    return null;
+  }
+}
+
+function getUserSub(){
+  const p=getOidcProfile();
+  return typeof p?.sub==="string"?p.sub:"";
+}
+
+function getUserGroups(){
+  const p=getOidcProfile();
+  const raw=p?.["cognito:groups"];
+  if(Array.isArray(raw)){return raw.map((x)=>String(x));}
+  if(typeof raw==="string"&&raw.trim()){return raw.split(",").map((s)=>s.trim()).filter(Boolean);}
+  return [];
+}
+
 export default function NewsAdminPage(){
   const[items,setItems]=useState<NewsItem[]>([]);
   const[loading,setLoading]=useState<boolean>(true);
@@ -101,6 +152,8 @@ export default function NewsAdminPage(){
   const[sortMode,setSortMode]=useState<"editor"|"latest"|"oldest"|"az">("editor");
   const[onlyWithImage,setOnlyWithImage]=useState<boolean>(false);
   const[onlyWithPdf,setOnlyWithPdf]=useState<boolean>(false);
+
+  const[dirtyIds,setDirtyIds]=useState<Set<string>>(new Set());
 
   useEffect(()=>{
     const load=async()=>{
@@ -142,10 +195,19 @@ export default function NewsAdminPage(){
             image,
             imageUrl:(raw.imageUrl as string)||"",
             images:images||[],
-            document:(raw.document as string)||""
+            document:(raw.document as string)||"",
+
+            createdAt:typeof raw.createdAt==="string"?raw.createdAt:undefined,
+            createdBy:raw.createdBy,
+            updatedAt:typeof raw.updatedAt==="string"?raw.updatedAt:undefined,
+            updatedBy:raw.updatedBy,
+            updatedByGroups:Array.isArray(raw.updatedByGroups)?raw.updatedByGroups:undefined
           };
 
-          return item;
+          return{
+            ...raw,
+            ...item
+          };
         });
 
         normalised.sort((a,b)=>a.order-b.order);
@@ -162,9 +224,16 @@ export default function NewsAdminPage(){
     load();
   },[]);
 
-  const markChanged=()=>{
+  const markChanged=(id?:string)=>{
     if(!hasChanges){
       setHasChanges(true);
+    }
+    if(id){
+      setDirtyIds((prev)=>{
+        const next=new Set(prev);
+        next.add(id);
+        return next;
+      });
     }
   };
 
@@ -178,7 +247,7 @@ export default function NewsAdminPage(){
       next[index]={...current,[field]:value} as NewsItem;
       return next;
     });
-    markChanged();
+    markChanged(id);
   };
 
   const handleReorder=(id:string,delta:number)=>{
@@ -197,7 +266,7 @@ export default function NewsAdminPage(){
       next.sort((a,b)=>a.order-b.order);
       return next;
     });
-    markChanged();
+    markChanged(id);
   };
 
   const handleAddNew=()=>{
@@ -223,7 +292,7 @@ export default function NewsAdminPage(){
   const handleDelete=(id:string)=>{
     if(!window.confirm("Delete this item?")){return;}
     setItems((prev)=>prev.filter((i)=>i.id!==id));
-    markChanged();
+    markChanged(id);
   };
 
   const handleRemoveImage=(id:string)=>{
@@ -237,7 +306,7 @@ export default function NewsAdminPage(){
       next[index]={...current,image:"",imageUrl:""} as NewsItem;
       return next;
     });
-    markChanged();
+    markChanged(id);
     setMessage("Cover image removed. Remember to Save Changes.");
   };
 
@@ -252,7 +321,7 @@ export default function NewsAdminPage(){
       next[index]={...current,document:""} as NewsItem;
       return next;
     });
-    markChanged();
+    markChanged(id);
     setMessage("PDF removed. Remember to Save Changes.");
   };
 
@@ -260,7 +329,31 @@ export default function NewsAdminPage(){
     try{
       setSaving(true);
       setMessage("");
-      const payload={items};
+
+      const now=new Date().toISOString();
+      const fullName=getUserDisplayName();
+      const email=getUserEmail();
+      const sub=getUserSub();
+      const groups=getUserGroups();
+
+      const itemsToSave=items.map((it)=>{
+        if(dirtyIds.has(it.id)){
+          return{
+            ...it,
+            updatedAt:now,
+            updatedBy:{
+              sub:sub||it.updatedBy?.sub||"",
+              email:email||it.updatedBy?.email||"",
+              fullName:fullName||it.updatedBy?.fullName||""
+            },
+            updatedByGroups:groups.length?groups:it.updatedByGroups
+          };
+        }
+        return it;
+      });
+
+      const payload={items:itemsToSave};
+
       const res=await fetch("/api/admin/news",{
         method:"PUT",
         headers:{"Content-Type":"application/json"},
@@ -274,6 +367,7 @@ export default function NewsAdminPage(){
         throw new Error(data.error||"Unknown error from API");
       }
       setHasChanges(false);
+      setDirtyIds(new Set());
       setMessage("Changes saved successfully.");
     }catch(err:any){
       setMessage(err.message||"Error saving changes");
@@ -349,7 +443,7 @@ export default function NewsAdminPage(){
         return next;
       });
 
-      markChanged();
+      markChanged(id);
       setMessage("Cover image uploaded. Remember to Save Changes.");
     }catch(err:any){
       setMessage(err.message||"Error uploading cover image");
@@ -391,7 +485,7 @@ export default function NewsAdminPage(){
         return next;
       });
 
-      markChanged();
+      markChanged(id);
       setMessage("Gallery image uploaded. Remember to Save Changes.");
     }catch(err:any){
       setMessage(err.message||"Error uploading gallery image");
@@ -426,7 +520,7 @@ export default function NewsAdminPage(){
       next[index]={...current,images:gallery,image:nextCover,imageUrl:""} as NewsItem;
       return next;
     });
-    markChanged();
+    markChanged(id);
     setMessage("Gallery image removed. Remember to Save Changes.");
   };
 
@@ -440,7 +534,7 @@ export default function NewsAdminPage(){
       next[index]={...current,image:src,imageUrl:""} as NewsItem;
       return next;
     });
-    markChanged();
+    markChanged(id);
     setMessage("Cover image updated. Remember to Save Changes.");
   };
 
@@ -461,7 +555,7 @@ export default function NewsAdminPage(){
         return next;
       });
 
-      markChanged();
+      markChanged(id);
       setMessage("PDF uploaded. Remember to Save Changes.");
     }catch(err:any){
       setMessage(err.message||"Error uploading PDF");
@@ -746,6 +840,7 @@ export default function NewsAdminPage(){
               const gallery=(item.images||[]).filter(Boolean);
 
               const missingCover=item.visible && !coverSrc;
+              const lastUpdatedLabel=formatLastUpdated(item);
 
               return(
                 <div key={item.id} className="rounded-lg border border-slate-200 bg-white shadow-sm">
@@ -800,6 +895,12 @@ export default function NewsAdminPage(){
                           </div>
                         )}
                       </div>
+
+                      {lastUpdatedLabel&&(
+                        <div className="rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-700">
+                          <span className="font-semibold">Last updated:</span> {lastUpdatedLabel}
+                        </div>
+                      )}
 
                       <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                         <div>

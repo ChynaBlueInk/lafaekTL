@@ -1,7 +1,7 @@
 // app/auth/callback/AuthCallbackClientPage.tsx
 "use client"
 
-import {useEffect}from "react"
+import {useEffect,useRef,useState}from "react"
 import {useRouter,useSearchParams}from "next/navigation"
 import {useAuth}from "react-oidc-context"
 import {useLanguage}from "@/lib/LanguageContext"
@@ -19,14 +19,58 @@ export default function AuthCallbackClientPage(){
     loading:isTet?"Kompleta login...":"Completing sign-in…",
     errorPrefix:isTet?"Erru iha login:":"Sign-in error:",
     back:isTet?"Fila ba Login":"Back to Login",
+    sessionFail:isTet
+      ?"La konsege halo sessão seguru. Favor koko fila fali."
+      :"Couldn’t create a secure session. Please try again.",
   }
+
+  const [sessionError,setSessionError]=useState<string|null>(null)
+  const didRun=useRef(false)
 
   useEffect(() => {
     const next=sp.get("next")||"/admin"
-    if(auth.isAuthenticated){
-      router.replace(next)
+
+    if(!auth.isAuthenticated||didRun.current){
+      return
     }
-  },[auth.isAuthenticated,router,sp])
+
+    didRun.current=true
+
+    ;(async()=>{
+      try{
+        const authority="https://cognito-idp.ap-southeast-2.amazonaws.com/ap-southeast-2_a70kol0sr"
+        const clientId="30g26p9ts1baddag42g747snp3"
+        const key=`oidc.user:${authority}:${clientId}`
+        const raw=sessionStorage.getItem(key)
+
+        if(!raw){
+          throw new Error("OIDC storage item not found")
+        }
+
+        const parsed=JSON.parse(raw)
+        const idToken=typeof parsed?.id_token==="string"?parsed.id_token.trim():""
+
+        if(!idToken){
+          throw new Error("id_token missing from OIDC storage")
+        }
+
+        const res=await fetch("/api/auth/session",{
+          method:"POST",
+          headers:{"content-type":"application/json"},
+          body:JSON.stringify({idToken})
+        })
+
+        if(!res.ok){
+          const data=await res.json().catch(()=>null)
+          throw new Error(data?.error||"Failed to set session cookie")
+        }
+
+        router.replace(next)
+      }catch(err:any){
+        setSessionError(err?.message||t.sessionFail)
+      }
+    })()
+  },[auth.isAuthenticated,router,sp,t.sessionFail])
 
   if(auth.isLoading){
     return (
@@ -39,12 +83,14 @@ export default function AuthCallbackClientPage(){
     )
   }
 
-  if(auth.error){
+  if(auth.error||sessionError){
     return (
       <div className="min-h-screen bg-white">
         <main className="mx-auto max-w-3xl px-6 py-14">
           <h1 className="text-2xl font-semibold text-[#333333]">{t.title}</h1>
-          <p className="mt-3 text-[#EB5757]">{t.errorPrefix} {auth.error.message}</p>
+          <p className="mt-3 text-[#EB5757]">
+            {t.errorPrefix} {auth.error?.message||sessionError}
+          </p>
           <a className="mt-6 inline-block text-[#2F80ED] hover:underline" href="/auth">
             {t.back}
           </a>

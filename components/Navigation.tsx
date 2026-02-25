@@ -8,6 +8,7 @@ import {Menu,X,ChevronDown}from "lucide-react"
 import {Button}from "./button"
 import {useLanguage}from "@/lib/LanguageContext"
 import {useAuth}from "react-oidc-context"
+import {canAccessAdminArea,getUserDisplayName}from "@/lib/auth"
 
 type MegaItem={href:string;title:string;description?:string}
 type NavItem=
@@ -22,22 +23,10 @@ export function Navigation(){
   const auth=useAuth()
 
   const isSignedIn=!!auth.user
-  const profile=auth.user?.profile as any
+  const signedInLabel=isSignedIn?getUserDisplayName():"User"
 
-  const signedInLabel=
-    profile?.name||
-    profile?.given_name||
-    profile?.email||
-    "User"
-
-  // --- Admin visibility (Cognito groups) ---
-  const groupsRaw=profile?.["cognito:groups"]
-  const groups:Array<string>=Array.isArray(groupsRaw)
-    ? groupsRaw
-    : (typeof groupsRaw==="string"&&groupsRaw.length>0?groupsRaw.split(",").map((s)=>s.trim()):[])
-
-  const adminGroups=["admin","contenteditor","impactstorycontributor","magazineadmin"]
-  const canAccessAdmin=isSignedIn&&groups.some((g)=>adminGroups.includes(String(g).toLowerCase()))
+  // ✅ single source of truth (sessionStorage OIDC profile)
+  const canAccessAdmin=isSignedIn&&canAccessAdminArea()
 
   const handleSignOut=async()=>{
     const cognitoDomain=(process.env.NEXT_PUBLIC_COGNITO_DOMAIN||"").replace(/\/$/,"")
@@ -47,6 +36,9 @@ export function Navigation(){
       (typeof window!=="undefined"?window.location.origin:"")
 
     try{
+      try{
+        await fetch("/api/auth/session",{method:"DELETE"})
+      }catch{}
       await auth.removeUser()
     }finally{
       try{
@@ -272,7 +264,6 @@ export function Navigation(){
                 )
               })}
 
-              {/* Admin link (desktop left nav area) */}
               {canAccessAdmin&&(
                 <Link href="/admin" className={`${desktopLinkClass} border border-white/30`}>
                   {t.admin}
@@ -390,7 +381,6 @@ export function Navigation(){
 
               <div className="h-px bg-white/20 my-2"/>
 
-              {/* Admin link (mobile) */}
               {canAccessAdmin&&(
                 <Link
                   href="/admin"

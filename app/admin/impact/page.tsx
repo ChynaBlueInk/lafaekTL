@@ -2,6 +2,7 @@
 "use client";
 
 import {useEffect,useMemo,useState,ChangeEvent}from "react";
+import {getUserDisplayName,getUserEmail}from "@/lib/auth";
 
 const S3_ORIGIN="https://lafaek-media.s3.ap-southeast-2.amazonaws.com";
 const ACTION_BAR_TOP=96; // adjust if your site navbar is taller/shorter
@@ -23,6 +24,14 @@ type ImpactItem={
   image?:string;
   imageUrl?:string;
   document?:string; // S3 key for uploaded PDF
+
+  // audit fields (already in S3)
+  createdAt?:string;
+  createdBy?:{sub?:string;email?:string;fullName?:string};
+  updatedAt?:string;
+  updatedBy?:{sub?:string;email?:string;fullName?:string};
+  updatedByGroups?:string[];
+
   // allow draft submission fields etc
   [key:string]:any;
 };
@@ -90,8 +99,6 @@ function safeStatus(raw:any):ImpactStatus{
   if(s==="draft"||s==="published"||s==="hidden"||s==="archived"){
     return s;
   }
-  // If there's no explicit status, infer a sensible default:
-  // visible => published, otherwise hidden (keeps it off public page)
   const vis=typeof raw?.visible==="boolean"?raw.visible:true;
   return vis?"published":"hidden";
 }
@@ -114,6 +121,48 @@ function getStatusClasses(status:ImpactStatus){
     return"border-slate-300 bg-slate-100 text-slate-700";
   }
   return"border-blue-200 bg-blue-50 text-blue-900";
+}
+
+function formatLastUpdated(item:ImpactItem){
+  const name=typeof item.updatedBy?.fullName==="string"?item.updatedBy.fullName.trim():"";
+  const email=typeof item.updatedBy?.email==="string"?item.updatedBy.email.trim():"";
+  const who=name||email;
+
+  const stampRaw=typeof item.updatedAt==="string"?item.updatedAt:"";
+  const stamp=stampRaw?new Date(stampRaw).toLocaleString():"";
+
+  if(!who&&!stamp){return"";}
+  if(who&&stamp){return `${who} • ${stamp}`;}
+  return who||stamp;
+}
+
+function getOidcProfile(){
+  if(typeof window==="undefined"){return null;}
+  try{
+    // uses your current OIDC storage key pattern
+    const authority="https://cognito-idp.ap-southeast-2.amazonaws.com/ap-southeast-2_a70kol0sr";
+    const clientId="30g26p9ts1baddag42g747snp3";
+    const key=`oidc.user:${authority}:${clientId}`;
+    const raw=sessionStorage.getItem(key);
+    if(!raw){return null;}
+    const parsed=JSON.parse(raw);
+    return parsed?.profile||null;
+  }catch{
+    return null;
+  }
+}
+
+function getUserSub(){
+  const p=getOidcProfile();
+  return typeof p?.sub==="string"?p.sub:"";
+}
+
+function getUserGroups(){
+  const p=getOidcProfile();
+  const raw=p?.["cognito:groups"];
+  if(Array.isArray(raw)){return raw.map((x)=>String(x));}
+  if(typeof raw==="string"&&raw.trim()){return raw.split(",").map((s)=>s.trim()).filter(Boolean);}
+  return [];
 }
 
 export default function ImpactAdminPage(){
@@ -141,21 +190,20 @@ export default function ImpactAdminPage(){
   const[onlyWithImage,setOnlyWithImage]=useState<boolean>(false);
   const[onlyWithPdf,setOnlyWithPdf]=useState<boolean>(false);
 
-  // NEW: status filter
+  // status filter
   const[statusFilter,setStatusFilter]=useState<"all"|ImpactStatus>("all");
+
+  const[dirtyIds,setDirtyIds]=useState<Set<string>>(new Set());
 
   useEffect(()=>{
     const load=async()=>{
-      console.log("[admin/impact] loading items from /api/admin/impact");
       try{
         setLoading(true);
         const res=await fetch("/api/admin/impact",{method:"GET",cache:"no-store"});
-        console.log("[admin/impact] GET /api/admin/impact status",res.status);
         if(!res.ok){
           throw new Error(`Failed to load impact stories: ${res.status}`);
         }
         const data:ApiResponse=await res.json();
-        console.log("[admin/impact] GET response payload",data);
         if(!data.ok){
           throw new Error(data.error||"Unknown error from Impact API");
         }
@@ -182,7 +230,13 @@ export default function ImpactAdminPage(){
             date:(raw.date as string)||new Date().toISOString().slice(0,10),
             image:(raw.image as string)||(raw.imageUrl as string)||"",
             imageUrl:(raw.imageUrl as string)||"",
-            document:(raw.document as string)||""
+            document:(raw.document as string)||"",
+
+            createdAt:typeof raw.createdAt==="string"?raw.createdAt:undefined,
+            createdBy:raw.createdBy,
+            updatedAt:typeof raw.updatedAt==="string"?raw.updatedAt:undefined,
+            updatedBy:raw.updatedBy,
+            updatedByGroups:Array.isArray(raw.updatedByGroups)?raw.updatedByGroups:undefined
           };
 
           return{
@@ -195,7 +249,6 @@ export default function ImpactAdminPage(){
         setItems(normalised);
         setError(undefined);
       }catch(err:any){
-        console.error("[admin/impact] load error",err);
         setError(err.message||"Error loading impact stories");
       }finally{
         setLoading(false);
@@ -204,9 +257,16 @@ export default function ImpactAdminPage(){
     load();
   },[]);
 
-  const markChanged=()=>{
+  const markChanged=(id?:string)=>{
     if(!hasChanges){
       setHasChanges(true);
+    }
+    if(id){
+      setDirtyIds((prev)=>{
+        const next=new Set(prev);
+        next.add(id);
+        return next;
+      });
     }
   };
 
@@ -218,13 +278,12 @@ export default function ImpactAdminPage(){
       const current=next[index];
       if(!current){return prev;}
 
-      // keep status/visible aligned (but don’t fight the user)
       if(field==="visible"){
         const vis=Boolean(value);
         let nextStatus=current.status||safeStatus(current);
         if(vis){
-          if(nextStatus==="draft"){/* leave as draft unless explicitly published */}
-          else if(nextStatus==="archived"){/* archived stays archived until unarchived */}
+          if(nextStatus==="draft"){}
+          else if(nextStatus==="archived"){}
           else{nextStatus="published";}
         }else{
           if(nextStatus==="published"){nextStatus="hidden";}
@@ -245,7 +304,7 @@ export default function ImpactAdminPage(){
       next[index]={...current,[field]:value} as ImpactItem;
       return next;
     });
-    markChanged();
+    markChanged(id);
   };
 
   const handleReorder=(id:string,delta:number)=>{
@@ -264,7 +323,7 @@ export default function ImpactAdminPage(){
       next.sort((a,b)=>a.order-b.order);
       return next;
     });
-    markChanged();
+    markChanged(id);
   };
 
   const handleAddNew=()=>{
@@ -292,7 +351,7 @@ export default function ImpactAdminPage(){
   const handleDelete=(id:string)=>{
     if(!window.confirm("Delete this impact story?")){return;}
     setItems((prev)=>prev.filter((i)=>i.id!==id));
-    markChanged();
+    markChanged(id);
   };
 
   const handleArchive=(id:string)=>{
@@ -323,12 +382,37 @@ export default function ImpactAdminPage(){
     try{
       setSaving(true);
       setMessage("");
-      const payload={items};
+
+      const now=new Date().toISOString();
+      const fullName=getUserDisplayName();
+      const email=getUserEmail();
+      const sub=getUserSub();
+      const groups=getUserGroups();
+
+      const itemsToSave=items.map((it)=>{
+        if(dirtyIds.has(it.id)){
+          return{
+            ...it,
+            updatedAt:now,
+            updatedBy:{
+              sub:sub||it.updatedBy?.sub||"",
+              email:email||it.updatedBy?.email||"",
+              fullName:fullName||it.updatedBy?.fullName||""
+            },
+            updatedByGroups:groups.length?groups:it.updatedByGroups
+          };
+        }
+        return it;
+      });
+
+      const payload={items:itemsToSave};
+
       const res=await fetch("/api/admin/impact",{
         method:"PUT",
         headers:{"Content-Type":"application/json"},
         body:JSON.stringify(payload)
       });
+
       if(!res.ok){
         throw new Error(`Failed to save: ${res.status}`);
       }
@@ -336,8 +420,10 @@ export default function ImpactAdminPage(){
       if(!data.ok){
         throw new Error(data.error||"Unknown error from Impact API");
       }
+
       setHasChanges(false);
       setMessage("Changes saved successfully.");
+      setDirtyIds(new Set());
     }catch(err:any){
       setMessage(err.message||"Error saving changes");
     }finally{
@@ -356,7 +442,7 @@ export default function ImpactAdminPage(){
       next[index]={...current,image:"",imageUrl:""} as ImpactItem;
       return next;
     });
-    markChanged();
+    markChanged(id);
     setMessage("Image removed. Remember to Save Changes.");
   };
 
@@ -371,7 +457,7 @@ export default function ImpactAdminPage(){
       next[index]={...current,document:""} as ImpactItem;
       return next;
     });
-    markChanged();
+    markChanged(id);
     setMessage("PDF removed. Remember to Save Changes.");
   };
 
@@ -427,7 +513,7 @@ export default function ImpactAdminPage(){
         next[index]={...current,image:s3Key,imageUrl:""} as ImpactItem;
         return next;
       });
-      markChanged();
+      markChanged(id);
       setMessage("Image uploaded. Remember to Save Changes.");
     }catch(err:any){
       setMessage(err.message||"Error uploading image");
@@ -498,7 +584,7 @@ export default function ImpactAdminPage(){
         next[index]={...current,document:s3Key} as ImpactItem;
         return next;
       });
-      markChanged();
+      markChanged(id);
       setMessage("PDF uploaded. Remember to Save Changes.");
     }catch(err:any){
       setMessage(err.message||"Error uploading PDF");
@@ -805,7 +891,7 @@ export default function ImpactAdminPage(){
 
               const status=(item.status||safeStatus(item)) as ImpactStatus;
               const statusLabel=getStatusLabel(status);
-
+              const lastUpdatedLabel=formatLastUpdated(item);
               const missingCover=item.visible && !imageSrc;
 
               const isDraft=status==="draft";
@@ -904,6 +990,12 @@ export default function ImpactAdminPage(){
                           </div>
                         )}
                       </div>
+
+                      {lastUpdatedLabel&&(
+                        <div className="rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-700">
+                          <span className="font-semibold">Last updated:</span> {lastUpdatedLabel}
+                        </div>
+                      )}
 
                       {item.submittedBy&&(
                         <details className="rounded-md border border-slate-200 bg-slate-50">
