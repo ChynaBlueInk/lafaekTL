@@ -15,24 +15,24 @@ export const metadata:Metadata={
 
 export default function RootLayout({children}:{children:React.ReactNode}){
   return (
-    <html lang="en">
-      <body className="min-h-screen bg-white">
+    <html lang="tet" suppressHydrationWarning>
+      <body className="min-h-screen bg-white" suppressHydrationWarning>
         <Providers>
           <ClientLayoutShell>
             <LanguageProvider>
               {/* Global nav */}
-              <Navigation />
+              <Navigation/>
 
               {/* Page content */}
-              <main className="">
+              <main>
                 {children}
               </main>
 
               {/* Global footer */}
-              <Footer />
+              <Footer/>
 
               {/* Floating chat widget */}
-              <ChatWidget />
+              <ChatWidget/>
             </LanguageProvider>
           </ClientLayoutShell>
         </Providers>
