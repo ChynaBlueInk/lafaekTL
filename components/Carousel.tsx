@@ -36,11 +36,10 @@ const copy: Record<
     cta: "❤️ Support Us",
   },
   tet: {
-    title: "Bemvindu ba Lafaek Learning Media",
-    subtitle: "Hadia moris iha Timor‑Leste liu hosi edukasaun no istória",
+    title: "Bemvindu mai Lafaek Learning Media",
+    subtitle: "Hakbiit Timor-Leste liuhusi Edukasaun & Istória sira",
     body:
-      "Ita bele apoiu Lafaek hodi sosa revista no produtus, sponsor konténu edukativu, halo anunsiu ho ami, " +
-      "ka kontrata equipa talentozu: escritor, ilustradór no videográfu.",
+      "Ita-boot bele apoiu Lafaek hodi sosa ami-nia revista no produtu sira, patrosina konteúdu edukativu, halo publisidade ho ami, ka kontrata ami-nia ekipa talentozu hosi hakerek-na'in, ilustradór, no videografu sira.",
     cta: "❤️ Apoiu Ami",
   },
 }
@@ -97,19 +96,28 @@ export default function Carousel({ language, intervalMs = 5000 }: CarouselProps)
     return () => el.removeEventListener("keydown", onKey)
   }, [current])
 
-  // Touch swipe
-  const onTouchStart = (e: React.TouchEvent) => {
-    touchStartX.current = e.touches[0].clientX
-  }
-  const onTouchEnd = (e: React.TouchEvent) => {
-    const startX = touchStartX.current
-    touchStartX.current = null
-    if (startX == null) return
-    const dx = e.changedTouches[0].clientX - startX
-    const threshold = 40 // light swipe threshold
-    if (dx > threshold) prev()
-    else if (dx < -threshold) next()
-  }
+ // Touch swipe
+const onTouchStart = (e: React.TouchEvent) => {
+  const touch = e.touches[0]
+  if (!touch) return
+  touchStartX.current = touch.clientX
+}
+
+const onTouchEnd = (e: React.TouchEvent) => {
+  const startX = touchStartX.current
+  touchStartX.current = null
+
+  if (startX == null) return
+
+  const touch = e.changedTouches[0]
+  if (!touch) return
+
+  const dx = touch.clientX - startX
+  const threshold = 40 // light swipe threshold
+
+  if (dx > threshold) prev()
+  else if (dx < -threshold) next()
+}
 
   return (
     <section

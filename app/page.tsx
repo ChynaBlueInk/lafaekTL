@@ -96,7 +96,7 @@ export default function HomePage(){
     },
     tet:{
       hero:{
-        title:"Benvindu mai iha Media Lafaek Aprendizazen",
+        title:"Benvindu mai Lafaek Learning Media",
         subtitle:"Empodera Timor-Leste liuhusi Edukasaun & Istoria sira",
         supportText:
           "Ita boot bele suporta Lafaek lihusi sosa ami nia Revista no produtu sira, sponsor konteudu edukasaun, halo publisidade iha ami nia Revista, ou bele aluga/selu ami nia ekipa hakerek nain, Ilustrador no videografer."
@@ -104,7 +104,7 @@ export default function HomePage(){
       news:{title:"Notísia Foun",subtitle:"Saida mak akontese iha Lafaek?",viewAll:"Haree hotu notísia"},
       socialEnterprise:{
         title:"Lafaek Enmpreza Social",
-        subtitle:"Husi Inisiativa Komunidade to'o Impaktu Organizasaun Timor-Oan.",
+        subtitle:"Husi Inisiativa Komunidade to'o Impaktu Organizasaun ba Timoroan.",
         stats:[
           {number:"25+",label:"Ninia impaktu liu tinan 25"},
           {number:"1M+",label:"Kada tinan ami distriubui Revista liu Miliaun 1"},
@@ -124,7 +124,7 @@ export default function HomePage(){
       },
       impact:{
         title:"Istória Impaktu Ami",
-        subtitle:"Mudansa ida-ne’ebé real iha komunidade Timor-oan",
+        subtitle:"Mudansa real iha komunidade Timorense sira",
         readMore:"Lee liu tan",
         viewAll:"Haree hotu istória impaktu"
       },
