@@ -1,4 +1,3 @@
-// lib/auth.ts
 export type LafaekRole=
   |"Admin"
   |"ContentEditor"
@@ -107,6 +106,10 @@ export function canAccessAdminMagazines(){
 
 export function canAccessAdminOurTeam(){
   return hasAnyRole(["Admin"])
+}
+
+export function canAccessAdminRevistaMedia(){
+  return hasAnyRole(["Admin","Communications","ContentEditor"])
 }
 
 // Backwards-compatible alias (if you already used this in places)

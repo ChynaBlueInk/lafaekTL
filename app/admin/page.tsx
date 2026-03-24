@@ -1,4 +1,3 @@
-// app/admin/page.tsx
 "use client";
 
 import {useMemo,useState}from "react";
@@ -9,10 +8,11 @@ import {
   canAccessAdminOurTeam,
   canAccessAdminMagazines,
   canAccessAdminNews,
-  canAccessAdminImpact
+  canAccessAdminImpact,
+  canAccessAdminRevistaMedia
 }from "@/lib/auth";
 
-type AdminKey="team"|"magazines"|"news"|"impact";
+type AdminKey="team"|"magazines"|"news"|"impact"|"revistaMedia";
 
 type AdminLink={
   key:AdminKey;
@@ -75,6 +75,15 @@ export default function AdminHubPage(){
       descEn:"Add impact stories and attach PDFs if needed.",
       descTet:"Hatama istória impaktu no tau PDF se presiza.",
       allowed:canAccessAdminImpact
+    },
+    {
+      key:"revistaMedia",
+      href:"/admin/revista-media",
+      titleEn:"Revista Media",
+      titleTet:"Revista Media",
+      descEn:"Upload short reels and videos from the field, the team, children, and communities.",
+      descTet:"Upload reel no vídeu badak hosi terrenu, ekipa, labarik, no komunidade sira.",
+      allowed:canAccessAdminRevistaMedia
     }
   ],[]);
 
@@ -212,6 +221,36 @@ export default function AdminHubPage(){
       tipsTet:[
         "Se tau PDF, pájina públiku sei loke PDF direitu.",
         "Se la iha PDF, garante katak iha testu Body atu pájina detallu iha kontentu."
+      ]
+    },
+    revistaMedia:{
+      titleEn:"How to update Revista Media",
+      titleTet:"Oinsá atu atualiza Revista Media",
+      stepsEn:[
+        "Open the Revista Media admin page.",
+        "Upload a short video file first.",
+        "Add a title and short description.",
+        "Choose the section and municipality.",
+        "Check the preview URL after upload.",
+        "For now, copy the uploaded link and keep a record until database saving is added."
+      ],
+      stepsTet:[
+        "Loke pájina admin Revista Media.",
+        "Upload uluk arquivo vídeu badak.",
+        "Hatama titulu no deskrisaun badak.",
+        "Hili seksaun no munisípiu.",
+        "Verifika link preview depois upload.",
+        "Agora daudaun, kopia link upload nian no rai di’ak to’o sistema rai dadus prontu."
+      ],
+      tipsEn:[
+        "Use portrait videos where possible.",
+        "Keep reels short and clear.",
+        "Check sound quality before uploading."
+      ],
+      tipsTet:[
+        "Uza vídeu vertikál bainhira bele.",
+        "Halo reel badak no klaru.",
+        "Verifika kualidade sonu molok upload."
       ]
     }
   }),[]);
