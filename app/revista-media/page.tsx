@@ -17,6 +17,42 @@ type RevistaMediaItem={
   playbackUrl:string
 }
 
+const demoVideos:RevistaMediaItem[]=[
+  {
+    id:"demo-1",
+    title:"Writers in the Field – Baucau",
+    description:"A short look at how Lafaek writers gather stories from communities.",
+    section:"In the Field",
+    municipality:"Baucau",
+    s3Key:"demo",
+    createdAt:new Date().toISOString(),
+    status:"published",
+    playbackUrl:"https://www.w3schools.com/html/mov_bbb.mp4"
+  },
+  {
+    id:"demo-2",
+    title:"Meet the Illustrator",
+    description:"How illustrations are created for Lafaek Kiik.",
+    section:"Meet the Team",
+    municipality:"Dili",
+    s3Key:"demo",
+    createdAt:new Date().toISOString(),
+    status:"published",
+    playbackUrl:"https://www.w3schools.com/html/movie.mp4"
+  },
+  {
+    id:"demo-3",
+    title:"Children Talk About Lafaek",
+    description:"Students share what they love about the magazine.",
+    section:"Children’s Voices",
+    municipality:"Ermera",
+    s3Key:"demo",
+    createdAt:new Date().toISOString(),
+    status:"published",
+    playbackUrl:"https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
+  }
+]
+
 export default function RevistaMediaPage(){
   const{language}=useLanguage()
   const L=language==="tet"?"tet":"en"
@@ -96,13 +132,16 @@ export default function RevistaMediaPage(){
           throw new Error(data?.error||labels.loadError)
         }
 
+        const apiItems=Array.isArray(data?.items)?data.items:[]
+
         if(!ignore){
-          setItems(Array.isArray(data?.items)?data.items:[])
+          setItems(apiItems.length>0?apiItems:demoVideos)
         }
       }catch(e:any){
         console.error(e)
         if(!ignore){
-          setLoadError(e?.message||labels.loadError)
+          setItems(demoVideos)
+          setLoadError("")
         }
       }finally{
         if(!ignore){
@@ -240,6 +279,11 @@ export default function RevistaMediaPage(){
                     <span className="rounded-full bg-[#219653] px-3 py-1 text-xs font-semibold text-white">
                       {item.section}
                     </span>
+                    {item.id.startsWith("demo")?(
+                      <span className="rounded-full bg-[#F2C94C] px-3 py-1 text-xs font-semibold text-[#333333]">
+                        Demo
+                      </span>
+                    ):null}
                   </div>
                 </div>
 
