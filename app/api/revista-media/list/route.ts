@@ -1,8 +1,9 @@
 export const runtime="nodejs"
 export const dynamic="force-dynamic"
 
-import {NextRequest,NextResponse}from "next/server"
-import {S3Client,GetObjectCommand,PutObjectCommand}from "@aws-sdk/client-s3"
+import {NextResponse}from "next/server"
+import {S3Client,GetObjectCommand}from "@aws-sdk/client-s3"
+import {getSignedUrl}from "@aws-sdk/s3-request-presigner"
 
 type RevistaMediaRecord={
   id:string
@@ -29,7 +30,7 @@ const s3=new S3Client({
   }
 })
 
-async function readExistingRecords(){
+async function readRecords(){
   if(!BUCKET){
     throw new Error("Missing AWS_S3_BUCKET")
   }
@@ -58,62 +59,37 @@ async function readExistingRecords(){
   }
 }
 
-export async function POST(req:NextRequest){
+export async function GET(){
   try{
     if(!BUCKET){
       return NextResponse.json({error:"Missing AWS_S3_BUCKET"},{status:500})
     }
 
-    const body=await req.json()
+    const records=await readRecords()
 
-    const {
-      id,
-      title,
-      description,
-      section,
-      municipality,
-      s3Key
-    }=body||{}
+    const items=await Promise.all(
+      records.map(async(item)=>{
+        const command=new GetObjectCommand({
+          Bucket:BUCKET,
+          Key:item.s3Key
+        })
 
-    if(!id||!title||!section||!municipality||!s3Key){
-      return NextResponse.json(
-        {error:"Missing required fields"},
-        {status:400}
-      )
-    }
+        const playbackUrl=await getSignedUrl(s3,command,{
+          expiresIn:60*60
+        })
 
-    const existing=await readExistingRecords()
-
-    const nextItem:RevistaMediaRecord={
-      id:String(id),
-      title:String(title).trim(),
-      description:String(description||"").trim(),
-      section:String(section).trim(),
-      municipality:String(municipality).trim(),
-      s3Key:String(s3Key).trim(),
-      createdAt:new Date().toISOString(),
-      status:"published"
-    }
-
-    const updated=[nextItem,...existing]
-
-    await s3.send(
-      new PutObjectCommand({
-        Bucket:BUCKET,
-        Key:INDEX_KEY,
-        Body:JSON.stringify(updated,null,2),
-        ContentType:"application/json"
+        return {
+          ...item,
+          playbackUrl
+        }
       })
     )
 
-    return NextResponse.json({
-      success:true,
-      item:nextItem
-    })
+    return NextResponse.json({items})
   }catch(err){
-    console.error("revista-media save error",err)
+    console.error("revista-media list error",err)
     return NextResponse.json(
-      {error:"Failed to save revista-media record"},
+      {error:"Failed to load revista-media items"},
       {status:500}
     )
   }

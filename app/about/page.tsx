@@ -26,6 +26,7 @@ export default function AboutPage(){
       history:{
         title:"Our History",
         paragraphs:[
+          "Our journey from a small initiative to a national impact organization.",
           "Founded in 2001 as an educational initiative, Lafaek Learning Media began with a simple goal: to provide accessible and engaging educational content to Timorese children. What started as a small team producing a single magazine has grown into a leading social enterprise.",
           "Over the years, we have expanded our reach, diversified our content, and built strong partnerships with GoTL, local communities, educators, and international organisations. In 2018, we proudly transitioned to become a fully Timorese-owned and operated organisation, a testament to our commitment to local empowerment and sustainability.",
         ],
@@ -60,11 +61,12 @@ export default function AboutPage(){
       mission:{
         title:"Deklarasaun Misaun Lafaek",
         description:
-          "Lafaek Media Aprendizajen dedika aan atu haburas literasia (lee no hakerek), numerasia (kona-ba númeru), pensamentu krítiku, no envolvimentu síviku entre labarik no foin-sa’e sira iha Timor-Leste. Ami kria materiál edukativu ho kualidade aas, relevante kulturalmente iha lian Tetum no Portugués, hodi fó kbiit ba jerasaun tuirmai atu harii futuru ne’ebé nabilan liu ba nasaun.",
+          "Lafaek Media Aprendizajen dedika aan ba haburas literasia (lee no hakerek), numerasia (kona-ba númeru), pensamentu krítiku, no envolvimentu síviku entre labarik no foin-sa’e sira iha Timor-Leste. Ami kria materiál edukativu ho kualidade aas, relevante kulturalmente iha dalen Tetum no Portugés, hodi fó kbiit ba jerasaun tuirmai atu harii futuru ne’ebé nabilan liu ba nasaun.",
       },
       history:{
         title:"Ita-nia Istória",
         paragraphs:[
+          "Ami-nia viajen husi inisiativa ki’ik ida to’o sai organizasaun ida-ne’ebé halo impaktu nasionál.",
           "Harii iha tinan 2001 nu’udar inisiativa edukasionál ida, Lafaek Media Aprendizajen hahú ho objetivu simples: atu fornese konteúdu edukasionál ne’ebé asesivel no involve ba labarik Timoroan sira. Buat ne’ebé hahú hanesan ekipa ki’ik ida ne’ebé produz revista ida de’it, ohin loron sai ona hanesan empreza sosiál ida ne’ebé importante.",
           "Iha tinan hirak nia laran, ami habelar ami-nia alkanse, diversifika ami-nia konteúdu, no harii parseria forte ho Governu Timor-Leste (GoTL), komunidade lokál sira, edukadór sira, no organizasaun internasionál sira. Iha 2018, ami halo tranzisaun ho orgullu atu sai organizasaun ida ne'ebé kompletamente na'in no operadu hosi Timor-oan sira, nu’udar testamenu ida ba ami-nia kompromisu ba empoderamentu lokál no sustentabilidade.",
         ],

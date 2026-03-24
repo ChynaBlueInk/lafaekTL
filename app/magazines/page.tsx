@@ -242,10 +242,10 @@ const ui={
     seriesInfoButton:"About this magazine series",
   },
   tet:{
-    title:"Revista Lafaek",
-    intro:"Haree revista Lafaek Kiik, Lafaek Prima, Manorin no Komunidade. Haree pájina amostra balu, depois aplica atu hetan asesu kompletu ba eskola ka apoiu.",
+    title:"Revista Lafaek sira",
+    intro:"Explora Lafaek Ki’ik, Lafaek Prima, Manorin, no Komunidade. Haree amostra badak balu, hafoin aplika atu hetan asesu kompletu ba eskola ka apoiu.",
     sampleButton:"Haree pájina amostra",
-    applyButton:"Aplica ba asesu kompletu",
+    applyButton:"Aplika hodi asesu kompletu",
     archiveButton:"Haree lista kompletu",
     sampleHeading:"Pájina amostra",
     sampleNote:"Pré-visaun ne'e hatudu pájina balu de'it. Revista kompletu disponivel ba eskola no parceiru aprovadu sira.",
