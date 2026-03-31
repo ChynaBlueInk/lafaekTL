@@ -72,12 +72,12 @@ export default function AboutPage(){
         ],
       },
       values:{
-        title:"Ami nia Valór Prinsipál sira",
+        title:"Ami-nia Valór Prinsipál sira",
         items:[
           {
             icon:Lightbulb,
             title:"Edukasaun ba ema hotu",
-            description:"Garante katak labarik hotu-hotu iha asesu ba aprendizajen ho kualidade.",
+            description:"Prinsípiu sira-ne'ebé orienta ami-nia serbisu no ami-nia ekipa.",
           },
           {
             icon:Users,

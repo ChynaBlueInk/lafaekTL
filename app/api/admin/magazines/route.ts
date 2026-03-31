@@ -1,4 +1,3 @@
-//app/api/admin/magazines/route.ts
 export const runtime="nodejs";
 export const dynamic="force-dynamic";
 
@@ -20,39 +19,70 @@ const s3=new S3Client({
 });
 
 type Series="LK"|"LBK"|"LP"|"LM";
+type MagazineLanguage="Tetun"|"English"|"Tetun + English";
+type AccessType="public"|"approval_required"|"private";
 
 export type MagazineRecord={
   id:string;
-  code:string;          // e.g. "LK-1-2018"
-  series:Series;        // LK / LBK / LP / LM
-  year:string;          // e.g. "2018"
-  issue:string;         // e.g. "1" or "02"
+  code:string;
+  series:Series;
+  year:string;
+  issue:string;
   titleEn?:string;
   titleTet?:string;
-  coverImage?:string;   // S3 key or full URL
-  pdfKey?:string;       // S3 key for full magazine PDF
-  visible?:boolean;     // default true
+  description?:string;
+  category?:string;
+  language?:MagazineLanguage;
+  coverImage?:string;
+  pdfKey?:string;
+  samplePages?:string[];
+  accessType?:AccessType;
+  visible?:boolean;
   createdAt?:string;
   updatedAt?:string;
+  createdBy?:{
+    sub?:string;
+    email?:string;
+    fullName?:string;
+  };
+  updatedBy?:{
+    sub?:string;
+    email?:string;
+    fullName?:string;
+  };
+  updatedByGroups?:string[];
   [key:string]:any;
 };
 
-// -------- helpers --------
+function safeSeries(raw:any):Series{
+  const s=String(raw??"").trim();
+  return(s==="LK"||s==="LBK"||s==="LP"||s==="LM")?(s as Series):"LK";
+}
+
+function safeLanguage(raw:any):MagazineLanguage{
+  const value=String(raw??"").trim();
+  if(value==="English"||value==="Tetun + English"){
+    return value;
+  }
+  return "Tetun";
+}
+
+function safeAccessType(raw:any):AccessType{
+  const value=String(raw??"").trim();
+  if(value==="approval_required"||value==="private"){
+    return value;
+  }
+  return "public";
+}
 
 function deriveFromCode(codeRaw:string):{series:Series;issue:string;year:string}{
   const code=String(codeRaw||"").trim();
   const[seriesRaw,issueRaw="",yearRaw=""]=code.split("-");
-  const series=(
-    seriesRaw==="LK"||
-    seriesRaw==="LBK"||
-    seriesRaw==="LP"||
-    seriesRaw==="LM"
-  )
-    ? seriesRaw
-    : "LK";
-  const year=yearRaw||"";
-  const issue=issueRaw||"";
-  return{series:series as Series,issue,year};
+  return{
+    series:safeSeries(seriesRaw),
+    issue:String(issueRaw||"").trim(),
+    year:String(yearRaw||"").trim()
+  };
 }
 
 async function readMagazinesFromS3():Promise<MagazineRecord[]>{
@@ -121,28 +151,55 @@ async function readMagazinesFromS3():Promise<MagazineRecord[]>{
   }
 
   const records:MagazineRecord[]=arr.map((raw:any,index:number)=>{
-    const code=String(raw.code??"").trim();
-    const idRaw=String(raw.id??"").trim();
+    const code=String(raw?.code??"").trim();
+    const idRaw=String(raw?.id??"").trim();
     const id=idRaw||code||`mag-${index}`;
 
-    const {series,issue,year}=deriveFromCode(code||raw.code||"");
+    const derived=deriveFromCode(code||raw?.code||"");
+    const series=safeSeries(raw?.series??derived.series);
+    const year=String(raw?.year??derived.year??"").trim();
+    const issue=String(raw?.issue??derived.issue??"").trim();
 
-    const visible=raw.visible!==false;
+    const visible=raw?.visible!==false;
 
     return{
+      ...raw,
       id,
       code:code||id,
-      series:(raw.series as Series)||series,
-      year:String(raw.year||year||""),
-      issue:String(raw.issue||issue||""),
-      titleEn:raw.titleEn?String(raw.titleEn):undefined,
-      titleTet:raw.titleTet?String(raw.titleTet):undefined,
-      coverImage:raw.coverImage?String(raw.coverImage):undefined,
-      pdfKey:raw.pdfKey?String(raw.pdfKey):undefined,
+      series,
+      year,
+      issue,
+      titleEn:raw?.titleEn?String(raw.titleEn).trim():undefined,
+      titleTet:raw?.titleTet?String(raw.titleTet).trim():undefined,
+      description:raw?.description?String(raw.description).trim():undefined,
+      category:raw?.category?String(raw.category).trim():undefined,
+      language:safeLanguage(raw?.language),
+      coverImage:raw?.coverImage?String(raw.coverImage).trim():undefined,
+      pdfKey:raw?.pdfKey?String(raw.pdfKey).trim():undefined,
+      samplePages:Array.isArray(raw?.samplePages)
+        ? raw.samplePages.map((p:any)=>String(p??"").trim()).filter(Boolean)
+        : [],
+      accessType:safeAccessType(raw?.accessType),
       visible,
-      createdAt:raw.createdAt?String(raw.createdAt):undefined,
-      updatedAt:raw.updatedAt?String(raw.updatedAt):undefined,
-      ...raw
+      createdAt:raw?.createdAt?String(raw.createdAt):undefined,
+      updatedAt:raw?.updatedAt?String(raw.updatedAt):undefined,
+      createdBy:raw?.createdBy&&typeof raw.createdBy==="object"
+        ? {
+            sub:raw.createdBy.sub?String(raw.createdBy.sub):undefined,
+            email:raw.createdBy.email?String(raw.createdBy.email):undefined,
+            fullName:raw.createdBy.fullName?String(raw.createdBy.fullName):undefined
+          }
+        : undefined,
+      updatedBy:raw?.updatedBy&&typeof raw.updatedBy==="object"
+        ? {
+            sub:raw.updatedBy.sub?String(raw.updatedBy.sub):undefined,
+            email:raw.updatedBy.email?String(raw.updatedBy.email):undefined,
+            fullName:raw.updatedBy.fullName?String(raw.updatedBy.fullName):undefined
+          }
+        : undefined,
+      updatedByGroups:Array.isArray(raw?.updatedByGroups)
+        ? raw.updatedByGroups.map((g:any)=>String(g).trim()).filter(Boolean)
+        : undefined
     };
   }).filter((m)=>!!m.code);
 
@@ -176,8 +233,6 @@ async function writeMagazinesToS3(items:MagazineRecord[]):Promise<void>{
   });
 }
 
-// -------- GET /api/admin/magazines --------
-
 export async function GET(){
   try{
     const items=await readMagazinesFromS3();
@@ -191,12 +246,10 @@ export async function GET(){
   }
 }
 
-// -------- PUT /api/admin/magazines --------
-// Expects body: { items: MagazineRecordLike[] }
-
 export async function PUT(req:Request){
   try{
     const body=await req.json().catch(()=>null);
+
     if(!body||!Array.isArray(body.items)){
       return NextResponse.json(
         {ok:false,error:"Request body must be {items:[...]}"},
@@ -210,30 +263,57 @@ export async function PUT(req:Request){
     const map=new Map<string,MagazineRecord>();
 
     for(const raw of incoming){
-      const code=String(raw.code??"").trim();
-      const idRaw=String(raw.id??"").trim();
+      const code=String(raw?.code??"").trim();
+      const idRaw=String(raw?.id??"").trim();
       const id=idRaw||code||`mag-${Math.random().toString(36).slice(2,8)}`;
+
       if(!code){
-        // We need at least a code to be able to link samples & public pages
         continue;
       }
 
-      const {series,issue,year}=deriveFromCode(code);
+      const derived=deriveFromCode(code);
+      const series=safeSeries(raw?.series??derived.series);
+      const year=String(raw?.year??derived.year??"").trim();
+      const issue=String(raw?.issue??derived.issue??"").trim();
 
       const existing:MagazineRecord={
+        ...raw,
         id,
         code,
-        series:(raw.series as Series)||series,
-        year:String(raw.year||year||""),
-        issue:String(raw.issue||issue||""),
-        titleEn:raw.titleEn?String(raw.titleEn):undefined,
-        titleTet:raw.titleTet?String(raw.titleTet):undefined,
-        coverImage:raw.coverImage?String(raw.coverImage):undefined,
-        pdfKey:raw.pdfKey?String(raw.pdfKey):undefined,
-        visible:raw.visible!==false,
-        createdAt:raw.createdAt?String(raw.createdAt):now,
+        series,
+        year,
+        issue,
+        titleEn:raw?.titleEn?String(raw.titleEn).trim():undefined,
+        titleTet:raw?.titleTet?String(raw.titleTet).trim():undefined,
+        description:raw?.description?String(raw.description).trim():undefined,
+        category:raw?.category?String(raw.category).trim():undefined,
+        language:safeLanguage(raw?.language),
+        coverImage:raw?.coverImage?String(raw.coverImage).trim():undefined,
+        pdfKey:raw?.pdfKey?String(raw.pdfKey).trim():undefined,
+        samplePages:Array.isArray(raw?.samplePages)
+          ? raw.samplePages.map((p:any)=>String(p??"").trim()).filter(Boolean)
+          : [],
+        accessType:safeAccessType(raw?.accessType),
+        visible:raw?.visible!==false,
+        createdAt:raw?.createdAt?String(raw.createdAt):now,
         updatedAt:now,
-        ...raw
+        createdBy:raw?.createdBy&&typeof raw.createdBy==="object"
+          ? {
+              sub:raw.createdBy.sub?String(raw.createdBy.sub):undefined,
+              email:raw.createdBy.email?String(raw.createdBy.email):undefined,
+              fullName:raw.createdBy.fullName?String(raw.createdBy.fullName):undefined
+            }
+          : undefined,
+        updatedBy:raw?.updatedBy&&typeof raw.updatedBy==="object"
+          ? {
+              sub:raw.updatedBy.sub?String(raw.updatedBy.sub):undefined,
+              email:raw.updatedBy.email?String(raw.updatedBy.email):undefined,
+              fullName:raw.updatedBy.fullName?String(raw.updatedBy.fullName):undefined
+            }
+          : undefined,
+        updatedByGroups:Array.isArray(raw?.updatedByGroups)
+          ? raw.updatedByGroups.map((g:any)=>String(g).trim()).filter(Boolean)
+          : undefined
       };
 
       map.set(code,existing);

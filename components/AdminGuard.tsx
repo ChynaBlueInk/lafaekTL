@@ -20,35 +20,43 @@ export default function AdminGuard({allowedRoles,children}:AdminGuardProps){
   const lang=useLanguage()
   const isTet=lang.language==="tet"
 
-  const groups=useMemo(() => getUserGroupsFromSessionStorage(),[])
+  const groups=useMemo(() => {
+    if(!auth.isAuthenticated){
+      return [] as string[]
+    }
+    return getUserGroupsFromSessionStorage()
+  },[auth.isAuthenticated,auth.user])
+
+  const ok=useMemo(() => {
+    return allowedRoles.some((r)=>groups.includes(r))
+  },[allowedRoles,groups])
 
   const t={
     loading:isTet?"Verifika asesu...":"Checking access…",
   }
 
   useEffect(() => {
+    if(auth.isLoading){
+      return
+    }
+
     // Not signed in → send to /auth with a return path
-    if(!auth.isLoading && !auth.isAuthenticated){
+    if(!auth.isAuthenticated){
       router.replace(`/auth?next=${encodeURIComponent(pathname||"/admin")}`)
       return
     }
 
-    if(!auth.isLoading && auth.isAuthenticated){
-      const hasGroups=groups.length>0
-
-      // Signed in but not approved (no group yet)
-      if(!hasGroups){
-        router.replace("/pending")
-        return
-      }
-
-      // Signed in but wrong role
-      const ok=allowedRoles.some((r) => groups.includes(r))
-      if(!ok){
-        router.replace("/not-authorised")
-      }
+    // Signed in but not approved (no group yet)
+    if(groups.length===0){
+      router.replace("/pending")
+      return
     }
-  },[auth.isAuthenticated,auth.isLoading,allowedRoles,groups,pathname,router])
+
+    // Signed in but wrong role
+    if(!ok){
+      router.replace("/not-authorised")
+    }
+  },[auth.isAuthenticated,auth.isLoading,groups,ok,pathname,router])
 
   if(auth.isLoading){
     return (
@@ -65,8 +73,6 @@ export default function AdminGuard({allowedRoles,children}:AdminGuardProps){
     return null
   }
 
-  // If approved and role ok, show content
-  const ok=allowedRoles.some((r) => groups.includes(r))
   if(groups.length===0 || !ok){
     return null
   }

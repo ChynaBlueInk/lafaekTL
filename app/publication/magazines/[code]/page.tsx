@@ -1,9 +1,13 @@
+//app/publication/magazines/[code]/page.tsx
 "use client";
 
 import {useEffect,useMemo,useState}from "react";
 import Link from "next/link";
 
 type Series="LK"|"LBK"|"LP"|"LM";
+
+type MagazineLanguage="Tetun"|"English"|"Tetun + English";
+type AccessType="public"|"approval_required"|"private";
 
 type PublicMagazine={
   code:string;
@@ -12,9 +16,13 @@ type PublicMagazine={
   issue:string;
   titleEn?:string;
   titleTet?:string;
+  description?:string;
+  category?:string;
+  language?:MagazineLanguage;
   coverImage?:string;
   samplePages?:string[];
   pdfKey?:string;
+  accessType?:AccessType;
 };
 
 type ApiResponse={
@@ -185,7 +193,14 @@ export default function MagazineReader({params}:{params:{code:string}}){
       </header>
 
       <div className="max-w-6xl mx-auto w-full px-4 py-3 flex flex-wrap items-center gap-3">
-        <label className="text-sm text-gray-600">{language==="en"?"Page":"Pájina"}</label>
+        {current.description&&(
+  <div className="max-w-6xl mx-auto px-4 pb-2">
+    <p className="text-sm text-gray-700">
+      {current.description}
+    </p>
+  </div>
+)}
+<label className="text-sm text-gray-600">{language==="en"?"Page":"Pájina"}</label>
         <input
           type="number"
           min={1}
@@ -209,20 +224,31 @@ export default function MagazineReader({params}:{params:{code:string}}){
           {language==="en"?"Next page":"Depois"}
         </button>
 
-        {pdfUrl?(
-          <a
-            href={pdfUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="ml-auto px-3 py-2 rounded-lg bg-green-700 text-white hover:bg-green-800"
-          >
-            {language==="en"?"Open full PDF":"Loke PDF kompletu"}
-          </a>
-        ):(
-          <span className="ml-auto text-xs text-gray-500">
-            {language==="en"?"Full PDF not available yet":"PDF kompletu seidauk disponivel"}
-          </span>
-        )}
+       {current.accessType==="private"?(
+  <span className="ml-auto text-xs text-gray-400">
+    {language==="en"?"Restricted":"Limitadu"}
+  </span>
+):current.accessType==="approval_required"?(
+  <button
+    disabled
+    className="ml-auto px-3 py-2 rounded-lg bg-gray-300 text-gray-600 cursor-not-allowed"
+  >
+    {language==="en"?"Request access (coming soon)":"Husu asesu (sei mai)"}
+  </button>
+):pdfUrl?(
+  <a
+    href={pdfUrl}
+    target="_blank"
+    rel="noopener noreferrer"
+    className="ml-auto px-3 py-2 rounded-lg bg-green-700 text-white hover:bg-green-800"
+  >
+    {language==="en"?"Open full PDF":"Loke PDF kompletu"}
+  </a>
+):(
+  <span className="ml-auto text-xs text-gray-500">
+    {language==="en"?"Full PDF not available yet":"PDF kompletu seidauk disponivel"}
+  </span>
+)}
       </div>
 
       <div className="flex-1 border-t border-gray-200 bg-white">

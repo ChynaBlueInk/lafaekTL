@@ -1,3 +1,4 @@
+//app/api/magazines/route.ts
 export const runtime="nodejs";
 export const dynamic="force-dynamic";
 
@@ -19,6 +20,8 @@ const s3=new S3Client({
 });
 
 type Series="LK"|"LBK"|"LP"|"LM";
+type MagazineLanguage="Tetun"|"English"|"Tetun + English";
+type AccessType="public"|"approval_required"|"private";
 
 type PublicMagazine={
   code:string;
@@ -27,14 +30,34 @@ type PublicMagazine={
   issue:string;
   titleEn?:string;
   titleTet?:string;
+  description?:string;
+  category?:string;
+  language?:MagazineLanguage;
   coverImage?:string;
   samplePages?:string[];
-  pdfKey?:string; // TEMP: public view-only, will be gated later
+  pdfKey?:string; // still returned for now; gating comes in the next step
+  accessType?:AccessType;
 };
 
 function safeSeries(raw:any):Series{
   const s=String(raw??"").trim();
   return(s==="LK"||s==="LBK"||s==="LP"||s==="LM")?(s as Series):"LK";
+}
+
+function safeLanguage(raw:any):MagazineLanguage{
+  const value=String(raw??"").trim();
+  if(value==="English"||value==="Tetun + English"){
+    return value;
+  }
+  return "Tetun";
+}
+
+function safeAccessType(raw:any):AccessType{
+  const value=String(raw??"").trim();
+  if(value==="approval_required"||value==="private"){
+    return value;
+  }
+  return "public";
 }
 
 function deriveFromCode(codeRaw:string):{series:Series;issue:string;year:string}{
@@ -116,7 +139,7 @@ export async function GET(){
 
         const samplePages=Array.isArray(raw?.samplePages)
           ? raw.samplePages.map((p:any)=>String(p??"").trim()).filter((p:string)=>!!p)
-          : undefined;
+          : [];
 
         const pdfKey=raw?.pdfKey?String(raw.pdfKey).trim():undefined;
 
@@ -125,11 +148,15 @@ export async function GET(){
           series,
           year,
           issue,
-          titleEn:raw?.titleEn?String(raw.titleEn):undefined,
-          titleTet:raw?.titleTet?String(raw.titleTet):undefined,
-          coverImage:raw?.coverImage?String(raw.coverImage):undefined,
+          titleEn:raw?.titleEn?String(raw.titleEn).trim():undefined,
+          titleTet:raw?.titleTet?String(raw.titleTet).trim():undefined,
+          description:raw?.description?String(raw.description).trim():undefined,
+          category:raw?.category?String(raw.category).trim():undefined,
+          language:safeLanguage(raw?.language),
+          coverImage:raw?.coverImage?String(raw.coverImage).trim():undefined,
           samplePages,
-          pdfKey
+          pdfKey,
+          accessType:safeAccessType(raw?.accessType)
         } as PublicMagazine;
       })
       .filter((m:PublicMagazine|null):m is PublicMagazine=>!!m);

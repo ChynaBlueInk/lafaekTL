@@ -1,7 +1,9 @@
+//app/providers.tsx
 "use client"
 
 import type {ReactNode}from "react"
-import {AuthProvider}from "react-oidc-context"
+import {useEffect}from "react"
+import {AuthProvider,useAuth}from "react-oidc-context"
 
 const authority=process.env.NEXT_PUBLIC_COGNITO_AUTHORITY||""
 const clientId=process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID||""
@@ -11,6 +13,55 @@ function resolveOrigin(){
   if(siteUrl){return siteUrl}
   if(typeof window!=="undefined"){return window.location.origin}
   return ""
+}
+
+function SessionSync(){
+  const auth=useAuth()
+
+  useEffect(() => {
+    let cancelled=false
+
+    async function syncSession(){
+      if(auth.isLoading){
+        return
+      }
+
+      try{
+        const idToken=auth.user?.id_token
+
+        if(auth.isAuthenticated && idToken){
+          await fetch("/api/auth/session",{
+            method:"POST",
+            headers:{
+              "Content-Type":"application/json",
+            },
+            body:JSON.stringify({idToken}),
+            credentials:"include",
+            cache:"no-store",
+          })
+          return
+        }
+
+        if(!cancelled){
+          await fetch("/api/auth/session",{
+            method:"DELETE",
+            credentials:"include",
+            cache:"no-store",
+          })
+        }
+      }catch{
+        // Avoid breaking the app if cookie sync fails
+      }
+    }
+
+    syncSession()
+
+    return () => {
+      cancelled=true
+    }
+  },[auth.isAuthenticated,auth.isLoading,auth.user])
+
+  return null
 }
 
 export default function Providers({children}:{children:ReactNode}){
@@ -55,6 +106,7 @@ export default function Providers({children}:{children:ReactNode}){
 
   return(
     <AuthProvider {...cognitoAuthConfig}>
+      <SessionSync />
       {children}
     </AuthProvider>
   )

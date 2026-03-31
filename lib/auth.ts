@@ -1,3 +1,4 @@
+//lib/auth.ts
 export type LafaekRole=
   |"Admin"
   |"ContentEditor"
@@ -7,8 +8,17 @@ export type LafaekRole=
   |"FriendsOfLafaek"
   |"ImpactStoryContributor"
 
-const AUTHORITY="https://cognito-idp.ap-southeast-2.amazonaws.com/ap-southeast-2_a70kol0sr"
-const CLIENT_ID="30g26p9ts1baddag42g747snp3"
+const AUTHORITY=
+  process.env.NEXT_PUBLIC_COGNITO_AUTHORITY||
+  "https://cognito-idp.ap-southeast-2.amazonaws.com/ap-southeast-2_a70kol0sr"
+
+const CLIENT_ID=
+  process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID||
+  "30g26p9ts1baddag42g747snp3"
+
+function getOidcStorageKey(){
+  return `oidc.user:${AUTHORITY}:${CLIENT_ID}`
+}
 
 function getOidcProfileFromSessionStorage(){
   if(typeof window==="undefined"){
@@ -16,7 +26,7 @@ function getOidcProfileFromSessionStorage(){
   }
 
   try{
-    const key=`oidc.user:${AUTHORITY}:${CLIENT_ID}`
+    const key=getOidcStorageKey()
     const raw=sessionStorage.getItem(key)
     if(!raw){return null}
     const parsed=JSON.parse(raw)
@@ -112,7 +122,7 @@ export function canAccessAdminRevistaMedia(){
   return hasAnyRole(["Admin","Communications","ContentEditor"])
 }
 
-// Backwards-compatible alias (if you already used this in places)
+// Backwards-compatible alias
 export function canAccessAdminArea(){
   return canAccessAdminHome()
 }
