@@ -1,3 +1,4 @@
+// app/revista-media/page.tsx
 "use client"
 
 import {useEffect,useMemo,useState}from "react"
@@ -14,44 +15,8 @@ type RevistaMediaItem={
   s3Key:string
   createdAt:string
   status:"published"
-  playbackUrl:string
+  videoUrl:string
 }
-
-const demoVideos:RevistaMediaItem[]=[
-  {
-    id:"demo-1",
-    title:"Writers in the Field – Baucau",
-    description:"A short look at how Lafaek writers gather stories from communities.",
-    section:"In the Field",
-    municipality:"Baucau",
-    s3Key:"demo",
-    createdAt:new Date().toISOString(),
-    status:"published",
-    playbackUrl:"https://www.w3schools.com/html/mov_bbb.mp4"
-  },
-  {
-    id:"demo-2",
-    title:"Meet the Illustrator",
-    description:"How illustrations are created for Lafaek Kiik.",
-    section:"Meet the Team",
-    municipality:"Dili",
-    s3Key:"demo",
-    createdAt:new Date().toISOString(),
-    status:"published",
-    playbackUrl:"https://www.w3schools.com/html/movie.mp4"
-  },
-  {
-    id:"demo-3",
-    title:"Children Talk About Lafaek",
-    description:"Students share what they love about the magazine.",
-    section:"Children’s Voices",
-    municipality:"Ermera",
-    s3Key:"demo",
-    createdAt:new Date().toISOString(),
-    status:"published",
-    playbackUrl:"https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
-  }
-]
 
 export default function RevistaMediaPage(){
   const{language}=useLanguage()
@@ -68,7 +33,7 @@ export default function RevistaMediaPage(){
       watch:"Watch video",
       municipality:"Municipality",
       role:"Category",
-      empty:"No videos match this filter yet.",
+      empty:"No videos have been published yet.",
       loading:"Loading videos...",
       loadError:"Could not load videos.",
       sections:[
@@ -92,7 +57,7 @@ export default function RevistaMediaPage(){
       watch:"Haree vídeu",
       municipality:"Munisípiu",
       role:"Kategoria",
-      empty:"Seidauk iha vídeu ne’ebé los ho filtro ida-ne’e.",
+      empty:"Seidauk iha vídeu publikaadu.",
       loading:"Karga hela vídeu sira...",
       loadError:"La konsege karga vídeu sira.",
       sections:[
@@ -115,6 +80,10 @@ export default function RevistaMediaPage(){
   const[selectedMunicipality,setSelectedMunicipality]=useState("All")
 
   useEffect(()=>{
+    setActiveSection(L==="tet"?"Hotu-hotu":"All")
+  },[L])
+
+  useEffect(()=>{
     let ignore=false
 
     async function load(){
@@ -126,7 +95,7 @@ export default function RevistaMediaPage(){
           cache:"no-store"
         })
 
-        const data=await res.json()
+        const data=await res.json().catch(()=>null)
 
         if(!res.ok){
           throw new Error(data?.error||labels.loadError)
@@ -135,13 +104,13 @@ export default function RevistaMediaPage(){
         const apiItems=Array.isArray(data?.items)?data.items:[]
 
         if(!ignore){
-          setItems(apiItems.length>0?apiItems:demoVideos)
+          setItems(apiItems)
         }
       }catch(e:any){
         console.error(e)
         if(!ignore){
-          setItems(demoVideos)
-          setLoadError("")
+          setItems([])
+          setLoadError(e?.message||labels.loadError)
         }
       }finally{
         if(!ignore){
@@ -158,8 +127,14 @@ export default function RevistaMediaPage(){
   },[labels.loadError])
 
   const municipalities=useMemo(()=>{
-    const list=Array.from(new Set(items.map((item)=>item.municipality)))
-    return ["All",...list]
+    const list=Array.from(
+      new Set(
+        items
+          .map((item)=>item.municipality)
+          .filter(Boolean)
+      )
+    )
+    return["All",...list]
   },[items])
 
   const filteredVideos=useMemo(()=>{
@@ -184,6 +159,7 @@ export default function RevistaMediaPage(){
           <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#F2C94C]">
             {labels.eyebrow}
           </p>
+
           <div className="mt-3 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <div className="max-w-3xl">
               <h1 className="text-4xl font-bold md:text-5xl">{labels.title}</h1>
@@ -269,7 +245,7 @@ export default function RevistaMediaPage(){
               >
                 <div className="relative aspect-[9/16] bg-black">
                   <video
-                    src={item.playbackUrl}
+                    src={item.videoUrl}
                     controls
                     preload="metadata"
                     className="h-full w-full object-cover"
@@ -279,11 +255,6 @@ export default function RevistaMediaPage(){
                     <span className="rounded-full bg-[#219653] px-3 py-1 text-xs font-semibold text-white">
                       {item.section}
                     </span>
-                    {item.id.startsWith("demo")?(
-                      <span className="rounded-full bg-[#F2C94C] px-3 py-1 text-xs font-semibold text-[#333333]">
-                        Demo
-                      </span>
-                    ):null}
                   </div>
                 </div>
 
@@ -317,7 +288,7 @@ export default function RevistaMediaPage(){
 
                   <div className="flex items-center gap-3">
                     <a
-                      href={item.playbackUrl}
+                      href={item.videoUrl}
                       target="_blank"
                       rel="noreferrer"
                       className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-[#219653] px-4 py-2.5 font-semibold text-white transition hover:bg-green-700"
