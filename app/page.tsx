@@ -459,7 +459,20 @@ export default function HomePage(){
             )}
           </div>
         </section>
-
+{/* Lafaek Logo Banner */}
+<section className="py-12 bg-white">
+  <div className="max-w-7xl mx-auto px-4 flex justify-center">
+    <div className="relative w-full max-w-md h-40">
+      <Image
+        src="/logo/lafaek-logo2.png"
+        alt="Lafaek Logo"
+        fill
+        className="object-contain"
+        priority
+      />
+    </div>
+  </div>
+</section>
         {/* Social Enterprise */}
         <section className="py-20 bg-gradient-to-br from-green-50 to-blue-50 text-center" aria-labelledby="social-enterprise">
           <div className="max-w-7xl mx-auto px-4">
@@ -477,20 +490,7 @@ export default function HomePage(){
             </div>
           </div>
         </section>
-{/* Lafaek Logo Banner */}
-<section className="py-12 bg-white">
-  <div className="max-w-7xl mx-auto px-4 flex justify-center">
-    <div className="relative w-full max-w-md h-40">
-      <Image
-        src="/logo/lafaek-logo2.png"
-        alt="Lafaek Logo"
-        fill
-        className="object-contain"
-        priority
-      />
-    </div>
-  </div>
-</section>
+
 
         {/* Donors & Sponsors */}
         <section className="bg-gray-50 border-t border-gray-200 py-12" aria-labelledby="sponsors">
@@ -500,18 +500,11 @@ export default function HomePage(){
             </h2>
 
             <div className="flex flex-wrap justify-center items-center gap-10">
-              <div className="relative h-16 w-40">
-                <Image
-                  src="/sponsors/care.png"
-                  alt="Care International"
-                  fill
-                  className="object-contain"
-                />
-              </div>
+              
 
               <div className="relative h-16 w-40">
                 <Image
-                  src="/sponsors/nz-mfat.png"
+                  src="/sponsors/logo-mfat.jpg"
                   alt="New Zealand Ministry of Foreign Affairs & Trade"
                   fill
                   className="object-contain"
@@ -522,6 +515,14 @@ export default function HomePage(){
                 <Image
                   src="/sponsors/timor-education.png"
                   alt="Timor-Leste Ministry of Education"
+                  fill
+                  className="object-contain"
+                />
+              </div>
+              <div className="relative h-16 w-40">
+                <Image
+                  src="/sponsors/logo-care.jpg"
+                  alt="Care International"
                   fill
                   className="object-contain"
                 />
