@@ -1,4 +1,5 @@
 export const runtime="nodejs"
+export const dynamic="force-dynamic"
 
 import {NextRequest,NextResponse}from "next/server"
 import {S3Client,GetObjectCommand}from "@aws-sdk/client-s3"
@@ -10,14 +11,20 @@ const BUCKET=process.env.AWS_S3_BUCKET
 const s3=new S3Client({
   region:REGION,
   credentials:{
-    accessKeyId:process.env.AWS_ACCESS_KEY_ID!,
-    secretAccessKey:process.env.AWS_SECRET_ACCESS_KEY!
+    accessKeyId:process.env.AWS_ACCESS_KEY_ID||"",
+    secretAccessKey:process.env.AWS_SECRET_ACCESS_KEY||""
   }
 })
 
+function normaliseKey(value:unknown){
+  if(typeof value!=="string"){return ""}
+  return value.trim().replace(/^\/+/,"")
+}
+
 export async function POST(req:NextRequest){
   try{
-    const {key}=await req.json()
+    const body=await req.json().catch(()=>null)
+    const key=normaliseKey(body?.key)
 
     if(!BUCKET){
       return NextResponse.json({error:"Missing AWS_S3_BUCKET"},{status:500})
@@ -39,6 +46,9 @@ export async function POST(req:NextRequest){
     return NextResponse.json({url})
   }catch(err){
     console.error("get-url error",err)
-    return NextResponse.json({error:"Failed to generate signed URL"},{status:500})
+    return NextResponse.json(
+      {error:"Failed to generate signed URL"},
+      {status:500}
+    )
   }
 }

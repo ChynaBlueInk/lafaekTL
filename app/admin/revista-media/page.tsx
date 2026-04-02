@@ -486,67 +486,102 @@ export default function AdminRevistaMediaPage(){
     handleFieldChange(id,"visible",true)
     setMessage("Marked as Published. Click Save Changes.")
   }
-
-  const handleSaveChanges=async()=>{
-    try{
-      setSaving(true)
-      setMessage("")
-
-      const now=new Date().toISOString()
-      const fullName=getUserDisplayName()
-      const email=getUserEmail()
-      const sub=getUserSub()
-      const groups=getUserGroups()
-
-      const itemsToSave=items.map((it)=>{
-        if(dirtyIds.has(it.id)){
-          return{
-            ...it,
-            updatedAt:now,
-            updatedBy:{
-              sub:sub||it.updatedBy?.sub||"",
-              email:email||it.updatedBy?.email||"",
-              fullName:fullName||it.updatedBy?.fullName||""
-            },
-            updatedByGroups:groups.length?groups:it.updatedByGroups
-          }
-        }
-        return it
-      })
-
-      const payload={items:itemsToSave}
-
-      const res=await fetch("/api/admin/revista-media",{
-        method:"PUT",
-        headers:{"Content-Type":"application/json"},
-        body:JSON.stringify(payload)
-      })
-
-      if(!res.ok){
-        throw new Error(`Failed to save: ${res.status}`)
-      }
-
-      const data=await res.json()
-      if(!data.ok){
-        throw new Error(data.error||labels.saveFailed)
-      }
-
-      setHasChanges(false)
-      setDirtyIds(new Set())
-      setMessage(labels.saveSuccess)
-    }catch(err:any){
-      setMessage(err.message||labels.saveFailed)
-    }finally{
-      setSaving(false)
-    }
+function getIdTokenFromSessionStorage(){
+  if(typeof window==="undefined"){return ""}
+  try{
+    const authority="https://cognito-idp.ap-southeast-2.amazonaws.com/ap-southeast-2_a70kol0sr"
+    const clientId="30g26p9ts1baddag42g747snp3"
+    const key=`oidc.user:${authority}:${clientId}`
+    const raw=sessionStorage.getItem(key)
+    if(!raw){return ""}
+    const parsed=JSON.parse(raw)
+    return typeof parsed?.id_token==="string"?parsed.id_token.trim():""
+  }catch{
+    return ""
   }
+}
+
+const handleSaveChanges=async()=>{
+  try{
+    setSaving(true)
+    setMessage("")
+
+    const now=new Date().toISOString()
+    const fullName=getUserDisplayName()
+    const email=getUserEmail()
+    const sub=getUserSub()
+    const groups=getUserGroups()
+
+    const itemsToSave=items.map((it)=>{
+      if(dirtyIds.has(it.id)){
+        return{
+          ...it,
+          updatedAt:now,
+          updatedBy:{
+            sub:sub||it.updatedBy?.sub||"",
+            email:email||it.updatedBy?.email||"",
+            fullName:fullName||it.updatedBy?.fullName||""
+          },
+          updatedByGroups:groups.length?groups:it.updatedByGroups
+        }
+      }
+      return it
+    })
+
+    const payload={items:itemsToSave}
+
+    const idToken=getIdTokenFromSessionStorage()
+
+    if(!idToken){
+      throw new Error("No sign-in token found. Please sign in again.")
+    }
+
+    const sessionRes=await fetch("/api/auth/session",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({idToken}),
+      credentials:"include",
+      cache:"no-store"
+    })
+
+    if(!sessionRes.ok){
+      const sessionData=await sessionRes.json().catch(()=>null)
+      throw new Error(sessionData?.error||"Could not refresh sign-in session. Please sign in again.")
+    }
+
+    const res=await fetch("/api/admin/revista-media",{
+      method:"PUT",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify(payload),
+      credentials:"include"
+    })
+
+    const data=await res.json().catch(()=>null)
+
+    if(!res.ok){
+      throw new Error(data?.error||`Failed to save: ${res.status}`)
+    }
+
+    if(!data?.ok){
+      throw new Error(data?.error||labels.saveFailed)
+    }
+
+    setHasChanges(false)
+    setDirtyIds(new Set())
+    setMessage(labels.saveSuccess)
+  }catch(err:any){
+    setMessage(err.message||labels.saveFailed)
+  }finally{
+    setSaving(false)
+  }
+}
 
   const presignAndUpload=async(file:File)=>{
     const presignRes=await fetch("/api/uploads/s3/presign",{
       method:"POST",
       headers:{"Content-Type":"application/json"},
       body:JSON.stringify({
-        folder:"uploads",
+        folder:"revista-media",
         fileName:file.name,
         contentType:file.type||"application/octet-stream"
       })

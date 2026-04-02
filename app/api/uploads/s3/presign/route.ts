@@ -8,7 +8,7 @@ import {createPresignedPost}from "@aws-sdk/s3-presigned-post"
 const REGION=process.env.AWS_REGION||"ap-southeast-2"
 const BUCKET=process.env.AWS_S3_BUCKET
 const RAW_BASE_PATH=process.env.AWS_S3_BASE_PATH||"uploads"
-const BASE_PATH_NORMALISED=RAW_BASE_PATH.replace(/^\/+/,"")
+const BASE_PATH_NORMALISED=RAW_BASE_PATH.replace(/^\/+/,"").replace(/\/+$/,"")
 const USE_ACL=process.env.AWS_S3_USE_ACL==="true"
 
 const s3=new S3Client({
@@ -24,6 +24,7 @@ const ALLOWED_FOLDERS=[
   "news",
   "impact",
   "uploads",
+  "revista-media",
   "magazines/covers",
   "magazines/pdfs",
   "magazines/samples",
@@ -44,13 +45,28 @@ function sanitiseFileName(fileName:string){
     .replace(/[^a-zA-Z0-9._-]/g,"_")
 }
 
+function joinS3Key(...parts:string[]){
+  return parts
+    .map((part)=>String(part||"").trim())
+    .filter(Boolean)
+    .map((part)=>part.replace(/^\/+/,"").replace(/\/+$/,""))
+    .filter(Boolean)
+    .join("/")
+}
+
+function buildPublicUrl(bucket:string,key:string){
+  return `https://${bucket}.s3.${REGION}.amazonaws.com/${key}`
+}
+
 export async function POST(req:NextRequest){
   try{
     const body=await req.json().catch(()=>null)
 
     const fileName=typeof body?.fileName==="string"?body.fileName.trim():""
     const contentType=typeof body?.contentType==="string"?body.contentType.trim():""
-    const folderRaw=typeof body?.folder==="string"?body.folder.trim().replace(/^\/+/,"").replace(/\/+$/,""):""
+    const folderRaw=typeof body?.folder==="string"
+      ? body.folder.trim().replace(/^\/+/,"").replace(/\/+$/,"")
+      : ""
 
     console.log("[presign] incoming body",{
       fileName,
@@ -85,12 +101,21 @@ export async function POST(req:NextRequest){
       )
     }
 
-    const safeFolder=isAllowedFolder(folderRaw)?folderRaw:"uploads"
+    const requestedFolder=isAllowedFolder(folderRaw)?folderRaw:"uploads"
     const safeName=sanitiseFileName(fileName)
-    const key=`${BASE_PATH_NORMALISED}/${safeFolder}/${Date.now()}-${safeName}`
+
+    // Prevent uploads/uploads/... duplication when the caller passes folder:"uploads"
+    const folderSegment=requestedFolder==="uploads"?"":requestedFolder
+
+    const key=joinS3Key(
+      BASE_PATH_NORMALISED,
+      folderSegment,
+      `${Date.now()}-${safeName}`
+    )
 
     console.log("[presign] using key",{
-      safeFolder,
+      requestedFolder,
+      folderSegment,
       key
     })
 
@@ -113,11 +138,10 @@ export async function POST(req:NextRequest){
       Expires:60
     })
 
-    const actionUrl=presign.url
-    const publicUrl=`${actionUrl}/${key}`
+    const publicUrl=buildPublicUrl(BUCKET!,key)
 
     console.log("[presign] success",{
-      url:actionUrl,
+      url:presign.url,
       key,
       hasKeyField:Boolean((presign.fields as any)?.key),
       region:REGION,
@@ -125,7 +149,7 @@ export async function POST(req:NextRequest){
     })
 
     return NextResponse.json({
-      url:actionUrl,
+      url:presign.url,
       fields:presign.fields,
       publicUrl,
       key,
