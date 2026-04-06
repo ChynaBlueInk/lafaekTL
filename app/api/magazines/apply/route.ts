@@ -2,13 +2,24 @@
 export const runtime="nodejs";
 export const dynamic="force-dynamic";
 
-import {NextResponse}from "next/server";
+import {NextRequest,NextResponse}from "next/server";
 import {S3Client,GetObjectCommand,PutObjectCommand}from "@aws-sdk/client-s3";
+import {jwtVerify,createRemoteJWKSet}from "jose";
 
 const REGION=process.env.AWS_REGION||"ap-southeast-2";
 const BUCKET=process.env.AWS_S3_BUCKET;
-// You can override this with an env var if you like
 const MAG_REQUESTS_KEY=process.env.AWS_S3_MAG_REQUESTS_JSON_KEY||"content/magazine-requests.json";
+
+const USER_POOL_ID=process.env.COGNITO_USER_POOL_ID||process.env.NEXT_PUBLIC_COGNITO_USER_POOL_ID;
+const CLIENT_ID=process.env.COGNITO_CLIENT_ID||process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID;
+
+const ISSUER=USER_POOL_ID
+  ? `https://cognito-idp.${REGION}.amazonaws.com/${USER_POOL_ID}`
+  : "";
+
+const JWKS=ISSUER
+  ? createRemoteJWKSet(new URL(`${ISSUER}/.well-known/jwks.json`))
+  : null;
 
 const s3=new S3Client({
   region:REGION,
@@ -20,9 +31,9 @@ const s3=new S3Client({
     : undefined
 });
 
-export type MagazineApplicationRecord={
+type MagazineApplicationRecord={
   id:string;
-  createdAt:string;        // ISO date time
+  createdAt:string;
   schoolName:string;
   district:string;
   schoolType:"government"|"catholic"|"ngo"|"private"|"other";
@@ -34,153 +45,163 @@ export type MagazineApplicationRecord={
   justification:string;
   isCommunityOrg?:boolean;
   organisationName?:string;
-  raw?:any;                // optional extra fields
+  raw?:any;
 };
 
-// ---------- helpers to read/write JSON in S3 ----------
+// ---------- AUTH ----------
+
+function getToken(req:NextRequest){
+  const auth=req.headers.get("authorization");
+  if(auth?.startsWith("Bearer ")){
+    return auth.slice(7);
+  }
+  return req.cookies.get("lafaek_id_token")?.value||null;
+}
+
+async function verifyAdmin(req:NextRequest){
+  if(!JWKS||!ISSUER||!CLIENT_ID){
+    return{ok:false,status:500,error:"Auth config missing"};
+  }
+
+  const token=getToken(req);
+  if(!token){
+    return{ok:false,status:401,error:"Not authenticated"};
+  }
+
+  try{
+    const {payload}=await jwtVerify(token,JWKS,{
+      issuer:ISSUER,
+      audience:CLIENT_ID
+    });
+
+    const groupsRaw=payload["cognito:groups"];
+    const groups=Array.isArray(groupsRaw)
+      ? groupsRaw.map(g=>String(g).toLowerCase())
+      : typeof groupsRaw==="string"
+      ? [groupsRaw.toLowerCase()]
+      : [];
+
+    const allowed=groups.includes("admin")||groups.includes("magazineadmin");
+
+    if(!allowed){
+      return{ok:false,status:403,error:"Not authorised"};
+    }
+
+    return{ok:true,payload};
+  }catch{
+    return{ok:false,status:401,error:"Invalid session"};
+  }
+}
+
+// ---------- helpers ----------
+
+async function streamToString(stream:any):Promise<string>{
+  if(!stream)return"";
+  if(typeof stream.transformToString==="function"){
+    return stream.transformToString();
+  }
+  const chunks:Buffer[]=[];
+  for await(const chunk of stream){
+    chunks.push(Buffer.isBuffer(chunk)?chunk:Buffer.from(chunk));
+  }
+  return Buffer.concat(chunks).toString("utf-8");
+}
 
 async function readRequestsFromS3():Promise<MagazineApplicationRecord[]>{
-  if(!BUCKET){
-    console.warn("[api/magazines/apply] AWS_S3_BUCKET not set, returning empty list");
-    return [];
-  }
+  if(!BUCKET)return[];
 
-  const cmd=new GetObjectCommand({
-    Bucket:BUCKET,
-    Key:MAG_REQUESTS_KEY
-  });
-
-  let res;
   try{
-    res=await s3.send(cmd);
-  }catch(err:any){
-    if(
-      err?.name==="NoSuchKey"||
-      err?.Code==="NoSuchKey"||
-      err?.$metadata?.httpStatusCode===404
-    ){
-      console.warn("[api/magazines/apply] JSON key not found, treating as empty []");
-      return [];
-    }
-    console.error("[api/magazines/apply] S3 GetObject error",err);
-    throw err;
-  }
+    const res=await s3.send(new GetObjectCommand({
+      Bucket:BUCKET,
+      Key:MAG_REQUESTS_KEY
+    }));
 
-  const body=await (async()=>{
-    const b=res.Body as any;
-    if(!b){return"";}
-    if(typeof b.transformToString==="function"){
-      return b.transformToString("utf-8");
-    }
-    return await new Promise<string>((resolve,reject)=>{
-      const chunks:Buffer[]=[];
-      b.on("data",(chunk:Buffer)=>chunks.push(chunk));
-      b.on("end",()=>resolve(Buffer.concat(chunks).toString("utf-8")));
-      b.on("error",reject);
-    });
-  })();
+    const body=await streamToString(res.Body);
+    if(!body)return[];
 
-  if(!body){
-    console.log("[api/magazines/apply] empty body, returning []");
-    return [];
-  }
+    const parsed=JSON.parse(body);
 
-  let parsed:any;
-  try{
-    parsed=JSON.parse(body);
-  }catch(err){
-    console.error("[api/magazines/apply] invalid JSON",err);
-    throw new Error("Failed to parse magazine-requests JSON");
-  }
+    const arr:Array<any>=Array.isArray(parsed)
+      ? parsed
+      : Array.isArray(parsed?.items)
+      ? parsed.items
+      : [];
 
-  const arr:Array<any>=Array.isArray(parsed)
-    ? parsed
-    : Array.isArray(parsed?.items)
-    ? parsed.items
-    : [];
-
-  if(!arr.length){
-    return [];
-  }
-
-  const records:MagazineApplicationRecord[]=arr.map((raw:any,index:number)=>{
-    const id=typeof raw.id==="string"&&raw.id.trim()
-      ? raw.id.trim()
-      : `magreq-${index}`;
-    return{
-      id,
+    return arr.map((raw:any,index:number)=>({
+      id:raw.id||`magreq-${index}`,
       createdAt:String(raw.createdAt||new Date().toISOString()),
       schoolName:String(raw.schoolName||""),
       district:String(raw.district||""),
-      schoolType:(raw.schoolType as MagazineApplicationRecord["schoolType"])||"other",
+      schoolType:raw.schoolType||"other",
       numStudents:Number(raw.numStudents||0),
       contactName:String(raw.contactName||""),
-      contactRole:raw.contactRole?String(raw.contactRole):undefined,
-      contactEmail:raw.contactEmail?String(raw.contactEmail):undefined,
-      contactPhone:raw.contactPhone?String(raw.contactPhone):undefined,
+      contactRole:raw.contactRole,
+      contactEmail:raw.contactEmail,
+      contactPhone:raw.contactPhone,
       justification:String(raw.justification||""),
       isCommunityOrg:Boolean(raw.isCommunityOrg)||false,
-      organisationName:raw.organisationName?String(raw.organisationName):undefined,
+      organisationName:raw.organisationName,
       raw
-    };
-  });
-
-  console.log("[api/magazines/apply] loaded records",{
-    count:records.length,
-    key:MAG_REQUESTS_KEY
-  });
-
-  return records;
+    }));
+  }catch(err:any){
+    if(err?.$metadata?.httpStatusCode===404)return[];
+    throw err;
+  }
 }
 
-async function writeRequestsToS3(items:MagazineApplicationRecord[]):Promise<void>{
-  if(!BUCKET){
-    throw new Error("AWS_S3_BUCKET is not configured");
-  }
+async function writeRequestsToS3(items:MagazineApplicationRecord[]){
+  if(!BUCKET)throw new Error("Missing bucket");
 
-  const payload={items};
-
-  const cmd=new PutObjectCommand({
+  await s3.send(new PutObjectCommand({
     Bucket:BUCKET,
     Key:MAG_REQUESTS_KEY,
-    Body:JSON.stringify(payload,null,2),
+    Body:JSON.stringify({items},null,2),
     ContentType:"application/json"
-  });
-
-  await s3.send(cmd);
-
-  console.log("[api/magazines/apply] wrote records",{
-    count:items.length,
-    key:MAG_REQUESTS_KEY
-  });
+  }));
 }
 
-// ---------- GET: list all applications (for future admin use) ----------
+async function backupRequests(){
+  const existing=await readRequestsFromS3();
+  if(!existing.length)return;
 
-export async function GET(){
+  const key=`content/backups/magazine-requests-${Date.now()}.json`;
+
+  await s3.send(new PutObjectCommand({
+    Bucket:BUCKET!,
+    Key:key,
+    Body:JSON.stringify({items:existing},null,2),
+    ContentType:"application/json"
+  }));
+}
+
+// ---------- GET (ADMIN ONLY) ----------
+
+export async function GET(req:NextRequest){
+  const auth=await verifyAdmin(req);
+
+  if(!auth.ok){
+    return NextResponse.json({ok:false,error:auth.error},{status:auth.status});
+  }
+
   try{
     const items=await readRequestsFromS3();
     return NextResponse.json({ok:true,items});
   }catch(err:any){
-    console.error("[api/magazines/apply] GET error",err);
     return NextResponse.json(
-      {ok:false,error:err?.message||"Failed to load magazine requests"},
+      {ok:false,error:"Failed to load magazine requests"},
       {status:500}
     );
   }
 }
 
-// ---------- POST: submit a new application ----------
+// ---------- POST (PUBLIC) ----------
 
 export async function POST(req:Request){
   try{
     const body=await req.json().catch(()=>null);
 
     if(!body){
-      return NextResponse.json(
-        {ok:false,error:"Missing request body"},
-        {status:400}
-      );
+      return NextResponse.json({ok:false,error:"Missing body"},{status:400});
     }
 
     const{
@@ -197,43 +218,39 @@ export async function POST(req:Request){
       organisationName
     }=body;
 
-    // basic validation – enough to keep data clean
     if(!schoolName||!district||!schoolType||!numStudents||!contactName||!justification){
-      return NextResponse.json(
-        {ok:false,error:"Missing required fields"},
-        {status:400}
-      );
+      return NextResponse.json({ok:false,error:"Missing required fields"},{status:400});
     }
 
-    const id=`magreq-${Date.now()}-${Math.random().toString(36).slice(2,8)}`;
-    const now=new Date().toISOString();
-
     const newRecord:MagazineApplicationRecord={
-      id,
-      createdAt:now,
+      id:`magreq-${Date.now()}`,
+      createdAt:new Date().toISOString(),
       schoolName:String(schoolName),
       district:String(district),
-      schoolType:(schoolType as MagazineApplicationRecord["schoolType"])||"other",
+      schoolType:schoolType||"other",
       numStudents:Number(numStudents),
       contactName:String(contactName),
-      contactRole:contactRole?String(contactRole):undefined,
-      contactEmail:contactEmail?String(contactEmail):undefined,
-      contactPhone:contactPhone?String(contactPhone):undefined,
+      contactRole,
+      contactEmail,
+      contactPhone,
       justification:String(justification),
       isCommunityOrg:Boolean(isCommunityOrg)||false,
-      organisationName:organisationName?String(organisationName):undefined,
+      organisationName,
       raw:body
     };
 
     const existing=await readRequestsFromS3();
+
+    // backup before write (NEW safety)
+    await backupRequests();
+
     const updated=[...existing,newRecord];
     await writeRequestsToS3(updated);
 
     return NextResponse.json({ok:true,item:newRecord});
   }catch(err:any){
-    console.error("[api/magazines/apply] POST error",err);
     return NextResponse.json(
-      {ok:false,error:err?.message||"Failed to submit application"},
+      {ok:false,error:"Failed to submit application"},
       {status:500}
     );
   }

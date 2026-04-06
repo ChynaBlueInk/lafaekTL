@@ -1,3 +1,4 @@
+//app/stories/gallery/page.tsx
 "use client"
 
 import { useState } from "react"

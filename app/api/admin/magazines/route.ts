@@ -1,334 +1,382 @@
 export const runtime="nodejs";
 export const dynamic="force-dynamic";
 
-import {NextResponse}from "next/server";
+import {NextRequest,NextResponse}from "next/server";
 import {S3Client,GetObjectCommand,PutObjectCommand}from "@aws-sdk/client-s3";
+import {getSignedUrl}from "@aws-sdk/s3-request-presigner";
+import {jwtVerify,createRemoteJWKSet,type JWTPayload}from "jose";
 
 const REGION=process.env.AWS_REGION||"ap-southeast-2";
 const BUCKET=process.env.AWS_S3_BUCKET;
-const MAG_JSON_KEY=process.env.AWS_S3_MAGAZINES_JSON_KEY||"content/magazines.json";
+const RAW_BASE_PATH=process.env.AWS_S3_BASE_PATH||"uploads";
+const BASE_PATH_NORMALISED=RAW_BASE_PATH.replace(/^\/+/,"");
+
+const SAMPLES_INDEX_KEY=
+  process.env.AWS_S3_MAGAZINE_SAMPLES_JSON_KEY||
+  "content/magazine-samples.json";
+
+const USER_POOL_ID=process.env.COGNITO_USER_POOL_ID||process.env.NEXT_PUBLIC_COGNITO_USER_POOL_ID;
+const COGNITO_CLIENT_ID=process.env.COGNITO_CLIENT_ID||process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID;
+
+const ISSUER=
+  process.env.COGNITO_ISSUER||
+  (USER_POOL_ID?`https://cognito-idp.${REGION}.amazonaws.com/${USER_POOL_ID}`:"");
+
+const JWKS=ISSUER?createRemoteJWKSet(new URL(`${ISSUER}/.well-known/jwks.json`)):null;
 
 const s3=new S3Client({
   region:REGION,
-  credentials:BUCKET
-    ? {
-        accessKeyId:process.env.AWS_ACCESS_KEY_ID||"",
-        secretAccessKey:process.env.AWS_SECRET_ACCESS_KEY||""
-      }
-    : undefined
+  credentials:
+    process.env.AWS_ACCESS_KEY_ID&&process.env.AWS_SECRET_ACCESS_KEY
+      ? {
+          accessKeyId:process.env.AWS_ACCESS_KEY_ID,
+          secretAccessKey:process.env.AWS_SECRET_ACCESS_KEY
+        }
+      : undefined
 });
 
-type Series="LK"|"LBK"|"LP"|"LM";
-type MagazineLanguage="Tetun"|"English"|"Tetun + English";
-type AccessType="public"|"approval_required"|"private";
+type CognitoPayload=JWTPayload&{
+  email?:string;
+  "cognito:groups"?:string[]|string;
+  "cognito:username"?:string;
+};
 
-export type MagazineRecord={
-  id:string;
-  code:string;
-  series:Series;
-  year:string;
-  issue:string;
-  titleEn?:string;
-  titleTet?:string;
-  description?:string;
-  category?:string;
-  language?:MagazineLanguage;
-  coverImage?:string;
-  pdfKey?:string;
+type SampleRecord={
+  id?:string;
+  code?:string;
   samplePages?:string[];
-  accessType?:AccessType;
-  visible?:boolean;
-  createdAt?:string;
-  updatedAt?:string;
-  createdBy?:{
-    sub?:string;
-    email?:string;
-    fullName?:string;
-  };
-  updatedBy?:{
-    sub?:string;
-    email?:string;
-    fullName?:string;
-  };
-  updatedByGroups?:string[];
   [key:string]:any;
 };
 
-function safeSeries(raw:any):Series{
-  const s=String(raw??"").trim();
-  return(s==="LK"||s==="LBK"||s==="LP"||s==="LM")?(s as Series):"LK";
-}
-
-function safeLanguage(raw:any):MagazineLanguage{
-  const value=String(raw??"").trim();
-  if(value==="English"||value==="Tetun + English"){
-    return value;
+function getToken(req:NextRequest){
+  const auth=req.headers.get("authorization");
+  if(auth?.startsWith("Bearer ")){
+    return auth.slice(7).trim();
   }
-  return "Tetun";
+  return req.cookies.get("lafaek_id_token")?.value||null;
 }
 
-function safeAccessType(raw:any):AccessType{
-  const value=String(raw??"").trim();
-  if(value==="approval_required"||value==="private"){
-    return value;
-  }
-  return "public";
+function normaliseGroups(value:CognitoPayload["cognito:groups"]):string[]{
+  if(Array.isArray(value))return value.map((group)=>String(group).toLowerCase());
+  if(typeof value==="string")return[value.toLowerCase()];
+  return[];
 }
 
-function deriveFromCode(codeRaw:string):{series:Series;issue:string;year:string}{
-  const code=String(codeRaw||"").trim();
-  const[seriesRaw,issueRaw="",yearRaw=""]=code.split("-");
-  return{
-    series:safeSeries(seriesRaw),
-    issue:String(issueRaw||"").trim(),
-    year:String(yearRaw||"").trim()
-  };
-}
-
-async function readMagazinesFromS3():Promise<MagazineRecord[]>{
-  if(!BUCKET){
-    console.warn("[api/admin/magazines] AWS_S3_BUCKET not set, returning empty list");
-    return[];
+async function verifyAdmin(req:NextRequest){
+  if(!JWKS||!ISSUER||!COGNITO_CLIENT_ID){
+    return{
+      ok:false as const,
+      status:500,
+      error:"Auth configuration is incomplete on the server."
+    };
   }
 
-  const cmd=new GetObjectCommand({
-    Bucket:BUCKET,
-    Key:MAG_JSON_KEY
-  });
+  const token=getToken(req);
 
-  let res;
+  if(!token){
+    return{
+      ok:false as const,
+      status:401,
+      error:"Authentication required."
+    };
+  }
+
   try{
-    res=await s3.send(cmd);
+    const {payload}=await jwtVerify(token,JWKS,{
+      issuer:ISSUER,
+      audience:COGNITO_CLIENT_ID
+    });
+
+    const typedPayload=payload as CognitoPayload;
+    const groups=normaliseGroups(typedPayload["cognito:groups"]);
+    const isAllowed=groups.includes("admin")||groups.includes("magazineadmin");
+
+    if(!isAllowed){
+      return{
+        ok:false as const,
+        status:403,
+        error:"You do not have permission to manage magazine sample pages."
+      };
+    }
+
+    return{
+      ok:true as const,
+      payload:typedPayload
+    };
+  }catch{
+    return{
+      ok:false as const,
+      status:401,
+      error:"Invalid or expired session."
+    };
+  }
+}
+
+async function streamToString(stream:any):Promise<string>{
+  if(!stream)return"";
+
+  if(typeof stream.transformToString==="function"){
+    return stream.transformToString();
+  }
+
+  const chunks:Buffer[]=[];
+  for await(const chunk of stream){
+    chunks.push(Buffer.isBuffer(chunk)?chunk:Buffer.from(chunk));
+  }
+
+  return Buffer.concat(chunks).toString("utf-8");
+}
+
+function normaliseSampleItems(parsed:any):SampleRecord[]{
+  if(Array.isArray(parsed))return parsed;
+  if(Array.isArray(parsed?.items))return parsed.items;
+  if(Array.isArray(parsed?.samples))return parsed.samples;
+  return[];
+}
+
+async function readSamplesFromS3(){
+  if(!BUCKET){
+    throw new Error("Missing AWS_S3_BUCKET");
+  }
+
+  try{
+    const response=await s3.send(
+      new GetObjectCommand({
+        Bucket:BUCKET,
+        Key:SAMPLES_INDEX_KEY
+      })
+    );
+
+    const raw=await streamToString(response.Body);
+
+    if(!raw.trim()){
+      return{
+        rawShape:{items:[]},
+        items:[]
+      };
+    }
+
+    const parsed=JSON.parse(raw);
+    const items=normaliseSampleItems(parsed);
+
+    return{
+      rawShape:parsed,
+      items
+    };
   }catch(err:any){
     if(
       err?.name==="NoSuchKey"||
       err?.Code==="NoSuchKey"||
       err?.$metadata?.httpStatusCode===404
     ){
-      console.warn("[api/admin/magazines] JSON not found, returning []");
-      return[];
+      return{
+        rawShape:{items:[]},
+        items:[]
+      };
     }
-    console.error("[api/admin/magazines] S3 GetObject error",err);
+
     throw err;
   }
-
-  const body=await (async()=>{
-    const b=res.Body as any;
-    if(!b){return"";}
-    if(typeof b.transformToString==="function"){
-      return b.transformToString("utf-8");
-    }
-    return await new Promise<string>((resolve,reject)=>{
-      const chunks:Buffer[]=[];
-      b.on("data",(chunk:Buffer)=>chunks.push(chunk));
-      b.on("end",()=>resolve(Buffer.concat(chunks).toString("utf-8")));
-      b.on("error",reject);
-    });
-  })();
-
-  if(!body){
-    console.log("[api/admin/magazines] empty body, returning []");
-    return[];
-  }
-
-  let parsed:any;
-  try{
-    parsed=JSON.parse(body);
-  }catch(err){
-    console.error("[api/admin/magazines] invalid JSON",err);
-    throw new Error("Failed to parse magazines.json");
-  }
-
-  const arr:Array<any>=Array.isArray(parsed)
-    ? parsed
-    : Array.isArray(parsed?.items)
-    ? parsed.items
-    : [];
-
-  if(!arr.length){
-    console.log("[api/admin/magazines] parsed but no items, returning []");
-    return[];
-  }
-
-  const records:MagazineRecord[]=arr.map((raw:any,index:number)=>{
-    const code=String(raw?.code??"").trim();
-    const idRaw=String(raw?.id??"").trim();
-    const id=idRaw||code||`mag-${index}`;
-
-    const derived=deriveFromCode(code||raw?.code||"");
-    const series=safeSeries(raw?.series??derived.series);
-    const year=String(raw?.year??derived.year??"").trim();
-    const issue=String(raw?.issue??derived.issue??"").trim();
-
-    const visible=raw?.visible!==false;
-
-    return{
-      ...raw,
-      id,
-      code:code||id,
-      series,
-      year,
-      issue,
-      titleEn:raw?.titleEn?String(raw.titleEn).trim():undefined,
-      titleTet:raw?.titleTet?String(raw.titleTet).trim():undefined,
-      description:raw?.description?String(raw.description).trim():undefined,
-      category:raw?.category?String(raw.category).trim():undefined,
-      language:safeLanguage(raw?.language),
-      coverImage:raw?.coverImage?String(raw.coverImage).trim():undefined,
-      pdfKey:raw?.pdfKey?String(raw.pdfKey).trim():undefined,
-      samplePages:Array.isArray(raw?.samplePages)
-        ? raw.samplePages.map((p:any)=>String(p??"").trim()).filter(Boolean)
-        : [],
-      accessType:safeAccessType(raw?.accessType),
-      visible,
-      createdAt:raw?.createdAt?String(raw.createdAt):undefined,
-      updatedAt:raw?.updatedAt?String(raw.updatedAt):undefined,
-      createdBy:raw?.createdBy&&typeof raw.createdBy==="object"
-        ? {
-            sub:raw.createdBy.sub?String(raw.createdBy.sub):undefined,
-            email:raw.createdBy.email?String(raw.createdBy.email):undefined,
-            fullName:raw.createdBy.fullName?String(raw.createdBy.fullName):undefined
-          }
-        : undefined,
-      updatedBy:raw?.updatedBy&&typeof raw.updatedBy==="object"
-        ? {
-            sub:raw.updatedBy.sub?String(raw.updatedBy.sub):undefined,
-            email:raw.updatedBy.email?String(raw.updatedBy.email):undefined,
-            fullName:raw.updatedBy.fullName?String(raw.updatedBy.fullName):undefined
-          }
-        : undefined,
-      updatedByGroups:Array.isArray(raw?.updatedByGroups)
-        ? raw.updatedByGroups.map((g:any)=>String(g).trim()).filter(Boolean)
-        : undefined
-    };
-  }).filter((m)=>!!m.code);
-
-  console.log("[api/admin/magazines] loaded items from S3",{
-    count:records.length,
-    key:MAG_JSON_KEY
-  });
-
-  return records;
 }
 
-async function writeMagazinesToS3(items:MagazineRecord[]):Promise<void>{
+async function writeJsonToS3(key:string,data:unknown){
   if(!BUCKET){
-    throw new Error("AWS_S3_BUCKET is not configured");
+    throw new Error("Missing AWS_S3_BUCKET");
   }
 
-  const payload={items};
+  await s3.send(
+    new PutObjectCommand({
+      Bucket:BUCKET,
+      Key:key,
+      Body:JSON.stringify(data,null,2),
+      ContentType:"application/json; charset=utf-8"
+    })
+  );
+}
 
-  const cmd=new PutObjectCommand({
-    Bucket:BUCKET,
-    Key:MAG_JSON_KEY,
-    Body:JSON.stringify(payload,null,2),
-    ContentType:"application/json"
-  });
+async function backupExistingFile(key:string){
+  const existing=await readSamplesFromS3();
+  const timestamp=new Date().toISOString().replace(/[:.]/g,"-");
+  const backupKey=`${BASE_PATH_NORMALISED}/backups/magazines/samples-${timestamp}.json`;
 
-  await s3.send(cmd);
+  await writeJsonToS3(backupKey,existing.rawShape);
+}
 
-  console.log("[api/admin/magazines] wrote items to S3",{
-    count:items.length,
-    key:MAG_JSON_KEY
-  });
+function sanitisePayload(body:any){
+  if(Array.isArray(body)){
+    return{items:body};
+  }
+
+  if(body&&typeof body==="object"){
+    if(Array.isArray(body.items)){
+      return{...body,items:body.items};
+    }
+
+    if(Array.isArray(body.samples)){
+      return{...body,items:body.samples};
+    }
+
+    return body;
+  }
+
+  return{items:[]};
+}
+
+function isHttpUrl(value:string){
+  return /^https?:\/\//i.test(value);
+}
+
+function extractKeyFromS3Url(value:string){
+  try{
+    const url=new URL(value);
+    const host=url.hostname.toLowerCase();
+
+    if(
+      host.includes(".s3.")||
+      host.startsWith("s3.")||
+      host.includes("amazonaws.com")
+    ){
+      return decodeURIComponent(url.pathname.replace(/^\/+/,""));
+    }
+
+    return null;
+  }catch{
+    return null;
+  }
+}
+
+async function toViewableUrl(value:string){
+  const trimmed=String(value||"").trim();
+  if(!trimmed)return"";
+
+  if(isHttpUrl(trimmed)){
+    const maybeKey=extractKeyFromS3Url(trimmed);
+
+    if(!maybeKey){
+      return trimmed;
+    }
+
+    return await getSignedUrl(
+      s3,
+      new GetObjectCommand({
+        Bucket:BUCKET!,
+        Key:maybeKey
+      }),
+      {expiresIn:60 * 60}
+    );
+  }
+
+  return await getSignedUrl(
+    s3,
+    new GetObjectCommand({
+      Bucket:BUCKET!,
+      Key:trimmed
+    }),
+    {expiresIn:60 * 60}
+  );
+}
+
+async function withSignedSamplePages(items:SampleRecord[]){
+  const signedItems=await Promise.all(
+    items.map(async(item)=>{
+      const pages=Array.isArray(item.samplePages)?item.samplePages:[];
+      const signedPages=(await Promise.all(
+        pages.map(async(page)=>{
+          try{
+            return await toViewableUrl(page);
+          }catch(error){
+            console.error("[api/magazines/samples] failed to sign sample page",{
+              code:item.code,
+              page,
+              error
+            });
+            return "";
+          }
+        })
+      )).filter(Boolean);
+
+      return{
+        ...item,
+        samplePages:signedPages
+      };
+    })
+  );
+
+  return signedItems;
 }
 
 export async function GET(){
   try{
-    const items=await readMagazinesFromS3();
-    return NextResponse.json({ok:true,items});
-  }catch(err:any){
-    console.error("[api/admin/magazines] GET error",err);
+    const data=await readSamplesFromS3();
+    const items=await withSignedSamplePages(data.items);
+
     return NextResponse.json(
-      {ok:false,error:err?.message||"Failed to load magazines"},
+      {
+        ok:true,
+        items,
+        samples:items
+      },
+      {status:200}
+    );
+  }catch(error){
+    console.error("GET /api/magazines/samples failed:",error);
+
+    return NextResponse.json(
+      {
+        ok:false,
+        error:"Failed to load magazine sample pages",
+        items:[],
+        samples:[]
+      },
       {status:500}
     );
   }
 }
 
-export async function PUT(req:Request){
+export async function PUT(req:NextRequest){
   try{
-    const body=await req.json().catch(()=>null);
+    const auth=await verifyAdmin(req);
 
-    if(!body||!Array.isArray(body.items)){
+    if(!auth.ok){
       return NextResponse.json(
-        {ok:false,error:"Request body must be {items:[...]}"},
-        {status:400}
+        {ok:false,error:auth.error},
+        {status:auth.status}
       );
     }
 
-    const incoming:any[]=body.items;
-    const now=new Date().toISOString();
+    const body=await req.json();
+    const safeBody=sanitisePayload(body);
 
-    const map=new Map<string,MagazineRecord>();
+    await backupExistingFile(SAMPLES_INDEX_KEY);
+    await writeJsonToS3(SAMPLES_INDEX_KEY,safeBody);
 
-    for(const raw of incoming){
-      const code=String(raw?.code??"").trim();
-      const idRaw=String(raw?.id??"").trim();
-      const id=idRaw||code||`mag-${Math.random().toString(36).slice(2,8)}`;
-
-      if(!code){
-        continue;
-      }
-
-      const derived=deriveFromCode(code);
-      const series=safeSeries(raw?.series??derived.series);
-      const year=String(raw?.year??derived.year??"").trim();
-      const issue=String(raw?.issue??derived.issue??"").trim();
-
-      const existing:MagazineRecord={
-        ...raw,
-        id,
-        code,
-        series,
-        year,
-        issue,
-        titleEn:raw?.titleEn?String(raw.titleEn).trim():undefined,
-        titleTet:raw?.titleTet?String(raw.titleTet).trim():undefined,
-        description:raw?.description?String(raw.description).trim():undefined,
-        category:raw?.category?String(raw.category).trim():undefined,
-        language:safeLanguage(raw?.language),
-        coverImage:raw?.coverImage?String(raw.coverImage).trim():undefined,
-        pdfKey:raw?.pdfKey?String(raw.pdfKey).trim():undefined,
-        samplePages:Array.isArray(raw?.samplePages)
-          ? raw.samplePages.map((p:any)=>String(p??"").trim()).filter(Boolean)
-          : [],
-        accessType:safeAccessType(raw?.accessType),
-        visible:raw?.visible!==false,
-        createdAt:raw?.createdAt?String(raw.createdAt):now,
-        updatedAt:now,
-        createdBy:raw?.createdBy&&typeof raw.createdBy==="object"
-          ? {
-              sub:raw.createdBy.sub?String(raw.createdBy.sub):undefined,
-              email:raw.createdBy.email?String(raw.createdBy.email):undefined,
-              fullName:raw.createdBy.fullName?String(raw.createdBy.fullName):undefined
-            }
-          : undefined,
-        updatedBy:raw?.updatedBy&&typeof raw.updatedBy==="object"
-          ? {
-              sub:raw.updatedBy.sub?String(raw.updatedBy.sub):undefined,
-              email:raw.updatedBy.email?String(raw.updatedBy.email):undefined,
-              fullName:raw.updatedBy.fullName?String(raw.updatedBy.fullName):undefined
-            }
-          : undefined,
-        updatedByGroups:Array.isArray(raw?.updatedByGroups)
-          ? raw.updatedByGroups.map((g:any)=>String(g).trim()).filter(Boolean)
-          : undefined
-      };
-
-      map.set(code,existing);
-    }
-
-    const cleaned=Array.from(map.values());
-
-    await writeMagazinesToS3(cleaned);
-
-    return NextResponse.json({ok:true,items:cleaned});
-  }catch(err:any){
-    console.error("[api/admin/magazines] PUT error",err);
     return NextResponse.json(
-      {ok:false,error:err?.message||"Failed to save magazines"},
+      {
+        ok:true,
+        message:"Magazine sample pages updated successfully.",
+        updatedBy:auth.payload.email||auth.payload["cognito:username"]||"unknown",
+        updatedAt:new Date().toISOString()
+      },
+      {status:200}
+    );
+  }catch(error){
+    console.error("PUT /api/magazines/samples failed:",error);
+
+    return NextResponse.json(
+      {ok:false,error:"Failed to update magazine sample pages."},
       {status:500}
     );
   }
+}
+
+export async function POST(){
+  return NextResponse.json({ok:false,error:"Method not allowed."},{status:405});
+}
+
+export async function PATCH(){
+  return NextResponse.json({ok:false,error:"Method not allowed."},{status:405});
+}
+
+export async function DELETE(){
+  return NextResponse.json({ok:false,error:"Method not allowed."},{status:405});
 }
