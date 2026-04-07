@@ -130,3 +130,7 @@ export function canAccessAdminArea(){
 export function isAdmin(){
   return hasAnyRole(["Admin"])
 }
+
+export function canAccessAdminCareers(){
+  return canAccessAdminArea();
+}

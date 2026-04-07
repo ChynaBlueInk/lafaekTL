@@ -9,10 +9,11 @@ import {
   canAccessAdminMagazines,
   canAccessAdminNews,
   canAccessAdminImpact,
-  canAccessAdminRevistaMedia
+  canAccessAdminRevistaMedia,
+  canAccessAdminCareers
 }from "@/lib/auth";
 
-type AdminKey="team"|"magazines"|"news"|"impact"|"revistaMedia";
+type AdminKey="team"|"magazines"|"news"|"impact"|"revistaMedia"|"careers";
 
 type AdminLink={
   key:AdminKey;
@@ -84,6 +85,15 @@ export default function AdminHubPage(){
       descEn:"Upload short reels and videos from the field, the team, children, and communities.",
       descTet:"Upload reel no vídeu badak hosi terrenu, ekipa, labarik, no komunidade sira.",
       allowed:canAccessAdminRevistaMedia
+    },
+    {
+      key:"careers",
+      href:"/admin/careers",
+      titleEn:"Careers",
+      titleTet:"Karreira",
+      descEn:"Review submitted jobs, publish approved roles, archive old listings, or reject unsuitable submissions.",
+      descTet:"Haree vaga ne'ebé submete ona, publika vaga ne'ebé aprova, arkiva lista antigu, ka rejeita submisaun ne'ebé la apropriadu.",
+      allowed:canAccessAdminCareers
     }
   ],[]);
 
@@ -251,6 +261,38 @@ export default function AdminHubPage(){
         "Uza vídeu vertikál bainhira bele.",
         "Halo reel badak no klaru.",
         "Verifika kualidade sonu molok upload."
+      ]
+    },
+    careers:{
+      titleEn:"How to manage Careers",
+      titleTet:"Oinsá atu jere Karreira",
+      stepsEn:[
+        "Open the Careers admin page.",
+        "Check new submissions under Pending first.",
+        "Open the job details and review title, organisation, deadline, summaries, and application details.",
+        "Use Publish for approved listings that are ready for the public page.",
+        "Use Archive for old listings that should no longer appear publicly.",
+        "Use Reject for unsuitable, incomplete, or suspicious submissions.",
+        "Use Delete only when a submission should be removed entirely."
+      ],
+      stepsTet:[
+        "Loke pájina admin Karreira.",
+        "Haree submisaun foun sira iha Pending uluk.",
+        "Loke detalhu vaga no revê titulu, organizasaun, data remata, rezumu, no detalhu aplikasaun.",
+        "Uza Publish ba lista ne'ebé aprova ona no prontu atu sai iha pájina públika.",
+        "Uza Archive ba lista antigu ne'ebé la presiza mos hatudu iha públiku.",
+        "Uza Reject ba submisaun ne'ebé la apropriadu, la kompletu, ka suspeitu.",
+        "Uza Delete de'it bainhira submisaun tenke hasai hotu."
+      ],
+      tipsEn:[
+        "Check the deadline before publishing so old jobs do not go live by mistake.",
+        "Read both English and Tetun summaries if both are included.",
+        "If details look suspicious, reject the listing rather than publish first and tidy later."
+      ],
+      tipsTet:[
+        "Verifika data remata molok publika para vaga antigu la sai públiku sala.",
+        "Lee rezumu Inglés no Tetun se rua hotu iha.",
+        "Se detalhu sira suspeitu, di'ak liu rejeita duké publika uluk no arranja depois."
       ]
     }
   }),[]);
