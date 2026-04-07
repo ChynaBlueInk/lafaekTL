@@ -1,4 +1,3 @@
-//app/magazines/page.tsx
 "use client";
 
 import {useState,useMemo,useEffect}from "react";
@@ -35,14 +34,67 @@ type MagazinesApiResponse={
 };
 
 const S3_ORIGIN="https://lafaek-media.s3.ap-southeast-2.amazonaws.com";
+const PLACEHOLDER_SRC="/placeholder.svg?width=640&height=720";
 
-const buildImageUrl=(src?:string)=>{
+const MONTHS_EN=[
+  "—","January","February","March","April","May","June","July","August","September","October","November","December",
+] as const;
+
+const MONTHS_TET=[
+  "—","Janeiru","Fevreiru","Marsu","Abril","Maiu","Juñu","Jullu","Agostu","Setembru","Outubru","Novembru","Dezembru",
+] as const;
+
+const getIndexedLabel=(items:readonly string[],index:number,fallback:string):string=>{
+  return items[index]??fallback;
+};
+
+const buildImageUrl=(src?:string):string=>{
   if(!src){return"";}
-  let clean=src.trim();
+  const clean=src.trim();
   if(clean.startsWith(S3_ORIGIN)){return clean;}
   if(clean.startsWith("http://")||clean.startsWith("https://")){return clean;}
-  clean=clean.replace(/^\/+/,"");
-  return`${S3_ORIGIN}/${clean}`;
+  return`${S3_ORIGIN}/${clean.replace(/^\/+/,"")}`;
+};
+
+const getSafeImageSrc=(src?:string):string=>{
+  const built=buildImageUrl(src);
+  return built||PLACEHOLDER_SRC;
+};
+
+const getFirstSampleSrc=(pages?:string[]):string=>{
+  const first=pages?.find((page)=>page.trim().length>0);
+  return getSafeImageSrc(first);
+};
+
+const getCardCoverSrc=(magazine:Magazine|MagazineBase):string=>{
+  if(magazine.cover){
+    return getSafeImageSrc(magazine.cover);
+  }
+
+  if("samplePages" in magazine){
+    return getFirstSampleSrc(magazine.samplePages);
+  }
+
+  return PLACEHOLDER_SRC;
+};
+
+const getExtensionFromUrl=(src?:string):string=>{
+  if(!src){return"";}
+
+  try{
+    const url=new URL(src);
+    const pathname=url.pathname.toLowerCase();
+    const lastDot=pathname.lastIndexOf(".");
+    return lastDot>=0?pathname.slice(lastDot):"";
+  }catch{
+    const clean=src.split("?")[0]?.toLowerCase()??"";
+    const lastDot=clean.lastIndexOf(".");
+    return lastDot>=0?clean.slice(lastDot):"";
+  }
+};
+
+const isProbablyPdf=(src?:string):boolean=>{
+  return getExtensionFromUrl(src)===".pdf";
 };
 
 const LAFAEK={
@@ -55,15 +107,14 @@ const LAFAEK={
   yellow:"#F2C94C",
 };
 
-const monthName=(n:string)=>{
-  const i=parseInt(n,10);
-  const en=([
-    "—","January","February","March","April","May","June","July","August","September","October","November","December",
-  ][i]||`Issue ${n}`);
-  const tet=([
-    "—","Janeiru","Fevreiru","Marsu","Abril","Maiu","Juñu","Jullu","Agostu","Setembru","Outubru","Novembru","Dezembru",
-  ][i]||`Numeru ${n}`);
-  return{en,tet};
+const monthName=(n:string):{en:string;tet:string}=>{
+  const parsed=Number.parseInt(n,10);
+  const index=Number.isNaN(parsed)?0:parsed;
+
+  return{
+    en:getIndexedLabel(MONTHS_EN,index,`Issue ${n}`),
+    tet:getIndexedLabel(MONTHS_TET,index,`Numeru ${n}`),
+  };
 };
 
 const seriesLabel=(s:Series)=>
@@ -75,10 +126,9 @@ const seriesLabel=(s:Series)=>
     ? {en:"Lafaek Komunidade",tet:"Lafaek Komunidade"}
     : {en:"Lafaek Kiik",tet:"Lafaek Kiik"};
 
-// (unchanged) seriesInfo + ui objects (keep your existing ones)
 const seriesInfo:Record<
   Series,
-  {en:{title:string;body:string}; tet:{title:string;body:string}}
+  {en:{title:string;body:string};tet:{title:string;body:string}}
 >={
   LK:{
     en:{title:"Lafaek Kiik",body:
@@ -234,6 +284,8 @@ const ui={
     sampleHeading:"Sample pages",
     sampleNote:"This preview shows a small selection of pages. Full magazines are available for approved schools and partners.",
     close:"Close",
+    openSample:"Open sample page",
+    sampleUnavailable:"Preview not available for this file. Open it in a new tab.",
     loadingSamples:"Loading samples…",
     loadingMagazines:"Loading magazines…",
     samplesError:"Could not load sample pages. You can still apply for access.",
@@ -251,6 +303,8 @@ const ui={
     sampleHeading:"Pájina amostra",
     sampleNote:"Pré-visaun ne'e hatudu pájina balu de'it. Revista kompletu disponivel ba eskola no parceiru aprovadu sira.",
     close:"Taka",
+    openSample:"Loke pájina amostra",
+    sampleUnavailable:"Pré-visaun la disponivel ba ficheiru ida-ne'e. Loke iha tab foun.",
     loadingSamples:"Hakarak kargga pájina amostra…",
     loadingMagazines:"Hakarak kargga revista…",
     samplesError:"La bele karga pájina amostra. Ita bele kontinua aplica ba asesu.",
@@ -261,8 +315,56 @@ const ui={
   },
 } as const;
 
+function SamplePreviewCard({
+  src,
+  alt,
+  openLabel,
+  unavailableLabel,
+}:{
+  src:string;
+  alt:string;
+  openLabel:string;
+  unavailableLabel:string;
+}){
+  const [failed,setFailed]=useState(false);
+  const pdf=isProbablyPdf(src);
+
+  return(
+    <div
+      className="relative aspect-[3/4] w-full overflow-hidden rounded-xl border bg-white"
+      style={{borderColor:LAFAEK.grayMid}}
+    >
+      {pdf||failed?(
+        <div className="flex h-full w-full flex-col items-center justify-center gap-3 p-6 text-center">
+          {!pdf&&(
+            <p className="text-sm text-gray-600">
+              {unavailableLabel}
+            </p>
+          )}
+          <a
+            href={src}
+            target="_blank"
+            rel="noreferrer"
+            className="rounded-lg px-4 py-2 text-sm font-semibold"
+            style={{background:LAFAEK.blue,color:"#fff"}}
+          >
+            {openLabel}
+          </a>
+        </div>
+      ):(
+        <img
+          src={src}
+          alt={alt}
+          className="h-full w-full object-contain"
+          onError={()=>setFailed(true)}
+        />
+      )}
+    </div>
+  );
+}
+
 export default function MagazinesLandingPage(){
-  const {language}=useLanguage() as {language:Lang; setLanguage:(lang:Lang)=>void};
+  const {language}=useLanguage() as {language:Lang;setLanguage:(lang:Lang)=>void};
   const t=ui[language];
 
   const[activeCode,setActiveCode]=useState<string|null>(null);
@@ -286,12 +388,14 @@ export default function MagazinesLandingPage(){
         if(!res.ok){
           throw new Error(`Failed to load magazines: ${res.status}`);
         }
+
         const data:MagazinesApiResponse=await res.json();
+
         if(!data.ok||!Array.isArray(data.items)){
           throw new Error(data.error||"Invalid magazines payload");
         }
 
-        const fromApi:MagazineBase[]=(data.items||[])
+        const fromApi:MagazineBase[]=data.items
           .map((raw:any)=>{
             const code=String(raw.code??"").trim();
             if(!code){return null;}
@@ -316,6 +420,7 @@ export default function MagazinesLandingPage(){
             const titleEn=raw.titleEn
               ? String(raw.titleEn)
               : `${s.en} ${when.en} ${year}`.trim();
+
             const titleTet=raw.titleTet
               ? String(raw.titleTet)
               : `${s.tet} ${when.tet} ${year}`.trim();
@@ -333,7 +438,7 @@ export default function MagazinesLandingPage(){
               cover:coverRaw,
             } as MagazineBase;
           })
-          .filter((m:MagazineBase|null):m is MagazineBase=>!!m);
+          .filter((m:MagazineBase|null):m is MagazineBase=>m!==null);
 
         setBaseMagazines(fromApi);
       }catch(err:any){
@@ -358,20 +463,24 @@ export default function MagazinesLandingPage(){
         if(!res.ok){
           throw new Error(`Failed to load samples: ${res.status}`);
         }
+
         const data:SamplesApiResponse=await res.json();
         if(!data.ok){
           throw new Error(data.error||"Unknown error from API");
         }
 
         const map:Record<string,string[]>={};
+
         (data.items||[]).forEach((raw:any)=>{
           const code=String(raw.code??"").trim();
           if(!code){return;}
+
           const pages=Array.isArray(raw.samplePages)
             ? raw.samplePages
                 .map((p:any)=>String(p??"").trim())
-                .filter((p:string)=>!!p)
+                .filter((p:string)=>p.length>0)
             : [];
+
           if(pages.length){
             map[code]=pages;
           }
@@ -385,6 +494,7 @@ export default function MagazinesLandingPage(){
         setLoadingSamples(false);
       }
     };
+
     void loadSamples();
   },[]);
 
@@ -404,20 +514,20 @@ export default function MagazinesLandingPage(){
   const currentSeriesInfo=infoSeries?seriesInfo[infoSeries][language]:null;
 
   return(
-    <div className="flex flex-col min-h-screen bg-white">
+    <div className="flex min-h-screen flex-col bg-white">
       <section className="w-full bg-[#219653] text-white">
-        <div className="max-w-6xl mx-auto px-4 py-10 md:py-14 flex flex-col md:flex-row items-center gap-6">
+        <div className="mx-auto flex max-w-6xl flex-col items-center gap-6 px-4 py-10 md:flex-row md:py-14">
           <div className="flex-1 space-y-4">
-            <h1 className="text-3xl md:text-4xl font-bold leading-tight">
+            <h1 className="text-3xl font-bold leading-tight md:text-4xl">
               {t.title}
             </h1>
-            <p className="text-sm md:text-base max-w-2xl">
+            <p className="max-w-2xl text-sm md:text-base">
               {t.intro}
             </p>
             <div className="flex flex-wrap gap-3">
               <Link
                 href="/magazines/apply"
-                className="inline-flex items-center justify-center px-5 py-2.5 rounded-full font-semibold shadow-sm"
+                className="inline-flex items-center justify-center rounded-full px-5 py-2.5 font-semibold shadow-sm"
                 style={{background:LAFAEK.yellow,color:"#4F4F4F"}}
               >
                 {t.applyButton}
@@ -425,7 +535,7 @@ export default function MagazinesLandingPage(){
 
               <Link
                 href="/publication/magazines"
-                className="inline-flex items-center justify-center px-5 py-2.5 rounded-full font-semibold border border-white/70 hover:bg-white/10 transition-colors"
+                className="inline-flex items-center justify-center rounded-full border border-white/70 px-5 py-2.5 font-semibold transition-colors hover:bg-white/10"
               >
                 {t.archiveButton}
               </Link>
@@ -450,41 +560,38 @@ export default function MagazinesLandingPage(){
             )}
           </div>
 
-          <div className="flex-1 flex justify-center">
-            <div className="grid grid-cols-3 gap-2 max-w-xs">
+          <div className="flex flex-1 justify-center">
+            <div className="grid max-w-xs grid-cols-3 gap-2">
               {loadingMagazines?(
                 <>
-                  <div className="w-20 h-28 rounded-lg border border-white/30 bg-white/10" />
-                  <div className="w-20 h-28 rounded-lg border border-white/30 bg-white/10" />
-                  <div className="w-20 h-28 rounded-lg border border-white/30 bg-white/10" />
+                  <div className="h-28 w-20 rounded-lg border border-white/30 bg-white/10" />
+                  <div className="h-28 w-20 rounded-lg border border-white/30 bg-white/10" />
+                  <div className="h-28 w-20 rounded-lg border border-white/30 bg-white/10" />
                 </>
               ):magazines.length>0?(
                 magazines.slice(0,3).map((m)=>{
-                 const coverSrc=m.cover
-  ? m.cover
-  : (m.samplePages&&m.samplePages.length>0
-      ? buildImageUrl(m.samplePages[0])
-      : "/placeholder.svg?width=640&height=720");
+                  const coverSrc=getCardCoverSrc(m);
 
                   return(
                     <div
                       key={m.code}
-                      className="relative w-20 h-28 rounded-lg overflow-hidden shadow-sm border border-white/30 bg-white/10"
+                      className="relative h-28 w-20 overflow-hidden rounded-lg border border-white/30 bg-white/10 shadow-sm"
                     >
                       <Image
                         src={coverSrc}
                         alt={m.name.en}
                         fill
                         className="object-cover"
+                        unoptimized
                       />
                     </div>
                   );
                 })
               ):(
                 <>
-                  <div className="w-20 h-28 rounded-lg border border-white/30 bg-white/10" />
-                  <div className="w-20 h-28 rounded-lg border border-white/30 bg-white/10" />
-                  <div className="w-20 h-28 rounded-lg border border-white/30 bg-white/10" />
+                  <div className="h-28 w-20 rounded-lg border border-white/30 bg-white/10" />
+                  <div className="h-28 w-20 rounded-lg border border-white/30 bg-white/10" />
+                  <div className="h-28 w-20 rounded-lg border border-white/30 bg-white/10" />
                 </>
               )}
             </div>
@@ -492,17 +599,17 @@ export default function MagazinesLandingPage(){
         </div>
       </section>
 
-      <main className="flex-1 max-w-6xl mx-auto px-4 py-8 md:py-10">
+      <main className="mx-auto flex-1 max-w-6xl px-4 py-8 md:py-10">
         {loadingMagazines?(
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {Array.from({length:6}).map((_,i)=>(
               <div
                 key={`sk-${i}`}
-                className="rounded-2xl overflow-hidden border shadow-sm bg-white"
+                className="overflow-hidden rounded-2xl border bg-white shadow-sm"
                 style={{borderColor:LAFAEK.grayMid}}
               >
-                <div className="w-full aspect-[3/2]" style={{background:LAFAEK.grayLight}} />
-                <div className="p-4 space-y-3">
+                <div className="aspect-[3/2] w-full" style={{background:LAFAEK.grayLight}} />
+                <div className="space-y-3 p-4">
                   <div className="h-3 w-32 rounded bg-gray-100" />
                   <div className="h-4 w-48 rounded bg-gray-100" />
                   <div className="h-10 w-full rounded bg-gray-100" />
@@ -522,20 +629,16 @@ export default function MagazinesLandingPage(){
         ):(
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {magazines.map((m)=>{
-              const coverSrc=m.cover
-  ? m.cover
-  : (m.samplePages&&m.samplePages.length>0
-      ? buildImageUrl(m.samplePages[0])
-      : "/placeholder.svg?width=640&height=720");
+              const coverSrc=getCardCoverSrc(m);
 
               return(
                 <article
                   key={m.code}
-                  className="rounded-2xl overflow-hidden border shadow-sm hover:shadow-md transition bg-white"
+                  className="overflow-hidden rounded-2xl border bg-white shadow-sm transition hover:shadow-md"
                   style={{borderColor:LAFAEK.grayMid}}
                 >
                   <div
-                    className="relative w-full aspect-[3/2]"
+                    className="relative aspect-[3/2] w-full"
                     style={{background:LAFAEK.grayLight}}
                   >
                     <Image
@@ -543,49 +646,55 @@ export default function MagazinesLandingPage(){
                       alt={m.name.en}
                       fill
                       className="object-cover"
+                      unoptimized
                     />
                     <div className="absolute inset-0 flex items-end justify-between p-2">
-                      <span className="text-xs bg-black/50 text-white px-2 py-1 rounded">
+                      <span className="rounded bg-black/50 px-2 py-1 text-xs text-white">
                         {m.code}
                       </span>
-                      <span className="text-xs bg-black/50 text-white px-2 py-1 rounded">
+                      <span className="rounded bg-black/50 px-2 py-1 text-xs text-white">
                         {m.year}
                       </span>
                     </div>
                   </div>
-                  <div className="p-4 space-y-2">
+
+                  <div className="space-y-2 p-4">
                     <p
                       className="text-xs uppercase tracking-wide"
                       style={{color:LAFAEK.textDark}}
                     >
                       {seriesLabel(m.series)[language]} • {m.year}
                     </p>
+
                     <h2
-                      className="text-base md:text-lg font-semibold"
+                      className="text-base font-semibold md:text-lg"
                       style={{color:LAFAEK.red}}
                     >
                       {m.name[language]}
                     </h2>
-                    <div className="pt-3 flex flex-col gap-2">
+
+                    <div className="flex flex-col gap-2 pt-3">
                       <button
                         type="button"
                         onClick={()=>setActiveCode(m.code)}
-                        className="w-full text-center font-semibold py-2.5 rounded-xl transition-colors"
+                        className="w-full rounded-xl py-2.5 text-center font-semibold transition-colors"
                         style={{background:LAFAEK.green,color:"#fff"}}
                       >
                         {t.sampleButton}
                       </button>
+
                       <Link
                         href="/magazines/apply"
-                        className="w-full text-center font-semibold py-2.5 rounded-xl border text-sm"
+                        className="w-full rounded-xl border py-2.5 text-center text-sm font-semibold"
                         style={{borderColor:LAFAEK.grayMid,color:LAFAEK.textDark}}
                       >
                         {t.applyButton}
                       </Link>
+
                       <button
                         type="button"
                         onClick={()=>setInfoSeries(m.series)}
-                        className="w-full text-center font-semibold py-2 rounded-xl text-xs md:text-sm border border-dashed"
+                        className="w-full rounded-xl border border-dashed py-2 text-center text-xs font-semibold md:text-sm"
                         style={{borderColor:LAFAEK.grayMid,color:LAFAEK.textDark}}
                       >
                         {t.seriesInfoButton}
@@ -601,9 +710,9 @@ export default function MagazinesLandingPage(){
 
       {activeMagazine&&(
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-          <div className="bg-white max-w-3xl w-full mx-4 rounded-2xl shadow-xl overflow-hidden">
+          <div className="mx-4 w-full max-w-3xl overflow-hidden rounded-2xl bg-white shadow-xl">
             <div
-              className="flex items-center justify-between px-4 py-3 border-b"
+              className="flex items-center justify-between border-b px-4 py-3"
               style={{borderColor:LAFAEK.grayMid}}
             >
               <div>
@@ -614,49 +723,50 @@ export default function MagazinesLandingPage(){
                   {activeMagazine.code}
                 </p>
               </div>
+
               <button
                 type="button"
                 onClick={()=>setActiveCode(null)}
-                className="px-3 py-1.5 rounded-lg text-sm font-semibold hover:bg-gray-100"
+                className="rounded-lg px-3 py-1.5 text-sm font-semibold hover:bg-gray-100"
               >
                 {t.close}
               </button>
             </div>
 
-            <div className="max-h-[70vh] overflow-y-auto px-4 py-4 space-y-3 bg-[#F5F5F5]">
+            <div className="max-h-[70vh] space-y-3 overflow-y-auto bg-[#F5F5F5] px-4 py-4">
               <h3 className="text-sm font-semibold" style={{color:LAFAEK.textDark}}>
                 {t.sampleHeading}
               </h3>
 
               {activeMagazine.samplePages&&activeMagazine.samplePages.length>0?(
                 <div className="grid gap-3 md:grid-cols-2">
-                  {activeMagazine.samplePages.map((src)=>(
-                    <div
-                      key={src}
-                      className="relative w-full aspect-[3/4] bg-white rounded-xl overflow-hidden border"
-                      style={{borderColor:LAFAEK.grayMid}}
-                    >
-                      <Image
-                        src={buildImageUrl(src)}
+                  {activeMagazine.samplePages.map((src)=>{
+                    const sampleSrc=buildImageUrl(src.trim());
+
+                    return(
+                      <SamplePreviewCard
+                        key={sampleSrc}
+                        src={sampleSrc}
                         alt={activeMagazine.name.en}
-                        fill
-                        className="object-contain"
+                        openLabel={t.openSample}
+                        unavailableLabel={t.sampleUnavailable}
                       />
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               ):(
                 <div
-                  className="relative w-full aspect-[3/4] bg-white rounded-xl overflow-hidden border flex flex-col items-center justify-center gap-2 px-4 text-center"
+                  className="relative flex aspect-[3/4] w-full flex-col items-center justify-center gap-2 overflow-hidden rounded-xl border px-4 text-center"
                   style={{borderColor:LAFAEK.grayMid}}
                 >
                   <Image
-                    src={activeMagazine.cover||"/placeholder.svg?width=640&height=720"}
+                    src={getSafeImageSrc(activeMagazine.cover)}
                     alt={activeMagazine.name.en}
                     fill
                     className="object-contain opacity-70"
+                    unoptimized
                   />
-                  <div className="relative z-10 mt-2 rounded-full bg-black/60 px-3 py-1 text-[11px] text-white inline-block">
+                  <div className="relative z-10 mt-2 inline-block rounded-full bg-black/60 px-3 py-1 text-[11px] text-white">
                     {t.noSamples}
                   </div>
                 </div>
@@ -668,20 +778,21 @@ export default function MagazinesLandingPage(){
             </div>
 
             <div
-              className="px-4 py-3 border-t flex justify-end gap-2"
+              className="flex justify-end gap-2 border-t px-4 py-3"
               style={{borderColor:LAFAEK.grayMid}}
             >
               <Link
                 href="/magazines/apply"
-                className="px-4 py-2 rounded-lg font-semibold text-sm"
+                className="rounded-lg px-4 py-2 text-sm font-semibold"
                 style={{background:LAFAEK.blue,color:"#fff"}}
               >
                 {t.applyButton}
               </Link>
+
               <button
                 type="button"
                 onClick={()=>setActiveCode(null)}
-                className="px-4 py-2 rounded-lg font-semibold text-sm border"
+                className="rounded-lg border px-4 py-2 text-sm font-semibold"
                 style={{borderColor:LAFAEK.grayMid}}
               >
                 {t.close}
@@ -693,23 +804,25 @@ export default function MagazinesLandingPage(){
 
       {currentSeriesInfo&&(
         <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-          <div className="bg-white max-w-xl w-full mx-4 rounded-2xl shadow-xl overflow-hidden">
+          <div className="mx-4 w-full max-w-xl overflow-hidden rounded-2xl bg-white shadow-xl">
             <div
-              className="flex items-center justify-between px-4 py-3 border-b"
+              className="flex items-center justify-between border-b px-4 py-3"
               style={{borderColor:LAFAEK.grayMid}}
             >
               <h2 className="text-lg font-semibold" style={{color:LAFAEK.green}}>
                 {currentSeriesInfo.title}
               </h2>
+
               <button
                 type="button"
                 onClick={()=>setInfoSeries(null)}
-                className="px-3 py-1.5 rounded-lg text-sm font-semibold hover:bg-gray-100"
+                className="rounded-lg px-3 py-1.5 text-sm font-semibold hover:bg-gray-100"
               >
                 {t.close}
               </button>
             </div>
-            <div className="max-h-[70vh] overflow-y-auto px-4 py-4 bg-[#F5F5F5]">
+
+            <div className="max-h-[70vh] overflow-y-auto bg-[#F5F5F5] px-4 py-4">
               <pre className="whitespace-pre-wrap text-sm text-gray-800">
                 {currentSeriesInfo.body}
               </pre>

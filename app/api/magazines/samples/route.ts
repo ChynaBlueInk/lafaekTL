@@ -1,23 +1,24 @@
-//app/api/magazines/samples/route.ts
 export const runtime="nodejs";
 export const dynamic="force-dynamic";
 
 import {NextRequest,NextResponse}from "next/server";
 import {S3Client,GetObjectCommand,PutObjectCommand}from "@aws-sdk/client-s3";
-import {jwtVerify,createRemoteJWKSet, type JWTPayload}from "jose";
+import {jwtVerify,createRemoteJWKSet,type JWTPayload}from "jose";
 
 const REGION=process.env.AWS_REGION||"ap-southeast-2";
 const BUCKET=process.env.AWS_S3_BUCKET;
 const RAW_BASE_PATH=process.env.AWS_S3_BASE_PATH||"uploads";
 const BASE_PATH_NORMALISED=RAW_BASE_PATH.replace(/^\/+/,"");
 
+const S3_ORIGIN=`https://${BUCKET}.s3.${REGION}.amazonaws.com`;
+
 /**
- * If your existing samples file lives somewhere else, change ONLY this line.
- * The earlier break may also be because the key did not match your real file.
+ * Use the SAME samples JSON key pattern as admin.
+ * This avoids admin/public silently reading different files.
  */
 const SAMPLES_INDEX_KEY=
   process.env.AWS_S3_MAGAZINE_SAMPLES_JSON_KEY||
-  `${BASE_PATH_NORMALISED}/magazines/samples.json`;
+  "content/magazine-samples.json";
 
 const USER_POOL_ID=process.env.COGNITO_USER_POOL_ID||process.env.NEXT_PUBLIC_COGNITO_USER_POOL_ID;
 const COGNITO_CLIENT_ID=process.env.COGNITO_CLIENT_ID||process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID;
@@ -43,6 +44,13 @@ type CognitoPayload=JWTPayload&{
   email?:string;
   "cognito:groups"?:string[]|string;
   "cognito:username"?:string;
+};
+
+type SampleItem={
+  id?:string;
+  code?:string;
+  samplePages?:string[];
+  [key:string]:any;
 };
 
 function getToken(req:NextRequest){
@@ -124,7 +132,7 @@ async function streamToString(stream:any):Promise<string>{
   return Buffer.concat(chunks).toString("utf-8");
 }
 
-function normaliseSampleItems(parsed:any){
+function normaliseSampleItems(parsed:any):SampleItem[]{
   if(Array.isArray(parsed))return parsed;
   if(Array.isArray(parsed?.items))return parsed.items;
   if(Array.isArray(parsed?.samples))return parsed.samples;
@@ -149,7 +157,7 @@ async function readSamplesFromS3(){
     if(!raw.trim()){
       return{
         rawShape:{items:[]},
-        items:[]
+        items:[] as SampleItem[]
       };
     }
 
@@ -168,7 +176,7 @@ async function readSamplesFromS3(){
     ){
       return{
         rawShape:{items:[]},
-        items:[]
+        items:[] as SampleItem[]
       };
     }
 
@@ -191,11 +199,10 @@ async function writeJsonToS3(key:string,data:unknown){
   );
 }
 
-async function backupExistingFile(key:string){
+async function backupExistingFile(){
   const existing=await readSamplesFromS3();
-  const existingItems=existing.items;
 
-  if(!existingItems.length&&(!existing.rawShape||Object.keys(existing.rawShape).length===0)){
+  if(!existing.items.length&&(!existing.rawShape||Object.keys(existing.rawShape).length===0)){
     return;
   }
 
@@ -225,19 +232,55 @@ function sanitisePayload(body:any){
   return{items:[]};
 }
 
+function toPublicSampleUrl(value:string):string{
+  const trimmed=String(value??"").trim();
+  if(!trimmed){return"";}
+
+  if(trimmed.startsWith("http://")||trimmed.startsWith("https://")){
+    return trimmed;
+  }
+
+  const key=trimmed.replace(/^\/+/,"");
+  return`${S3_ORIGIN}/${key}`;
+}
+
+function withPublicSampleUrls(items:SampleItem[]):SampleItem[]{
+  return items.map((item,index)=>{
+    const code=typeof item.code==="string"?item.code.trim():"";
+    const id=typeof item.id==="string"&&item.id.trim()
+      ? item.id.trim()
+      : code||`sample-${index}`;
+
+    const samplePages=Array.isArray(item.samplePages)
+      ? item.samplePages
+          .map((page)=>toPublicSampleUrl(String(page??"")))
+          .filter(Boolean)
+      : [];
+
+    return{
+      ...item,
+      id,
+      code,
+      samplePages
+    };
+  }).filter((item)=>!!item.code);
+}
+
 /**
  * PUBLIC READ
- * Keep sample pages visible to public users.
+ * Returns stable public URLs for sample pages.
+ * Requires the underlying sample objects in S3 to be public-readable.
  */
 export async function GET(){
   try{
     const data=await readSamplesFromS3();
+    const items=withPublicSampleUrls(data.items);
 
     return NextResponse.json(
       {
         ok:true,
-        items:data.items,
-        samples:data.items
+        items,
+        samples:items
       },
       {status:200}
     );
@@ -258,7 +301,7 @@ export async function GET(){
 
 /**
  * ADMIN-ONLY WRITE
- * Stops public overwrite of sample-page data.
+ * Stores raw keys or URLs as provided by admin.
  */
 export async function PUT(req:NextRequest){
   try{
@@ -274,7 +317,7 @@ export async function PUT(req:NextRequest){
     const body=await req.json();
     const safeBody=sanitisePayload(body);
 
-    await backupExistingFile(SAMPLES_INDEX_KEY);
+    await backupExistingFile();
     await writeJsonToS3(SAMPLES_INDEX_KEY,safeBody);
 
     return NextResponse.json(
