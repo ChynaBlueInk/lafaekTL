@@ -1,3 +1,4 @@
+//app/api/magazines/samples/route.ts
 export const runtime="nodejs";
 export const dynamic="force-dynamic";
 
@@ -12,10 +13,6 @@ const BASE_PATH_NORMALISED=RAW_BASE_PATH.replace(/^\/+/,"");
 
 const S3_ORIGIN=`https://${BUCKET}.s3.${REGION}.amazonaws.com`;
 
-/**
- * Use the SAME samples JSON key pattern as admin.
- * This avoids admin/public silently reading different files.
- */
 const SAMPLES_INDEX_KEY=
   process.env.AWS_S3_MAGAZINE_SAMPLES_JSON_KEY||
   "content/magazine-samples.json";
@@ -232,16 +229,30 @@ function sanitisePayload(body:any){
   return{items:[]};
 }
 
+function extractKeyFromS3Url(value:string):string{
+  try{
+    const url=new URL(value);
+    return decodeURIComponent(url.pathname.replace(/^\/+/,""));
+  }catch{
+    return value.replace(/^\/+/,"").split("?")[0]||"";
+  }
+}
+
 function toPublicSampleUrl(value:string):string{
   const trimmed=String(value??"").trim();
   if(!trimmed){return"";}
 
-  if(trimmed.startsWith("http://")||trimmed.startsWith("https://")){
-    return trimmed;
-  }
+  const key=trimmed.startsWith("http://")||trimmed.startsWith("https://")
+    ? extractKeyFromS3Url(trimmed)
+    : trimmed.replace(/^\/+/,"");
 
-  const key=trimmed.replace(/^\/+/,"");
+  if(!key){return"";}
+
   return`${S3_ORIGIN}/${key}`;
+}
+
+function uniqueStrings(values:string[]):string[]{
+  return Array.from(new Set(values.map((value)=>(value.trim())).filter(Boolean)));
 }
 
 function withPublicSampleUrls(items:SampleItem[]):SampleItem[]{
@@ -252,9 +263,9 @@ function withPublicSampleUrls(items:SampleItem[]):SampleItem[]{
       : code||`sample-${index}`;
 
     const samplePages=Array.isArray(item.samplePages)
-      ? item.samplePages
-          .map((page)=>toPublicSampleUrl(String(page??"")))
-          .filter(Boolean)
+      ? uniqueStrings(
+          item.samplePages.map((page)=>(toPublicSampleUrl(String(page??""))))
+        )
       : [];
 
     return{
@@ -266,11 +277,6 @@ function withPublicSampleUrls(items:SampleItem[]):SampleItem[]{
   }).filter((item)=>!!item.code);
 }
 
-/**
- * PUBLIC READ
- * Returns stable public URLs for sample pages.
- * Requires the underlying sample objects in S3 to be public-readable.
- */
 export async function GET(){
   try{
     const data=await readSamplesFromS3();
@@ -299,10 +305,6 @@ export async function GET(){
   }
 }
 
-/**
- * ADMIN-ONLY WRITE
- * Stores raw keys or URLs as provided by admin.
- */
 export async function PUT(req:NextRequest){
   try{
     const auth=await verifyAdmin(req);

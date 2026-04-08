@@ -115,7 +115,7 @@ export default function ChatWidget(){
         <button
           type="button"
           onClick={()=>persistDock("open")}
-          className="fixed right-3 top-3 z-50 inline-flex items-center gap-2 rounded-full bg-[#219653] px-3 py-2 text-xs font-semibold text-white shadow-lg ring-1 ring-black/10 hover:brightness-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F2C94C]"
+          className="fixed right-3 top-16 md:top-3 z-40 inline-flex items-center gap-2 rounded-full bg-[#219653] px-3 py-2 text-xs font-semibold text-white shadow-lg ring-1 ring-black/10 hover:brightness-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#F2C94C]"
           aria-label={t.openChat}
         >
           <MessageCircle className="h-4 w-4" />

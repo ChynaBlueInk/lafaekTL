@@ -1,15 +1,12 @@
 "use client"
 
-import { useState, useRef, useCallback, useMemo } from "react"
+import { useState, useRef, useCallback, useMemo, useEffect } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { Menu, X, ChevronDown } from "lucide-react"
-import { Button } from "./button"
 import { useLanguage } from "@/lib/LanguageContext"
 import { useAuth } from "react-oidc-context"
 import { canAccessAdminArea, getUserDisplayName } from "@/lib/auth"
-
-// ─── Types ────────────────────────────────────────────────────────────────────
 
 type MegaItem = { href: string; title: string; description?: string }
 
@@ -19,7 +16,6 @@ type NavItem =
 
 type SimpleNavItem = { href: string; label: string }
 
-// Shared translation shape — TypeScript will warn if either locale is missing a key
 type Translations = {
   brand: string
   home: string
@@ -117,16 +113,12 @@ const translations: Record<"en" | "tet", Translations> = {
   },
 }
 
-// ─── Static data (outside component — never re-created on render) ──────────────
-
 const LOGGED_IN_NAV: SimpleNavItem[] = [
   { href: "/learning", label: "learning" },
   { href: "/friends", label: "friends" },
   { href: "/careers", label: "careers" },
   { href: "/revista-media", label: "revistaMedia" },
 ]
-
-// ─── Sub-components ───────────────────────────────────────────────────────────
 
 interface LangToggleProps {
   current: "en" | "tet"
@@ -157,8 +149,6 @@ function LangToggle({ current, onSelect, labels }: LangToggleProps) {
   )
 }
 
-// ─── Mega menu (desktop) ──────────────────────────────────────────────────────
-
 interface MegaMenuProps {
   label: string
   items: MegaItem[]
@@ -168,12 +158,43 @@ interface MegaMenuProps {
 function MegaMenu({ label, items, desktopLinkClass }: MegaMenuProps) {
   const [isOpen, setIsOpen] = useState(false)
   const buttonRef = useRef<HTMLButtonElement>(null)
+  const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const clearCloseTimer = () => {
+    if(closeTimerRef.current){
+      clearTimeout(closeTimerRef.current)
+      closeTimerRef.current = null
+    }
+  }
+
+  const openMenu = () => {
+    clearCloseTimer()
+    setIsOpen(true)
+  }
+
+  const closeMenuSoon = () => {
+    clearCloseTimer()
+    closeTimerRef.current = setTimeout(() => {
+      setIsOpen(false)
+    }, 180)
+  }
+
+  const closeMenuNow = () => {
+    clearCloseTimer()
+    setIsOpen(false)
+  }
+
+  useEffect(() => {
+    return () => {
+      clearCloseTimer()
+    }
+  }, [])
 
   return (
     <div
       className="relative"
-      onMouseEnter={() => setIsOpen(true)}
-      onMouseLeave={() => setIsOpen(false)}
+      onMouseEnter={openMenu}
+      onMouseLeave={closeMenuSoon}
     >
       <button
         ref={buttonRef}
@@ -181,10 +202,17 @@ function MegaMenu({ label, items, desktopLinkClass }: MegaMenuProps) {
         className={`${desktopLinkClass} flex items-center`}
         aria-haspopup="menu"
         aria-expanded={isOpen}
-        onClick={() => setIsOpen((v) => !v)}
+        onClick={() => {
+          if(isOpen){
+            closeMenuNow()
+          }else{
+            openMenu()
+          }
+        }}
+        onFocus={openMenu}
         onKeyDown={(e) => {
-          if (e.key === "Escape") {
-            setIsOpen(false)
+          if(e.key === "Escape"){
+            closeMenuNow()
             buttonRef.current?.blur()
           }
         }}
@@ -198,39 +226,43 @@ function MegaMenu({ label, items, desktopLinkClass }: MegaMenuProps) {
 
       {isOpen && (
         <div
-          role="menu"
-          aria-label={label}
-          className="absolute left-0 mt-2 w-[680px] bg-white rounded-xl shadow-lg border border-[#F5F5F5] z-50"
-          onKeyDown={(e) => {
-            if (e.key === "Escape") {
-              setIsOpen(false)
-              buttonRef.current?.focus()
-            }
-          }}
+          className="absolute left-0 top-full z-50 pt-1"
+          onMouseEnter={openMenu}
+          onMouseLeave={closeMenuSoon}
         >
-          <div className="p-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {items.map((m) => (
-              <Link
-                key={m.href}
-                href={m.href}
-                role="menuitem"
-                className="block rounded-lg p-3 hover:bg-[#F5F5F5] transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#219653]"
-                onClick={() => setIsOpen(false)}
-              >
-                <div className="text-[15px] font-semibold text-[#4F4F4F]">{m.title}</div>
-                {m.description && (
-                  <div className="mt-1 text-sm text-[#828282] leading-snug">{m.description}</div>
-                )}
-              </Link>
-            ))}
+          <div
+            role="menu"
+            aria-label={label}
+            className="w-[680px] rounded-xl border border-[#F5F5F5] bg-white shadow-lg"
+            onKeyDown={(e) => {
+              if(e.key === "Escape"){
+                closeMenuNow()
+                buttonRef.current?.focus()
+              }
+            }}
+          >
+            <div className="grid grid-cols-1 gap-4 p-5 sm:grid-cols-2">
+              {items.map((m) => (
+                <Link
+                  key={m.href}
+                  href={m.href}
+                  role="menuitem"
+                  className="block rounded-lg p-3 transition hover:bg-[#F5F5F5] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#219653]"
+                  onClick={closeMenuNow}
+                >
+                  <div className="text-[15px] font-semibold text-[#4F4F4F]">{m.title}</div>
+                  {m.description && (
+                    <div className="mt-1 text-sm leading-snug text-[#828282]">{m.description}</div>
+                  )}
+                </Link>
+              ))}
+            </div>
           </div>
         </div>
       )}
     </div>
   )
 }
-
-// ─── Main component ───────────────────────────────────────────────────────────
 
 export function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -245,13 +277,11 @@ export function Navigation() {
 
   const t = translations[language]
 
-  // Translated logged-in nav labels resolved here so LOGGED_IN_NAV keys stay language-agnostic
   const loggedInNav = useMemo(
     () => LOGGED_IN_NAV.map((item) => ({ ...item, label: t[item.label as keyof Translations] })),
     [t]
   )
 
-  // Left nav built from translations — stable reference within a render
   const leftNav: NavItem[] = useMemo(
     () => [
       { href: "/", label: t.home },
@@ -272,7 +302,6 @@ export function Navigation() {
     [t]
   )
 
-  // ── Sign-out ──────────────────────────────────────────────────────────────
   const handleSignOut = useCallback(async () => {
     const cognitoDomain = (process.env.NEXT_PUBLIC_COGNITO_DOMAIN ?? "").replace(/\/$/, "")
     const clientId = auth.settings?.client_id ?? ""
@@ -280,31 +309,21 @@ export function Navigation() {
       auth.settings?.post_logout_redirect_uri ??
       (typeof window !== "undefined" ? window.location.origin : "")
 
-    // 1. Best-effort server-side session clear
     try {
       await fetch("/api/auth/session", { method: "DELETE" })
-    } catch {
-      // Non-fatal — continue sign-out regardless
-    }
+    } catch {}
 
-    // 2. Remove OIDC user (if this throws we still want to redirect)
     try {
       await auth.removeUser()
-    } catch {
-      // Non-fatal
-    }
+    } catch {}
 
-    // 3. Always clean up local state
     try {
       sessionStorage.clear()
-    } catch {
-      // Non-fatal
-    }
+    } catch {}
 
     setIsMenuOpen(false)
     setOpenMobileSubmenu(null)
 
-    // 4. Redirect to Cognito logout or home
     const destination =
       cognitoDomain && clientId && logoutUri
         ? `${cognitoDomain}/logout?client_id=${encodeURIComponent(clientId)}&logout_uri=${encodeURIComponent(logoutUri)}`
@@ -313,7 +332,6 @@ export function Navigation() {
     window.location.href = destination
   }, [auth])
 
-  // ── Shared class strings ──────────────────────────────────────────────────
   const desktopLinkClass =
     "px-2 py-1 rounded-md text-white hover:text-[#F2C94C] hover:bg-white/10 font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
 
@@ -323,18 +341,13 @@ export function Navigation() {
   const mobileLinkClass =
     "py-2 px-4 rounded-md transition-colors text-white hover:text-[#F2C94C] hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
 
-  // ── Render ────────────────────────────────────────────────────────────────
   return (
     <nav
       aria-label="Main navigation"
-      className="bg-[#219653]/90 backdrop-blur-sm border-b-2 border-[#F2C94C] sticky top-0 z-50 w-full"
+      className="sticky top-0 z-50 w-full border-b-2 border-[#F2C94C] bg-[#219653]/90 backdrop-blur-sm"
     >
-      <div className="max-w-7xl mx-auto px-4 py-3">
-
-        {/* ── Top row ── */}
+      <div className="mx-auto max-w-7xl px-4 py-3">
         <div className="flex items-center justify-between gap-4">
-
-          {/* Logo + desktop left nav */}
           <div className="flex items-center gap-6">
             <Link href="/" className="flex items-center gap-3" aria-label={`${t.brand} — go to homepage`}>
               <div className="relative h-14 w-14 md:h-16 md:w-16">
@@ -347,12 +360,12 @@ export function Navigation() {
                   priority
                 />
               </div>
-              <span className="text-2xl md:text-3xl font-bold text-white" aria-hidden="true">
+              <span className="text-2xl font-bold text-white md:text-3xl" aria-hidden="true">
                 {t.brand}
               </span>
             </Link>
 
-            <div className="hidden md:flex items-center gap-3" role="list">
+            <div className="hidden items-center gap-3 md:flex" role="list">
               {leftNav.map((item) =>
                 "mega" in item ? (
                   <div key={item.label} role="listitem">
@@ -373,9 +386,8 @@ export function Navigation() {
             </div>
           </div>
 
-          {/* Right controls */}
           <div className="flex items-center gap-2">
-            <div className="hidden md:flex items-center gap-3">
+            <div className="hidden items-center gap-3 md:flex">
               <LangToggle
                 current={language}
                 onSelect={setLanguage}
@@ -384,13 +396,13 @@ export function Navigation() {
 
               {isSignedIn ? (
                 <>
-                  <span className="text-white/90 text-sm hidden lg:inline" aria-live="polite">
+                  <span className="hidden text-sm text-white/90 lg:inline" aria-live="polite">
                     {t.signedInAs} {signedInLabel}
                   </span>
                   <button
                     type="button"
                     onClick={handleSignOut}
-                    className="text-white hover:text-[#F2C94C] font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
+                    className="font-medium text-white transition-colors hover:text-[#F2C94C] focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
                   >
                     {t.signOut}
                   </button>
@@ -398,18 +410,17 @@ export function Navigation() {
               ) : (
                 <Link
                   href="/auth"
-                  className="text-white hover:text-[#F2C94C] font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
+                  className="font-medium text-white transition-colors hover:text-[#F2C94C] focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
                 >
                   {t.loginSignup}
                 </Link>
               )}
             </div>
 
-            {/* Hamburger */}
             <button
               type="button"
               onClick={() => setIsMenuOpen((v) => !v)}
-              className="md:hidden text-white hover:bg-white/20 p-2 rounded-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
+              className="rounded-md p-2 text-white hover:bg-white/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white md:hidden"
               aria-label={isMenuOpen ? t.closeMenu : t.openMenu}
               aria-expanded={isMenuOpen}
               aria-controls="mobile-menu"
@@ -419,11 +430,10 @@ export function Navigation() {
           </div>
         </div>
 
-        {/* ── Member bar (desktop, signed-in) ── */}
         {isSignedIn && (
-          <div className="hidden md:block mt-3 pt-3 border-t border-white/20">
+          <div className="mt-3 hidden border-t border-white/20 pt-3 md:block">
             <nav aria-label="Member area" className="flex flex-wrap items-center gap-2">
-              <span className="text-white/70 text-xs uppercase tracking-wide mr-2">
+              <span className="mr-2 text-xs uppercase tracking-wide text-white/70">
                 {t.memberArea}
               </span>
               {loggedInNav.map((item) => (
@@ -440,12 +450,9 @@ export function Navigation() {
           </div>
         )}
 
-        {/* ── Mobile menu ── */}
         {isMenuOpen && (
-          <div id="mobile-menu" className="md:hidden mt-4 pb-4">
+          <div id="mobile-menu" className="mt-4 pb-4 md:hidden">
             <div className="flex flex-col space-y-2 pt-2">
-
-              {/* Mobile: lang + auth */}
               <div className="flex items-center gap-2 px-4">
                 <LangToggle
                   current={language}
@@ -456,14 +463,14 @@ export function Navigation() {
                   <button
                     type="button"
                     onClick={handleSignOut}
-                    className="ml-auto text-white hover:text-[#F2C94C] font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
+                    className="ml-auto font-medium text-white transition-colors hover:text-[#F2C94C] focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
                   >
                     {t.signOut}
                   </button>
                 ) : (
                   <Link
                     href="/auth"
-                    className="ml-auto text-white hover:text-[#F2C94C] font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
+                    className="ml-auto font-medium text-white transition-colors hover:text-[#F2C94C] focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     {t.loginSignup}
@@ -472,21 +479,20 @@ export function Navigation() {
               </div>
 
               {isSignedIn && (
-                <div className="px-4 text-white/80 text-sm" aria-live="polite">
+                <div className="px-4 text-sm text-white/80" aria-live="polite">
                   {t.signedInAs} {signedInLabel}
                 </div>
               )}
 
-              <div className="h-px bg-white/20 my-2" role="separator" />
+              <div className="my-2 h-px bg-white/20" role="separator" />
 
-              {/* Mobile: left nav */}
               <nav aria-label="Primary navigation">
                 {leftNav.map((item) =>
                   "mega" in item ? (
                     <div key={item.label} className="px-2">
                       <button
                         type="button"
-                        className="w-full text-left px-2 py-2 text-white font-semibold flex items-center justify-between hover:bg-white/10 rounded-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
+                        className="flex w-full items-center justify-between rounded-md px-2 py-2 text-left font-semibold text-white hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
                         onClick={() =>
                           setOpenMobileSubmenu((cur) => (cur === item.label ? null : item.label))
                         }
@@ -501,13 +507,13 @@ export function Navigation() {
                       </button>
 
                       {openMobileSubmenu === item.label && (
-                        <div className="mt-1 ml-2" role="menu" aria-label={item.label}>
+                        <div className="ml-2 mt-1" role="menu" aria-label={item.label}>
                           {item.mega.map((m) => (
                             <Link
                               key={m.href}
                               href={m.href}
                               role="menuitem"
-                              className="block px-4 py-2 rounded-md hover:bg-white/10 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
+                              className="block rounded-md px-4 py-2 transition-colors hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
                               onClick={() => {
                                 setIsMenuOpen(false)
                                 setOpenMobileSubmenu(null)
@@ -515,7 +521,7 @@ export function Navigation() {
                             >
                               <div className="text-white/95">{m.title}</div>
                               {m.description && (
-                                <div className="text-white/70 text-sm leading-snug">{m.description}</div>
+                                <div className="text-sm leading-snug text-white/70">{m.description}</div>
                               )}
                             </Link>
                           ))}
@@ -535,12 +541,11 @@ export function Navigation() {
                 )}
               </nav>
 
-              {/* Mobile: member area */}
               {isSignedIn && (
                 <>
-                  <div className="h-px bg-white/20 my-2" role="separator" />
+                  <div className="my-2 h-px bg-white/20" role="separator" />
                   <nav aria-label="Member area">
-                    <div className="px-4 text-white/70 text-xs uppercase tracking-wide mb-1">
+                    <div className="mb-1 px-4 text-xs uppercase tracking-wide text-white/70">
                       {t.memberArea}
                     </div>
                     {loggedInNav.map((item) => (
