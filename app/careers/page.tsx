@@ -741,7 +741,31 @@ export default function CareersPage(){
           </div>
         </div>
       </section>
+{/* ── Job Seeker Help ── */}
+<section className="mx-auto w-full max-w-7xl px-4 pb-6">
+  <div className="rounded-2xl border border-[#2F80ED] bg-[#F0F7FF] p-6 shadow-sm flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    
+    <div className="max-w-2xl">
+      <h2 className="text-lg font-bold text-[#333333]">
+        {language==="tet"?"Ajuda ba Buka Servisu":"Job Seeker Help"}
+      </h2>
 
+      <p className="mt-2 text-sm text-[#4F4F4F]">
+        {language==="tet"
+          ?"Dalan prátiku atu prepara CV, cover letter, entrevista, no harii esperiénsia maski vaga seidauk iha."
+          :"Practical advice for CVs, cover letters, interviews, portfolios, and how to find work even when no jobs are listed."}
+      </p>
+    </div>
+
+    <Link
+      href="/careers/job-help"
+      className="inline-flex items-center justify-center rounded-full bg-[#2F80ED] px-5 py-3 text-sm font-semibold text-white hover:bg-blue-600 transition"
+    >
+      {language==="tet"?"Haree ajuda":"Get job search help"}
+    </Link>
+
+  </div>
+</section>
       <section
         className="mx-auto w-full max-w-7xl px-4 pb-6"
         aria-label={text.filtersTitle}

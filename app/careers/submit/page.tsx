@@ -20,9 +20,9 @@ import {
   Tag,
   TriangleAlert,
   X,
+  Paperclip,
+  File,
 } from "lucide-react";
-
-// ─── Types ────────────────────────────────────────────────────────────────────
 
 type Lang = "en" | "tet";
 type JobType = "Full-time" | "Part-time" | "Contract" | "Internship" | "Volunteer";
@@ -57,8 +57,6 @@ type FormState = {
   sourceNote: string;
 };
 
-// ─── Static data ──────────────────────────────────────────────────────────────
-
 const INITIAL_FORM: FormState = {
   title: "",
   org: "",
@@ -92,10 +90,16 @@ const JOB_CATEGORIES: JobCategory[] = [
   "Other",
 ];
 
-const IMAGE_MAX_BYTES = 5 * 1024 * 1024; // 5 MB
+const IMAGE_MAX_BYTES = 5 * 1024 * 1024;
 const IMAGE_ACCEPT = ["image/jpeg", "image/png", "image/webp"];
 
-// ─── Translation shape ────────────────────────────────────────────────────────
+const ATTACHMENT_MAX_BYTES = 10 * 1024 * 1024;
+const ATTACHMENT_ACCEPT = [
+  "application/pdf",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+];
+const ATTACHMENT_EXTENSIONS = ".pdf,.doc,.docx";
 
 type Translations = {
   back: string;
@@ -107,6 +111,7 @@ type Translations = {
   sectionApplication: string;
   sectionContact: string;
   sectionImage: string;
+  sectionAttachment: string;
   sectionReview: string;
   fields: {
     title: string;
@@ -130,6 +135,8 @@ type Translations = {
     sourceNoteHelp: string;
     heroImage: string;
     heroImageHelp: string;
+    attachment: string;
+    attachmentHelp: string;
   };
   placeholders: {
     title: string;
@@ -154,6 +161,9 @@ type Translations = {
     removeImage: string;
     chooseImage: string;
     changeImage: string;
+    chooseAttachment: string;
+    changeAttachment: string;
+    removeAttachment: string;
   };
   validation: {
     required: string;
@@ -163,6 +173,8 @@ type Translations = {
     deadlinePast: string;
     imageType: string;
     imageSize: string;
+    attachmentType: string;
+    attachmentSize: string;
   };
   successTitle: string;
   successBody: string;
@@ -185,6 +197,7 @@ const TRANSLATIONS: Record<Lang, Translations> = {
     sectionApplication: "Application details",
     sectionContact: "Submitter details",
     sectionImage: "Job image",
+    sectionAttachment: "Job attachment",
     sectionReview: "Review before sending",
     fields: {
       title: "Job title",
@@ -209,6 +222,8 @@ const TRANSLATIONS: Record<Lang, Translations> = {
         "For example: Shared by organisation directly, from official Facebook page, from HR team",
       heroImage: "Banner image",
       heroImageHelp: "Optional. JPEG, PNG or WebP, max 5 MB. Shown at the top of the job card.",
+      attachment: "Attachment",
+      attachmentHelp: "Optional. PDF, DOC or DOCX, max 10 MB. Useful for job descriptions or terms of reference.",
     },
     placeholders: {
       title: "e.g. Graphic Designer",
@@ -233,6 +248,9 @@ const TRANSLATIONS: Record<Lang, Translations> = {
       removeImage: "Remove image",
       chooseImage: "Choose image",
       changeImage: "Change image",
+      chooseAttachment: "Choose PDF or Word file",
+      changeAttachment: "Change file",
+      removeAttachment: "Remove file",
     },
     validation: {
       required: "Please fill in all required fields.",
@@ -242,6 +260,8 @@ const TRANSLATIONS: Record<Lang, Translations> = {
       deadlinePast: "The deadline must be today or a future date.",
       imageType: "Please upload a JPEG, PNG, or WebP image.",
       imageSize: "The image must be 5 MB or smaller.",
+      attachmentType: "Please upload a PDF, DOC, or DOCX file.",
+      attachmentSize: "The attachment must be 10 MB or smaller.",
     },
     successTitle: "Job submitted",
     successBody: "Thanks. Your job listing has been sent for review and is not public yet.",
@@ -262,6 +282,7 @@ const TRANSLATIONS: Record<Lang, Translations> = {
     sectionApplication: "Detalhe aplika",
     sectionContact: "Detalhe ema ne'ebé submete",
     sectionImage: "Imajen kargu",
+    sectionAttachment: "Dokumentu kargu",
     sectionReview: "Haree fila-fali antes haruka",
     fields: {
       title: "Títulu kargu",
@@ -286,6 +307,8 @@ const TRANSLATIONS: Record<Lang, Translations> = {
         "Hanesan: Organizasaun mak fahe direto, husi pájina Facebook ofisiál, husi ekipa HR",
       heroImage: "Imajen banner",
       heroImageHelp: "Opsionál. JPEG, PNG ka WebP, másimu 5 MB. Hatudu iha leten kartaun servisu.",
+      attachment: "Dokumentu",
+      attachmentHelp: "Opsionál. PDF, DOC ka DOCX, másimu 10 MB. Di'ak atu tau job description ka terms of reference.",
     },
     placeholders: {
       title: "ez. Graphic Designer",
@@ -310,6 +333,9 @@ const TRANSLATIONS: Record<Lang, Translations> = {
       removeImage: "Hasai imajen",
       chooseImage: "Hili imajen",
       changeImage: "Muda imajen",
+      chooseAttachment: "Hili ficheiru PDF ka Word",
+      changeAttachment: "Muda ficheiru",
+      removeAttachment: "Hasai ficheiru",
     },
     validation: {
       required: "Favór kompleta kampu obrigatóriu hotu.",
@@ -319,6 +345,8 @@ const TRANSLATIONS: Record<Lang, Translations> = {
       deadlinePast: "Data remata tenke ohin ka futuru.",
       imageType: "Favór karrega imajen JPEG, PNG ka WebP.",
       imageSize: "Imajen tenke ki'ik liu 5 MB.",
+      attachmentType: "Favór karrega ficheiru PDF, DOC ka DOCX.",
+      attachmentSize: "Ficheiru tenke ki'ik liu 10 MB.",
     },
     successTitle: "Vaga submete ona",
     successBody: "Obrigadu. Ita-nia lista vaga haruka ona ba revisaun no seidauk sai públiku.",
@@ -329,17 +357,13 @@ const TRANSLATIONS: Record<Lang, Translations> = {
   },
 };
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
 function isValidEmail(value: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }
 
-function todayISO(){
+function todayISO() {
   return new Date().toISOString().split("T")[0] ?? "";
 }
-
-// ─── FieldLabel ───────────────────────────────────────────────────────────────
 
 function FieldLabel({
   htmlFor,
@@ -363,8 +387,6 @@ function FieldLabel({
     </label>
   );
 }
-
-// ─── ImageUploadField ─────────────────────────────────────────────────────────
 
 function ImageUploadField({
   file,
@@ -404,7 +426,6 @@ function ImageUploadField({
 
   return (
     <div>
-      {/* Hidden native file input — triggered programmatically */}
       <input
         ref={inputRef}
         id="hero-image"
@@ -481,7 +502,118 @@ function ImageUploadField({
   );
 }
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
+function AttachmentUploadField({
+  file,
+  onChange,
+  error,
+  labels,
+}: {
+  file: File | null;
+  onChange: (f: File | null) => void;
+  error: string;
+  labels: {
+    chooseAttachment: string;
+    changeAttachment: string;
+    removeAttachment: string;
+    attachmentHelp: string;
+  };
+}) {
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
+    onChange(e.target.files?.[0] ?? null);
+  }
+
+  function handleDrop(e: React.DragEvent<HTMLDivElement>) {
+    e.preventDefault();
+    const dropped = e.dataTransfer.files[0];
+    if (dropped) onChange(dropped);
+  }
+
+  function handleRemove() {
+    onChange(null);
+    if (inputRef.current) inputRef.current.value = "";
+  }
+
+  return (
+    <div>
+      <input
+        ref={inputRef}
+        id="job-attachment"
+        type="file"
+        accept={ATTACHMENT_EXTENSIONS}
+        className="sr-only"
+        aria-describedby="job-attachment-help"
+        onChange={handleInputChange}
+      />
+
+      {file ? (
+        <div className="rounded-xl border border-gray-200 bg-white">
+          <div className="flex items-center justify-between gap-3 px-4 py-4">
+            <div className="flex min-w-0 items-center gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#EAF7EF] text-[#219653]">
+                <File className="h-5 w-5" aria-hidden="true" />
+              </div>
+              <div className="min-w-0">
+                <p className="truncate text-sm font-medium text-[#333333]">{file.name}</p>
+                <p className="text-xs text-[#828282]">
+                  {(file.size / (1024 * 1024)).toFixed(2)} MB
+                </p>
+              </div>
+            </div>
+
+            <div className="ml-3 flex shrink-0 gap-2">
+              <button
+                type="button"
+                onClick={() => inputRef.current?.click()}
+                className="rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-medium hover:bg-gray-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#219653]"
+              >
+                {labels.changeAttachment}
+              </button>
+              <button
+                type="button"
+                onClick={handleRemove}
+                className="inline-flex items-center gap-1 rounded-full border border-[#EB5757] bg-white px-3 py-1 text-xs font-medium text-[#EB5757] hover:bg-red-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#EB5757]"
+              >
+                <X className="h-3 w-3" aria-hidden="true" />
+                {labels.removeAttachment}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div
+          role="button"
+          tabIndex={0}
+          aria-label={labels.chooseAttachment}
+          onClick={() => inputRef.current?.click()}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") inputRef.current?.click();
+          }}
+          onDrop={handleDrop}
+          onDragOver={(e) => e.preventDefault()}
+          className={`flex cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed px-6 py-10 text-center transition hover:bg-gray-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#219653] ${
+            error ? "border-[#EB5757] bg-red-50" : "border-gray-300 bg-white"
+          }`}
+        >
+          <Paperclip className="h-8 w-8 text-gray-400" aria-hidden="true" />
+          <div>
+            <p className="text-sm font-medium text-[#333333]">{labels.chooseAttachment}</p>
+            <p id="job-attachment-help" className="mt-1 text-xs text-[#828282]">
+              {labels.attachmentHelp}
+            </p>
+          </div>
+        </div>
+      )}
+
+      {error && (
+        <p role="alert" className="mt-1 text-xs text-[#EB5757]">
+          {error}
+        </p>
+      )}
+    </div>
+  );
+}
 
 export default function CareersSubmitPage() {
   const { language } = useLanguage() as { language: Lang; setLanguage: (l: Lang) => void };
@@ -489,16 +621,17 @@ export default function CareersSubmitPage() {
 
   const [form, setForm] = useState<FormState>(INITIAL_FORM);
 
-  // Image kept separate — File is not serialisable like string fields
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
   const [imageError, setImageError] = useState("");
+
+  const [attachmentFile, setAttachmentFile] = useState<File | null>(null);
+  const [attachmentError, setAttachmentError] = useState("");
 
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState("");
   const [formError, setFormError] = useState("");
 
-  // Refs for programmatic focus after validation errors / success
   const errorRef = useRef<HTMLDivElement>(null);
   const successRef = useRef<HTMLDivElement>(null);
 
@@ -510,8 +643,6 @@ export default function CareersSubmitPage() {
   function updateField<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((prev) => ({ ...prev, [key]: value }));
   }
-
-  // ── Image handler ───────────────────────────────────────────────────────────
 
   const handleImageChange = useCallback(
     (file: File | null) => {
@@ -546,7 +677,34 @@ export default function CareersSubmitPage() {
     [language]
   );
 
-  // ── Validation ──────────────────────────────────────────────────────────────
+  const handleAttachmentChange = useCallback(
+    (file: File | null) => {
+      setAttachmentError("");
+
+      if (!file) {
+        setAttachmentFile(null);
+        return;
+      }
+
+      const lowerName = file.name.toLowerCase();
+      const isAcceptedType = ATTACHMENT_ACCEPT.includes(file.type);
+      const isAcceptedExtension =
+        lowerName.endsWith(".pdf") || lowerName.endsWith(".doc") || lowerName.endsWith(".docx");
+
+      if (!isAcceptedType && !isAcceptedExtension) {
+        setAttachmentError(TRANSLATIONS[language].validation.attachmentType);
+        return;
+      }
+
+      if (file.size > ATTACHMENT_MAX_BYTES) {
+        setAttachmentError(TRANSLATIONS[language].validation.attachmentSize);
+        return;
+      }
+
+      setAttachmentFile(file);
+    },
+    [language]
+  );
 
   function validateForm(): string {
     const v = TRANSLATIONS[language].validation;
@@ -571,11 +729,10 @@ export default function CareersSubmitPage() {
     if (form.summaryEN.trim().length < 20 || form.summaryTET.trim().length < 20) return v.summaryLength;
     if (form.deadline < todayISO()) return v.deadlinePast;
     if (imageError) return imageError;
+    if (attachmentError) return attachmentError;
 
     return "";
   }
-
-  // ── Submit ──────────────────────────────────────────────────────────────────
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -592,9 +749,6 @@ export default function CareersSubmitPage() {
     setSubmitting(true);
 
     try {
-      // FormData carries binary files alongside text.
-      // Do NOT set Content-Type manually — the browser writes the correct
-      // multipart/form-data boundary when you pass FormData to fetch().
       const fd = new FormData();
 
       const textFields: Array<[string, string | undefined]> = [
@@ -621,8 +775,8 @@ export default function CareersSubmitPage() {
         if (value !== undefined) fd.append(key, value);
       }
 
-      // Append file last — multer / formidable expect it after text fields
       if (imageFile) fd.append("heroImage", imageFile, imageFile.name);
+      if (attachmentFile) fd.append("jobAttachment", attachmentFile, attachmentFile.name);
 
       const res = await fetch("/api/careers/submit", { method: "POST", body: fd });
       if (!res.ok) throw new Error("Submit failed");
@@ -630,6 +784,7 @@ export default function CareersSubmitPage() {
       setSuccess(text.successBody);
       setForm(INITIAL_FORM);
       handleImageChange(null);
+      handleAttachmentChange(null);
       setTimeout(() => successRef.current?.focus(), 50);
     } catch {
       setFormError(text.errorBody);
@@ -639,17 +794,14 @@ export default function CareersSubmitPage() {
     }
   }
 
-  // ── Reset ───────────────────────────────────────────────────────────────────
-
   function handleReset() {
     if (!window.confirm(text.buttons.resetConfirm)) return;
     setForm(INITIAL_FORM);
     handleImageChange(null);
+    handleAttachmentChange(null);
     setFormError("");
     setSuccess("");
   }
-
-  // ── Shared class strings ────────────────────────────────────────────────────
 
   const inputClass =
     "w-full rounded-xl border border-gray-300 bg-white px-4 py-3 shadow-sm focus:border-[#2F80ED] focus:outline-none";
@@ -658,11 +810,8 @@ export default function CareersSubmitPage() {
   const helperClass = "mt-1 text-xs text-[#828282]";
   const sectionClass = "rounded-2xl border border-gray-200 bg-white p-6 shadow-sm";
 
-  // ── Render ──────────────────────────────────────────────────────────────────
-
   return (
     <div className="min-h-screen bg-white">
-
       <header className="bg-[#F2C94C]">
         <div className="mx-auto max-w-5xl px-4 py-8">
           <Link
@@ -682,19 +831,6 @@ export default function CareersSubmitPage() {
       </header>
 
       <main className="mx-auto max-w-5xl px-4 py-8">
-
-        {/* Notice */}
-        <div className="mb-6 rounded-2xl border border-[#F2C94C] bg-[#FFF9E8] p-5 shadow-sm">
-          <div className="flex items-start gap-3">
-            <ShieldAlert className="mt-0.5 h-5 w-5 shrink-0 text-[#EB5757]" aria-hidden="true" />
-            <div>
-              <h2 className="text-lg font-bold text-[#333333]">{text.noticeTitle}</h2>
-              <p className="mt-2 text-sm leading-7 text-[#4F4F4F]">{text.noticeBody}</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Success */}
         {success && (
           <div
             ref={successRef}
@@ -713,7 +849,6 @@ export default function CareersSubmitPage() {
           </div>
         )}
 
-        {/* Error */}
         {formError && (
           <div
             ref={errorRef}
@@ -732,9 +867,17 @@ export default function CareersSubmitPage() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} noValidate aria-label={text.title} className="space-y-8">
+        <div className="mb-6 rounded-2xl border border-[#F2C94C] bg-[#FFF9E8] p-5 shadow-sm">
+          <div className="flex items-start gap-3">
+            <ShieldAlert className="mt-0.5 h-5 w-5 shrink-0 text-[#EB5757]" aria-hidden="true" />
+            <div>
+              <h2 className="text-lg font-bold text-[#333333]">{text.noticeTitle}</h2>
+              <p className="mt-2 text-sm leading-7 text-[#4F4F4F]">{text.noticeBody}</p>
+            </div>
+          </div>
+        </div>
 
-          {/* Section 1 — Role details */}
+        <form onSubmit={handleSubmit} noValidate aria-label={text.title} className="space-y-8">
           <section className={sectionClass} aria-labelledby="section-role">
             <div className="mb-5 flex items-center gap-2">
               <Briefcase className="h-5 w-5 text-[#219653]" aria-hidden="true" />
@@ -823,7 +966,6 @@ export default function CareersSubmitPage() {
             </div>
           </section>
 
-          {/* Section 2 — Image */}
           <section className={sectionClass} aria-labelledby="section-image">
             <div className="mb-5 flex items-center gap-2">
               <ImagePlus className="h-5 w-5 text-[#219653]" aria-hidden="true" />
@@ -845,7 +987,25 @@ export default function CareersSubmitPage() {
             />
           </section>
 
-          {/* Section 3 — Application details */}
+          <section className={sectionClass} aria-labelledby="section-attachment">
+            <div className="mb-5 flex items-center gap-2">
+              <Paperclip className="h-5 w-5 text-[#219653]" aria-hidden="true" />
+              <h2 id="section-attachment" className="text-xl font-bold text-[#333333]">{text.sectionAttachment}</h2>
+            </div>
+            <FieldLabel htmlFor="job-attachment" requiredLabel={text.required}>{text.fields.attachment}</FieldLabel>
+            <AttachmentUploadField
+              file={attachmentFile}
+              onChange={handleAttachmentChange}
+              error={attachmentError}
+              labels={{
+                chooseAttachment: text.buttons.chooseAttachment,
+                changeAttachment: text.buttons.changeAttachment,
+                removeAttachment: text.buttons.removeAttachment,
+                attachmentHelp: text.fields.attachmentHelp,
+              }}
+            />
+          </section>
+
           <section className={sectionClass} aria-labelledby="section-application">
             <div className="mb-5 flex items-center gap-2">
               <Globe className="h-5 w-5 text-[#219653]" aria-hidden="true" />
@@ -883,7 +1043,6 @@ export default function CareersSubmitPage() {
             </div>
           </section>
 
-          {/* Section 4 — Contact */}
           <section className={sectionClass} aria-labelledby="section-contact">
             <div className="mb-5 flex items-center gap-2">
               <FileText className="h-5 w-5 text-[#219653]" aria-hidden="true" />
@@ -905,7 +1064,6 @@ export default function CareersSubmitPage() {
             </div>
           </section>
 
-          {/* Section 5 — Review & submit */}
           <section className="rounded-2xl border border-gray-200 bg-[#F5F5F5] p-6 shadow-sm" aria-labelledby="section-review">
             <h2 id="section-review" className="text-xl font-bold text-[#333333]">{text.sectionReview}</h2>
             <p className="mt-2 text-sm text-[#4F4F4F]">{text.noticeBody}</p>
