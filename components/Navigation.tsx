@@ -22,6 +22,7 @@ type Translations = {
   magazines: string
   news: string
   communityStories: string
+  keepSafeOnline: string
   about: string
   contact: string
   aboutUs: string
@@ -55,6 +56,7 @@ const translations: Record<"en" | "tet", Translations> = {
     magazines: "Magazines",
     news: "News",
     communityStories: "Impact Stories",
+    keepSafeOnline: "Keep Safe Online",
     about: "About",
     contact: "Contact",
     aboutUs: "About Us",
@@ -86,6 +88,7 @@ const translations: Record<"en" | "tet", Translations> = {
     magazines: "Revista",
     news: "Notísia",
     communityStories: "Istória Impaktu",
+    keepSafeOnline: "Seguru Online",
     about: "Kona-ba",
     contact: "Kontakt",
     aboutUs: "Kona-ba Ami",
@@ -288,6 +291,7 @@ export function Navigation() {
       { href: "/magazines", label: t.magazines },
       { href: "/stories/news", label: t.news },
       { href: "/stories/impact", label: t.communityStories },
+      { href: "/cyber", label: t.keepSafeOnline },
       {
         label: t.about,
         mega: [

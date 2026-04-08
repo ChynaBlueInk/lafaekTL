@@ -3,22 +3,17 @@
 import { useState } from "react";
 import Link from "next/link";
 import {
-  ShieldCheck,
-  LockKeyhole,
   AlertTriangle,
-  CheckCircle2,
-  KeyRound,
-  WifiOff,
-  Eye,
-  Smartphone,
-  Fingerprint,
-  Brain,
+  TrendingUp,
+  Globe,
+  Users,
+  Heart,
+  ChevronRight,
+  BookOpen,
   ExternalLink,
   Gamepad2,
 } from "lucide-react";
 import { useLanguage } from "@/lib/LanguageContext";
-
-// ─── Types ────────────────────────────────────────────────────────────────────
 
 type Lang = "en" | "tet";
 
@@ -34,9 +29,10 @@ type T = {
   gameDesc: string;
   gameCta: string;
   movesTitle: string;
-  moves: string[];
+  moves: { title: string; desc: string }[];
   stopThinkCheckTitle: string;
-  stopThinkCheck: { step: string; text: string }[];
+  stopThinkCheckLead: string;
+  stopThinkCheck: { step: string; text: string; confirm: string }[];
   deepfakeTitle: string;
   deepfakePoints: string[];
   accountsTitle: string;
@@ -51,9 +47,9 @@ type T = {
   resourcesIntro: string;
   resources: { text: string; href: string }[];
   note: string;
+  backToCyber: string;
+  protocolConfirmed: string;
 };
-
-// ─── Translations ─────────────────────────────────────────────────────────────
 
 const TRANSLATIONS: Record<Lang, T> = {
   en: {
@@ -83,31 +79,62 @@ const TRANSLATIONS: Record<Lang, T> = {
     gameCta: "LAUNCH CYBER VANGUARD →",
     movesTitle: "8 ESSENTIAL MOVES",
     moves: [
-      "Use a unique password for every account. Enable 2FA — prefer app or biometrics over SMS.",
-      "Add recovery methods now: backup codes, second email. Lockouts are disasters without them.",
-      "Audit social privacy: limit who sees posts, stories, friends list, and your phone number.",
-      "Think before you post: no live location, school schedules, IDs, or travel details.",
-      "Beware DMs with urgency, money requests, offers too good to be true, or romantic pressure.",
-      "Verify before you tap: check sender address, hover links, contact the person another way.",
-      "Avoid logging in on public Wi-Fi. Use mobile hotspot if you must. Always log out after.",
-      "Auto-update OS, apps, and browsers. Delete apps you haven't opened in months.",
+      {
+        title: "Use unique passwords",
+        desc: "Use a different password for every account. Turn on 2FA and use an app, passkey, or biometrics if possible.",
+      },
+      {
+        title: "Set recovery options now",
+        desc: "Add backup codes and a second email. If you get locked out, recovery matters more than panic.",
+      },
+      {
+        title: "Audit social privacy",
+        desc: "Limit who sees posts, stories, your friend list, and your phone number.",
+      },
+      {
+        title: "Think before you post",
+        desc: "Do not share live location, school schedules, ID details, or travel plans.",
+      },
+      {
+        title: "Watch urgent DMs",
+        desc: "Be suspicious of money requests, too-good-to-be-true offers, or emotional pressure.",
+      },
+      {
+        title: "Verify before tapping",
+        desc: "Check sender address, inspect links, and contact the person another way if needed.",
+      },
+      {
+        title: "Be smart on public Wi-Fi",
+        desc: "Use a hotspot if possible. Avoid logging into sensitive accounts on public networks.",
+      },
+      {
+        title: "Keep devices updated",
+        desc: "Update your phone, apps, and browser. Delete apps you never use.",
+      },
     ],
     stopThinkCheckTitle: "STOP — THINK — CHECK",
+    stopThinkCheckLead: "Tap each step to confirm you understand it.",
     stopThinkCheck: [
-      { step: "STOP", text: "Pause on surprise messages, giveaways, or urgent requests. Don't act yet." },
+      {
+        step: "STOP",
+        text: "Pause on surprise messages, giveaways, or urgent requests. Do not react straight away.",
+        confirm: "Good. Pausing stops panic-clicking and gives you time to think.",
+      },
       {
         step: "THINK",
-        text: "What are they asking for — money, codes, photos, passwords? Is this impersonation?",
+        text: "What are they asking for — money, codes, photos, passwords? Could this be impersonation?",
+        confirm: "Good. Scammers want speed. Thinking slows them down.",
       },
       {
         step: "CHECK",
-        text: "Verify via another channel. Inspect the URL. Search if others report the same scam.",
+        text: "Verify through another channel. Inspect the URL. Search if others report the same scam.",
+        confirm: "Good. A second check catches fake links, fake people, and fake urgency.",
       },
     ],
     deepfakeTitle: "DEEPFAKE DETECTION",
     deepfakePoints: [
       "Unnatural blinking, odd lighting, or accessories that shift between frames.",
-      "Lip-sync lag or robotic voice cadence that doesn't match the emotion.",
+      "Lip-sync lag or robotic voice cadence that does not match the emotion.",
       "Message creates urgency, fear, or flattery — designed to make you act fast.",
       "Account is new, unverified, or shares zero mutual connections.",
     ],
@@ -116,19 +143,19 @@ const TRANSLATIONS: Record<Lang, T> = {
       { text: "Use a password manager — or a personal system. Every account needs a unique password." },
       { text: "Enable biometrics or passcode on all devices. Set auto-lock under 1 minute." },
       { text: "Activate 2FA / passkeys for email, banking, socials, and cloud storage." },
-      { text: "Register for 'Find My Device'. Test it once to confirm it works." },
+      { text: "Register for Find My Device. Test it once to confirm it works." },
     ],
     privacyTitle: "PRIVACY SWEEP",
     privacyList: [
       "Set personal accounts to private. Audit tagged photos and old posts.",
-      "Hide phone/email from public profile. Restrict who can find you by number.",
-      "Disable 'precise location' in social apps unless absolutely needed.",
-      "Turn off auto-sync of address book to platforms if not essential.",
+      "Hide phone and email from public profile. Restrict who can find you by number.",
+      "Disable precise location in social apps unless absolutely needed.",
+      "Turn off auto-sync of your contacts if it is not essential.",
     ],
     wifiTitle: "PUBLIC Wi-Fi PROTOCOL",
     wifiList: [
       { text: "Default to mobile hotspot. Never do banking on café Wi-Fi." },
-      { text: "If you must use public Wi-Fi — log out afterward and disable auto-connect." },
+      { text: "If you must use public Wi-Fi, log out afterwards and disable auto-connect." },
     ],
     reportTitle: "IF IT GOES WRONG",
     reportSteps: [
@@ -136,7 +163,7 @@ const TRANSLATIONS: Record<Lang, T> = {
       "Change passwords immediately. Revoke suspicious sessions. Enable 2FA.",
       "Report and block the account in-app.",
       "Tell a trusted adult, mentor, or your institution's IT support.",
-      "If threatened (e.g. sextortion) — stop responding. Seek help. Keep evidence.",
+      "If threatened, including sextortion, stop responding. Seek help. Keep evidence.",
     ],
     resourcesTitle: "INTEL SOURCES",
     resourcesIntro: "Free training and deeper learning for the serious operator.",
@@ -147,6 +174,8 @@ const TRANSLATIONS: Record<Lang, T> = {
       },
     ],
     note: "Original Lafaek guidance. External link provided for optional deeper learning.",
+    backToCyber: "Back to Cyber",
+    protocolConfirmed: "✓ PROTOCOL CONFIRMED — YOU'RE READY TO OPERATE",
   },
   tet: {
     title: "CYBER VANGUARD",
@@ -159,7 +188,7 @@ const TRANSLATIONS: Record<Lang, T> = {
     learnItems: [
       {
         title: "DETETA AMEASA",
-        desc: "Phishing, ema halo hanesan ita kolega, oferta la loos, sextortion no iska prémiu.",
+        desc: "Phishing, ema halo hanesan kolega, oferta la loos, sextortion no isku prémiu.",
       },
       {
         title: "SEGURA KONTA SIRA",
@@ -171,56 +200,87 @@ const TRANSLATIONS: Record<Lang, T> = {
       },
     ],
     gameTitle: "TAMA ARENA",
-    gameDesc: "Prátika kbiit sira iha missaun. Hatudu ita-nia rank.",
+    gameDesc: "Prátika kbiit sira iha misaun. Hatudu ita-nia rank.",
     gameCta: "HAHU CYBER VANGUARD →",
     movesTitle: "MOVIMENTU ESENSIAL 8",
     moves: [
-      "Uza password úniku ba kada konta. Liga 2FA — di'ak liu via app ka biometria la'ós SMS.",
-      "Aumenta métodu rekuperasaun agora: kódigu backup, email segundu. Lockout sai dezastre la ho sira.",
-      "Haree fila-fali privasidade sosiál: limita sé mak bele haree post, story, lista kolega no numeru telefone.",
-      "Hanoin uluk molok posta: sala lokasaun atual, oráriu eskola, ID ka detallu viajen.",
-      "Kuidadu ho DM ho urjénsia, husu osan, oferta di'ak liu ka presaun romántiku.",
-      "Verifika uluk molok klik: haree remetente/URL no kontaktu ema ida-ne'e liu husi kanál seluk.",
-      "Evita halo login iha Wi-Fi públiku. Uza hotspot se presiza. Halo logout depois.",
-      "Mantein auto-update ba OS, app no browser. Hamoos app sira ne'ebé ita la uza ona.",
-    ],
-    stopThinkCheckTitle: "PARA — HANOIN — CHEKA",
-    stopThinkCheck: [
-      { step: "PARA", text: "Para ba mensajen surpreza, oferese prezente ka buat 'urgent'. La'o atua lalais." },
       {
-        step: "HANOIN",
-        text: "Saida mak sira husu — osan, kódigu, foto ka password? Bele impersonasaun ka lae?",
+        title: "Uza password úniku",
+        desc: "Uza password diferente ba kada konta. Liga 2FA no uza app, passkey, ka biometria se bele.",
+      },
+      {
+        title: "Prepara rekuperasaun agora",
+        desc: "Tau backup code no email segundu. Se ita lakon asesu, rekuperasaun mak importante.",
+      },
+      {
+        title: "Haree privasidade sosiál",
+        desc: "Limita sé maka bele haree post, story, lista kolega no numeru telefone.",
+      },
+      {
+        title: "Hanoin molok posta",
+        desc: "Keta fahe lokasaun atual, oráriu eskola, detallu ID ka planu viajen.",
+      },
+      {
+        title: "Kuidadu ho DM urgente",
+        desc: "Deskonfia mensajen ne'ebé husu osan, oferta di'ak liu, ka presaun emosionál.",
+      },
+      {
+        title: "Verifika molok klik",
+        desc: "Haree remetente, verifika link, no kontaktu ema ida-ne'e liu husi dalan seluk se presiza.",
+      },
+      {
+        title: "Matenek iha Wi-Fi públiku",
+        desc: "Uza hotspot se bele. Evita login ba konta importante iha rede públiku.",
+      },
+      {
+        title: "Mantén dispozitivu atualizadu",
+        desc: "Atualiza telemovel, app no browser. Hamoos app sira ne'ebé ita la uza.",
+      },
+    ],
+    stopThinkCheckTitle: "PARA — HANOÍN — CHEKA",
+    stopThinkCheckLead: "Taka kada etapa atu konfirma katak ita kompriende.",
+    stopThinkCheck: [
+      {
+        step: "PARA",
+        text: "Para bainhira simu mensajen surpreza, prezente ka pedidu urgente. La presiza responde kedas.",
+        confirm: "Di'ak. Para uluk evita klik tanba pániku.",
+      },
+      {
+        step: "HANOÍN",
+        text: "Saida mak sira husu — osan, kódigu, foto, password? Bele impostór ka lae?",
+        confirm: "Di'ak. Fraudador sira hakarak ita halo lalais, la'ós hanoin kle'an.",
       },
       {
         step: "CHEKA",
-        text: "Verifika liu husi kanál seluk. Haree URL. Buka se ema seluk hatete fraude hanesan.",
+        text: "Verifika liu husi kanál seluk. Haree URL. Buka se ema seluk relata fraude hanesan.",
+        confirm: "Di'ak. Chekagem ida tan ajuda deteta link falsu no ema falsu.",
       },
     ],
     deepfakeTitle: "DETEKSAUN DEEPFAKE",
     deepfakePoints: [
       "Piska matan la natural, naroman estrañu ka objetu ne'ebé muda iha frame sira.",
-      "Boca ko'alia la hanesan liafuan ka lian hanesan robô la tuir emosaun.",
-      "Mensaun kria urjénsia, tauk ka elojia atu halo ita atua lalais.",
-      "Konta foun, seidauk verifika ka iha kolega komun uitoan.",
+      "Boca no lian la hanesan ka lian hanesan robô la tuir emosaun.",
+      "Mensajen kria urjénsia, tauk ka elojia atu halo ita atua lalais.",
+      "Konta foun, seidauk verifika ka la iha kolega komun.",
     ],
     accountsTitle: "TAKA KONTA SIRA",
     accountsList: [
       { text: "Uza password manager ka sistema pesoál. Kada konta tenke iha password úniku." },
-      { text: "Liga biometria ka passcode iha dispozitivu hotu. Auto-lock < minutu ida." },
+      { text: "Liga biometria ka passcode iha dispozitivu hotu. Auto-lock menus husi minutu ida." },
       { text: "Ativa 2FA / passkeys ba email, banku, rede sosiál no cloud storage." },
-      { text: "Rejista ba 'Find My Device'. Testu dala ida atu konfirma funsiona." },
+      { text: "Rejista Find My Device. Testa dala ida atu konfirma funsiona." },
     ],
-    privacyTitle: "BARRA PRIVASIDADE",
+    privacyTitle: "HAREE PRIVASIDADE",
     privacyList: [
-      "Halo konta pesoál sai privadu. Haree fali foto ne'ebé tag no post tuan sira.",
-      "Subar telefone/email hosi perfil públiku. Restrinje sé mak bele buka ita liu husi numeru.",
-      "Hasa'e 'precise location' iha app sosiál sira se la presiza duni.",
-      "Hamate auto-sync ba livru kontaktu se la esensiál.",
+      "Halo konta pesoál sai privadu. Haree fila-fali foto tag no post tuan sira.",
+      "Subar telefone no email hosi perfil públiku. Limita sé maka bele buka ita liu husi numeru.",
+      "Hasa'e precise location iha app sosiál sira se la presiza duni.",
+      "Hamate auto-sync ba lista kontaktu se la esensiál.",
     ],
     wifiTitle: "PROTOKOLU Wi-Fi PÚBLIKU",
     wifiList: [
-      { text: "Default ba mobile hotspot. Keta halo banku iha Wi-Fi kafé nian." },
-      { text: "Se presiza uza Wi-Fi públiku — halo logout depois no hamate auto-connect." },
+      { text: "Di'ak liu uza mobile hotspot. Keta halo banku iha Wi-Fi kafé nian." },
+      { text: "Se presiza uza Wi-Fi públiku, halo logout depois no hamate auto-connect." },
     ],
     reportTitle: "SE BUA LA'O SALA",
     reportSteps: [
@@ -228,7 +288,7 @@ const TRANSLATIONS: Record<Lang, T> = {
       "Troka kedas password sira. Taka sesaun suspetu. Ativa 2FA.",
       "Relata no blokeia konta iha app.",
       "Fó-hatene ba adultu konfiadu, mentor ka IT suporte iha ita-nia instituisaun.",
-      "Se ema ameasa ita (sextortion) — para hatán. Buka ajuda. Rai evidénsia.",
+      "Se ema ameasa ita, inklui sextortion, para hatán. Buka ajuda. Rai evidénsia.",
     ],
     resourcesTitle: "FONTE INTELIJÉNSIA",
     resourcesIntro: "Formasaun gratuita no aprendizajen kle'an ba operadór sério.",
@@ -238,34 +298,31 @@ const TRANSLATIONS: Record<Lang, T> = {
         href: "https://www.teensinai.com/understanding-cyber-security/",
       },
     ],
-    note: "Orientasaun orijinál hosi Lafaek. Link esterna fó ba aprendizajen liután se presiza.",
+    note: "Orientasaun original hosi Lafaek. Link esterna ida ne'e ba aprendizajen liután se presiza.",
+    backToCyber: "Fila ba Cyber",
+    protocolConfirmed: "✓ PROTOKOLU KONFIRMA ONA — ITA PRONTU ATU OPERA",
   },
 };
 
-// ─── Accordion item (for moves list) ─────────────────────────────────────────
-
-function MoveItem({ index, text }: { index: number; text: string }) {
-  const [open, setOpen] = useState(false);
-  const preview = text.split(".")[0] + ".";
-  const rest = text.slice(preview.length).trim();
-
+function MoveCard({
+  index,
+  title,
+  desc,
+}: {
+  index: number;
+  title: string;
+  desc: string;
+}) {
   return (
-    <li
-      className="move-item"
-      onClick={() => setOpen((v) => !v)}
-      aria-expanded={open}
-    >
-      <div className="move-header">
-        <span className="move-num">{"0" + (index + 1)}</span>
-        <span className="move-preview">{preview}</span>
-        <span className="move-chevron">{open ? "▲" : "▼"}</span>
+    <div className="move-card panel">
+      <div className="move-card-top">
+        <span className="move-card-num">{"0" + (index + 1)}</span>
+        <h3 className="move-card-title">{title}</h3>
       </div>
-      {open && rest && <p className="move-detail">{rest}</p>}
-    </li>
+      <p className="move-card-desc">{desc}</p>
+    </div>
   );
 }
-
-// ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function CyberYouthPage() {
   const { language } = useLanguage();
@@ -280,7 +337,6 @@ export default function CyberYouthPage() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Orbitron:wght@700;900&family=Noto+Sans:wght@400;600&display=swap');
 
-        /* ── Base ── */
         .yp {
           font-family: 'Rajdhani', 'Noto Sans', sans-serif;
           background: #0A0D14;
@@ -289,7 +345,6 @@ export default function CyberYouthPage() {
           overflow-x: hidden;
         }
 
-        /* ── Scan lines overlay ── */
         .yp::before {
           content: '';
           position: fixed;
@@ -305,7 +360,6 @@ export default function CyberYouthPage() {
           z-index: 1000;
         }
 
-        /* ── Shared ── */
         .yp h1, .yp h2, .yp h3 {
           font-family: 'Orbitron', sans-serif;
           letter-spacing: 0.04em;
@@ -325,22 +379,6 @@ export default function CyberYouthPage() {
           height: 2px;
           background: linear-gradient(90deg, #00FFC8, #B24BF3, transparent);
         }
-
-        .chip {
-          display: inline-block;
-          border: 1px solid currentColor;
-          border-radius: 2px;
-          padding: 0.15rem 0.5rem;
-          font-size: 0.7rem;
-          font-weight: 700;
-          letter-spacing: 0.1em;
-          text-transform: uppercase;
-        }
-
-        .accent-cyan  { color: #00FFC8; }
-        .accent-mag   { color: #FF4ED8; }
-        .accent-amber { color: #FFB800; }
-        .accent-red   { color: #FF4560; }
 
         .section-wrap {
           max-width: 960px;
@@ -364,10 +402,32 @@ export default function CyberYouthPage() {
           background: linear-gradient(90deg, rgba(0,255,200,0.4), transparent);
         }
 
-        /* ── Hero ── */
+        .accent-cyan  { color: #00FFC8; }
+        .accent-mag   { color: #FF4ED8; }
+        .accent-amber { color: #FFB800; }
+        .accent-red   { color: #FF4560; }
+
+        .top-link-wrap {
+          max-width: 960px;
+          margin: 0 auto;
+          padding: 1rem 1.25rem 0;
+        }
+        .top-link {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.4rem;
+          color: rgba(224,232,255,0.8);
+          text-decoration: none;
+          font-size: 0.95rem;
+          font-weight: 600;
+        }
+        .top-link:hover {
+          color: #00FFC8;
+        }
+
         .hero {
           position: relative;
-          padding: 3.5rem 1.25rem 4rem;
+          padding: 2.75rem 1.25rem 4rem;
           text-align: center;
           overflow: hidden;
         }
@@ -460,15 +520,6 @@ export default function CyberYouthPage() {
           position: relative;
         }
 
-        /* ── Diagonal cut divider ── */
-        .cut-divider {
-          height: 48px;
-          background: #0A0D14;
-          clip-path: polygon(0 0, 100% 30%, 100% 100%, 0 100%);
-          margin-top: -2px;
-        }
-
-        /* ── Game CTA ── */
         .game-cta-section {
           padding: 2.5rem 1.25rem;
           background: linear-gradient(135deg, rgba(0,255,200,0.06), rgba(178,75,243,0.06));
@@ -491,7 +542,6 @@ export default function CyberYouthPage() {
           }
         }
         .game-title {
-          font-family: 'Orbitron', sans-serif;
           font-size: 1.25rem;
           font-weight: 900;
           color: white;
@@ -507,7 +557,6 @@ export default function CyberYouthPage() {
           gap: 0.5rem;
           background: linear-gradient(135deg, #00FFC8, #00C8A0);
           color: #0A0D14;
-          font-family: 'Orbitron', sans-serif;
           font-size: 0.8rem;
           font-weight: 700;
           letter-spacing: 0.08em;
@@ -522,7 +571,6 @@ export default function CyberYouthPage() {
           transform: translateY(-1px);
         }
 
-        /* ── Objectives ── */
         .objectives-section {
           padding: 3rem 1.25rem;
         }
@@ -538,7 +586,6 @@ export default function CyberYouthPage() {
           overflow: hidden;
         }
         .obj-num {
-          font-family: 'Orbitron', sans-serif;
           font-size: 3rem;
           font-weight: 900;
           line-height: 1;
@@ -549,7 +596,6 @@ export default function CyberYouthPage() {
           pointer-events: none;
         }
         .obj-label {
-          font-family: 'Orbitron', sans-serif;
           font-size: 0.9rem;
           font-weight: 700;
           margin-bottom: 0.5rem;
@@ -560,60 +606,51 @@ export default function CyberYouthPage() {
           color: rgba(224,232,255,0.65);
         }
 
-        /* ── Moves ── */
-        .moves-section { padding: 3rem 1.25rem; }
-        .moves-list {
-          list-style: none;
-          display: flex;
-          flex-direction: column;
-          gap: 0.5rem;
+        .moves-section {
+          padding: 3rem 1.25rem;
         }
-        .move-item {
-          border: 1px solid rgba(255,255,255,0.08);
-          background: rgba(255,255,255,0.03);
-          border-radius: 3px;
-          padding: 0.9rem 1.1rem;
-          cursor: pointer;
-          transition: border-color 0.2s, background 0.2s;
+        .moves-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+          gap: 1rem;
         }
-        .move-item:hover {
-          border-color: rgba(0,255,200,0.3);
-          background: rgba(0,255,200,0.04);
+        .move-card {
+          padding: 1.2rem;
+          border-radius: 4px;
+          min-height: 180px;
         }
-        .move-header {
+        .move-card-top {
           display: flex;
           align-items: center;
           gap: 0.75rem;
+          margin-bottom: 0.8rem;
         }
-        .move-num {
-          font-family: 'Orbitron', sans-serif;
-          font-size: 0.7rem;
-          color: #00FFC8;
+        .move-card-num {
           min-width: 2rem;
+          font-size: 0.75rem;
           font-weight: 700;
+          color: #FFB800;
         }
-        .move-preview {
-          flex: 1;
+        .move-card-title {
           font-size: 0.95rem;
-          font-weight: 600;
-          color: rgba(224,232,255,0.9);
+          font-weight: 700;
+          color: white;
+          line-height: 1.35;
         }
-        .move-chevron {
-          font-size: 0.65rem;
-          color: rgba(224,232,255,0.35);
-        }
-        .move-detail {
-          margin-top: 0.6rem;
-          margin-left: 2.75rem;
-          font-size: 0.88rem;
-          color: rgba(224,232,255,0.55);
-          line-height: 1.55;
+        .move-card-desc {
+          font-size: 0.9rem;
+          color: rgba(224,232,255,0.68);
+          line-height: 1.6;
         }
 
-        /* ── Stop Think Check ── */
         .stc-section {
           padding: 3rem 1.25rem;
           background: linear-gradient(180deg, transparent, rgba(255,180,0,0.04), transparent);
+        }
+        .stc-lead {
+          color: rgba(224,232,255,0.65);
+          font-size: 0.95rem;
+          margin-bottom: 1rem;
         }
         .stc-grid {
           display: grid;
@@ -628,20 +665,19 @@ export default function CyberYouthPage() {
           overflow: hidden;
           cursor: pointer;
           transition: transform 0.15s;
+          min-height: 220px;
         }
         .stc-card:hover { transform: translateY(-3px); }
         .stc-card.done::after {
-          content: '✓ CONFIRMED';
+          content: '✓';
           position: absolute;
-          bottom: 0.75rem;
-          right: 0.75rem;
-          font-family: 'Orbitron', sans-serif;
-          font-size: 0.6rem;
+          top: 0.9rem;
+          right: 0.9rem;
+          font-size: 1rem;
+          font-weight: 900;
           color: #00FFC8;
-          letter-spacing: 0.1em;
         }
         .stc-step {
-          font-family: 'Orbitron', sans-serif;
           font-size: 1.4rem;
           font-weight: 900;
           margin-bottom: 0.5rem;
@@ -651,13 +687,20 @@ export default function CyberYouthPage() {
           line-height: 1.55;
           color: rgba(224,232,255,0.7);
         }
+        .stc-confirm {
+          margin-top: 1rem;
+          padding-top: 0.9rem;
+          border-top: 1px solid rgba(255,255,255,0.08);
+          font-size: 0.85rem;
+          line-height: 1.5;
+          color: #00FFC8;
+        }
         .stc-banner {
           margin-top: 1.25rem;
           padding: 1rem 1.25rem;
           background: rgba(0,255,200,0.08);
           border: 1px solid #00FFC8;
           border-radius: 3px;
-          font-family: 'Orbitron', sans-serif;
           font-size: 0.8rem;
           color: #00FFC8;
           text-align: center;
@@ -669,7 +712,6 @@ export default function CyberYouthPage() {
           to   { opacity: 1; transform: translateY(0); }
         }
 
-        /* ── Deepfake ── */
         .df-section { padding: 3rem 1.25rem; }
         .df-list {
           list-style: none;
@@ -700,7 +742,6 @@ export default function CyberYouthPage() {
           box-shadow: 0 0 6px #FF4560;
         }
 
-        /* ── Two columns ── */
         .two-col {
           display: grid;
           grid-template-columns: 1fr;
@@ -731,10 +772,8 @@ export default function CyberYouthPage() {
           margin-top: 0.45rem;
         }
 
-        /* ── Report ── */
         .report-section { padding: 3rem 1.25rem; }
         .report-steps {
-          counter-reset: step;
           list-style: none;
           display: flex;
           flex-direction: column;
@@ -742,7 +781,6 @@ export default function CyberYouthPage() {
           margin-top: 1.25rem;
         }
         .report-step {
-          counter-increment: step;
           display: flex;
           align-items: flex-start;
           gap: 0.9rem;
@@ -755,7 +793,6 @@ export default function CyberYouthPage() {
           line-height: 1.5;
         }
         .report-num {
-          font-family: 'Orbitron', sans-serif;
           font-size: 0.7rem;
           color: #FF4560;
           min-width: 1.5rem;
@@ -763,7 +800,6 @@ export default function CyberYouthPage() {
           padding-top: 0.15rem;
         }
 
-        /* ── Intel / Resources ── */
         .intel-section {
           padding: 3rem 1.25rem;
           border-top: 1px solid rgba(255,255,255,0.06);
@@ -787,7 +823,6 @@ export default function CyberYouthPage() {
           letter-spacing: 0.03em;
         }
 
-        /* ── Footer CTA ── */
         .footer-cta {
           padding: 4rem 1.25rem;
           text-align: center;
@@ -809,12 +844,17 @@ export default function CyberYouthPage() {
         @media (max-width: 480px) {
           .objectives-grid { grid-template-columns: 1fr; }
           .stc-grid { grid-template-columns: 1fr; }
+          .moves-grid { grid-template-columns: 1fr; }
         }
       `}</style>
 
       <div className="yp">
+        <div className="top-link-wrap">
+          <Link href="/cyber" className="top-link">
+            ← {t.backToCyber}
+          </Link>
+        </div>
 
-        {/* ── Hero ── */}
         <section className="hero">
           <div className="hero-grid-bg" aria-hidden="true" />
           <div className="hero-glow" aria-hidden="true" />
@@ -830,21 +870,19 @@ export default function CyberYouthPage() {
           <p className="hero-intro">{t.introLead}</p>
         </section>
 
-        {/* ── Game CTA ── */}
         <section className="game-cta-section">
           <div className="game-cta-inner">
             <div>
               <div className="game-title">{t.gameTitle}</div>
               <div className="game-desc">{t.gameDesc}</div>
             </div>
-            <Link href="/learning/cyber/youth/game" className="game-btn">
+            <Link href="/cyber/youth/game" className="game-btn">
               <Gamepad2 style={{ width: 16, height: 16 }} aria-hidden="true" />
               {t.gameCta}
             </Link>
           </div>
         </section>
 
-        {/* ── Mission Objectives ── */}
         <section className="objectives-section">
           <div className="section-wrap">
             <h2 className="section-title accent-cyan">{t.learnTitle}</h2>
@@ -885,53 +923,74 @@ export default function CyberYouthPage() {
           </div>
         </section>
 
-        {/* ── 8 Essential Moves (accordion) ── */}
         <section className="moves-section">
           <div className="section-wrap">
             <h2 className="section-title accent-amber">{t.movesTitle}</h2>
-            <ul className="moves-list">
+            <div className="moves-grid">
               {t.moves.map((move, i) => (
-                <MoveItem key={i} index={i} text={move} />
+                <MoveCard
+                  key={i}
+                  index={i}
+                  title={move.title}
+                  desc={move.desc}
+                />
               ))}
-            </ul>
+            </div>
           </div>
         </section>
 
-        {/* ── Stop Think Check (interactive) ── */}
         <section className="stc-section">
           <div className="section-wrap">
             <h2 className="section-title accent-amber">{t.stopThinkCheckTitle}</h2>
+            <p className="stc-lead">{t.stopThinkCheckLead}</p>
+
             <div className="stc-grid">
               {t.stopThinkCheck.map((s, i) => {
                 const colors = ["#FF4560", "#FFB800", "#00FFC8"];
                 const bgs = ["rgba(255,70,86,0.08)", "rgba(255,184,0,0.08)", "rgba(0,255,200,0.08)"];
                 const borders = ["rgba(255,70,86,0.3)", "rgba(255,184,0,0.3)", "rgba(0,255,200,0.3)"];
+
                 return (
                   <div
                     key={i}
                     className={`stc-card panel ${stcDone[i] ? "done" : ""}`}
                     style={{ background: bgs[i], borderColor: borders[i] }}
-                    onClick={() => setStcDone((prev) => { const n = [...prev]; n[i] = true; return n; })}
+                    onClick={() =>
+                      setStcDone((prev) => {
+                        const next = [...prev];
+                        next[i] = true;
+                        return next;
+                      })
+                    }
                     role="button"
                     aria-pressed={stcDone[i]}
                     tabIndex={0}
-                    onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") setStcDone((prev) => { const n = [...prev]; n[i] = true; return n; }); }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        setStcDone((prev) => {
+                          const next = [...prev];
+                          next[i] = true;
+                          return next;
+                        });
+                      }
+                    }}
                   >
                     <div className="stc-step" style={{ color: colors[i] }}>{s.step}</div>
                     <p className="stc-text">{s.text}</p>
+                    {stcDone[i] && <div className="stc-confirm">{s.confirm}</div>}
                   </div>
                 );
               })}
             </div>
+
             {allStcDone && (
               <div className="stc-banner">
-                ✓ &nbsp; PROTOCOL CONFIRMED — YOU'RE READY TO OPERATE
+                {t.protocolConfirmed}
               </div>
             )}
           </div>
         </section>
 
-        {/* ── Deepfake Detection ── */}
         <section className="df-section">
           <div className="section-wrap">
             <h2 className="section-title accent-red">{t.deepfakeTitle}</h2>
@@ -946,7 +1005,6 @@ export default function CyberYouthPage() {
           </div>
         </section>
 
-        {/* ── Account Lockdown + Privacy Sweep ── */}
         <div className="two-col">
           <div className="panel" style={{ padding: "1.5rem" }}>
             <h3
@@ -979,13 +1037,16 @@ export default function CyberYouthPage() {
           </div>
         </div>
 
-        {/* ── Wi-Fi Protocol ── */}
         <section style={{ padding: "0 1.25rem 3rem" }}>
           <div className="section-wrap" style={{ padding: 0 }}>
             <h2 className="section-title accent-amber">{t.wifiTitle}</h2>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "1rem" }}>
               {t.wifiList.map((item, i) => (
-                <div key={i} className="panel df-item" style={{ borderColor: "rgba(255,184,0,0.25)", background: "rgba(255,184,0,0.05)" }}>
+                <div
+                  key={i}
+                  className="panel df-item"
+                  style={{ borderColor: "rgba(255,184,0,0.25)", background: "rgba(255,184,0,0.05)" }}
+                >
                   <span className="df-dot" style={{ background: "#FFB800", boxShadow: "0 0 6px #FFB800" }} aria-hidden="true" />
                   {item.text}
                 </div>
@@ -994,7 +1055,6 @@ export default function CyberYouthPage() {
           </div>
         </section>
 
-        {/* ── If It Goes Wrong ── */}
         <section className="report-section">
           <div className="section-wrap">
             <h2 className="section-title accent-red">{t.reportTitle}</h2>
@@ -1009,7 +1069,6 @@ export default function CyberYouthPage() {
           </div>
         </section>
 
-        {/* ── Intel / Resources ── */}
         <section className="intel-section">
           <div className="section-wrap">
             <h2 className="section-title accent-cyan">{t.resourcesTitle}</h2>
@@ -1030,18 +1089,16 @@ export default function CyberYouthPage() {
           </div>
         </section>
 
-        {/* ── Footer CTA ── */}
         <section className="footer-cta">
           <div className="section-wrap">
             <h2>{t.gameTitle}</h2>
             <p>{t.gameDesc}</p>
-            <Link href="/learning/cyber/youth/game" className="game-btn">
+            <Link href="/cyber/youth/game" className="game-btn">
               <Gamepad2 style={{ width: 16, height: 16 }} aria-hidden="true" />
               {t.gameCta}
             </Link>
           </div>
         </section>
-
       </div>
     </>
   );
