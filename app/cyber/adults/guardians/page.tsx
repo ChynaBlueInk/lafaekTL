@@ -1,4 +1,3 @@
-// app/learning/cyber/adults/guardians/page.tsx
 "use client";
 
 import Link from "next/link";
@@ -241,7 +240,6 @@ export default function GuardiansInteractivePage(){
 
   const scenarios=useMemo<Scenario[]>(()=>getGuardianScenarios({language}),[language]);
 
-  // ✅ TS-safe: always point at a real scenario if any exist
   const safeScenarioIdx=useMemo(()=>{
     if(scenarios.length===0) return 0;
     return Math.max(0,Math.min(scenarioIdx,scenarios.length-1));
@@ -277,7 +275,6 @@ export default function GuardiansInteractivePage(){
       </section>
 
       <section className="max-w-6xl mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Conversation Coach */}
         <div className="rounded-2xl border border-[#E5E7EB] bg-white p-5">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-[#2F80ED]/10 text-[#2F80ED] flex items-center justify-center">
@@ -336,7 +333,6 @@ export default function GuardiansInteractivePage(){
           </div>
         </div>
 
-        {/* Password Demo */}
         <div className="rounded-2xl border border-[#E5E7EB] bg-white p-5">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-[#6FCF97]/20 text-[#219653] flex items-center justify-center">
@@ -383,7 +379,6 @@ export default function GuardiansInteractivePage(){
           </div>
         </div>
 
-        {/* Boundaries Builder */}
         <div className="rounded-2xl border border-[#E5E7EB] bg-white p-5">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-[#F2C94C]/20 text-[#B7791F] flex items-center justify-center">
@@ -433,7 +428,6 @@ export default function GuardiansInteractivePage(){
           </div>
         </div>
 
-        {/* Privacy Checklist */}
         <div className="rounded-2xl border border-[#E5E7EB] bg-white p-5">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-[#EB5757]/10 text-[#EB5757] flex items-center justify-center">
@@ -481,7 +475,6 @@ export default function GuardiansInteractivePage(){
           </div>
         </div>
 
-        {/* Scenarios */}
         <div className="rounded-2xl border border-[#E5E7EB] bg-white p-5 lg:col-span-2">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-[#9B51E0]/10 text-[#9B51E0] flex items-center justify-center">
@@ -542,8 +535,8 @@ export default function GuardiansInteractivePage(){
                       scenarioAnswer===null
                         ? "bg-white border-[#E5E7EB] hover:border-[#2F80ED]"
                         : idx===scenario.correct
-                          ? "bg-[#219653]/10 border-[#219653]"
-                          : "bg-white border-[#E5E7EB] opacity-60"
+                        ? "bg-[#219653]/10 border-[#219653]"
+                        : "bg-white border-[#E5E7EB] opacity-60"
                     }`}
                   >
                     <div className="font-semibold text-[#4F4F4F]">{opt}</div>
@@ -588,8 +581,6 @@ export default function GuardiansInteractivePage(){
   );
 }
 
-/* ---------------- helpers ---------------- */
-
 function StrengthBar({score}:{score:number}){
   const pct=Math.max(0,Math.min(100,score));
   return(
@@ -602,7 +593,7 @@ function StrengthBar({score}:{score:number}){
 function renderStrengthLabel({language,score}:{language:"en"|"tet";score:number}){
   if(score>=80) return language==="tet"?"Forte":"Strong";
   if(score>=55) return language==="tet"?"Di'ak":"Good";
-  if(score>=35) return language==="tet"?"Fraqueza":"Weak";
+  if(score>=35) return language==="tet"?"Fraku":"Weak";
   return language==="tet"?"Fraku tebes":"Very weak";
 }
 
