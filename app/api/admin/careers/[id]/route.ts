@@ -20,6 +20,14 @@ type JobCategory=
 
 type CareerSubmissionStatus="pending"|"published"|"archived"|"rejected";
 
+type CareerAttachment={
+  name:string;
+  url:string;
+  key:string;
+  type:string;
+  size:number;
+};
+
 type CareerSubmissionRecord={
   id:string;
   status:CareerSubmissionStatus;
@@ -42,6 +50,7 @@ type CareerSubmissionRecord={
   sourceNote?:string;
   heroImage?:string;
   heroImageKey?:string;
+  attachment?:CareerAttachment;
   createdAt:string;
   updatedAt:string;
 };
@@ -326,6 +335,32 @@ function normaliseRequiredString(value:unknown){
   return value.trim();
 }
 
+function normaliseAttachment(value:unknown){
+  if(!value||typeof value!=="object"){
+    return undefined;
+  }
+
+  const raw=value as Record<string,unknown>;
+
+  const name=normaliseRequiredString(raw.name);
+  const url=normaliseRequiredString(raw.url);
+  const key=normaliseRequiredString(raw.key);
+  const type=normaliseRequiredString(raw.type)||"application/octet-stream";
+  const size=typeof raw.size==="number"&&Number.isFinite(raw.size)?raw.size:0;
+
+  if(!name||!url||!key){
+    return undefined;
+  }
+
+  return {
+    name,
+    url,
+    key,
+    type,
+    size,
+  } satisfies CareerAttachment;
+}
+
 function validateRecordShape(record:CareerSubmissionRecord){
   if(
     !record.id||
@@ -355,6 +390,12 @@ function validateRecordShape(record:CareerSubmissionRecord){
 
   if(!isValidEmail(record.contactEmail)){
     return false;
+  }
+
+  if(record.attachment){
+    if(!record.attachment.name||!record.attachment.url||!record.attachment.key){
+      return false;
+    }
   }
 
   return true;
@@ -444,6 +485,9 @@ export async function PATCH(
       );
     }
 
+    const previousHeroImageKey=existing.heroImageKey;
+    const previousAttachmentKey=existing.attachment?.key;
+
     const nextStatus=normaliseOptionalString(body.status) as CareerSubmissionStatus|undefined;
     const nextTitle=body.title!==undefined?normaliseRequiredString(body.title):existing.title;
     const nextOrg=body.org!==undefined?normaliseRequiredString(body.org) as OrgType:existing.org;
@@ -462,6 +506,9 @@ export async function PATCH(
     const nextContactName=body.contactName!==undefined?normaliseRequiredString(body.contactName):existing.contactName;
     const nextContactEmail=body.contactEmail!==undefined?normaliseRequiredString(body.contactEmail):existing.contactEmail;
     const nextSourceNote=body.sourceNote!==undefined?normaliseOptionalString(body.sourceNote):existing.sourceNote;
+    const nextHeroImage=body.heroImage!==undefined?normaliseOptionalString(body.heroImage):existing.heroImage;
+    const nextHeroImageKey=body.heroImageKey!==undefined?normaliseOptionalString(body.heroImageKey):existing.heroImageKey;
+    const nextAttachment=body.attachment!==undefined?normaliseAttachment(body.attachment):existing.attachment;
 
     if(nextStatus!==undefined&&!VALID_STATUSES.has(nextStatus)){
       return NextResponse.json(
@@ -561,6 +608,9 @@ export async function PATCH(
       contactName:nextContactName,
       contactEmail:nextContactEmail,
       sourceNote:nextSourceNote,
+      heroImage:nextHeroImage,
+      heroImageKey:nextHeroImageKey,
+      attachment:nextAttachment,
       updatedAt:new Date().toISOString(),
     };
 
@@ -573,6 +623,22 @@ export async function PATCH(
 
     records[index]=updated;
     await writeJsonFile(CAREERS_INDEX_KEY,records);
+
+    if(previousHeroImageKey&&previousHeroImageKey!==updated.heroImageKey){
+      try{
+        await deleteS3Object(previousHeroImageKey);
+      }catch(error){
+        console.error("admin careers PATCH old image cleanup error",error);
+      }
+    }
+
+    if(previousAttachmentKey&&previousAttachmentKey!==updated.attachment?.key){
+      try{
+        await deleteS3Object(previousAttachmentKey);
+      }catch(error){
+        console.error("admin careers PATCH old attachment cleanup error",error);
+      }
+    }
 
     return NextResponse.json(
       {ok:true,record:updated},
@@ -624,6 +690,14 @@ export async function DELETE(
         await deleteS3Object(existing.heroImageKey);
       }catch(error){
         console.error("admin careers DELETE image cleanup error",error);
+      }
+    }
+
+    if(existing.attachment?.key){
+      try{
+        await deleteS3Object(existing.attachment.key);
+      }catch(error){
+        console.error("admin careers DELETE attachment cleanup error",error);
       }
     }
 

@@ -19,6 +19,14 @@ type JobCategory=
 
 type CareerSubmissionStatus="pending"|"published"|"archived"|"rejected";
 
+type CareerAttachment={
+  name:string;
+  url:string;
+  key:string;
+  type:string;
+  size:number;
+};
+
 type CareerSubmissionRecord={
   id:string;
   status:CareerSubmissionStatus;
@@ -41,6 +49,7 @@ type CareerSubmissionRecord={
   sourceNote?:string;
   heroImage?:string;
   heroImageKey?:string;
+  attachment?:CareerAttachment;
   createdAt:string;
   updatedAt:string;
 };
@@ -53,6 +62,7 @@ const BASE_PATH=RAW_BASE_PATH.replace(/^\/+/,"").replace(/\/+$/,"");
 const CAREERS_BASE=`${BASE_PATH}/careers`;
 const CAREERS_INDEX_KEY=`${CAREERS_BASE}/submissions.json`;
 const CAREERS_IMAGE_BASE=`${CAREERS_BASE}/images`;
+const CAREERS_FILE_BASE=`${CAREERS_BASE}/files`;
 
 const VALID_JOB_TYPES=new Set<JobType>([
   "Full-time",
@@ -89,7 +99,14 @@ const VALID_IMAGE_TYPES=new Set([
   "image/webp",
 ]);
 
+const VALID_ATTACHMENT_TYPES=new Set([
+  "application/pdf",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+]);
+
 const IMAGE_MAX_BYTES=5*1024*1024;
+const ATTACHMENT_MAX_BYTES=10*1024*1024;
 
 const s3=new S3Client({
   region:REGION,
@@ -127,11 +144,14 @@ function parseTags(value:string){
   ).slice(0,20);
 }
 
-function safeFileName(name:string){
+function safeFileExtension(name:string){
   const lastDot=name.lastIndexOf(".");
   const ext=lastDot>=0?name.slice(lastDot).toLowerCase():"";
-  const safeExt=/^\.[a-z0-9]{1,10}$/.test(ext)?ext:"";
-  return safeExt;
+  return /^\.[a-z0-9]{1,10}$/.test(ext)?ext:"";
+}
+
+function buildPublicUrl(bucket:string,key:string){
+  return `https://${bucket}.s3.${REGION}.amazonaws.com/${key}`;
 }
 
 async function streamToString(stream:ReadableStream<Uint8Array>){
@@ -199,7 +219,7 @@ async function uploadHeroImage(file:File,id:string){
     throw new Error("Image too large");
   }
 
-  const ext=safeFileName(file.name)||(
+  const ext=safeFileExtension(file.name)||(
     file.type==="image/png"
       ? ".png"
       : file.type==="image/webp"
@@ -220,9 +240,51 @@ async function uploadHeroImage(file:File,id:string){
     })
   );
 
-  const publicUrl=`https://${BUCKET}.s3.${REGION}.amazonaws.com/${key}`;
+  return {
+    key,
+    url:buildPublicUrl(BUCKET,key),
+  };
+}
 
-  return {key,url:publicUrl};
+async function uploadAttachment(file:File,id:string){
+  if(!BUCKET){
+    throw new Error("Missing AWS_S3_BUCKET");
+  }
+
+  const lowerName=file.name.toLowerCase();
+  const ext=safeFileExtension(lowerName);
+  const typeOk=VALID_ATTACHMENT_TYPES.has(file.type);
+  const extensionOk=ext===".pdf"||ext===".doc"||ext===".docx";
+
+  if(!typeOk&&!extensionOk){
+    throw new Error("Invalid attachment type");
+  }
+
+  if(file.size>ATTACHMENT_MAX_BYTES){
+    throw new Error("Attachment too large");
+  }
+
+  const finalExt=ext||".bin";
+  const key=`${CAREERS_FILE_BASE}/${id}${finalExt}`;
+  const bytes=Buffer.from(await file.arrayBuffer());
+
+  await s3.send(
+    new PutObjectCommand({
+      Bucket:BUCKET,
+      Key:key,
+      Body:bytes,
+      ContentType:file.type||"application/octet-stream",
+      CacheControl:"private, no-store",
+    })
+  );
+
+  return {
+    name:file.name,
+    key,
+    url:buildPublicUrl(BUCKET,key),
+    type:file.type||"application/octet-stream",
+    size:file.size,
+  };
 }
 
 function validateRequiredString(value:string){
@@ -264,6 +326,12 @@ export async function POST(request:Request){
         ? heroImageEntry
         : null;
 
+    const attachmentEntry=formData.get("jobAttachment");
+    const jobAttachment=
+      attachmentEntry instanceof File&&attachmentEntry.size>0
+        ? attachmentEntry
+        : null;
+
     if(
       !validateRequiredString(title)||
       !VALID_ORG_TYPES.has(org)||
@@ -290,7 +358,8 @@ export async function POST(request:Request){
       );
     }
 
-const today=new Date().toISOString().split("T")[0] ?? "";    if(deadline<today){
+    const today=new Date().toISOString().split("T")[0] ?? "";
+    if(deadline<today){
       return NextResponse.json(
         {ok:false,error:"Deadline must be today or in the future."},
         {status:400}
@@ -341,16 +410,42 @@ const today=new Date().toISOString().split("T")[0] ?? "";    if(deadline<today){
       }
     }
 
+    if(jobAttachment){
+      const lowerName=jobAttachment.name.toLowerCase();
+      const ext=safeFileExtension(lowerName);
+      const typeOk=VALID_ATTACHMENT_TYPES.has(jobAttachment.type);
+      const extensionOk=ext===".pdf"||ext===".doc"||ext===".docx";
+
+      if(!typeOk&&!extensionOk){
+        return NextResponse.json(
+          {ok:false,error:"Attachment must be PDF, DOC, or DOCX."},
+          {status:400}
+        );
+      }
+
+      if(jobAttachment.size>ATTACHMENT_MAX_BYTES){
+        return NextResponse.json(
+          {ok:false,error:"Attachment must be 10 MB or smaller."},
+          {status:400}
+        );
+      }
+    }
+
     const now=new Date().toISOString();
     const id=`career-${now.slice(0,10)}-${randomUUID().slice(0,8)}`;
 
     let heroImageUrl:string|undefined;
     let heroImageKey:string|undefined;
+    let attachment:CareerAttachment|undefined;
 
     if(heroImage){
       const uploaded=await uploadHeroImage(heroImage,id);
       heroImageUrl=uploaded.url;
       heroImageKey=uploaded.key;
+    }
+
+    if(jobAttachment){
+      attachment=await uploadAttachment(jobAttachment,id);
     }
 
     const newRecord:CareerSubmissionRecord={
@@ -375,6 +470,7 @@ const today=new Date().toISOString().split("T")[0] ?? "";    if(deadline<today){
       sourceNote:sourceNote||undefined,
       heroImage:heroImageUrl,
       heroImageKey,
+      attachment,
       createdAt:now,
       updatedAt:now,
     };

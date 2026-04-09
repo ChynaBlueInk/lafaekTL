@@ -18,6 +18,14 @@ type JobCategory=
 
 type CareerSubmissionStatus="pending"|"published"|"archived"|"rejected";
 
+type CareerAttachment={
+  name:string;
+  url:string;
+  key:string;
+  type:string;
+  size:number;
+};
+
 type CareerSubmissionRecord={
   id:string;
   status:CareerSubmissionStatus;
@@ -40,8 +48,35 @@ type CareerSubmissionRecord={
   sourceNote?:string;
   heroImage?:string;
   heroImageKey?:string;
+  attachment?:CareerAttachment;
   createdAt:string;
   updatedAt:string;
+};
+
+type PublicAttachment={
+  label:string;
+  url:string;
+  type:"doc"|"pdf"|"image"|"other";
+};
+
+type PublicCareerRecord={
+  id:string;
+  title:string;
+  org:OrgType;
+  organizationName:string;
+  type:JobType;
+  category:JobCategory;
+  location:string;
+  deadline:string;
+  tags:string[];
+  summaryEN:string;
+  summaryTET:string;
+  applyUrl?:string;
+  applyEmail?:string;
+  emailSubject?:string;
+  emailBody?:string;
+  heroImage?:string;
+  attachments?:PublicAttachment[];
 };
 
 const REGION=process.env.AWS_REGION||"ap-southeast-2";
@@ -183,8 +218,47 @@ function sortNewestFirst(records:CareerSubmissionRecord[]){
   });
 }
 
+function toAttachmentType(contentType:string){
+  const lower=contentType.toLowerCase();
+
+  if(lower.includes("pdf")) return "pdf";
+  if(lower.includes("word")||lower.includes("msword")||lower.includes("document")) return "doc";
+  if(lower.startsWith("image/")) return "image";
+  return "other";
+}
+
+function toPublicRecord(record:CareerSubmissionRecord):PublicCareerRecord{
+  return {
+    id:record.id,
+    title:record.title,
+    org:record.org,
+    organizationName:record.organizationName,
+    type:record.type,
+    category:record.category,
+    location:record.location,
+    deadline:record.deadline,
+    tags:record.tags,
+    summaryEN:record.summaryEN,
+    summaryTET:record.summaryTET,
+    applyUrl:record.applyUrl,
+    applyEmail:record.applyEmail,
+    emailSubject:record.emailSubject,
+    emailBody:record.emailBody,
+    heroImage:record.heroImage,
+    attachments:record.attachment
+      ? [
+          {
+            label:record.attachment.name,
+            url:record.attachment.url,
+            type:toAttachmentType(record.attachment.type),
+          },
+        ]
+      : [],
+  };
+}
+
 function filterPublicRecords(
-  records:CareerSubmissionRecord[],
+  records:PublicCareerRecord[],
   params:URLSearchParams
 ){
   const q=params.get("q")?.trim().toLowerCase()||"";
@@ -245,7 +319,7 @@ export async function GET(request:NextRequest){
 
     const publishedRecords=sortNewestFirst(
       allRecords.filter(isPublishedPublicRecord)
-    );
+    ).map(toPublicRecord);
 
     const filteredRecords=filterPublicRecords(
       publishedRecords,

@@ -30,7 +30,8 @@ const ALLOWED_FOLDERS=[
   "magazines/pdfs",
   "magazines/samples",
   "careers/images",
-  "careers/pdfs"
+  "careers/pdfs",
+  "careers/files"
 ] as const
 
 type AllowedFolder=(typeof ALLOWED_FOLDERS)[number]

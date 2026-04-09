@@ -16,12 +16,15 @@ import {
   Loader2,
   Mail,
   MapPin,
+  Pencil,
+  Plus,
   RefreshCw,
   ShieldAlert,
   Tag,
   Trash2,
   TriangleAlert,
   X,
+  Paperclip,
 } from "lucide-react";
 
 type Lang="en"|"tet";
@@ -38,6 +41,14 @@ type JobCategory=
   |"Other";
 
 type CareerSubmissionStatus="pending"|"published"|"archived"|"rejected";
+
+type CareerAttachment={
+  name:string;
+  url:string;
+  key:string;
+  type:string;
+  size:number;
+};
 
 type CareerSubmissionRecord={
   id:string;
@@ -61,6 +72,7 @@ type CareerSubmissionRecord={
   sourceNote?:string;
   heroImage?:string;
   heroImageKey?:string;
+  attachment?:CareerAttachment;
   createdAt:string;
   updatedAt:string;
 };
@@ -142,12 +154,13 @@ export default function AdminCareersPage(){
     en:{
       back:"Back to admin",
       title:"Careers Admin",
-      subtitle:"Review submitted job listings and track which ones are pending, published, archived, or rejected.",
+      subtitle:"Manage submitted jobs, add new listings, edit records, and control what gets published.",
       refresh:"Refresh",
+      addJob:"Add Job",
+      edit:"Edit",
       loading:"Loading career submissions...",
       errorTitle:"Unable to load submissions",
       empty:"No career submissions found for this filter.",
-      loadingAction:"Updating...",
       filters:{
         all:"All",
         pending:"Pending",
@@ -165,6 +178,8 @@ export default function AdminCareersPage(){
         submittedBy:"Submitted by",
         source:"Source note",
         view:"View details",
+        attachment:"Attachment",
+        noAttachment:"No attachment",
       },
       modal:{
         close:"Close",
@@ -182,6 +197,8 @@ export default function AdminCareersPage(){
         updatedAt:"Updated",
         sourceNote:"Source note",
         noSource:"No source note provided.",
+        attachment:"Attachment",
+        openAttachment:"Open attachment",
       },
       counts:{
         total:"Total",
@@ -197,9 +214,6 @@ export default function AdminCareersPage(){
         archive:"Archive",
         reject:"Reject",
         delete:"Delete",
-        published:"Published",
-        archived:"Archived",
-        rejected:"Rejected",
         deleteConfirm:"Delete this submission? This cannot be undone.",
         publishConfirm:"Publish this job listing?",
         archiveConfirm:"Archive this submission?",
@@ -215,12 +229,13 @@ export default function AdminCareersPage(){
     tet:{
       back:"Fila ba admin",
       title:"Admin Karreira",
-      subtitle:"Haree no revê lista vaga ne'ebé submete ona no tuir estado pending, published, archived, ka rejected.",
+      subtitle:"Jere submisaun vaga sira, aumenta vaga foun, edita rejistu sira, no kontrola saida mak publika.",
       refresh:"Atualiza",
+      addJob:"Aumenta Vaga",
+      edit:"Edita",
       loading:"Karreira sira karga hela...",
       errorTitle:"La konsege karga submisaun sira",
       empty:"La iha submisaun karreira ba filtru ida ne'e.",
-      loadingAction:"Atualiza hela...",
       filters:{
         all:"Hotu",
         pending:"Pending",
@@ -238,6 +253,8 @@ export default function AdminCareersPage(){
         submittedBy:"Submete hosi",
         source:"Nota fonte",
         view:"Haree detalhu",
+        attachment:"Dokumentu",
+        noAttachment:"La iha dokumentu",
       },
       modal:{
         close:"Taka",
@@ -255,6 +272,8 @@ export default function AdminCareersPage(){
         updatedAt:"Atualiza iha",
         sourceNote:"Nota fonte",
         noSource:"La iha nota fonte.",
+        attachment:"Dokumentu",
+        openAttachment:"Loke dokumentu",
       },
       counts:{
         total:"Totál",
@@ -270,9 +289,6 @@ export default function AdminCareersPage(){
         archive:"Arkiva",
         reject:"Rejeita",
         delete:"Hasai",
-        published:"Publikadu",
-        archived:"Arkivadu",
-        rejected:"Rejeitadu",
         deleteConfirm:"Hasai submisaun ida ne'e? La bele fila fali.",
         publishConfirm:"Publika lista servisu ida ne'e?",
         archiveConfirm:"Arkiva submisaun ida ne'e?",
@@ -443,6 +459,14 @@ export default function AdminCareersPage(){
 
     return(
       <div className="flex flex-wrap gap-2">
+        <Link
+          href={`/admin/careers/${record.id}/edit`}
+          className="inline-flex items-center gap-2 rounded-full border border-[#2F80ED] bg-white px-4 py-2 text-sm font-medium text-[#2F80ED] hover:bg-blue-50"
+        >
+          <Pencil className="h-4 w-4" />
+          {text.edit}
+        </Link>
+
         {record.status!=="published"&&(
           <button
             type="button"
@@ -529,15 +553,25 @@ export default function AdminCareersPage(){
               </p>
             </div>
 
-            <button
-              type="button"
-              onClick={()=>loadCareers(statusFilter,true)}
-              disabled={refreshing}
-              className="inline-flex items-center gap-2 self-start rounded-full border border-[#219653] bg-white px-4 py-2 text-sm font-medium text-[#219653] hover:bg-[#EAF7EF] disabled:opacity-70"
-            >
-              <RefreshCw className={`h-4 w-4 ${refreshing?"animate-spin":""}`} />
-              {text.refresh}
-            </button>
+            <div className="flex flex-wrap gap-3">
+              <Link
+                href="/admin/careers/add"
+                className="inline-flex items-center gap-2 self-start rounded-full bg-[#219653] px-4 py-2 text-sm font-medium text-white hover:bg-green-700"
+              >
+                <Plus className="h-4 w-4" />
+                {text.addJob}
+              </Link>
+
+              <button
+                type="button"
+                onClick={()=>loadCareers(statusFilter,true)}
+                disabled={refreshing}
+                className="inline-flex items-center gap-2 self-start rounded-full border border-[#219653] bg-white px-4 py-2 text-sm font-medium text-[#219653] hover:bg-[#EAF7EF] disabled:opacity-70"
+              >
+                <RefreshCw className={`h-4 w-4 ${refreshing?"animate-spin":""}`} />
+                {text.refresh}
+              </button>
+            </div>
           </div>
         </div>
       </header>
@@ -696,6 +730,14 @@ export default function AdminCareersPage(){
                         {text.cards.submitted}: <strong>{formatDate(record.createdAt,language)}</strong>
                       </span>
                     </div>
+
+                    <div className="flex items-center gap-2">
+                      <Paperclip className="h-4 w-4 text-[#828282]" />
+                      <span>
+                        {text.cards.attachment}:{" "}
+                        <strong>{record.attachment?.name||text.cards.noAttachment}</strong>
+                      </span>
+                    </div>
                   </div>
 
                   {record.tags.length>0&&(
@@ -829,6 +871,25 @@ export default function AdminCareersPage(){
                         <p>
                           <strong>{text.modal.emailSubject}:</strong> {activeRecord.emailSubject}
                         </p>
+                      )}
+                    </div>
+                  </div>
+
+                  <div>
+                    <p className="font-semibold text-[#333333]">{text.modal.attachment}</p>
+                    <div className="mt-2">
+                      {activeRecord.attachment?(
+                        <a
+                          href={activeRecord.attachment.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 rounded-full border border-gray-300 bg-white px-3 py-2 text-sm text-[#4F4F4F] hover:bg-gray-50"
+                        >
+                          <Paperclip className="h-4 w-4" />
+                          {text.modal.openAttachment}: {activeRecord.attachment.name}
+                        </a>
+                      ):(
+                        <p>{text.cards.noAttachment}</p>
                       )}
                     </div>
                   </div>

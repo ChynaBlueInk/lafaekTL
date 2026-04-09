@@ -4,7 +4,8 @@ export const dynamic="force-dynamic";
 import {NextRequest,NextResponse} from "next/server";
 import {cookies} from "next/headers";
 import {createRemoteJWKSet,jwtVerify,JWTVerifyResult} from "jose";
-import {S3Client,GetObjectCommand} from "@aws-sdk/client-s3";
+import {S3Client,GetObjectCommand,PutObjectCommand} from "@aws-sdk/client-s3";
+import {randomUUID} from "crypto";
 
 type JobType="Full-time"|"Part-time"|"Contract"|"Internship"|"Volunteer";
 type OrgType="CARE"|"Lafaek"|"NGO"|"Private"|"Government"|"Education"|"External";
@@ -19,6 +20,14 @@ type JobCategory=
   |"Other";
 
 type CareerSubmissionStatus="pending"|"published"|"archived"|"rejected";
+
+type CareerAttachment={
+  name:string;
+  url:string;
+  key:string;
+  type:string;
+  size:number;
+};
 
 type CareerSubmissionRecord={
   id:string;
@@ -42,6 +51,7 @@ type CareerSubmissionRecord={
   sourceNote?:string;
   heroImage?:string;
   heroImageKey?:string;
+  attachment?:CareerAttachment;
   createdAt:string;
   updatedAt:string;
 };
@@ -50,6 +60,14 @@ type TokenPayload={
   sub?:string;
   email?:string;
   "cognito:groups"?:string[]|string;
+};
+
+type Counts={
+  pending:number;
+  published:number;
+  archived:number;
+  rejected:number;
+  total:number;
 };
 
 const REGION=process.env.AWS_REGION||"ap-southeast-2";
@@ -66,6 +84,35 @@ const VALID_STATUSES=new Set<CareerSubmissionStatus>([
   "published",
   "archived",
   "rejected",
+]);
+
+const VALID_JOB_TYPES=new Set<JobType>([
+  "Full-time",
+  "Part-time",
+  "Contract",
+  "Internship",
+  "Volunteer",
+]);
+
+const VALID_ORG_TYPES=new Set<OrgType>([
+  "CARE",
+  "Lafaek",
+  "NGO",
+  "Private",
+  "Government",
+  "Education",
+  "External",
+]);
+
+const VALID_CATEGORIES=new Set<JobCategory>([
+  "Media & Communications",
+  "Design & Creative",
+  "Education & Training",
+  "Logistics & Operations",
+  "Administration",
+  "Community & Development",
+  "Finance & HR",
+  "Other",
 ]);
 
 const ADMIN_GROUPS=new Set([
@@ -217,6 +264,129 @@ async function readJsonFile<T>(key:string,fallback:T):Promise<T>{
   }
 }
 
+async function writeJsonFile<T>(key:string,data:T){
+  if(!BUCKET){
+    throw new Error("Missing AWS_S3_BUCKET");
+  }
+
+  await s3.send(
+    new PutObjectCommand({
+      Bucket:BUCKET,
+      Key:key,
+      Body:JSON.stringify(data,null,2),
+      ContentType:"application/json; charset=utf-8",
+      CacheControl:"no-store",
+    })
+  );
+}
+
+function isValidEmail(value:string){
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
+
+function isValidUrl(value:string){
+  try{
+    const parsed=new URL(value);
+    return parsed.protocol==="http:"||parsed.protocol==="https:";
+  }catch{
+    return false;
+  }
+}
+
+function parseTags(value:unknown){
+  if(Array.isArray(value)){
+    return Array.from(
+      new Set(
+        value.map((item)=>String(item).trim()).filter(Boolean)
+      )
+    ).slice(0,20);
+  }
+
+  if(typeof value==="string"){
+    return Array.from(
+      new Set(
+        value.split(",").map((item)=>item.trim()).filter(Boolean)
+      )
+    ).slice(0,20);
+  }
+
+  return [];
+}
+
+function normaliseOptionalString(value:unknown){
+  if(typeof value!=="string"){
+    return undefined;
+  }
+  const trimmed=value.trim();
+  return trimmed?trimmed:undefined;
+}
+
+function normaliseRequiredString(value:unknown){
+  if(typeof value!=="string"){
+    return "";
+  }
+  return value.trim();
+}
+
+function normaliseAttachment(value:unknown){
+  if(!value||typeof value!=="object"){
+    return undefined;
+  }
+
+  const raw=value as Record<string,unknown>;
+  const name=normaliseRequiredString(raw.name);
+  const url=normaliseRequiredString(raw.url);
+  const key=normaliseRequiredString(raw.key);
+  const type=normaliseRequiredString(raw.type)||"application/octet-stream";
+  const size=typeof raw.size==="number"&&Number.isFinite(raw.size)?raw.size:0;
+
+  if(!name||!url||!key){
+    return undefined;
+  }
+
+  return {name,url,key,type,size} satisfies CareerAttachment;
+}
+
+function validateRecordShape(record:CareerSubmissionRecord){
+  if(
+    !record.id||
+    !VALID_STATUSES.has(record.status)||
+    !record.title.trim()||
+    !VALID_ORG_TYPES.has(record.org)||
+    !record.organizationName.trim()||
+    !VALID_JOB_TYPES.has(record.type)||
+    !VALID_CATEGORIES.has(record.category)||
+    !record.location.trim()||
+    !record.deadline.trim()||
+    !record.summaryEN.trim()||
+    !record.summaryTET.trim()||
+    !record.contactName.trim()||
+    !record.contactEmail.trim()
+  ){
+    return false;
+  }
+
+  if(record.applyUrl&&!isValidUrl(record.applyUrl)){
+    return false;
+  }
+
+  if(record.applyEmail&&!isValidEmail(record.applyEmail)){
+    return false;
+  }
+
+  if(!isValidEmail(record.contactEmail)){
+    return false;
+  }
+
+  if(record.attachment){
+    if(!record.attachment.name||!record.attachment.url||!record.attachment.key){
+      return false;
+    }
+  }
+
+  return true;
+}
+
 function sortNewestFirst(records:CareerSubmissionRecord[]){
   return [...records].sort((a,b)=>{
     const aTime=new Date(a.createdAt).getTime();
@@ -258,7 +428,7 @@ export async function GET(request:NextRequest){
     }
 
     if(includeCounts){
-      const counts={
+      const counts:Counts={
         pending:0,
         published:0,
         archived:0,
@@ -269,7 +439,7 @@ export async function GET(request:NextRequest){
       const allRecords=await readJsonFile<CareerSubmissionRecord[]>(CAREERS_INDEX_KEY,[]);
       for(const record of allRecords){
         if(record.status in counts){
-          counts[record.status as keyof typeof counts]+=1;
+          counts[record.status as keyof Counts]+=1;
         }
       }
 
@@ -295,6 +465,175 @@ export async function GET(request:NextRequest){
 
     return NextResponse.json(
       {ok:false,error:"Failed to load career submissions."},
+      {status:500}
+    );
+  }
+}
+
+export async function POST(request:NextRequest){
+  try{
+    if(!BUCKET){
+      return NextResponse.json(
+        {ok:false,error:"Server is missing S3 bucket configuration."},
+        {status:500}
+      );
+    }
+
+    const adminCheck=await requireAdmin();
+    if(!adminCheck.ok){
+      return adminCheck.response;
+    }
+
+    const body=await request.json();
+
+    const title=normaliseRequiredString(body.title);
+    const org=normaliseRequiredString(body.org) as OrgType;
+    const organizationName=normaliseRequiredString(body.organizationName);
+    const type=normaliseRequiredString(body.type) as JobType;
+    const category=normaliseRequiredString(body.category) as JobCategory;
+    const location=normaliseRequiredString(body.location);
+    const deadline=normaliseRequiredString(body.deadline);
+    const tags=parseTags(body.tags);
+    const summaryEN=normaliseRequiredString(body.summaryEN);
+    const summaryTET=normaliseRequiredString(body.summaryTET);
+    const applyUrl=normaliseOptionalString(body.applyUrl);
+    const applyEmail=normaliseOptionalString(body.applyEmail);
+    const emailSubject=normaliseOptionalString(body.emailSubject);
+    const emailBody=normaliseOptionalString(body.emailBody);
+    const contactName=normaliseRequiredString(body.contactName);
+    const contactEmail=normaliseRequiredString(body.contactEmail);
+    const sourceNote=normaliseOptionalString(body.sourceNote);
+    const status=(normaliseOptionalString(body.status) as CareerSubmissionStatus|undefined) ?? "pending";
+    const heroImage=normaliseOptionalString(body.heroImage);
+    const heroImageKey=normaliseOptionalString(body.heroImageKey);
+    const attachment=normaliseAttachment(body.attachment);
+
+    if(!VALID_STATUSES.has(status)){
+      return NextResponse.json(
+        {ok:false,error:"Invalid status."},
+        {status:400}
+      );
+    }
+
+    if(!VALID_ORG_TYPES.has(org)){
+      return NextResponse.json(
+        {ok:false,error:"Invalid organisation type."},
+        {status:400}
+      );
+    }
+
+    if(!VALID_JOB_TYPES.has(type)){
+      return NextResponse.json(
+        {ok:false,error:"Invalid job type."},
+        {status:400}
+      );
+    }
+
+    if(!VALID_CATEGORIES.has(category)){
+      return NextResponse.json(
+        {ok:false,error:"Invalid category."},
+        {status:400}
+      );
+    }
+
+    if(!title||!organizationName||!location||!deadline||!summaryEN||!summaryTET||!contactName||!contactEmail){
+      return NextResponse.json(
+        {ok:false,error:"Required fields cannot be blank."},
+        {status:400}
+      );
+    }
+
+    if(summaryEN.length<20||summaryTET.length<20){
+      return NextResponse.json(
+        {ok:false,error:"Both summaries must be at least 20 characters."},
+        {status:400}
+      );
+    }
+
+    const today=new Date().toISOString().split("T")[0] ?? "";
+    if(deadline<today){
+      return NextResponse.json(
+        {ok:false,error:"Deadline must be today or in the future."},
+        {status:400}
+      );
+    }
+
+    if(!applyUrl&&!applyEmail){
+      return NextResponse.json(
+        {ok:false,error:"Provide either an apply URL or an apply email."},
+        {status:400}
+      );
+    }
+
+    if(applyUrl&&!isValidUrl(applyUrl)){
+      return NextResponse.json(
+        {ok:false,error:"Apply URL must be a valid http or https link."},
+        {status:400}
+      );
+    }
+
+    if(applyEmail&&!isValidEmail(applyEmail)){
+      return NextResponse.json(
+        {ok:false,error:"Apply email is not valid."},
+        {status:400}
+      );
+    }
+
+    if(!isValidEmail(contactEmail)){
+      return NextResponse.json(
+        {ok:false,error:"Contact email is not valid."},
+        {status:400}
+      );
+    }
+
+    const now=new Date().toISOString();
+    const record:CareerSubmissionRecord={
+      id:`career-${now.slice(0,10)}-${randomUUID().slice(0,8)}`,
+      status,
+      title,
+      org,
+      organizationName,
+      type,
+      category,
+      location,
+      deadline,
+      tags,
+      summaryEN,
+      summaryTET,
+      applyUrl,
+      applyEmail,
+      emailSubject,
+      emailBody,
+      contactName,
+      contactEmail,
+      sourceNote,
+      heroImage,
+      heroImageKey,
+      attachment,
+      createdAt:now,
+      updatedAt:now,
+    };
+
+    if(!validateRecordShape(record)){
+      return NextResponse.json(
+        {ok:false,error:"New record failed validation."},
+        {status:400}
+      );
+    }
+
+    const existing=await readJsonFile<CareerSubmissionRecord[]>(CAREERS_INDEX_KEY,[]);
+    const updated=[record,...existing];
+
+    await writeJsonFile(CAREERS_INDEX_KEY,updated);
+
+    return NextResponse.json(
+      {ok:true,record},
+      {status:201}
+    );
+  }catch(error){
+    console.error("admin careers POST error",error);
+    return NextResponse.json(
+      {ok:false,error:"Failed to create career submission."},
       {status:500}
     );
   }
