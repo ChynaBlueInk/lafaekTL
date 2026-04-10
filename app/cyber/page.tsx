@@ -173,7 +173,7 @@ const TRANSLATIONS: Record<Lang, T> = {
     audienceSubtitle: "Cyber safety looks different at every stage of life. Choose the guide that fits you.",
     audiences: [
       {
-        href: "/learning/cyber/children",
+        href: "/cyber/children",
         age: "Ages 7-14",
         title: "Young Explorers",
         desc: "Fun, interactive adventures that teach children the basics of staying safe online — through games, characters, and simple rules.",
@@ -181,7 +181,7 @@ const TRANSLATIONS: Record<Lang, T> = {
         theme: "children",
       },
       {
-        href: "/learning/cyber/youth",
+        href: "/cyber/youth",
         age: "Ages 15–25",
         title: "Cyber Vanguard",
         desc: "Practical skills for social media, gaming, study, and early work life — spotting scams, locking accounts, and protecting your privacy.",
@@ -189,7 +189,7 @@ const TRANSLATIONS: Record<Lang, T> = {
         theme: "youth",
       },
       {
-        href: "/learning/cyber/adults",
+        href: "/cyber/adults",
         age: "Adults & Families",
         title: "Community Shield",
         desc: "Guidance for parents, professionals, and community members — protecting family, work, finances, and the people around you.",
@@ -321,7 +321,7 @@ const TRANSLATIONS: Record<Lang, T> = {
     audienceSubtitle: "Seguransa online haree diferente iha kada etapa moris. Hili guia ne'ebé tuir ho ita.",
     audiences: [
       {
-        href: "/learning/cyber/children",
+        href: "/cyber/children",
         age: "Tinan 7–14",
         title: "Eksplorادór Ki'ik",
         desc: "Aventura divertidu no interativu ne'ebé hanorin labarik sira báziku atu nafatin seguru online — liu husi jogu, karakter, no regra simples.",
@@ -329,7 +329,7 @@ const TRANSLATIONS: Record<Lang, T> = {
         theme: "children",
       },
       {
-        href: "/learning/cyber/youth",
+        href: "/cyber/youth",
         age: "Tinan 15–25",
         title: "Cyber Vanguard",
         desc: "Kbiit prátiku ba rede sosiál, jogu, estudu, no servisu — hatene fraude, taka konta, no proteje privasidade.",
@@ -337,7 +337,7 @@ const TRANSLATIONS: Record<Lang, T> = {
         theme: "youth",
       },
       {
-        href: "/learning/cyber/adults",
+        href: "/cyber/adults",
         age: "Adultu no Família",
         title: "Protetor Komunidade",
         desc: "Orientasaun ba inan-aman, profisionál, no membru komunidade — proteje família, servisu, finansa, no ema sira iha nia leet.",
