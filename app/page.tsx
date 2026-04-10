@@ -462,10 +462,9 @@ export default function HomePage(){
 {/* Lafaek Logo Banner */}
 <section className="py-12 bg-white">
   <div className="max-w-7xl mx-auto px-4 flex justify-center">
-    <div className="relative w-full max-w-md h-40">
-      <Image
-        src="/logo/lafaek-logo2.png"
-        alt="Lafaek Logo"
+<div className="relative w-full max-w-3xl h-64">      <Image
+        src="/characters/0-lafaek-friends.png"
+        alt="Lafaek friends"
         fill
         className="object-contain"
         priority

@@ -3,6 +3,7 @@
 
 import {useLanguage}from "@/lib/LanguageContext";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function OurJourneyPage(){
   const{language,setLanguage}=useLanguage();
@@ -76,12 +77,24 @@ export default function OurJourneyPage(){
   const YT="https://youtu.be/nVV9UK6cq5E?si=tpBE3x1JV36yqG5F";
 
   return(
+    
     <div className="flex flex-col min-h-screen bg-white">
       <main className="flex-grow py-12 px-4">
+       
         <div className="max-w-5xl mx-auto text-center">
           <h1 className="text-4xl font-bold text-green-700 mb-3">{t.title}</h1>
           <p className="text-xl text-gray-700 mb-6">{t.subtitle}</p>
-          <p className="text-lg text-gray-600 leading-relaxed mb-8">{t.description}</p>
+   {/* ── Hero Image ── */}
+<div className="relative w-full max-w-3xl h-48 mx-auto">
+    <Image
+            src="/characters/tasi-sleep.jpg"
+            alt="Lafaek resting by the sea"
+            fill
+            className="object-contain rounded-lg"
+            priority
+          />
+        </div>
+                  <p className="text-lg text-gray-600 leading-relaxed mb-8">{t.description}</p>
 
           {/* Watch CTA */}
           <Link
