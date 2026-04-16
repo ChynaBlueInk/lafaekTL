@@ -8,7 +8,9 @@
     "start": "next start"
   },
   "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.1030.0",
     "@aws-sdk/client-s3": "^3.901.0",
+    "@aws-sdk/lib-dynamodb": "^3.1030.0",
     "@aws-sdk/s3-presigned-post": "^3.901.0",
     "@aws-sdk/s3-request-presigner": "^3.896.0",
     "@keystar/ui": "0.7.19",
@@ -30,6 +32,7 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-oidc-context": "^3.3.0",
+    "react-pageflip": "^2.0.3",
     "tailwindcss": "3.4.1",
     "zustand": "^5.0.8"
   },
