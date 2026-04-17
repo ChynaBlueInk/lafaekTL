@@ -25,9 +25,12 @@ function buildLoginRedirect(req:NextRequest){
 export async function middleware(req:NextRequest){
   const {pathname}=req.nextUrl
 
-  if(!pathname.startsWith("/admin")){
-    return NextResponse.next()
-  }
+if(
+  !pathname.startsWith("/admin") &&
+  !pathname.startsWith("/api/admin")
+){
+  return NextResponse.next()
+}
 
   const token=req.cookies.get(COOKIE_NAME)?.value
   if(!token){
@@ -63,7 +66,6 @@ export async function middleware(req:NextRequest){
     return buildLoginRedirect(req)
   }
 }
-
 export const config={
-  matcher:["/admin/:path*"],
+  matcher:["/admin/:path*","/api/admin/:path*"],
 }

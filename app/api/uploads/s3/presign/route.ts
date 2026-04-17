@@ -1,4 +1,3 @@
-//app/api/uploads/s3/presign/route.ts
 export const runtime="nodejs"
 export const dynamic="force-dynamic"
 
@@ -31,7 +30,10 @@ const ALLOWED_FOLDERS=[
   "magazines/samples",
   "careers/images",
   "careers/pdfs",
-  "careers/files"
+  "careers/files",
+  "books/covers",
+  "books/pages",
+  "books/pdfs"
 ] as const
 
 type AllowedFolder=(typeof ALLOWED_FOLDERS)[number]
@@ -105,8 +107,6 @@ export async function POST(req:NextRequest){
 
     const requestedFolder=isAllowedFolder(folderRaw)?folderRaw:"uploads"
     const safeName=sanitiseFileName(fileName)
-
-    // Prevent uploads/uploads/... duplication when the caller passes folder:"uploads"
     const folderSegment=requestedFolder==="uploads"?"":requestedFolder
 
     const key=joinS3Key(

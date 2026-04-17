@@ -1,31 +1,34 @@
-import { ScanCommand } from "@aws-sdk/lib-dynamodb";
-import { NextResponse } from "next/server";
-import { dynamodb } from "@/lib/aws";
+export const runtime="nodejs";
+export const dynamic="force-dynamic";
 
-export async function GET() {
-  try {
-    const command = new ScanCommand({
-      TableName: process.env.BOOKS_TABLE,
+import {ScanCommand} from "@aws-sdk/lib-dynamodb";
+import {NextResponse} from "next/server";
+import {dynamodb} from "@/lib/aws";
+
+export async function GET(){
+  try{
+    const command=new ScanCommand({
+      TableName:process.env.BOOKS_TABLE,
     });
 
-    const result = await dynamodb.send(command);
+    const result=await dynamodb.send(command);
 
     return NextResponse.json({
-      success: true,
-      books: result.Items || [],
+      success:true,
+      books:result.Items || [],
     });
-  } catch (error) {
-    console.error("Error fetching books:", error);
+  }catch(error){
+    console.error("Error fetching books:",error);
 
-    const message =
+    const message=
       error instanceof Error ? error.message : "Failed to fetch books.";
 
     return NextResponse.json(
       {
-        success: false,
+        success:false,
         message,
       },
-      { status: 500 }
+      {status:500}
     );
   }
 }
