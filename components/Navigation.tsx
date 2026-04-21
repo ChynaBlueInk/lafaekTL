@@ -1,4 +1,3 @@
-//components/Navigation.tsx
 "use client"
 
 import { useState, useRef, useCallback, useMemo, useEffect } from "react"
@@ -37,7 +36,9 @@ type Translations = {
   learning: string
   friends: string
   careers: string
-  revistaMedia: string
+  videos: string
+  services: string
+  books: string
   admin: string
   loginSignup: string
   signOut: string
@@ -71,14 +72,16 @@ const translations: Record<"en" | "tet", Translations> = {
     learning: "Learning",
     friends: "Friends of Lafaek",
     careers: "Careers",
-    revistaMedia: "Revista Media",
+    videos: "Videos",
+    services: "Services",
+    books: "Books",
     admin: "Admin",
     loginSignup: "Login / Signup",
     signOut: "Sign out",
     signedInAs: "Signed in as",
     en: "EN",
     tet: "TET",
-    memberArea: "Test Area",
+    memberArea: "Member Area",
     openMenu: "Open navigation menu",
     closeMenu: "Close navigation menu",
     expandSubmenu: "Expand submenu",
@@ -95,22 +98,24 @@ const translations: Record<"en" | "tet", Translations> = {
     aboutUs: "Kona-ba Ami",
     aboutUsDesc: "Misaun, valor no servisu Lafaek.",
     ourTeam: "Ekip Ami",
-    ourTeamDesc: "Escritor, ilustradór, dezainer no ekipasaun produsaun.",
+    ourTeamDesc: "Eskritór, ilustradór, dezainer no ekipa produsaun.",
     ourJourney: "Dalan Ami",
     ourJourneyDesc: "Tinan 25 aprende hamutuk ho Timor-Leste.",
     socialEnterprise: "Empreza Sosiál",
-    socialEnterpriseDesc: "Transitasaun husi NGO ba modelu negósiu sustentavel.",
+    socialEnterpriseDesc: "Ami nia tranzisaun husi NGO ba modelu negósiu sustentavel.",
     learning: "Aprendizajen",
     friends: "Kolega Lafaek",
-    careers: "Empregu/Vaga",
-    revistaMedia: "Revista Media",
+    careers: "Karreira",
+    videos: "Vídeu sira",
+    services: "Servisu",
+    books: "Livru sira",
     admin: "Admin",
     loginSignup: "Tama / Rejistu",
     signOut: "Sai",
-    signedInAs: "Tama ho",
+    signedInAs: "Tama hanesan",
     en: "EN",
     tet: "TET",
-    memberArea: "Teste Área",
+    memberArea: "Área Membro",
     openMenu: "Loke menu navigasaun",
     closeMenu: "Taka menu navigasaun",
     expandSubmenu: "Hatudu submenu",
@@ -121,7 +126,9 @@ const LOGGED_IN_NAV: SimpleNavItem[] = [
   { href: "/learning", label: "learning" },
   { href: "/friends", label: "friends" },
   { href: "/careers", label: "careers" },
-  { href: "/revista-media", label: "revistaMedia" },
+  { href: "/revista-media", label: "videos" },
+  { href: "/services", label: "services" },
+  { href: "/temp/books", label: "books" },
 ]
 
 interface LangToggleProps {
@@ -132,7 +139,7 @@ interface LangToggleProps {
 
 function LangToggle({ current, onSelect, labels }: LangToggleProps) {
   const base =
-    "px-2 py-1 text-xs font-semibold rounded-md transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
+    "rounded-md px-2 py-1 text-xs font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
   const active = "bg-[#F2C94C] text-[#219653]"
   const inactive = "border border-white text-white hover:bg-white/20"
 
@@ -165,7 +172,7 @@ function MegaMenu({ label, items, desktopLinkClass }: MegaMenuProps) {
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const clearCloseTimer = () => {
-    if(closeTimerRef.current){
+    if (closeTimerRef.current) {
       clearTimeout(closeTimerRef.current)
       closeTimerRef.current = null
     }
@@ -207,15 +214,15 @@ function MegaMenu({ label, items, desktopLinkClass }: MegaMenuProps) {
         aria-haspopup="menu"
         aria-expanded={isOpen}
         onClick={() => {
-          if(isOpen){
+          if (isOpen) {
             closeMenuNow()
-          }else{
+          } else {
             openMenu()
           }
         }}
         onFocus={openMenu}
         onKeyDown={(e) => {
-          if(e.key === "Escape"){
+          if (e.key === "Escape") {
             closeMenuNow()
             buttonRef.current?.blur()
           }
@@ -239,7 +246,7 @@ function MegaMenu({ label, items, desktopLinkClass }: MegaMenuProps) {
             aria-label={label}
             className="w-[680px] rounded-xl border border-[#F5F5F5] bg-white shadow-lg"
             onKeyDown={(e) => {
-              if(e.key === "Escape"){
+              if (e.key === "Escape") {
                 closeMenuNow()
                 buttonRef.current?.focus()
               }
@@ -338,13 +345,13 @@ export function Navigation() {
   }, [auth])
 
   const desktopLinkClass =
-    "px-2 py-1 rounded-md text-white hover:text-[#F2C94C] hover:bg-white/10 font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
+    "rounded-md px-2 py-1 font-medium text-white transition-colors hover:bg-white/10 hover:text-[#F2C94C] focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
 
   const secondBarLinkClass =
-    "px-3 py-2 rounded-md text-white/95 hover:text-[#F2C94C] hover:bg-white/10 font-medium text-sm transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
+    "rounded-md px-3 py-2 text-sm font-medium text-white/95 transition-colors hover:bg-white/10 hover:text-[#F2C94C] focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
 
   const mobileLinkClass =
-    "py-2 px-4 rounded-md transition-colors text-white hover:text-[#F2C94C] hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
+    "rounded-md px-4 py-2 text-white transition-colors hover:bg-white/10 hover:text-[#F2C94C] focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
 
   return (
     <nav
@@ -436,7 +443,7 @@ export function Navigation() {
         </div>
 
         {isSignedIn && (
-          <div className="mt-3 hidden border-t border-white/20 pt-3 md:block">
+          <div className="mt-2 hidden border-t border-white/20 pt-2 md:block">
             <nav aria-label="Member area" className="flex flex-wrap items-center gap-2">
               <span className="mr-2 text-xs uppercase tracking-wide text-white/70">
                 {t.memberArea}
