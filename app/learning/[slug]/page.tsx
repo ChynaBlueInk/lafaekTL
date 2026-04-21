@@ -110,8 +110,7 @@ export default function LearningSubjectPage({
       noItemsTitle: "No items yet",
       noItemsText:
         "This category is ready, but no published learning items have been uploaded yet.",
-      openItem: "Open item",
-      openFlipbook: "Open flipbook",
+      openFlipbook: "Open book",
       pages: "pages",
       sourcePdf: "PDF available",
       publishedItems: "Published items",
@@ -128,8 +127,7 @@ export default function LearningSubjectPage({
       noItemsTitle: "Seidauk iha item",
       noItemsText:
         "Kategoría ida ne’e prontu ona, maibé seidauk iha item aprendizagem publika ne’ebé upload ona.",
-      openItem: "Loke item",
-      openFlipbook: "Loke flipbook",
+      openFlipbook: "Loke livru",
       pages: "pájina sira",
       sourcePdf: "Iha PDF",
       publishedItems: "Item publika sira",
