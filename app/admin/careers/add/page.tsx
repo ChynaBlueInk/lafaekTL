@@ -1,4 +1,3 @@
-//app/admin/careers/add/page.tsx
 "use client";
 
 import {useRouter} from "next/navigation";

@@ -1,417 +1,567 @@
-//app/admin/books/page.tsx
-"use client";
+"use client"
 
-import {useEffect,useMemo,useState} from "react";
+import { useEffect, useMemo, useState } from "react"
 
-type FormState={
-  bookId:string;
-  titleEn:string;
-  titleTet:string;
-  descriptionEn:string;
-  descriptionTet:string;
-  level:""|"LK"|"LP";
-  category:string;
-  sourcePdfUrl:string;
-  isPublished:boolean;
-};
+type FormState = {
+  bookId: string
+  titleEn: string
+  titleTet: string
+  descriptionEn: string
+  descriptionTet: string
+  level: "" | "LK" | "LP"
+  category: string
+  sourcePdfUrl: string
+  isPublished: boolean
+}
 
-type UploadState={
-  isUploadingCover:boolean;
-  isUploadingPages:boolean;
-  isUploadingPdf:boolean;
-};
+type UploadState = {
+  isUploadingCover: boolean
+  isUploadingPages: boolean
+  isUploadingPdf: boolean
+}
 
-type AdminBookRecord={
-  bookId:string;
-  titleEn:string;
-  titleTet:string;
-  descriptionEn:string;
-  descriptionTet:string;
-  level:"LK"|"LP";
-  category:string;
-  coverImageUrl:string;
-  pageImageUrls:string[];
-  sourcePdfUrl?:string;
-  isPublished:boolean;
-  createdAt:string;
-  updatedAt:string;
-};
+type AdminBookRecord = {
+  bookId: string
+  titleEn: string
+  titleTet: string
+  descriptionEn: string
+  descriptionTet: string
+  level: "LK" | "LP"
+  category: string
+  coverImageUrl: string
+  pageImageUrls: string[]
+  sourcePdfUrl?: string
+  isPublished: boolean
+  createdAt: string
+  updatedAt: string
+}
 
-const initialForm:FormState={
-  bookId:"",
-  titleEn:"",
-  titleTet:"",
-  descriptionEn:"",
-  descriptionTet:"",
-  level:"",
-  category:"",
-  sourcePdfUrl:"",
-  isPublished:false,
-};
+const initialForm: FormState = {
+  bookId: "",
+  titleEn: "",
+  titleTet: "",
+  descriptionEn: "",
+  descriptionTet: "",
+  level: "",
+  category: "",
+  sourcePdfUrl: "",
+  isPublished: false,
+}
 
-async function getPresign(file:File,folder:string){
-  const response=await fetch("/api/uploads/s3/presign",{
-    method:"POST",
-    headers:{
-      "Content-Type":"application/json",
+async function getPresign(file: File, folder: string) {
+  const response = await fetch("/api/uploads/s3/presign", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
     },
-    body:JSON.stringify({
-      fileName:file.name,
-      contentType:file.type||"application/octet-stream",
+    body: JSON.stringify({
+      fileName: file.name,
+      contentType: file.type || "application/octet-stream",
       folder,
     }),
-  });
+  })
 
-  const data=await response.json();
+  const data = await response.json()
 
-  if(!response.ok){
-    throw new Error(data?.error||"Failed to create upload link.");
+  if (!response.ok) {
+    throw new Error(data?.error || "Failed to create upload link.")
   }
 
   return data as {
-    url:string;
-    fields:Record<string,string>;
-    publicUrl:string;
-    key:string;
-  };
+    url: string
+    fields: Record<string, string>
+    publicUrl: string
+    key: string
+  }
 }
 
-async function uploadFileToS3(file:File,folder:string){
-  const presign=await getPresign(file,folder);
+async function uploadFileToS3(file: File, folder: string) {
+  const presign = await getPresign(file, folder)
 
-  const formData=new FormData();
+  const formData = new FormData()
 
-  Object.entries(presign.fields).forEach(([key,value])=>{
-    formData.append(key,value);
-  });
+  Object.entries(presign.fields).forEach(([key, value]) => {
+    formData.append(key, value)
+  })
 
-  formData.append("file",file);
+  formData.append("file", file)
 
-  const uploadResponse=await fetch(presign.url,{
-    method:"POST",
-    body:formData,
-  });
+  const uploadResponse = await fetch(presign.url, {
+    method: "POST",
+    body: formData,
+  })
 
-  if(!uploadResponse.ok){
-    const uploadText=await uploadResponse.text().catch(()=>"");
-    throw new Error(uploadText||`Upload failed for ${file.name}`);
+  if (!uploadResponse.ok) {
+    const uploadText = await uploadResponse.text().catch(() => "")
+    throw new Error(uploadText || `Upload failed for ${file.name}`)
   }
 
   return {
-    publicUrl:presign.publicUrl,
-    key:presign.key,
-  };
+    publicUrl: presign.publicUrl,
+    key: presign.key,
+  }
 }
 
-export default function AdminBooksPage(){
-  const [form,setForm]=useState<FormState>(initialForm);
-  const [coverImageUrl,setCoverImageUrl]=useState("");
-  const [pageImageUrls,setPageImageUrls]=useState<string[]>([]);
-  const [pdfUrl,setPdfUrl]=useState("");
-  const [editingBookId,setEditingBookId]=useState("");
-  const [isSaving,setIsSaving]=useState(false);
-  const [isLoadingBooks,setIsLoadingBooks]=useState(true);
-  const [books,setBooks]=useState<AdminBookRecord[]>([]);
-  const [deletingBookId,setDeletingBookId]=useState("");
-  const [uploadState,setUploadState]=useState<UploadState>({
-    isUploadingCover:false,
-    isUploadingPages:false,
-    isUploadingPdf:false,
-  });
-  const [message,setMessage]=useState("");
-  const [error,setError]=useState("");
+export default function AdminBooksPage() {
+  const [form, setForm] = useState<FormState>(initialForm)
+  const [coverImageUrl, setCoverImageUrl] = useState("")
+  const [pageImageUrls, setPageImageUrls] = useState<string[]>([])
+  const [pdfUrl, setPdfUrl] = useState("")
+  const [editingBookId, setEditingBookId] = useState("")
+  const [isSaving, setIsSaving] = useState(false)
+  const [isLoadingBooks, setIsLoadingBooks] = useState(true)
+  const [books, setBooks] = useState<AdminBookRecord[]>([])
+  const [deletingBookId, setDeletingBookId] = useState("")
+  const [uploadState, setUploadState] = useState<UploadState>({
+    isUploadingCover: false,
+    isUploadingPages: false,
+    isUploadingPdf: false,
+  })
+  const [message, setMessage] = useState("")
+  const [error, setError] = useState("")
+  const [hasChanges, setHasChanges] = useState(false)
 
-  const isBusy=useMemo(()=>{
+  const isBusy = useMemo(() => {
     return (
       isSaving ||
       uploadState.isUploadingCover ||
       uploadState.isUploadingPages ||
       uploadState.isUploadingPdf
-    );
-  },[isSaving,uploadState]);
+    )
+  }, [isSaving, uploadState])
 
-  const isEditing=editingBookId.length>0;
+  const isEditing = editingBookId.length > 0
 
-  const resetForm=()=>{
-    setForm(initialForm);
-    setCoverImageUrl("");
-    setPageImageUrls([]);
-    setPdfUrl("");
-    setEditingBookId("");
-  };
+  const totalPublished = useMemo(() => {
+    return books.filter((book) => book.isPublished).length
+  }, [books])
 
-  const handleChange=(field:keyof FormState,value:string|boolean)=>{
-    setForm((prev)=>({
+  const totalWithPdf = useMemo(() => {
+    return books.filter((book) => !!book.sourcePdfUrl).length
+  }, [books])
+
+  const totalPageImages = useMemo(() => {
+    return books.reduce((sum, book) => sum + book.pageImageUrls.length, 0)
+  }, [books])
+
+  const markChanged = () => {
+    setHasChanges(true)
+  }
+
+  const resetForm = () => {
+    setForm(initialForm)
+    setCoverImageUrl("")
+    setPageImageUrls([])
+    setPdfUrl("")
+    setEditingBookId("")
+    setHasChanges(false)
+  }
+
+  const handleChange = (field: keyof FormState, value: string | boolean) => {
+    setForm((prev) => ({
       ...prev,
-      [field]:value,
-    }));
-  };
+      [field]: value,
+    }))
+    markChanged()
+  }
 
-  const loadBooks=async ()=>{
-    try{
-      setIsLoadingBooks(true);
+  const loadBooks = async () => {
+    try {
+      setIsLoadingBooks(true)
 
-      const response=await fetch("/api/admin/books",{
-        cache:"no-store",
-      });
+      const response = await fetch("/api/admin/books", {
+        cache: "no-store",
+      })
 
-      const data=await response.json();
+      const data = await response.json()
 
-      if(!response.ok || !data.success || !Array.isArray(data.books)){
-        throw new Error(data.message||"Failed to load books.");
+      if (!response.ok || !data.success || !Array.isArray(data.books)) {
+        throw new Error(data.message || "Failed to load books.")
       }
 
-      setBooks(data.books);
-    }catch(err){
-      const nextMessage=
-        err instanceof Error ? err.message : "Failed to load books.";
-      setError(nextMessage);
-    }finally{
-      setIsLoadingBooks(false);
+      setBooks(data.books)
+    } catch (err) {
+      const nextMessage =
+        err instanceof Error ? err.message : "Failed to load books."
+      setError(nextMessage)
+    } finally {
+      setIsLoadingBooks(false)
     }
-  };
+  }
 
-  useEffect(()=>{
-    loadBooks();
-  },[]);
+  useEffect(() => {
+    loadBooks()
+  }, [])
 
-  const handleEdit=(book:AdminBookRecord)=>{
-    setError("");
-    setMessage("");
-    setEditingBookId(book.bookId);
+  useEffect(() => {
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      if (!hasChanges) {
+        return
+      }
+
+      event.preventDefault()
+      event.returnValue = ""
+    }
+
+    window.addEventListener("beforeunload", handleBeforeUnload)
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload)
+    }
+  }, [hasChanges])
+
+  useEffect(() => {
+    const handleDocumentClick = (event: MouseEvent) => {
+      if (!hasChanges) {
+        return
+      }
+
+      const target = event.target as HTMLElement | null
+      const anchor = target?.closest("a") as HTMLAnchorElement | null
+
+      if (!anchor) {
+        return
+      }
+
+      const href = anchor.getAttribute("href") || ""
+      if (!href || href.startsWith("#") || href.startsWith("javascript:")) {
+        return
+      }
+
+      const isModifiedClick =
+        event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0
+
+      if (isModifiedClick || anchor.target === "_blank" || anchor.hasAttribute("download")) {
+        return
+      }
+
+      const confirmed = window.confirm("You have unsaved changes. Leave this page and lose them?")
+      if (!confirmed) {
+        event.preventDefault()
+        event.stopPropagation()
+      }
+    }
+
+    document.addEventListener("click", handleDocumentClick, true)
+
+    return () => {
+      document.removeEventListener("click", handleDocumentClick, true)
+    }
+  }, [hasChanges])
+
+  const handleEdit = (book: AdminBookRecord) => {
+    if (hasChanges) {
+      const confirmed = window.confirm(
+        "You have unsaved changes in the current form. Switch books and lose them?"
+      )
+      if (!confirmed) {
+        return
+      }
+    }
+
+    setError("")
+    setMessage("")
+    setEditingBookId(book.bookId)
     setForm({
-      bookId:book.bookId,
-      titleEn:book.titleEn,
-      titleTet:book.titleTet,
-      descriptionEn:book.descriptionEn,
-      descriptionTet:book.descriptionTet,
-      level:book.level,
-      category:book.category,
-      sourcePdfUrl:book.sourcePdfUrl||"",
-      isPublished:book.isPublished,
-    });
-    setCoverImageUrl(book.coverImageUrl||"");
-    setPageImageUrls(Array.isArray(book.pageImageUrls)?book.pageImageUrls:[]);
-    setPdfUrl(book.sourcePdfUrl||"");
+      bookId: book.bookId,
+      titleEn: book.titleEn,
+      titleTet: book.titleTet,
+      descriptionEn: book.descriptionEn,
+      descriptionTet: book.descriptionTet,
+      level: book.level,
+      category: book.category,
+      sourcePdfUrl: book.sourcePdfUrl || "",
+      isPublished: book.isPublished,
+    })
+    setCoverImageUrl(book.coverImageUrl || "")
+    setPageImageUrls(Array.isArray(book.pageImageUrls) ? book.pageImageUrls : [])
+    setPdfUrl(book.sourcePdfUrl || "")
+    setHasChanges(false)
 
     window.scrollTo({
-      top:0,
-      behavior:"smooth",
-    });
-  };
+      top: 0,
+      behavior: "smooth",
+    })
+  }
 
-  const handleCancelEdit=()=>{
-    setError("");
-    setMessage("");
-    resetForm();
-  };
-
-  const handleCoverUpload=async (event:React.ChangeEvent<HTMLInputElement>)=>{
-    const file=event.target.files?.[0];
-    if(!file) return;
-
-    setError("");
-    setMessage("");
-    setUploadState((prev)=>({...prev,isUploadingCover:true}));
-
-    try{
-      const result=await uploadFileToS3(file,"books/covers");
-      setCoverImageUrl(result.publicUrl);
-      setMessage("Cover uploaded successfully.");
-    }catch(err){
-      const nextMessage=err instanceof Error?err.message:"Failed to upload cover.";
-      setError(nextMessage);
-    }finally{
-      setUploadState((prev)=>({...prev,isUploadingCover:false}));
-      event.target.value="";
+  const handleCancelEdit = () => {
+    if (hasChanges) {
+      const confirmed = window.confirm("Discard unsaved changes in this form?")
+      if (!confirmed) {
+        return
+      }
     }
-  };
 
-  const handlePagesUpload=async (event:React.ChangeEvent<HTMLInputElement>)=>{
-    const files=Array.from(event.target.files||[]);
-    if(files.length===0) return;
+    setError("")
+    setMessage("")
+    resetForm()
+  }
 
-    setError("");
-    setMessage("");
-    setUploadState((prev)=>({...prev,isUploadingPages:true}));
+  const handleCoverUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
 
-    try{
-      const uploaded:string[]=[];
+    setError("")
+    setMessage("")
+    setUploadState((prev) => ({ ...prev, isUploadingCover: true }))
 
-      for(const file of files){
-        const result=await uploadFileToS3(file,"books/pages");
-        uploaded.push(result.publicUrl);
+    try {
+      const result = await uploadFileToS3(file, "books/covers")
+      setCoverImageUrl(result.publicUrl)
+      markChanged()
+      setMessage("Cover uploaded successfully. Click Save Changes to keep it.")
+    } catch (err) {
+      const nextMessage = err instanceof Error ? err.message : "Failed to upload cover."
+      setError(nextMessage)
+    } finally {
+      setUploadState((prev) => ({ ...prev, isUploadingCover: false }))
+      event.target.value = ""
+    }
+  }
+
+  const handlePagesUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files || [])
+    if (files.length === 0) return
+
+    setError("")
+    setMessage("")
+    setUploadState((prev) => ({ ...prev, isUploadingPages: true }))
+
+    try {
+      const uploaded: string[] = []
+
+      for (const file of files) {
+        const result = await uploadFileToS3(file, "books/pages")
+        uploaded.push(result.publicUrl)
       }
 
-      setPageImageUrls((prev)=>[...prev,...uploaded]);
-      setMessage(`${uploaded.length} page image${uploaded.length===1?"":"s"} uploaded successfully.`);
-    }catch(err){
-      const nextMessage=err instanceof Error?err.message:"Failed to upload page images.";
-      setError(nextMessage);
-    }finally{
-      setUploadState((prev)=>({...prev,isUploadingPages:false}));
-      event.target.value="";
+      setPageImageUrls((prev) => [...prev, ...uploaded])
+      markChanged()
+      setMessage(
+        `${uploaded.length} page image${uploaded.length === 1 ? "" : "s"} uploaded successfully. Click Save Changes to keep them.`
+      )
+    } catch (err) {
+      const nextMessage = err instanceof Error ? err.message : "Failed to upload page images."
+      setError(nextMessage)
+    } finally {
+      setUploadState((prev) => ({ ...prev, isUploadingPages: false }))
+      event.target.value = ""
     }
-  };
+  }
 
-  const handlePdfUpload=async (event:React.ChangeEvent<HTMLInputElement>)=>{
-    const file=event.target.files?.[0];
-    if(!file) return;
+  const handlePdfUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
 
-    setError("");
-    setMessage("");
-    setUploadState((prev)=>({...prev,isUploadingPdf:true}));
+    setError("")
+    setMessage("")
+    setUploadState((prev) => ({ ...prev, isUploadingPdf: true }))
 
-    try{
-      const result=await uploadFileToS3(file,"books/pdfs");
-      setPdfUrl(result.publicUrl);
-      setForm((prev)=>({
+    try {
+      const result = await uploadFileToS3(file, "books/pdfs")
+      setPdfUrl(result.publicUrl)
+      setForm((prev) => ({
         ...prev,
-        sourcePdfUrl:result.publicUrl,
-      }));
-      setMessage("PDF uploaded successfully.");
-    }catch(err){
-      const nextMessage=err instanceof Error?err.message:"Failed to upload PDF.";
-      setError(nextMessage);
-    }finally{
-      setUploadState((prev)=>({...prev,isUploadingPdf:false}));
-      event.target.value="";
+        sourcePdfUrl: result.publicUrl,
+      }))
+      markChanged()
+      setMessage("PDF uploaded successfully. Click Save Changes to keep it.")
+    } catch (err) {
+      const nextMessage = err instanceof Error ? err.message : "Failed to upload PDF."
+      setError(nextMessage)
+    } finally {
+      setUploadState((prev) => ({ ...prev, isUploadingPdf: false }))
+      event.target.value = ""
     }
-  };
+  }
 
-  const removePage=(index:number)=>{
-    setPageImageUrls((prev)=>prev.filter((_,i)=>i!==index));
-  };
+  const removePage = (index: number) => {
+    setPageImageUrls((prev) => prev.filter((_, i) => i !== index))
+    markChanged()
+    setMessage("Page image removed locally. Click Save Changes to keep it that way.")
+  }
 
-  const clearPdf=()=>{
-    setPdfUrl("");
-    setForm((prev)=>({
+  const clearPdf = () => {
+    setPdfUrl("")
+    setForm((prev) => ({
       ...prev,
-      sourcePdfUrl:"",
-    }));
-  };
+      sourcePdfUrl: "",
+    }))
+    markChanged()
+    setMessage("PDF removed locally. Click Save Changes to keep it that way.")
+  }
 
-  const handleDelete=async (bookId:string)=>{
-    const confirmed=window.confirm(`Delete book "${bookId}"?`);
-    if(!confirmed){
-      return;
+  const handleDelete = async (bookId: string) => {
+    const confirmed = window.confirm(`Delete book "${bookId}"?`)
+    if (!confirmed) {
+      return
     }
 
-    setDeletingBookId(bookId);
-    setMessage("");
-    setError("");
+    setDeletingBookId(bookId)
+    setMessage("")
+    setError("")
 
-    try{
-      const response=await fetch("/api/admin/books",{
-        method:"DELETE",
-        headers:{
-          "Content-Type":"application/json",
+    try {
+      const response = await fetch("/api/admin/books", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
         },
-        body:JSON.stringify({bookId}),
-      });
+        body: JSON.stringify({ bookId }),
+      })
 
-      const data=await response.json();
+      const data = await response.json()
 
-      if(!response.ok || !data.success){
-        throw new Error(data.message || "Failed to delete book.");
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || "Failed to delete book.")
       }
 
-      if(editingBookId===bookId){
-        resetForm();
+      if (editingBookId === bookId) {
+        resetForm()
       }
 
-      setMessage("Book deleted successfully.");
-      await loadBooks();
-    }catch(err){
-      const nextMessage=
-        err instanceof Error ? err.message : "Failed to delete book.";
-      setError(nextMessage);
-    }finally{
-      setDeletingBookId("");
+      setMessage("Book deleted successfully.")
+      await loadBooks()
+    } catch (err) {
+      const nextMessage =
+        err instanceof Error ? err.message : "Failed to delete book."
+      setError(nextMessage)
+    } finally {
+      setDeletingBookId("")
     }
-  };
+  }
 
-  const handleSubmit=async (event:React.FormEvent<HTMLFormElement>)=>{
-    event.preventDefault();
-    setIsSaving(true);
-    setMessage("");
-    setError("");
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    setIsSaving(true)
+    setMessage("")
+    setError("")
 
-    try{
-      const payload={
-        bookId:form.bookId.trim(),
-        titleEn:form.titleEn.trim(),
-        titleTet:form.titleTet.trim(),
-        descriptionEn:form.descriptionEn.trim(),
-        descriptionTet:form.descriptionTet.trim(),
-        level:form.level,
-        category:form.category.trim(),
-        coverImageUrl:coverImageUrl.trim(),
-        pageImageUrls:pageImageUrls.map((item)=>item.trim()).filter(Boolean),
-        sourcePdfUrl:(pdfUrl||form.sourcePdfUrl).trim(),
-        isPublished:form.isPublished,
-      };
+    try {
+      const payload = {
+        bookId: form.bookId.trim(),
+        titleEn: form.titleEn.trim(),
+        titleTet: form.titleTet.trim(),
+        descriptionEn: form.descriptionEn.trim(),
+        descriptionTet: form.descriptionTet.trim(),
+        level: form.level,
+        category: form.category.trim(),
+        coverImageUrl: coverImageUrl.trim(),
+        pageImageUrls: pageImageUrls.map((item) => item.trim()).filter(Boolean),
+        sourcePdfUrl: (pdfUrl || form.sourcePdfUrl).trim(),
+        isPublished: form.isPublished,
+      }
 
-      const response=await fetch("/api/admin/books",{
-        method:isEditing ? "PUT" : "POST",
-        headers:{
-          "Content-Type":"application/json",
+      const response = await fetch("/api/admin/books", {
+        method: isEditing ? "PUT" : "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-        body:JSON.stringify(payload),
-      });
+        body: JSON.stringify(payload),
+      })
 
-      const data=await response.json();
+      const data = await response.json()
 
-      if(!response.ok || !data.success){
-        throw new Error(data.message || `Failed to ${isEditing ? "update" : "save"} book.`);
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || `Failed to ${isEditing ? "update" : "save"} book.`)
       }
 
-      setMessage(isEditing ? "Book updated successfully." : "Book saved successfully.");
-      resetForm();
-      await loadBooks();
-    }catch(err){
-      const nextMessage=err instanceof Error ? err.message : `Failed to ${isEditing ? "update" : "save"} book.`;
-      setError(nextMessage);
-    }finally{
-      setIsSaving(false);
+      setMessage(isEditing ? "Book updated successfully." : "Book saved successfully.")
+      resetForm()
+      await loadBooks()
+    } catch (err) {
+      const nextMessage =
+        err instanceof Error ? err.message : `Failed to ${isEditing ? "update" : "save"} book.`
+      setError(nextMessage)
+    } finally {
+      setIsSaving(false)
     }
-  };
+  }
 
   return (
-    <main className="min-h-screen bg-[#f5f5f5] px-4 py-8">
-      <div className="mx-auto max-w-5xl space-y-8">
-        <div>
-          <h1 className="text-3xl font-bold text-[#1f2937]">Books Admin</h1>
-          <p className="mt-2 text-sm text-[#4b5563]">
-            Upload book assets to AWS and save the book metadata to DynamoDB.
-          </p>
-        </div>
+    <main className="min-h-screen bg-[#f5f5f5] px-4 pb-8">
+      <div className="sticky top-28 z-30 -mx-4 mb-6 border-b border-[#e5e7eb] bg-white/95 px-4 py-3 backdrop-blur md:top-32">
+        <div className="mx-auto flex max-w-5xl flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-[#1f2937]">Books Admin</h1>
+            <p className="mt-1 text-sm text-[#4b5563]">
+              Upload book assets to AWS and save the book metadata to DynamoDB.
+            </p>
+          </div>
 
-        <div className="rounded-2xl border border-[#e5e7eb] bg-white p-6 shadow-sm">
-          <div className="mb-4 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-            <div>
-              <h2 className="text-xl font-bold text-[#1f2937]">
-                {isEditing ? "Edit Book" : "Add New Book"}
-              </h2>
-              <p className="mt-1 text-sm text-[#4b5563]">
-                {isEditing
-                  ? `You are editing ${editingBookId}.`
-                  : "Create a new book record and upload the related files."}
-              </p>
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="text-xs text-[#4b5563]">
+              Total: <span className="font-semibold">{books.length}</span>
+              {" "}• Published: <span className="font-semibold">{totalPublished}</span>
+              {" "}• PDFs: <span className="font-semibold">{totalWithPdf}</span>
+              {" "}• Page images: <span className="font-semibold">{totalPageImages}</span>
+              {" "}• Unsaved: <span className={`font-semibold ${hasChanges ? "text-[#b45309]" : "text-[#166534]"}`}>
+                {hasChanges ? "Yes" : "None"}
+              </span>
             </div>
 
             {isEditing ? (
               <button
                 type="button"
                 onClick={handleCancelEdit}
-                className="rounded-lg border border-[#d1d5db] px-4 py-2 text-sm font-medium text-[#374151] hover:bg-[#f9fafb]"
+                disabled={isBusy}
+                className="rounded-lg border border-[#d1d5db] px-4 py-2 text-sm font-medium text-[#374151] hover:bg-[#f9fafb] disabled:opacity-60"
               >
                 Cancel Edit
               </button>
             ) : null}
+
+            <button
+              type="submit"
+              form="books-admin-form"
+              disabled={isBusy || !hasChanges}
+              className="rounded-lg bg-[#219653] px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
+            >
+              {isSaving
+                ? isEditing
+                  ? "Updating..."
+                  : "Saving..."
+                : isEditing
+                ? "Update Book"
+                : "Save Book"}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div className="mx-auto max-w-5xl space-y-8">
+        {hasChanges ? (
+          <div className="rounded-lg border border-[#f59e0b] bg-[#fff7ed] px-4 py-3 text-sm text-[#9a3412]">
+            You have unsaved changes. Click <span className="font-semibold">Save Book</span> or{" "}
+            <span className="font-semibold">Update Book</span> before leaving this page.
+          </div>
+        ) : null}
+
+        {message ? (
+          <div className="rounded-lg border border-[#6FCF97] bg-[#ecfdf3] px-4 py-3 text-sm text-[#166534]">
+            {message}
+          </div>
+        ) : null}
+
+        {error ? (
+          <div className="rounded-lg border border-[#EB5757] bg-[#fef2f2] px-4 py-3 text-sm text-[#991b1b]">
+            {error}
+          </div>
+        ) : null}
+
+        <div className="rounded-2xl border border-[#e5e7eb] bg-white p-6 shadow-sm">
+          <div className="mb-4">
+            <h2 className="text-xl font-bold text-[#1f2937]">
+              {isEditing ? "Edit Book" : "Add New Book"}
+            </h2>
+            <p className="mt-1 text-sm text-[#4b5563]">
+              {isEditing
+                ? `You are editing ${editingBookId}.`
+                : "Create a new book record and upload the related files."}
+            </p>
           </div>
 
-          <form className="space-y-6" onSubmit={handleSubmit}>
+          <form id="books-admin-form" className="space-y-6" onSubmit={handleSubmit}>
             <div className="grid gap-4 md:grid-cols-2">
               <div>
                 <label htmlFor="bookId" className="mb-2 block text-sm font-medium text-[#374151]">
@@ -421,7 +571,7 @@ export default function AdminBooksPage(){
                   id="bookId"
                   type="text"
                   value={form.bookId}
-                  onChange={(event)=>handleChange("bookId",event.target.value)}
+                  onChange={(event) => handleChange("bookId", event.target.value)}
                   placeholder="lk-hamoos-tasi"
                   disabled={isEditing}
                   className="w-full rounded-lg border border-[#d1d5db] px-3 py-2 text-sm outline-none focus:border-[#219653] disabled:bg-[#f3f4f6] disabled:text-[#6b7280]"
@@ -435,7 +585,7 @@ export default function AdminBooksPage(){
                 <select
                   id="level"
                   value={form.level}
-                  onChange={(event)=>handleChange("level",event.target.value as FormState["level"])}
+                  onChange={(event) => handleChange("level", event.target.value as FormState["level"])}
                   className="w-full rounded-lg border border-[#d1d5db] px-3 py-2 text-sm outline-none focus:border-[#219653]"
                 >
                   <option value="" disabled>
@@ -456,7 +606,7 @@ export default function AdminBooksPage(){
                   id="titleEn"
                   type="text"
                   value={form.titleEn}
-                  onChange={(event)=>handleChange("titleEn",event.target.value)}
+                  onChange={(event) => handleChange("titleEn", event.target.value)}
                   className="w-full rounded-lg border border-[#d1d5db] px-3 py-2 text-sm outline-none focus:border-[#219653]"
                 />
               </div>
@@ -469,7 +619,7 @@ export default function AdminBooksPage(){
                   id="titleTet"
                   type="text"
                   value={form.titleTet}
-                  onChange={(event)=>handleChange("titleTet",event.target.value)}
+                  onChange={(event) => handleChange("titleTet", event.target.value)}
                   className="w-full rounded-lg border border-[#d1d5db] px-3 py-2 text-sm outline-none focus:border-[#219653]"
                 />
               </div>
@@ -483,7 +633,7 @@ export default function AdminBooksPage(){
                 id="category"
                 type="text"
                 value={form.category}
-                onChange={(event)=>handleChange("category",event.target.value)}
+                onChange={(event) => handleChange("category", event.target.value)}
                 placeholder="Environment, Health, Story, Reading"
                 className="w-full rounded-lg border border-[#d1d5db] px-3 py-2 text-sm outline-none focus:border-[#219653]"
               />
@@ -501,9 +651,13 @@ export default function AdminBooksPage(){
                 disabled={isBusy}
                 className="block w-full text-sm text-[#374151]"
               />
+              <p className="mt-2 text-xs text-[#6b7280]">
+                Upload first, then click Save Changes to keep it.
+              </p>
+
               {coverImageUrl ? (
                 <div className="mt-3 space-y-3">
-                  <div className="rounded-lg bg-white p-3 text-xs text-[#374151] break-all">
+                  <div className="rounded-lg bg-white p-3 text-xs break-all text-[#374151]">
                     {coverImageUrl}
                   </div>
                   <img
@@ -529,12 +683,12 @@ export default function AdminBooksPage(){
                 className="block w-full text-sm text-[#374151]"
               />
               <p className="mt-2 text-xs text-[#6b7280]">
-                Upload the inside pages in reading order.
+                Upload the inside pages in reading order, then save the record.
               </p>
 
-              {pageImageUrls.length>0 ? (
+              {pageImageUrls.length > 0 ? (
                 <div className="mt-4 space-y-2">
-                  {pageImageUrls.map((url,index)=>(
+                  {pageImageUrls.map((url, index) => (
                     <div
                       key={`${url}-${index}`}
                       className="flex items-start justify-between gap-3 rounded-lg bg-white p-3 text-xs text-[#374151]"
@@ -542,7 +696,7 @@ export default function AdminBooksPage(){
                       <span className="break-all">{url}</span>
                       <button
                         type="button"
-                        onClick={()=>removePage(index)}
+                        onClick={() => removePage(index)}
                         className="shrink-0 rounded-md border border-[#EB5757] px-2 py-1 text-[#EB5757] hover:bg-[#fff5f5]"
                       >
                         Remove
@@ -559,7 +713,7 @@ export default function AdminBooksPage(){
                   Source PDF Upload (optional)
                 </label>
 
-                {(pdfUrl||form.sourcePdfUrl) ? (
+                {(pdfUrl || form.sourcePdfUrl) ? (
                   <button
                     type="button"
                     onClick={clearPdf}
@@ -578,9 +732,13 @@ export default function AdminBooksPage(){
                 disabled={isBusy}
                 className="block w-full text-sm text-[#374151]"
               />
-              {(pdfUrl||form.sourcePdfUrl) ? (
-                <div className="mt-3 rounded-lg bg-white p-3 text-xs text-[#374151] break-all">
-                  {pdfUrl||form.sourcePdfUrl}
+              <p className="mt-2 text-xs text-[#6b7280]">
+                Upload first, then click Save Changes to keep it.
+              </p>
+
+              {(pdfUrl || form.sourcePdfUrl) ? (
+                <div className="mt-3 rounded-lg bg-white p-3 text-xs break-all text-[#374151]">
+                  {pdfUrl || form.sourcePdfUrl}
                 </div>
               ) : null}
             </div>
@@ -594,7 +752,7 @@ export default function AdminBooksPage(){
                   id="descriptionEn"
                   rows={4}
                   value={form.descriptionEn}
-                  onChange={(event)=>handleChange("descriptionEn",event.target.value)}
+                  onChange={(event) => handleChange("descriptionEn", event.target.value)}
                   className="w-full rounded-lg border border-[#d1d5db] px-3 py-2 text-sm outline-none focus:border-[#219653]"
                 />
               </div>
@@ -607,7 +765,7 @@ export default function AdminBooksPage(){
                   id="descriptionTet"
                   rows={4}
                   value={form.descriptionTet}
-                  onChange={(event)=>handleChange("descriptionTet",event.target.value)}
+                  onChange={(event) => handleChange("descriptionTet", event.target.value)}
                   className="w-full rounded-lg border border-[#d1d5db] px-3 py-2 text-sm outline-none focus:border-[#219653]"
                 />
               </div>
@@ -618,52 +776,12 @@ export default function AdminBooksPage(){
                 id="isPublished"
                 type="checkbox"
                 checked={form.isPublished}
-                onChange={(event)=>handleChange("isPublished",event.target.checked)}
+                onChange={(event) => handleChange("isPublished", event.target.checked)}
                 className="h-4 w-4 rounded border-[#d1d5db]"
               />
               <label htmlFor="isPublished" className="text-sm text-[#374151]">
                 Publish this book now
               </label>
-            </div>
-
-            {message ? (
-              <div className="rounded-lg border border-[#6FCF97] bg-[#ecfdf3] px-4 py-3 text-sm text-[#166534]">
-                {message}
-              </div>
-            ) : null}
-
-            {error ? (
-              <div className="rounded-lg border border-[#EB5757] bg-[#fef2f2] px-4 py-3 text-sm text-[#991b1b]">
-                {error}
-              </div>
-            ) : null}
-
-            <div className="border-t border-[#e5e7eb] pt-4">
-              <div className="flex flex-wrap gap-3">
-                <button
-                  type="submit"
-                  disabled={isBusy}
-                  className="rounded-lg bg-[#219653] px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
-                >
-                  {isSaving
-                    ? isEditing
-                      ? "Updating..."
-                      : "Saving..."
-                    : isEditing
-                    ? "Update Book"
-                    : "Save Book"}
-                </button>
-
-                {isEditing ? (
-                  <button
-                    type="button"
-                    onClick={handleCancelEdit}
-                    className="rounded-lg border border-[#d1d5db] px-4 py-2 text-sm font-medium text-[#374151] hover:bg-[#f9fafb]"
-                  >
-                    Cancel
-                  </button>
-                ) : null}
-              </div>
             </div>
           </form>
         </div>
@@ -690,13 +808,13 @@ export default function AdminBooksPage(){
             <div className="rounded-xl bg-[#fafafa] p-4 text-sm text-[#4b5563]">
               Loading books...
             </div>
-          ) : books.length===0 ? (
+          ) : books.length === 0 ? (
             <div className="rounded-xl bg-[#fafafa] p-4 text-sm text-[#4b5563]">
               No books found yet.
             </div>
           ) : (
             <div className="space-y-4">
-              {books.map((book)=>(
+              {books.map((book) => (
                 <div
                   key={book.bookId}
                   className="rounded-xl border border-[#e5e7eb] bg-[#fafafa] p-4"
@@ -760,19 +878,19 @@ export default function AdminBooksPage(){
                   <div className="mt-4 flex flex-wrap gap-2">
                     <button
                       type="button"
-                      onClick={()=>handleEdit(book)}
-                      disabled={deletingBookId===book.bookId}
+                      onClick={() => handleEdit(book)}
+                      disabled={deletingBookId === book.bookId}
                       className="rounded-lg border border-[#d1d5db] px-3 py-2 text-sm font-medium text-[#374151] hover:bg-white disabled:opacity-60"
                     >
                       Edit
                     </button>
                     <button
                       type="button"
-                      onClick={()=>handleDelete(book.bookId)}
-                      disabled={deletingBookId===book.bookId}
+                      onClick={() => handleDelete(book.bookId)}
+                      disabled={deletingBookId === book.bookId}
                       className="rounded-lg border border-[#EB5757] px-3 py-2 text-sm font-medium text-[#EB5757] hover:bg-[#fff5f5] disabled:opacity-60"
                     >
-                      {deletingBookId===book.bookId ? "Deleting..." : "Delete"}
+                      {deletingBookId === book.bookId ? "Deleting..." : "Delete"}
                     </button>
                   </div>
                 </div>
@@ -782,5 +900,5 @@ export default function AdminBooksPage(){
         </div>
       </div>
     </main>
-  );
+  )
 }

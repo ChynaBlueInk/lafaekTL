@@ -1,11 +1,10 @@
-// app/admin/impact/page.tsx
 "use client";
 
 import {useEffect,useMemo,useState,ChangeEvent}from "react";
 import {getUserDisplayName,getUserEmail}from "@/lib/auth";
 
 const S3_ORIGIN="https://lafaek-media.s3.ap-southeast-2.amazonaws.com";
-const ACTION_BAR_TOP=96; // adjust if your site navbar is taller/shorter
+const ACTION_BAR_TOP=96;
 
 type ImpactStatus="draft"|"published"|"hidden"|"archived";
 
@@ -20,19 +19,18 @@ type ImpactItem={
   excerptTet:string;
   bodyEn:string;
   bodyTet:string;
-  date:string; // ISO date: YYYY-MM-DD
+  date:string;
   image?:string;
   imageUrl?:string;
-  document?:string; // S3 key for uploaded PDF
-
-  // audit fields (already in S3)
+  document?:string;
   createdAt?:string;
   createdBy?:{sub?:string;email?:string;fullName?:string};
   updatedAt?:string;
   updatedBy?:{sub?:string;email?:string;fullName?:string};
   updatedByGroups?:string[];
-
-  // allow draft submission fields etc
+  submittedBy?:{fullName?:string;email?:string;phone?:string};
+  draft?:{storySummary?:string};
+  location?:{suco?:string;municipality?:string};
   [key:string]:any;
 };
 
@@ -47,23 +45,14 @@ type PresignResponse={
   fields:Record<string,string>;
   key?:string;
   publicUrl?:string;
-  meta?:{
-    REGION:string;
-    BUCKET:string;
-    USE_ACL:boolean;
-  };
   error?:string;
 };
 
 const buildImageUrl=(src?:string)=>{
   if(!src){return"";}
   let clean=src.trim();
-  if(clean.startsWith(S3_ORIGIN)){
-    return clean;
-  }
-  if(clean.startsWith("http://")||clean.startsWith("https://")){
-    return clean;
-  }
+  if(clean.startsWith(S3_ORIGIN)){return clean;}
+  if(clean.startsWith("http://")||clean.startsWith("https://")){return clean;}
   clean=clean.replace(/^\/+/,"");
   return`${S3_ORIGIN}/${clean}`;
 };
@@ -71,9 +60,7 @@ const buildImageUrl=(src?:string)=>{
 const buildFileUrl=(src?:string)=>{
   if(!src){return"";}
   let clean=src.trim();
-  if(clean.startsWith("http://")||clean.startsWith("https://")||clean.startsWith(S3_ORIGIN)){
-    return clean;
-  }
+  if(clean.startsWith("http://")||clean.startsWith("https://")||clean.startsWith(S3_ORIGIN)){return clean;}
   clean=clean.replace(/^\/+/,"");
   return`${S3_ORIGIN}/${clean}`;
 };
@@ -91,7 +78,7 @@ const emptyItem=():ImpactItem=>({
   bodyTet:"",
   date:new Date().toISOString().slice(0,10),
   image:"",
-  document:""
+  document:"",
 });
 
 function safeStatus(raw:any):ImpactStatus{
@@ -111,15 +98,9 @@ function getStatusLabel(status:ImpactStatus){
 }
 
 function getStatusClasses(status:ImpactStatus){
-  if(status==="draft"){
-    return"border-amber-200 bg-amber-50 text-amber-900";
-  }
-  if(status==="published"){
-    return"border-emerald-200 bg-emerald-50 text-emerald-900";
-  }
-  if(status==="archived"){
-    return"border-slate-300 bg-slate-100 text-slate-700";
-  }
+  if(status==="draft"){return"border-amber-200 bg-amber-50 text-amber-900";}
+  if(status==="published"){return"border-emerald-200 bg-emerald-50 text-emerald-900";}
+  if(status==="archived"){return"border-slate-300 bg-slate-100 text-slate-700";}
   return"border-blue-200 bg-blue-50 text-blue-900";
 }
 
@@ -127,19 +108,16 @@ function formatLastUpdated(item:ImpactItem){
   const name=typeof item.updatedBy?.fullName==="string"?item.updatedBy.fullName.trim():"";
   const email=typeof item.updatedBy?.email==="string"?item.updatedBy.email.trim():"";
   const who=name||email;
-
   const stampRaw=typeof item.updatedAt==="string"?item.updatedAt:"";
   const stamp=stampRaw?new Date(stampRaw).toLocaleString():"";
-
   if(!who&&!stamp){return"";}
-  if(who&&stamp){return `${who} • ${stamp}`;}
+  if(who&&stamp){return`${who} • ${stamp}`;}
   return who||stamp;
 }
 
 function getOidcProfile(){
   if(typeof window==="undefined"){return null;}
   try{
-    // uses your current OIDC storage key pattern
     const authority="https://cognito-idp.ap-southeast-2.amazonaws.com/ap-southeast-2_a70kol0sr";
     const clientId="30g26p9ts1baddag42g747snp3";
     const key=`oidc.user:${authority}:${clientId}`;
@@ -161,7 +139,9 @@ function getUserGroups(){
   const p=getOidcProfile();
   const raw=p?.["cognito:groups"];
   if(Array.isArray(raw)){return raw.map((x)=>String(x));}
-  if(typeof raw==="string"&&raw.trim()){return raw.split(",").map((s)=>s.trim()).filter(Boolean);}
+  if(typeof raw==="string"&&raw.trim()){
+    return raw.split(",").map((s)=>s.trim()).filter(Boolean);
+  }
   return [];
 }
 
@@ -175,22 +155,19 @@ export default function ImpactAdminPage(){
   const[showAddModal,setShowAddModal]=useState<boolean>(false);
   const[newItem,setNewItem]=useState<ImpactItem>(emptyItem());
 
-  const[uploadingId,setUploadingId]=useState<string|undefined>(); // image
-  const[uploadingDocId,setUploadingDocId]=useState<string|undefined>(); // document
+  const[uploadingId,setUploadingId]=useState<string|undefined>();
+  const[uploadingDocId,setUploadingDocId]=useState<string|undefined>();
   const[message,setMessage]=useState<string>("");
 
   const[query,setQuery]=useState<string>("");
   const[showKeys,setShowKeys]=useState<boolean>(false);
 
-  // Filters + sort
   const[filterMode,setFilterMode]=useState<"all"|"visible"|"hidden">("all");
   const[dateFrom,setDateFrom]=useState<string>("");
   const[dateTo,setDateTo]=useState<string>("");
   const[sortMode,setSortMode]=useState<"editor"|"latest"|"oldest"|"az">("editor");
   const[onlyWithImage,setOnlyWithImage]=useState<boolean>(false);
   const[onlyWithPdf,setOnlyWithPdf]=useState<boolean>(false);
-
-  // status filter
   const[statusFilter,setStatusFilter]=useState<"all"|ImpactStatus>("all");
 
   const[dirtyIds,setDirtyIds]=useState<Set<string>>(new Set());
@@ -199,10 +176,13 @@ export default function ImpactAdminPage(){
     const load=async()=>{
       try{
         setLoading(true);
+        setError(undefined);
+
         const res=await fetch("/api/admin/impact",{method:"GET",cache:"no-store"});
         if(!res.ok){
           throw new Error(`Failed to load impact stories: ${res.status}`);
         }
+
         const data:ApiResponse=await res.json();
         if(!data.ok){
           throw new Error(data.error||"Unknown error from Impact API");
@@ -211,10 +191,7 @@ export default function ImpactAdminPage(){
         const normalised:ImpactItem[]=(data.items||[]).map((raw:any,index:number)=>{
           const rawId=typeof raw.id==="string"?raw.id:"";
           const status=safeStatus(raw);
-
-          const visible=typeof raw.visible==="boolean"
-            ? raw.visible
-            : status==="published";
+          const visible=typeof raw.visible==="boolean" ? raw.visible : status==="published";
 
           const item:ImpactItem={
             id:rawId||`impact-item-${index}`,
@@ -231,31 +208,76 @@ export default function ImpactAdminPage(){
             image:(raw.image as string)||(raw.imageUrl as string)||"",
             imageUrl:(raw.imageUrl as string)||"",
             document:(raw.document as string)||"",
-
             createdAt:typeof raw.createdAt==="string"?raw.createdAt:undefined,
             createdBy:raw.createdBy,
             updatedAt:typeof raw.updatedAt==="string"?raw.updatedAt:undefined,
             updatedBy:raw.updatedBy,
-            updatedByGroups:Array.isArray(raw.updatedByGroups)?raw.updatedByGroups:undefined
+            updatedByGroups:Array.isArray(raw.updatedByGroups)?raw.updatedByGroups:undefined,
+            submittedBy:raw.submittedBy,
+            draft:raw.draft,
+            location:raw.location,
           };
 
           return{
             ...raw,
-            ...item
+            ...item,
           };
         });
 
-        normalised.sort((a,b)=>a.order-b.order);
+        normalised.sort((a,b)=>(a.order??0)-(b.order??0));
         setItems(normalised);
-        setError(undefined);
       }catch(err:any){
-        setError(err.message||"Error loading impact stories");
+        setError(err?.message||"Error loading impact stories");
       }finally{
         setLoading(false);
       }
     };
-    load();
+
+    void load();
   },[]);
+
+  useEffect(()=>{
+    const handleBeforeUnload=(event:BeforeUnloadEvent)=>{
+      if(!hasChanges){return;}
+      event.preventDefault();
+      event.returnValue="";
+    };
+
+    window.addEventListener("beforeunload",handleBeforeUnload);
+    return()=>{
+      window.removeEventListener("beforeunload",handleBeforeUnload);
+    };
+  },[hasChanges]);
+
+  useEffect(()=>{
+    const handleDocumentClick=(event:MouseEvent)=>{
+      if(!hasChanges){return;}
+
+      const target=event.target as HTMLElement|null;
+      const anchor=target?.closest("a") as HTMLAnchorElement|null;
+
+      if(!anchor){return;}
+
+      const href=anchor.getAttribute("href")||"";
+      if(!href||href.startsWith("#")||href.startsWith("javascript:")){return;}
+
+      const isModifiedClick=
+        event.metaKey||event.ctrlKey||event.shiftKey||event.altKey||event.button!==0;
+
+      if(isModifiedClick||anchor.target==="_blank"||anchor.hasAttribute("download")){return;}
+
+      const confirmed=window.confirm("You have unsaved changes. Leave this page and lose them?");
+      if(!confirmed){
+        event.preventDefault();
+        event.stopPropagation();
+      }
+    };
+
+    document.addEventListener("click",handleDocumentClick,true);
+    return()=>{
+      document.removeEventListener("click",handleDocumentClick,true);
+    };
+  },[hasChanges]);
 
   const markChanged=(id?:string)=>{
     if(!hasChanges){
@@ -281,29 +303,34 @@ export default function ImpactAdminPage(){
       if(field==="visible"){
         const vis=Boolean(value);
         let nextStatus=current.status||safeStatus(current);
+
         if(vis){
-          if(nextStatus==="draft"){}
-          else if(nextStatus==="archived"){}
-          else{nextStatus="published";}
+          if(nextStatus==="draft"||nextStatus==="archived"){
+            nextStatus=nextStatus;
+          }else{
+            nextStatus="published";
+          }
         }else{
-          if(nextStatus==="published"){nextStatus="hidden";}
+          if(nextStatus==="published"){
+            nextStatus="hidden";
+          }
         }
+
         next[index]={...current,visible:vis,status:nextStatus} as ImpactItem;
         return next;
       }
 
       if(field==="status"){
         const s=value as ImpactStatus;
-        const vis=current.visible;
-        const forcedVisible=s==="published"?true:false;
-        const nextVisible=s==="published"?true:(s==="draft"?false:(s==="hidden"?false:(s==="archived"?false:vis)));
-        next[index]={...current,status:s,visible:forcedVisible?true:nextVisible} as ImpactItem;
+        const nextVisible=s==="published";
+        next[index]={...current,status:s,visible:nextVisible} as ImpactItem;
         return next;
       }
 
       next[index]={...current,[field]:value} as ImpactItem;
       return next;
     });
+
     markChanged(id);
   };
 
@@ -312,27 +339,38 @@ export default function ImpactAdminPage(){
       const next=[...prev];
       const index=next.findIndex((i)=>i.id===id);
       if(index===-1){return prev;}
+
       const targetIndex=index+delta;
       if(targetIndex<0||targetIndex>=next.length){return prev;}
+
       const current=next[index];
       const target=next[targetIndex];
       if(!current||!target){return prev;}
+
       const currentOrder=current.order;
       next[index]={...current,order:target.order};
       next[targetIndex]={...target,order:currentOrder};
-      next.sort((a,b)=>a.order-b.order);
+      next.sort((a,b)=>(a.order??0)-(b.order??0));
       return next;
     });
+
     markChanged(id);
+    setMessage("Order updated. Click Save Changes.");
   };
 
   const handleAddNew=()=>{
     setNewItem(emptyItem());
     setShowAddModal(true);
     setMessage("");
+    setError(undefined);
   };
 
   const handleAddNewSubmit=()=>{
+    if(!newItem.titleEn.trim()){
+      setMessage("Please add at least an English title before creating the story.");
+      return;
+    }
+
     setItems((prev)=>{
       const maxOrder=prev.length?Math.max(...prev.map((i)=>i.order||0)):0;
       const itemToAdd={
@@ -340,18 +378,21 @@ export default function ImpactAdminPage(){
         id:`impact-temp-${Date.now()}`,
         status:newItem.status||"hidden",
         visible:Boolean(newItem.visible),
-        order:maxOrder+1
+        order:maxOrder+1,
       } as ImpactItem;
       return[...prev,itemToAdd];
     });
+
     setShowAddModal(false);
     setHasChanges(true);
+    setMessage("Story created locally. Click Save Changes to publish the update to AWS.");
   };
 
   const handleDelete=(id:string)=>{
     if(!window.confirm("Delete this impact story?")){return;}
     setItems((prev)=>prev.filter((i)=>i.id!==id));
     markChanged(id);
+    setMessage("Story deleted locally. Click Save Changes to keep it that way.");
   };
 
   const handleArchive=(id:string)=>{
@@ -363,7 +404,7 @@ export default function ImpactAdminPage(){
   };
 
   const handleUnarchive=(id:string)=>{
-    const ok=window.confirm("Unarchive this story? It will return as Hidden (not public) until you make it Visible.");
+    const ok=window.confirm("Unarchive this story? It will return as Hidden until you make it Visible.");
     if(!ok){return;}
     handleFieldChange(id,"status","hidden");
     handleFieldChange(id,"visible",false);
@@ -382,6 +423,7 @@ export default function ImpactAdminPage(){
     try{
       setSaving(true);
       setMessage("");
+      setError(undefined);
 
       const now=new Date().toISOString();
       const fullName=getUserDisplayName();
@@ -397,9 +439,9 @@ export default function ImpactAdminPage(){
             updatedBy:{
               sub:sub||it.updatedBy?.sub||"",
               email:email||it.updatedBy?.email||"",
-              fullName:fullName||it.updatedBy?.fullName||""
+              fullName:fullName||it.updatedBy?.fullName||"",
             },
-            updatedByGroups:groups.length?groups:it.updatedByGroups
+            updatedByGroups:groups.length?groups:it.updatedByGroups,
           };
         }
         return it;
@@ -410,22 +452,23 @@ export default function ImpactAdminPage(){
       const res=await fetch("/api/admin/impact",{
         method:"PUT",
         headers:{"Content-Type":"application/json"},
-        body:JSON.stringify(payload)
+        body:JSON.stringify(payload),
       });
 
       if(!res.ok){
         throw new Error(`Failed to save: ${res.status}`);
       }
+
       const data=await res.json();
       if(!data.ok){
         throw new Error(data.error||"Unknown error from Impact API");
       }
 
       setHasChanges(false);
-      setMessage("Changes saved successfully.");
       setDirtyIds(new Set());
+      setMessage("Changes saved successfully.");
     }catch(err:any){
-      setMessage(err.message||"Error saving changes");
+      setError(err?.message||"Error saving changes");
     }finally{
       setSaving(false);
     }
@@ -433,6 +476,7 @@ export default function ImpactAdminPage(){
 
   const handleRemoveImage=(id:string)=>{
     if(!window.confirm("Remove the image from this story?")){return;}
+
     setItems((prev)=>{
       const next=[...prev];
       const index=next.findIndex((i)=>i.id===id);
@@ -442,12 +486,14 @@ export default function ImpactAdminPage(){
       next[index]={...current,image:"",imageUrl:""} as ImpactItem;
       return next;
     });
+
     markChanged(id);
     setMessage("Image removed. Remember to Save Changes.");
   };
 
   const handleRemoveDocument=(id:string)=>{
     if(!window.confirm("Remove the PDF from this story?")){return;}
+
     setItems((prev)=>{
       const next=[...prev];
       const index=next.findIndex((i)=>i.id===id);
@@ -457,6 +503,7 @@ export default function ImpactAdminPage(){
       next[index]={...current,document:""} as ImpactItem;
       return next;
     });
+
     markChanged(id);
     setMessage("PDF removed. Remember to Save Changes.");
   };
@@ -465,6 +512,7 @@ export default function ImpactAdminPage(){
     try{
       setUploadingId(id);
       setMessage("");
+      setError(undefined);
 
       const presignRes=await fetch("/api/uploads/s3/presign",{
         method:"POST",
@@ -472,8 +520,8 @@ export default function ImpactAdminPage(){
         body:JSON.stringify({
           folder:"impact",
           fileName:file.name,
-          contentType:file.type
-        })
+          contentType:file.type,
+        }),
       });
 
       if(!presignRes.ok){
@@ -513,10 +561,11 @@ export default function ImpactAdminPage(){
         next[index]={...current,image:s3Key,imageUrl:""} as ImpactItem;
         return next;
       });
+
       markChanged(id);
       setMessage("Image uploaded. Remember to Save Changes.");
     }catch(err:any){
-      setMessage(err.message||"Error uploading image");
+      setError(err?.message||"Error uploading image");
     }finally{
       setUploadingId(undefined);
     }
@@ -536,6 +585,7 @@ export default function ImpactAdminPage(){
     try{
       setUploadingDocId(id);
       setMessage("");
+      setError(undefined);
 
       const presignRes=await fetch("/api/uploads/s3/presign",{
         method:"POST",
@@ -543,8 +593,8 @@ export default function ImpactAdminPage(){
         body:JSON.stringify({
           folder:"impact",
           fileName:file.name,
-          contentType:file.type
-        })
+          contentType:file.type,
+        }),
       });
 
       if(!presignRes.ok){
@@ -584,10 +634,11 @@ export default function ImpactAdminPage(){
         next[index]={...current,document:s3Key} as ImpactItem;
         return next;
       });
+
       markChanged(id);
       setMessage("PDF uploaded. Remember to Save Changes.");
     }catch(err:any){
-      setMessage(err.message||"Error uploading PDF");
+      setError(err?.message||"Error uploading PDF");
     }finally{
       setUploadingDocId(undefined);
     }
@@ -620,7 +671,7 @@ export default function ImpactAdminPage(){
           i.submittedBy?.email,
           i.location?.suco,
           i.location?.municipality,
-          i.draft?.storySummary
+          i.draft?.storySummary,
         ]
           .filter(Boolean)
           .map((x)=>String(x).toLowerCase());
@@ -694,11 +745,8 @@ export default function ImpactAdminPage(){
   return(
     <div className="min-h-screen bg-slate-50">
       <div className="mx-auto max-w-7xl px-4 py-8">
-
         <div
-          className="fixed left-0 right-0 z-40 border-b border-slate-200 bg-slate-50/95 backdrop-blur"
-          style={{top:ACTION_BAR_TOP}}
-        >
+         className="sticky top-28 z-30 -mx-4 mb-6 border-b border-slate-200 bg-white/95 px-4 py-3 backdrop-blur md:top-32">
           <div className="mx-auto max-w-7xl px-4 py-3">
             <div className="flex flex-col justify-between gap-3 md:flex-row md:items-center">
               <div>
@@ -712,7 +760,7 @@ export default function ImpactAdminPage(){
                 <button
                   type="button"
                   onClick={handleAddNew}
-                  className="rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-emerald-700 disabled:opacity-60"
+                  className="rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-emerald-700"
                 >
                   + Add New
                 </button>
@@ -765,7 +813,7 @@ export default function ImpactAdminPage(){
                   >
                     <option value="all">All</option>
                     <option value="visible">Visible only</option>
-                    <option value="hidden">Not visible only</option>
+                    <option value="hidden">Hidden only</option>
                   </select>
                 </div>
 
@@ -774,7 +822,7 @@ export default function ImpactAdminPage(){
                   <select
                     className="rounded-md border border-slate-300 bg-white px-2 py-2 text-sm"
                     value={statusFilter}
-                    onChange={(e)=>setStatusFilter(e.target.value as any)}
+                    onChange={(e)=>setStatusFilter(e.target.value as "all"|ImpactStatus)}
                   >
                     <option value="all">All</option>
                     <option value="draft">Draft</option>
@@ -861,6 +909,12 @@ export default function ImpactAdminPage(){
 
         <div className="h-72 md:h-52" />
 
+        {hasChanges&&(
+          <div className="mb-4 rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+            You have unsaved changes. Uploads and edits do not auto-save. Click <span className="font-semibold">Save Changes</span> before leaving this page.
+          </div>
+        )}
+
         {message&&(
           <div className="mb-4 rounded-md border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 shadow-sm">
             {message}
@@ -888,12 +942,10 @@ export default function ImpactAdminPage(){
             {filteredItems.map((item)=>{
               const imageSrc=buildImageUrl(item.image||item.imageUrl);
               const documentUrl=buildFileUrl(item.document);
-
               const status=(item.status||safeStatus(item)) as ImpactStatus;
               const statusLabel=getStatusLabel(status);
               const lastUpdatedLabel=formatLastUpdated(item);
-              const missingCover=item.visible && !imageSrc;
-
+              const missingCover=item.visible&&!imageSrc;
               const isDraft=status==="draft";
               const canPublish=!!(item.titleEn?.trim()&&item.excerptEn?.trim()&&item.date);
 
@@ -945,7 +997,7 @@ export default function ImpactAdminPage(){
                             type="button"
                             onClick={()=>{
                               if(!canPublish){
-                                setMessage("To publish: add Title (English), Excerpt (English), and Date (then Save Changes).");
+                                setMessage("To publish: add Title (English), Excerpt (English), and Date, then Save Changes.");
                                 return;
                               }
                               handlePublish(item.id);
@@ -964,7 +1016,7 @@ export default function ImpactAdminPage(){
                           >
                             Unarchive
                           </button>
-                        ):(
+                        ) : (
                           <button
                             type="button"
                             onClick={()=>handleArchive(item.id)}
@@ -1010,197 +1062,196 @@ export default function ImpactAdminPage(){
                               <div><span className="font-medium">Phone:</span> {item.submittedBy.phone||""}</div>
                             </div>
                             <div className="rounded-md border border-slate-200 bg-white p-3 text-sm text-slate-700">
-                              <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">Location</div>
-                              <div className="mt-2"><span className="font-medium">Suco:</span> {item.location?.suco||""}</div>
-                              <div><span className="font-medium">Municipality:</span> {item.location?.municipality||""}</div>
-                            </div>
-                            <div className="rounded-md border border-slate-200 bg-white p-3 text-sm text-slate-700 md:col-span-2">
-                              <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">Draft summary</div>
-                              <div className="mt-2 whitespace-pre-wrap">{item.draft?.storySummary||""}</div>
-                              <div className="mt-2 text-xs text-slate-500">
-                                Permissions confirmed: {item.draft?.permissionsConfirmed===true?"Yes":"No"}
-                              </div>
+                              <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">Location / Draft</div>
+                              <div className="mt-2"><span className="font-medium">Municipality:</span> {item.location?.municipality||""}</div>
+                              <div><span className="font-medium">Suco:</span> {item.location?.suco||""}</div>
+                              <div className="mt-2"><span className="font-medium">Summary:</span> {item.draft?.storySummary||""}</div>
                             </div>
                           </div>
                         </details>
                       )}
 
-                      <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                        <div>
-                          <label className="mb-1 block text-xs font-medium text-slate-700">
-                            Title (English)
-                          </label>
+                      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                        <div className="space-y-2">
+                          <label className="text-xs font-semibold uppercase tracking-wide text-slate-500">Title (English)</label>
                           <input
                             type="text"
-                            className="w-full rounded border border-slate-300 px-2 py-2 text-sm"
+                            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
                             value={item.titleEn}
                             onChange={(e)=>handleFieldChange(item.id,"titleEn",e.target.value)}
                           />
                         </div>
-                        <div>
-                          <label className="mb-1 block text-xs font-medium text-slate-700">
-                            Title (Tetun)
-                          </label>
+
+                        <div className="space-y-2">
+                          <label className="text-xs font-semibold uppercase tracking-wide text-slate-500">Title (Tetun)</label>
                           <input
                             type="text"
-                            className="w-full rounded border border-slate-300 px-2 py-2 text-sm"
+                            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
                             value={item.titleTet}
                             onChange={(e)=>handleFieldChange(item.id,"titleTet",e.target.value)}
                           />
                         </div>
+
+                        <div className="space-y-2">
+                          <label className="text-xs font-semibold uppercase tracking-wide text-slate-500">Excerpt (English)</label>
+                          <textarea
+                            rows={3}
+                            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+                            value={item.excerptEn}
+                            onChange={(e)=>handleFieldChange(item.id,"excerptEn",e.target.value)}
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <label className="text-xs font-semibold uppercase tracking-wide text-slate-500">Excerpt (Tetun)</label>
+                          <textarea
+                            rows={3}
+                            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+                            value={item.excerptTet}
+                            onChange={(e)=>handleFieldChange(item.id,"excerptTet",e.target.value)}
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <label className="text-xs font-semibold uppercase tracking-wide text-slate-500">Body (English)</label>
+                          <textarea
+                            rows={7}
+                            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+                            value={item.bodyEn}
+                            onChange={(e)=>handleFieldChange(item.id,"bodyEn",e.target.value)}
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <label className="text-xs font-semibold uppercase tracking-wide text-slate-500">Body (Tetun)</label>
+                          <textarea
+                            rows={7}
+                            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+                            value={item.bodyTet}
+                            onChange={(e)=>handleFieldChange(item.id,"bodyTet",e.target.value)}
+                          />
+                        </div>
                       </div>
-
-                      <details className="rounded-md border border-slate-200 bg-slate-50">
-                        <summary className="cursor-pointer select-none px-3 py-2 text-sm font-medium text-slate-800">
-                          Edit story text (Excerpts + Bodies)
-                        </summary>
-                        <div className="grid grid-cols-1 gap-3 p-3 md:grid-cols-2">
-                          <div>
-                            <label className="mb-1 block text-xs font-medium text-slate-700">
-                              Excerpt (English)
-                            </label>
-                            <textarea
-                              className="h-24 w-full rounded border border-slate-300 px-2 py-2 text-sm"
-                              value={item.excerptEn}
-                              onChange={(e)=>handleFieldChange(item.id,"excerptEn",e.target.value)}
-                            />
-                          </div>
-                          <div>
-                            <label className="mb-1 block text-xs font-medium text-slate-700">
-                              Excerpt (Tetun)
-                            </label>
-                            <textarea
-                              className="h-24 w-full rounded border border-slate-300 px-2 py-2 text-sm"
-                              value={item.excerptTet}
-                              onChange={(e)=>handleFieldChange(item.id,"excerptTet",e.target.value)}
-                            />
-                          </div>
-                          <div>
-                            <label className="mb-1 block text-xs font-medium text-slate-700">
-                              Body (English)
-                            </label>
-                            <textarea
-                              className="h-40 w-full rounded border border-slate-300 px-2 py-2 text-sm"
-                              value={item.bodyEn}
-                              onChange={(e)=>handleFieldChange(item.id,"bodyEn",e.target.value)}
-                            />
-                          </div>
-                          <div>
-                            <label className="mb-1 block text-xs font-medium text-slate-700">
-                              Body (Tetun)
-                            </label>
-                            <textarea
-                              className="h-40 w-full rounded border border-slate-300 px-2 py-2 text-sm"
-                              value={item.bodyTet}
-                              onChange={(e)=>handleFieldChange(item.id,"bodyTet",e.target.value)}
-                            />
-                          </div>
-                        </div>
-                      </details>
-
-                      {showKeys&&(
-                        <div className="rounded-md border border-slate-200 bg-white px-3 py-2 text-xs text-slate-600">
-                          <div className="break-all"><span className="font-semibold">ID:</span> {item.id}</div>
-                          {item.image&&(<div className="break-all"><span className="font-semibold">Image key:</span> {item.image}</div>)}
-                          {item.document&&(<div className="break-all"><span className="font-semibold">PDF key:</span> {item.document}</div>)}
-                        </div>
-                      )}
                     </div>
 
-                    <div className="flex w-full flex-col gap-3 md:w-64">
-                      <div className="rounded-md border border-slate-200 bg-white p-3">
-                        <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-600">
-                          Image
+                    <div className="w-full space-y-4 md:w-[22rem]">
+                      <div className="rounded-md border border-slate-200 bg-slate-50 p-3">
+                        <div className="mb-2 flex items-center justify-between">
+                          <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">Image</span>
+                          {imageSrc&&(
+                            <a
+                              href={imageSrc}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="text-xs text-blue-700 underline"
+                            >
+                              Open
+                            </a>
+                          )}
                         </div>
 
-                        {imageSrc?(
+                        {imageSrc ? (
                           <img
                             src={imageSrc}
-                            alt={item.titleEn||"Impact image"}
-                            className="h-28 w-full rounded border border-slate-200 object-cover"
+                            alt={item.titleEn||"Impact story image"}
+                            className="mb-3 h-44 w-full rounded-md border border-slate-200 object-cover"
                           />
-                        ):(
-                          <div className="flex h-28 w-full items-center justify-center rounded border border-dashed border-slate-300 bg-slate-50 text-center text-xs text-slate-400">
-                            No image
+                        ) : (
+                          <div className="mb-3 flex h-44 items-center justify-center rounded-md border border-dashed border-slate-300 bg-white text-xs text-slate-400">
+                            No image uploaded
                           </div>
                         )}
 
-                        <div className="mt-2 grid grid-cols-1 gap-2">
-                          <label className="inline-flex w-full cursor-pointer items-center justify-center rounded-md border border-slate-300 px-2 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">
+                        <div className="space-y-2">
+                          <label className="inline-flex cursor-pointer items-center rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 hover:bg-slate-100">
                             <input
                               type="file"
                               accept="image/*"
                               className="hidden"
                               onChange={(e)=>handleFileInputChange(item.id,e)}
                             />
-                            {uploadingId===item.id?"Uploading...":"Upload image"}
+                            {uploadingId===item.id ? "Uploading..." : "Upload image"}
                           </label>
 
-                          {imageSrc&&(
-                            <button
-                              type="button"
-                              onClick={()=>handleRemoveImage(item.id)}
-                              className="rounded-md border border-slate-300 px-2 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
-                            >
-                              Remove image
-                            </button>
+                          <button
+                            type="button"
+                            onClick={()=>handleRemoveImage(item.id)}
+                            className="rounded-md border border-red-300 bg-white px-3 py-2 text-sm text-red-700 hover:bg-red-50"
+                          >
+                            Remove image
+                          </button>
+
+                          {(showKeys&&item.image)&&(
+                            <div className="rounded-md bg-white px-2 py-2 text-[11px] text-slate-500 break-all">
+                              {item.image}
+                            </div>
                           )}
                         </div>
                       </div>
 
-                      <div className="rounded-md border border-slate-200 bg-white p-3">
-                        <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-600">
-                          PDF (optional)
+                      <div className="rounded-md border border-slate-200 bg-slate-50 p-3">
+                        <div className="mb-2 flex items-center justify-between">
+                          <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">Document (PDF)</span>
+                          {documentUrl&&(
+                            <a
+                              href={documentUrl}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="text-xs text-blue-700 underline"
+                            >
+                              Open
+                            </a>
+                          )}
                         </div>
 
-                        {item.document?(
-                          <a
-                            href={documentUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="block break-all text-sm text-blue-700 underline"
-                          >
-                            Open PDF
-                          </a>
-                        ):(
-                          <div className="text-sm text-slate-400">
-                            No PDF attached
+                        {documentUrl ? (
+                          <div className="mb-3 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 break-all">
+                            PDF uploaded
+                          </div>
+                        ) : (
+                          <div className="mb-3 rounded-md border border-dashed border-slate-300 bg-white px-3 py-3 text-xs text-slate-400">
+                            No PDF uploaded
                           </div>
                         )}
 
-                        <div className="mt-2 grid grid-cols-1 gap-2">
-                          <label className="inline-flex w-full cursor-pointer items-center justify-center rounded-md border border-slate-300 px-2 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">
+                        <div className="space-y-2">
+                          <label className="inline-flex cursor-pointer items-center rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 hover:bg-slate-100">
                             <input
                               type="file"
                               accept="application/pdf"
                               className="hidden"
                               onChange={(e)=>handleDocumentInputChange(item.id,e)}
                             />
-                            {uploadingDocId===item.id?"Uploading...":"Upload PDF"}
+                            {uploadingDocId===item.id ? "Uploading..." : "Upload PDF"}
                           </label>
 
-                          {item.document&&(
-                            <button
-                              type="button"
-                              onClick={()=>handleRemoveDocument(item.id)}
-                              className="rounded-md border border-slate-300 px-2 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
-                            >
-                              Remove PDF
-                            </button>
+                          <button
+                            type="button"
+                            onClick={()=>handleRemoveDocument(item.id)}
+                            className="rounded-md border border-red-300 bg-white px-3 py-2 text-sm text-red-700 hover:bg-red-50"
+                          >
+                            Remove PDF
+                          </button>
+
+                          {(showKeys&&item.document)&&(
+                            <div className="rounded-md bg-white px-2 py-2 text-[11px] text-slate-500 break-all">
+                              {item.document}
+                            </div>
                           )}
                         </div>
                       </div>
 
-                      <button
-                        type="button"
-                        onClick={()=>handleDelete(item.id)}
-                        className="rounded-md border border-red-300 px-3 py-2 text-sm font-medium text-red-700 hover:bg-red-50"
-                      >
-                        Delete story
-                      </button>
-
-                      <div className="text-xs text-slate-500">
-                        Tip: Uploads don’t auto-save. Use “Save Changes” after edits.
+                      <div className="rounded-md border border-slate-200 bg-slate-50 p-3">
+                        <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">Actions</div>
+                        <div className="mt-3 flex flex-wrap gap-2">
+                          <button
+                            type="button"
+                            onClick={()=>handleDelete(item.id)}
+                            className="rounded-md border border-red-300 bg-white px-3 py-2 text-sm text-red-700 hover:bg-red-50"
+                          >
+                            Delete
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -1212,88 +1263,62 @@ export default function ImpactAdminPage(){
 
         {showAddModal&&(
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-            <div className="w-full max-w-3xl rounded-lg bg-white p-6 shadow-xl max-h-[90vh] overflow-y-auto">
-              <div className="mb-4 flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-slate-900">Add New Impact Story</h2>
-                <button
-                  type="button"
-                  onClick={()=>setShowAddModal(false)}
-                  className="rounded px-2 py-1 text-sm text-slate-500 hover:bg-slate-100"
-                >
-                  ✕
-                </button>
-              </div>
+            <div className="w-full max-w-2xl rounded-xl bg-white p-6 shadow-xl">
+              <h2 className="text-xl font-semibold text-slate-900">Add New Impact Story</h2>
+              <p className="mt-1 text-sm text-slate-600">
+                Create the record first, then upload image/PDF and click Save Changes on the main page.
+              </p>
 
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <label className="block text-xs font-medium text-slate-700">Title (English)</label>
+                  <label className="text-xs font-semibold uppercase tracking-wide text-slate-500">Title (English)</label>
                   <input
                     type="text"
-                    className="w-full rounded border border-slate-300 px-2 py-1 text-xs"
+                    className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
                     value={newItem.titleEn}
-                    onChange={(e)=>setNewItem({...newItem,titleEn:e.target.value})}
-                  />
-                  <label className="block text-xs font-medium text-slate-700">Title (Tetun)</label>
-                  <input
-                    type="text"
-                    className="w-full rounded border border-slate-300 px-2 py-1 text-xs"
-                    value={newItem.titleTet}
-                    onChange={(e)=>setNewItem({...newItem,titleTet:e.target.value})}
-                  />
-                  <label className="block text-xs font-medium text-slate-700">Excerpt (English)</label>
-                  <textarea
-                    className="h-20 w-full rounded border border-slate-300 px-2 py-1 text-xs"
-                    value={newItem.excerptEn}
-                    onChange={(e)=>setNewItem({...newItem,excerptEn:e.target.value})}
-                  />
-                  <label className="block text-xs font-medium text-slate-700">Excerpt (Tetun)</label>
-                  <textarea
-                    className="h-20 w-full rounded border border-slate-300 px-2 py-1 text-xs"
-                    value={newItem.excerptTet}
-                    onChange={(e)=>setNewItem({...newItem,excerptTet:e.target.value})}
+                    onChange={(e)=>setNewItem((prev)=>({...prev,titleEn:e.target.value}))}
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <label className="block text-xs font-medium text-slate-700">Body (English)</label>
-                  <textarea
-                    className="h-24 w-full rounded border border-slate-300 px-2 py-1 text-xs"
-                    value={newItem.bodyEn}
-                    onChange={(e)=>setNewItem({...newItem,bodyEn:e.target.value})}
+                  <label className="text-xs font-semibold uppercase tracking-wide text-slate-500">Title (Tetun)</label>
+                  <input
+                    type="text"
+                    className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+                    value={newItem.titleTet}
+                    onChange={(e)=>setNewItem((prev)=>({...prev,titleTet:e.target.value}))}
                   />
-                  <label className="block text-xs font-medium text-slate-700">Body (Tetun)</label>
+                </div>
+
+                <div className="space-y-2 md:col-span-2">
+                  <label className="text-xs font-semibold uppercase tracking-wide text-slate-500">Excerpt (English)</label>
                   <textarea
-                    className="h-24 w-full rounded border border-slate-300 px-2 py-1 text-xs"
-                    value={newItem.bodyTet}
-                    onChange={(e)=>setNewItem({...newItem,bodyTet:e.target.value})}
+                    rows={3}
+                    className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+                    value={newItem.excerptEn}
+                    onChange={(e)=>setNewItem((prev)=>({...prev,excerptEn:e.target.value}))}
                   />
-                  <label className="mt-2 block text-xs font-medium text-slate-700">Date</label>
+                </div>
+
+                <div className="space-y-2 md:col-span-2">
+                  <label className="text-xs font-semibold uppercase tracking-wide text-slate-500">Date</label>
                   <input
                     type="date"
-                    className="w-40 rounded border border-slate-300 px-2 py-1 text-xs"
-                    value={newItem.date?newItem.date.slice(0,10):""}
-                    onChange={(e)=>setNewItem({...newItem,date:e.target.value})}
+                    className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+                    value={newItem.date}
+                    onChange={(e)=>setNewItem((prev)=>({...prev,date:e.target.value}))}
                   />
-                  <label className="mt-2 inline-flex items-center gap-2 text-xs text-slate-700">
-                    <input
-                      type="checkbox"
-                      className="h-4 w-4 rounded border-slate-300"
-                      checked={newItem.visible}
-                      onChange={(e)=>setNewItem({...newItem,visible:e.target.checked,status:e.target.checked?"published":"hidden"})}
-                    />
-                    Visible
-                  </label>
-                  <div className="mt-3 text-xs text-slate-500">
-                    Images and PDF can be uploaded after saving.
-                  </div>
                 </div>
               </div>
 
               <div className="mt-6 flex justify-end gap-3">
                 <button
                   type="button"
-                  onClick={()=>setShowAddModal(false)}
-                  className="rounded-md border border-slate-300 px-4 py-2 text-sm text-slate-700 hover:bg-slate-100"
+                  onClick={()=>{
+                    setShowAddModal(false);
+                    setNewItem(emptyItem());
+                  }}
+                  className="rounded-md border border-slate-300 bg-white px-4 py-2 text-sm text-slate-700 hover:bg-slate-100"
                 >
                   Cancel
                 </button>
@@ -1302,13 +1327,12 @@ export default function ImpactAdminPage(){
                   onClick={handleAddNewSubmit}
                   className="rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700"
                 >
-                  Add Item
+                  Add Story
                 </button>
               </div>
             </div>
           </div>
         )}
-
       </div>
     </div>
   );

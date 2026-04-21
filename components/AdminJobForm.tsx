@@ -1,4 +1,3 @@
-//components/AdminJobForm.tsx
 "use client";
 
 import {useEffect,useMemo,useRef,useState} from "react";
@@ -184,6 +183,7 @@ export default function AdminJobForm({mode,initialData,onSaved}:AdminJobFormProp
   const [saveSuccess,setSaveSuccess]=useState("");
   const [uploadingImage,setUploadingImage]=useState(false);
   const [uploadingAttachment,setUploadingAttachment]=useState(false);
+  const [hasChanges,setHasChanges]=useState(false);
 
   const imageInputRef=useRef<HTMLInputElement|null>(null);
   const attachmentInputRef=useRef<HTMLInputElement|null>(null);
@@ -196,6 +196,8 @@ export default function AdminJobForm({mode,initialData,onSaved}:AdminJobFormProp
     setExistingAttachment(initialData?.attachment);
     setAttachmentFile(null);
     setAttachmentRemoved(false);
+    setHasChanges(false);
+    setSaveError("");
   },[initialData]);
 
   useEffect(()=>{
@@ -206,13 +208,78 @@ export default function AdminJobForm({mode,initialData,onSaved}:AdminJobFormProp
     };
   },[heroPreview]);
 
+  useEffect(()=>{
+    const handleBeforeUnload=(event:BeforeUnloadEvent)=>{
+      if(!hasChanges){
+        return;
+      }
+      event.preventDefault();
+      event.returnValue="";
+    };
+
+    window.addEventListener("beforeunload",handleBeforeUnload);
+    return()=>{
+      window.removeEventListener("beforeunload",handleBeforeUnload);
+    };
+  },[hasChanges]);
+
+  useEffect(()=>{
+    const handleDocumentClick=(event:MouseEvent)=>{
+      if(!hasChanges){
+        return;
+      }
+
+      const target=event.target as HTMLElement|null;
+      const anchor=target?.closest("a") as HTMLAnchorElement|null;
+
+      if(!anchor){
+        return;
+      }
+
+      const href=anchor.getAttribute("href")||"";
+      if(!href||href.startsWith("#")||href.startsWith("javascript:")){
+        return;
+      }
+
+      const isModifiedClick=
+        event.metaKey||event.ctrlKey||event.shiftKey||event.altKey||event.button!==0;
+
+      if(isModifiedClick||anchor.target==="_blank"||anchor.hasAttribute("download")){
+        return;
+      }
+
+      const confirmed=window.confirm("You have unsaved changes. Leave this page and lose them?");
+      if(!confirmed){
+        event.preventDefault();
+        event.stopPropagation();
+      }
+    };
+
+    document.addEventListener("click",handleDocumentClick,true);
+    return()=>{
+      document.removeEventListener("click",handleDocumentClick,true);
+    };
+  },[hasChanges]);
+
   const parsedTags=useMemo(
     ()=>form.tags.split(",").map((item)=>item.trim()).filter(Boolean),
     [form.tags]
   );
 
+  const isBusy=saving||uploadingImage||uploadingAttachment;
+
+  function markChanged(){
+    if(!hasChanges){
+      setHasChanges(true);
+    }
+    if(saveSuccess){
+      setSaveSuccess("");
+    }
+  }
+
   function updateField<K extends keyof FormState>(key:K,value:FormState[K]){
     setForm((prev)=>({...prev,[key]:value}));
+    markChanged();
   }
 
   function handleHeroChange(file:File|null){
@@ -221,6 +288,7 @@ export default function AdminJobForm({mode,initialData,onSaved}:AdminJobFormProp
 
     if(!file){
       setHeroImageFile(null);
+      markChanged();
       return;
     }
 
@@ -241,6 +309,7 @@ export default function AdminJobForm({mode,initialData,onSaved}:AdminJobFormProp
     setHeroImageRemoved(false);
     setHeroImageFile(file);
     setHeroPreview(URL.createObjectURL(file));
+    markChanged();
   }
 
   function handleAttachmentChange(file:File|null){
@@ -249,6 +318,7 @@ export default function AdminJobForm({mode,initialData,onSaved}:AdminJobFormProp
 
     if(!file){
       setAttachmentFile(null);
+      markChanged();
       return;
     }
 
@@ -268,6 +338,7 @@ export default function AdminJobForm({mode,initialData,onSaved}:AdminJobFormProp
 
     setAttachmentRemoved(false);
     setAttachmentFile(file);
+    markChanged();
   }
 
   function validateForm(){
@@ -470,6 +541,7 @@ export default function AdminJobForm({mode,initialData,onSaved}:AdminJobFormProp
       setHeroImageRemoved(false);
       setHeroPreview(savedRecord.heroImage ?? null);
       setForm(normaliseInitialData(savedRecord));
+      setHasChanges(false);
 
       onSaved?.(savedRecord);
     }catch(error:any){
@@ -487,30 +559,86 @@ export default function AdminJobForm({mode,initialData,onSaved}:AdminJobFormProp
 
   return(
     <div className="min-h-screen bg-[#F5F5F5]">
-      <header className="border-b border-gray-200 bg-white">
-        <div className="mx-auto max-w-5xl px-4 py-8">
-          <Link
-            href="/admin/careers"
-            className="inline-flex items-center gap-2 text-sm font-medium text-[#4F4F4F] hover:text-[#2F80ED]"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back to careers admin
-          </Link>
+      <div className="sticky top-28 z-30 -mx-4 mb-6 border-b border-gray-200 bg-white/95 px-4 py-3 backdrop-blur md:top-32">
+        <div className="mx-auto max-w-5xl">
+          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            <div>
+              <Link
+                href="/admin/careers"
+                className="inline-flex items-center gap-2 text-sm font-medium text-[#4F4F4F] hover:text-[#2F80ED]"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Back to careers admin
+              </Link>
 
-          <div className="mt-4">
-            <h1 className="text-3xl font-extrabold tracking-tight text-[#333333] md:text-4xl">
-              {mode==="add"?"Add Job":"Edit Job"}
-            </h1>
-            <p className="mt-2 text-[#4F4F4F]">
-              {mode==="add"
-                ? "Create a new careers listing for admin review or direct publishing."
-                : "Update the job details, files, and publishing status."}
-            </p>
+              <div className="mt-3">
+                <h1 className="text-3xl font-extrabold tracking-tight text-[#333333] md:text-4xl">
+                  {mode==="add"?"Add Job":"Edit Job"}
+                </h1>
+                <p className="mt-2 text-[#4F4F4F]">
+                  {mode==="add"
+                    ? "Create a new careers listing for admin review or direct publishing."
+                    : "Update the job details, files, and publishing status."}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-3">
+              {hasChanges&&(
+                <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+                  Unsaved changes
+                </div>
+              )}
+
+              <button
+                type="button"
+                disabled={isBusy}
+                onClick={()=>handleSubmit(form.status)}
+                className="inline-flex items-center gap-2 rounded-full bg-[#219653] px-5 py-3 text-sm font-semibold text-white hover:bg-green-700 disabled:opacity-70"
+              >
+                <Save className="h-4 w-4" />
+                {saving&&form.status!=="published"?"Saving...":"Save job"}
+              </button>
+
+              <button
+                type="button"
+                disabled={isBusy}
+                onClick={()=>handleSubmit("published")}
+                className="inline-flex items-center gap-2 rounded-full bg-[#EB5757] px-5 py-3 text-sm font-semibold text-white hover:bg-red-600 disabled:opacity-70"
+              >
+                <Send className="h-4 w-4" />
+                {saving&&form.status==="published"?"Publishing...":"Publish now"}
+              </button>
+
+              <Link
+                href="/admin/careers"
+                className="rounded-full border border-gray-300 bg-white px-5 py-3 text-sm font-medium text-[#4F4F4F] hover:bg-gray-50"
+              >
+                Cancel
+              </Link>
+            </div>
           </div>
-        </div>
-      </header>
 
-      <main className="mx-auto max-w-5xl px-4 py-8">
+          {(uploadingImage||uploadingAttachment||saving)&&(
+            <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-[#F5F5F5] px-4 py-2 text-sm text-[#4F4F4F]">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              {uploadingImage
+                ? "Uploading image..."
+                : uploadingAttachment
+                ? "Uploading attachment..."
+                : "Saving..."}
+            </div>
+          )}
+        </div>
+      </div>
+
+      <main className="mx-auto max-w-5xl px-4 pb-8">
+        {hasChanges&&(
+          <div className="mb-6 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-amber-900 shadow-sm">
+            Uploads and field edits do not auto-save. Click <span className="font-semibold">Save job</span> or <span className="font-semibold">Publish now</span> before leaving this page.
+          </div>
+        )}
+
         {saveSuccess&&(
           <div className="mb-6 rounded-2xl border border-[#6FCF97] bg-[#EAF7EF] p-4 text-[#1F6F43] shadow-sm">
             <div className="flex items-start gap-3">
@@ -725,6 +853,7 @@ export default function AdminJobForm({mode,initialData,onSaved}:AdminJobFormProp
                         if(imageInputRef.current){
                           imageInputRef.current.value="";
                         }
+                        markChanged();
                       }}
                       className="inline-flex items-center gap-2 rounded-full border border-[#EB5757] bg-white px-4 py-2 text-sm text-[#EB5757] hover:bg-red-50"
                     >
@@ -792,6 +921,7 @@ export default function AdminJobForm({mode,initialData,onSaved}:AdminJobFormProp
                         if(attachmentInputRef.current){
                           attachmentInputRef.current.value="";
                         }
+                        markChanged();
                       }}
                       className="inline-flex items-center gap-2 rounded-full border border-[#EB5757] bg-white px-4 py-2 text-sm text-[#EB5757] hover:bg-red-50"
                     >
@@ -834,6 +964,7 @@ export default function AdminJobForm({mode,initialData,onSaved}:AdminJobFormProp
                       onClick={()=>{
                         setExistingAttachment(undefined);
                         setAttachmentRemoved(true);
+                        markChanged();
                       }}
                       className="inline-flex items-center gap-2 rounded-full border border-[#EB5757] bg-white px-4 py-2 text-sm text-[#EB5757] hover:bg-red-50"
                     >
@@ -969,53 +1100,6 @@ export default function AdminJobForm({mode,initialData,onSaved}:AdminJobFormProp
                   <option value="rejected">Rejected</option>
                 </select>
               </div>
-            </div>
-          </section>
-
-          <section className="rounded-2xl border border-gray-200 bg-[#F5F5F5] p-6 shadow-sm">
-            <h2 className="text-xl font-bold text-[#333333]">Save</h2>
-            <p className="mt-2 text-sm text-[#4F4F4F]">
-              Use save to keep the chosen status, or publish directly now.
-            </p>
-
-            {(uploadingImage||uploadingAttachment||saving)&&(
-              <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm text-[#4F4F4F]">
-                <Loader2 className="h-4 w-4 animate-spin" />
-                {uploadingImage
-                  ? "Uploading image..."
-                  : uploadingAttachment
-                  ? "Uploading attachment..."
-                  : "Saving..."}
-              </div>
-            )}
-
-            <div className="mt-6 flex flex-wrap gap-3">
-              <button
-                type="button"
-                disabled={saving}
-                onClick={()=>handleSubmit(form.status)}
-                className="inline-flex items-center gap-2 rounded-full bg-[#219653] px-5 py-3 text-sm font-semibold text-white hover:bg-green-700 disabled:opacity-70"
-              >
-                <Save className="h-4 w-4" />
-                Save job
-              </button>
-
-              <button
-                type="button"
-                disabled={saving}
-                onClick={()=>handleSubmit("published")}
-                className="inline-flex items-center gap-2 rounded-full bg-[#EB5757] px-5 py-3 text-sm font-semibold text-white hover:bg-red-600 disabled:opacity-70"
-              >
-                <Send className="h-4 w-4" />
-                Publish now
-              </button>
-
-              <Link
-                href="/admin/careers"
-                className="rounded-full border border-gray-300 bg-white px-5 py-3 text-sm font-medium text-[#4F4F4F] hover:bg-gray-50"
-              >
-                Cancel
-              </Link>
             </div>
           </section>
         </div>
