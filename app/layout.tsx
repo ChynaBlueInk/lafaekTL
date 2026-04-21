@@ -19,11 +19,9 @@ export default function RootLayout({children}:{children:React.ReactNode}) {
           <ClientLayoutShell>
             <LanguageProvider>
               <Navigation />
-
               <main className="pt-28 md:pt-32">
                 {children}
               </main>
-
               <Footer />
             </LanguageProvider>
           </ClientLayoutShell>
