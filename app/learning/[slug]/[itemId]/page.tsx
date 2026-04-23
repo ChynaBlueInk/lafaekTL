@@ -2,8 +2,9 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { useLanguage } from "@/lib/LanguageContext";
+import { useParams } from "next/navigation";
 import FlipBookViewer from "@/components/books/FlipBookViewer";
+import { useLanguage } from "@/lib/LanguageContext";
 import type { LearningItemRecord } from "@/lib/learning-types";
 
 type LearningApiResponse = {
@@ -12,12 +13,16 @@ type LearningApiResponse = {
   message?: string;
 };
 
-export default function LearningItemPage({
-  params,
-}: {
-  params: { slug: string; itemId: string };
-}) {
+function normaliseId(value: string) {
+  return decodeURIComponent(value).trim().toLowerCase();
+}
+
+export default function LearningItemPage() {
   const { language } = useLanguage();
+  const params = useParams<{ slug: string; itemId: string }>();
+
+  const slug = typeof params?.slug === "string" ? params.slug : "";
+  const itemId = typeof params?.itemId === "string" ? params.itemId : "";
 
   const [item, setItem] = useState<LearningItemRecord | null>(null);
   const [loading, setLoading] = useState(true);
@@ -25,20 +30,16 @@ export default function LearningItemPage({
 
   const labels = {
     en: {
-      backToCategory: "Back to category",
-      backToLearning: "Back to Learning",
+      backToCategory: "Back",
       loading: "Loading learning item...",
       notFound: "Learning item not found.",
       noPages: "This learning item does not have flipbook pages yet.",
-      openPdf: "Open source PDF",
     },
     tet: {
-      backToCategory: "Fila ba kategoría",
-      backToLearning: "Fila ba Learning",
+      backToCategory: "Fila fali",
       loading: "Hein hela item aprendizagem...",
       notFound: "La hetan item aprendizagem ida ne’e.",
       noPages: "Item aprendizagem ida ne’e seidauk iha pajina flipbook.",
-      openPdf: "Loke source PDF",
     },
   } as const;
 
@@ -46,12 +47,18 @@ export default function LearningItemPage({
 
   useEffect(() => {
     async function loadItem() {
+      if (!slug || !itemId) {
+        setError("Missing learning route details.");
+        setLoading(false);
+        return;
+      }
+
       try {
         setLoading(true);
         setError("");
 
         const response = await fetch(
-          `/api/learning?categorySlug=${encodeURIComponent(params.slug)}`,
+          `/api/learning?categorySlug=${encodeURIComponent(slug)}`,
           {
             cache: "no-store",
           }
@@ -63,7 +70,10 @@ export default function LearningItemPage({
           throw new Error(data.message || "Failed to load learning item.");
         }
 
-        const found = data.items.find((entry) => entry.itemId === params.itemId) || null;
+        const targetId = normaliseId(itemId);
+
+        const found =
+          data.items.find((entry) => normaliseId(entry.itemId) === targetId) || null;
 
         if (!found) {
           throw new Error("Learning item not found.");
@@ -80,7 +90,7 @@ export default function LearningItemPage({
     }
 
     loadItem();
-  }, [params.slug, params.itemId]);
+  }, [slug, itemId]);
 
   const flipbookPages = useMemo(() => {
     if (!item) {
@@ -106,7 +116,7 @@ export default function LearningItemPage({
         <div className="mx-auto max-w-6xl">
           <div className="flex items-center justify-between bg-[#219653] px-4 py-3 text-white">
             <Link
-              href={`/learning/${params.slug}`}
+              href={`/learning/${slug}`}
               className="rounded-md bg-white/10 px-3 py-2 text-sm font-semibold hover:bg-white/20"
             >
               {t.backToCategory}
@@ -116,18 +126,12 @@ export default function LearningItemPage({
               {language === "tet" ? "La hetan item" : "Item not found"}
             </h1>
 
-            <div className="w-[120px]" />
+            <div className="w-[64px]" />
           </div>
 
           <main className="rounded-xl bg-white p-8 shadow-sm">
             <p className="text-[#333333] font-semibold">{t.notFound}</p>
             <p className="mt-2 text-[#828282]">{error}</p>
-            <Link
-              href="/learning"
-              className="mt-4 inline-block text-[#2F80ED] underline hover:no-underline"
-            >
-              {t.backToLearning}
-            </Link>
           </main>
         </div>
       </div>
@@ -138,7 +142,7 @@ export default function LearningItemPage({
     <div className="min-h-screen bg-[#f5f5f5]">
       <div className="flex items-center justify-between bg-[#219653] px-4 py-3 text-white">
         <Link
-          href={`/learning/${params.slug}`}
+          href={`/learning/${slug}`}
           className="rounded-md bg-white/10 px-3 py-2 text-sm font-semibold hover:bg-white/20"
         >
           {t.backToCategory}
@@ -148,20 +152,7 @@ export default function LearningItemPage({
           {language === "tet" ? item.titleTet : item.titleEn}
         </h1>
 
-        <div className="flex w-[120px] justify-end">
-          {item.sourcePdfUrl ? (
-            <a
-              href={item.sourcePdfUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="rounded-md bg-white/10 px-3 py-2 text-sm font-semibold hover:bg-white/20"
-            >
-              PDF
-            </a>
-          ) : (
-            <div className="w-[64px]" />
-          )}
-        </div>
+        <div className="w-[64px]" />
       </div>
 
       <main className="px-4 py-8">
@@ -174,16 +165,6 @@ export default function LearningItemPage({
           ) : (
             <div className="rounded-xl bg-white p-8 text-center shadow-sm">
               <p className="text-gray-700">{t.noPages}</p>
-              {item.sourcePdfUrl ? (
-                <a
-                  href={item.sourcePdfUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-4 inline-block rounded-lg bg-[#219653] px-4 py-2 text-sm font-semibold text-white hover:bg-[#1b7f45]"
-                >
-                  {t.openPdf}
-                </a>
-              ) : null}
             </div>
           )}
         </div>

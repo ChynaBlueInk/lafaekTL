@@ -1,4 +1,3 @@
-// app/page.tsx
 "use client";
 
 import {useEffect,useState}from "react";
@@ -32,18 +31,18 @@ type ImpactApiResponse={
 
 const buildImageUrl=(src?:string)=>{
   if(!src){
-    return"/placeholder.svg?height=160&width=280";
+    return "/placeholder.svg?height=160&width=280";
   }
   let clean=src.trim();
   if(clean.startsWith("http://")||clean.startsWith("https://")){
     return clean;
   }
   clean=clean.replace(/^\/+/,"");
-  return`${S3_ORIGIN}/${clean}`;
+  return `${S3_ORIGIN}/${clean}`;
 };
 
 export default function HomePage(){
-  const{language}=useLanguage();
+  const {language}=useLanguage();
   const L=language==="tet"?"tet":"en";
 
   const content={
@@ -79,7 +78,8 @@ export default function HomePage(){
         title:"Our Impact Stories",
         subtitle:"Real change in Timorese communities",
         readMore:"Read more",
-        viewAll:"View all impact stories"
+        viewAll:"View all impact stories",
+        empty:"No impact stories to show yet. Please check back soon."
       },
       kidsSection:{
         title:"Fun Zone for Kids!",
@@ -92,6 +92,19 @@ export default function HomePage(){
         volunteer:"Volunteer",
         donate:"Support Us",
         partner:"Partner With Us"
+      },
+      social:{
+        title:"Follow Lafaek Online",
+        facebookTitle:"Follow us on Facebook",
+        facebookText:"Stay updated with our latest stories and community events.",
+        facebookButton:"Visit Facebook",
+        instagramTitle:"See us on Instagram",
+        instagramText:"Photos, short stories, and field updates from our work.",
+        instagramButton:"Visit Instagram",
+        youtubeTitle:"Watch us on YouTube",
+        youtubeText:"Discover our stories, field videos, and behind-the-scenes content from Lafaek.",
+        youtubeButton:"Visit YouTube",
+        youtubeSecondary:"See all videos"
       }
     },
     tet:{
@@ -126,7 +139,8 @@ export default function HomePage(){
         title:"Istória Impaktu Ami",
         subtitle:"Mudansa real iha komunidade Timorense sira",
         readMore:"Lee liu tan",
-        viewAll:"Haree hotu istória impaktu"
+        viewAll:"Haree hotu istória impaktu",
+        empty:"Seidauk iha istória impaktu atu hatudu. Favor fila fali mai depois."
       },
       kidsSection:{
         title:"Zona Divertidu ba Labarik!",
@@ -139,28 +153,79 @@ export default function HomePage(){
         volunteer:"Voluntáriu",
         donate:"Suporta Ami",
         partner:"Sai Parceiru ho Ami"
+      },
+      social:{
+        title:"Tuir Lafaek iha Online",
+        facebookTitle:"Segue ami iha Facebook",
+        facebookText:"Hatudu ba ita notísia foun no eventu komunitáriu sira.",
+        facebookButton:"Vizita Facebook",
+        instagramTitle:"Haree ami iha Instagram",
+        instagramText:"Haree foto, istória badinas no atividade sira iha kampu.",
+        instagramButton:"Vizita Instagram",
+        youtubeTitle:"Haree ami iha YouTube",
+        youtubeText:"Deskobre ami nia istória, vídeo kampu no konteúdu iha kotuk.",
+        youtubeButton:"Vizita YouTube",
+        youtubeSecondary:"Haree vídeo hotu"
       }
     }
   } as const;
 
   const t=content[L];
 
-  const[impactItems,setImpactItems]=useState<ImpactItem[]>([]);
-  const[impactError,setImpactError]=useState<string|undefined>();
+  const [impactItems,setImpactItems]=useState<ImpactItem[]>([]);
+  const [impactError,setImpactError]=useState<string|undefined>();
 
   useEffect(()=>{
     const loadImpact=async()=>{
       try{
         setImpactError(undefined);
-        console.log("[home] loading impact stories for homepage cards");
-        const res=await fetch("/api/admin/impact",{method:"GET"});
-        console.log("[home] /api/admin/impact status",res.status);
-        if(!res.ok){
-          throw new Error(`Failed to load impact stories: ${res.status}`);
+
+        const endpoints=[
+          "/api/impact",
+          "/api/stories/impact",
+          "/api/admin/impact"
+        ];
+
+        let data:ImpactApiResponse|null=null;
+        let lastError="Could not load impact stories.";
+
+        for(const url of endpoints){
+          try{
+            const res=await fetch(url,{
+              method:"GET",
+              headers:{Accept:"application/json"},
+              cache:"no-store"
+            });
+
+            const contentType=res.headers.get("content-type")||"";
+            const rawText=await res.text();
+
+            if(!res.ok){
+              lastError=`Failed to load impact stories: ${res.status}`;
+              continue;
+            }
+
+            if(!contentType.includes("application/json")){
+              lastError=`Impact endpoint returned ${contentType||"non-JSON content"} from ${url}`;
+              continue;
+            }
+
+            const parsed=JSON.parse(rawText) as ImpactApiResponse;
+
+            if(!parsed.ok||!Array.isArray(parsed.items)){
+              lastError=parsed.error||`Invalid impact payload from ${url}`;
+              continue;
+            }
+
+            data=parsed;
+            break;
+          }catch(err:any){
+            lastError=err?.message||`Error reading impact stories from ${url}`;
+          }
         }
-        const data:ImpactApiResponse=await res.json();
-        if(!data.ok){
-          throw new Error(data.error||"Unknown error from Impact API");
+
+        if(!data){
+          throw new Error(lastError);
         }
 
         const items:ImpactItem[]=(data.items||[])
@@ -168,11 +233,17 @@ export default function HomePage(){
             const id=typeof raw.id==="string"&&raw.id.trim()
               ? raw.id.trim()
               : `impact-${index}`;
-            const slug=typeof raw.slug==="string"&&raw.slug.trim()?raw.slug.trim():undefined;
+            const slug=typeof raw.slug==="string"&&raw.slug.trim()
+              ? raw.slug.trim()
+              : undefined;
             const titleEn=String(raw.titleEn??"Untitled");
-            const titleTet=typeof raw.titleTet==="string"?raw.titleTet:undefined;
+            const titleTet=typeof raw.titleTet==="string"
+              ? raw.titleTet
+              : undefined;
             const excerptEn=String(raw.excerptEn??"");
-            const excerptTet=typeof raw.excerptTet==="string"?raw.excerptTet:undefined;
+            const excerptTet=typeof raw.excerptTet==="string"
+              ? raw.excerptTet
+              : undefined;
             const date=String(raw.date??"");
 
             const rawImages=Array.isArray(raw.images)
@@ -186,9 +257,11 @@ export default function HomePage(){
               : undefined;
 
             const visible=raw.visible!==false;
-            const order=typeof raw.order==="number"?raw.order:index+1;
+            const order=typeof raw.order==="number"
+              ? raw.order
+              : index+1;
 
-            return{
+            return {
               ...raw,
               id,
               slug,
@@ -208,7 +281,9 @@ export default function HomePage(){
         items.sort((a,b)=>{
           const da=a.date?new Date(a.date).getTime():0;
           const db=b.date?new Date(b.date).getTime():0;
-          if(db!==da){return db-da;}
+          if(db!==da){
+            return db-da;
+          }
           const oa=a.order??0;
           const ob=b.order??0;
           return oa-ob;
@@ -218,6 +293,7 @@ export default function HomePage(){
       }catch(err:any){
         console.error("[home] impact load error",err);
         setImpactError(err.message||"Error loading impact stories");
+        setImpactItems([]);
       }
     };
 
@@ -229,138 +305,163 @@ export default function HomePage(){
       <main className="flex-1">
         <Carousel />
 
-        {/* Social + CTA Block */}
         <section className="bg-gray-50 py-12 px-4" aria-labelledby="social-and-cta">
-          <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {/* Facebook */}
-            <div className="bg-white border border-gray-300 rounded-lg shadow overflow-hidden flex flex-col">
-              <div className="relative w-full h-40 bg-gray-100">
-                <Image
-                  src="/HomePage/LafaekFacebook.png"
-                  alt="Lafaek Facebook"
-                  fill
-                  sizes="(min-width:1024px) 25vw, 100vw"
-                  className="object-cover"
-                  priority
-                />
+          <div className="max-w-7xl mx-auto">
+            <div className="mb-8 text-center">
+              <h2
+                id="social-and-cta"
+                className="text-3xl md:text-4xl font-bold text-[#219653]"
+              >
+                {t.social.title}
+              </h2>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+              <div className="lg:col-span-3 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden flex flex-col">
+                <div className="relative w-full h-40 bg-gray-100">
+                  <Image
+                    src="/HomePage/LafaekFacebook.png"
+                    alt="Lafaek Facebook"
+                    fill
+                    sizes="(min-width:1024px) 25vw, 100vw"
+                    className="object-cover"
+                    priority
+                  />
+                </div>
+
+                <div className="p-5 flex flex-col flex-grow">
+                  <h3 className="text-xl font-bold text-blue-700 mb-2">
+                    {t.social.facebookTitle}
+                  </h3>
+                  <p className="text-sm text-gray-600 mb-4">
+                    {t.social.facebookText}
+                  </p>
+                  <a
+                    href="https://www.facebook.com/RevistaLafaek"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-auto inline-flex items-center justify-center rounded-full bg-blue-600 px-5 py-3 text-sm font-bold text-white hover:bg-blue-700 transition-colors"
+                    aria-label="Visit our Facebook page (opens in a new tab)"
+                  >
+                    {t.social.facebookButton}
+                  </a>
+                </div>
               </div>
-              <div className="p-5 flex flex-col flex-grow">
-                <h3 className="text-xl font-bold text-blue-700 mb-2">
-                  {language==="tet"?"Segue ami iha Facebook":"Follow us on Facebook"}
-                </h3>
-                <p className="text-gray-600 mb-4 text-sm">
-                  {language==="tet"
-                    ?"Hahú hatene notísia foun no eventu komunitáriu sira."
-                    :"Stay updated with our latest stories and community events."}
-                </p>
-                <a
-                  href="https://www.facebook.com/RevistaLafaek"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-blue-600 hover:bg-blue-700 text-white font-bold text-center py-3 px-6 rounded-full mt-auto"
-                  aria-label="Visit our Facebook page (opens in a new tab)"
-                >
-                  {language==="tet"?"Vizita Facebook":"Visit Facebook"}
-                </a>
+
+              <div className="lg:col-span-3 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden flex flex-col">
+                <div className="relative w-full h-40 bg-gray-100">
+                  <Image
+                    src="/HomePage/LafaekInstagram.png"
+                    alt="Lafaek Instagram"
+                    fill
+                    sizes="(min-width:1024px) 25vw, 100vw"
+                    className="object-contain p-6"
+                  />
+                </div>
+
+                <div className="p-5 flex flex-col flex-grow">
+                  <h3 className="text-xl font-bold text-[#EB5757] mb-2">
+                    {t.social.instagramTitle}
+                  </h3>
+                  <p className="text-sm text-gray-600 mb-4">
+                    {t.social.instagramText}
+                  </p>
+                  <a
+                    href="https://www.instagram.com/revistalafaek/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-auto inline-flex items-center justify-center rounded-full bg-[#EB5757] px-5 py-3 text-sm font-bold text-white hover:bg-red-600 transition-colors"
+                    aria-label="Visit our Instagram page (opens in a new tab)"
+                  >
+                    {t.social.instagramButton}
+                  </a>
+                </div>
+              </div>
+
+              <div className="lg:col-span-6 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden flex flex-col">
+                <div className="relative w-full h-56 md:h-72 bg-gray-100">
+                  <Image
+                    src="/HomePage/LafaekWebsite.png"
+                    alt="Lafaek YouTube"
+                    fill
+                    sizes="(min-width:1024px) 50vw, 100vw"
+                    className="object-cover"
+                    priority
+                  />
+                </div>
+
+                <div className="p-6 flex flex-col flex-grow">
+                  <div>
+                    <h3 className="text-2xl font-bold text-red-600 mb-2">
+                      {t.social.youtubeTitle}
+                    </h3>
+                    <p className="text-gray-600 text-sm md:text-base">
+                      {t.social.youtubeText}
+                    </p>
+                  </div>
+
+                  <div className="mt-6 flex flex-wrap gap-3">
+                    <a
+                      href="https://www.youtube.com/@lafaek"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center justify-center rounded-full bg-red-600 px-6 py-3 text-sm font-bold text-white hover:bg-red-700 transition-colors"
+                      aria-label="Visit our YouTube channel (opens in a new tab)"
+                    >
+                      {t.social.youtubeButton}
+                    </a>
+
+                    <a
+                      href="https://www.youtube.com/@lafaek/videos"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center justify-center rounded-full border border-red-200 bg-white px-6 py-3 text-sm font-bold text-red-600 hover:bg-red-50 transition-colors"
+                    >
+                      {t.social.youtubeSecondary}
+                    </a>
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* Instagram */}
-            <div className="bg-white border border-gray-300 rounded-lg shadow overflow-hidden flex flex-col">
-              
-<div className="relative w-full h-40 bg-gray-100">
-  <Image
-    src="/HomePage/LafaekInstagram.png"
-    alt="Lafaek Instagram"
-    fill
-    sizes="(min-width:1024px) 25vw, 100vw"
-    className="object-contain p-6"
-  />
-</div>
+            <div className="mt-6 rounded-2xl bg-gradient-to-r from-[#219653] via-[#2F80ED] to-[#219653] p-6 md:p-8 text-white shadow-lg">
+              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+                <div className="max-w-2xl">
+                  <h2 className="text-2xl md:text-3xl font-bold mb-2">
+                    {t.cta.title}
+                  </h2>
+                  <p className="text-sm md:text-base text-white/90">
+                    {t.cta.subtitle}
+                  </p>
+                </div>
 
-              <div className="p-5 flex flex-col flex-grow">
-                <h3 className="text-xl font-bold text-[#EB5757] mb-2">
-                  {language==="tet"?"Haree ami iha Instagram":"See us on Instagram"}
-                </h3>
-                <p className="text-gray-600 mb-4 text-sm">
-                  {language==="tet"
-                    ?"Haree foto, istória badinas no atividade sira iha kampu."
-                    :"Photos, short stories, and field updates from our work."}
-                </p>
-                <a
-                  href="https://www.instagram.com/revistalafaek/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-[#EB5757] hover:bg-red-600 text-white font-bold text-center py-3 px-6 rounded-full mt-auto"
-                  aria-label="Visit our Instagram page (opens in a new tab)"
-                >
-                  {language==="tet"?"Vizita Instagram":"Visit Instagram"}
-                </a>
-              </div>
-            </div>
+                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+                  <Link
+                    href="/get-involved#volunteer"
+                    className="inline-flex items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-bold text-[#219653] hover:bg-gray-100 transition-colors"
+                  >
+                    {t.cta.volunteer}
+                  </Link>
 
-            {/* YouTube */}
-            <div className="bg-white border border-gray-300 rounded-lg shadow overflow-hidden flex flex-col">
-              <div className="relative w-full h-40 bg-gray-100">
-                <Image
-                  src="/HomePage/LafaekWebsite.png"
-                  alt="Lafaek YouTube"
-                  fill
-                  sizes="(min-width:1024px) 25vw, 100vw"
-                  className="object-cover"
-                  priority
-                />
-              </div>
-              <div className="p-5 flex flex-col flex-grow">
-                <h3 className="text-xl font-bold text-red-600 mb-2">
-                  {language==="tet"?"Haree ami iha YouTube":"Watch us on YouTube"}
-                </h3>
-                <p className="text-gray-600 mb-4 text-sm">
-                  {language==="tet"
-                    ?"Deskobre ami-nia konteúdu, istória no vídeo sira husi kampu."
-                    :"Discover our behind-the-scenes content, stories, and videos from the field."}
-                </p>
-                <a
-                  href="https://www.youtube.com/@lafaek"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-red-600 hover:bg-red-700 text-white font-bold text-center py-3 px-6 rounded-full mt-auto"
-                  aria-label="Visit our YouTube channel (opens in a new tab)"
-                >
-                  {language==="tet"?"Vizita YouTube":"Visit YouTube"}
-                </a>
-              </div>
-            </div>
+                  <Link
+                    href="/get-involved#donate"
+                    className="inline-flex items-center justify-center rounded-full border-2 border-white px-6 py-3 text-sm font-bold text-white hover:bg-white hover:text-[#2F80ED] transition-colors"
+                  >
+                    {t.cta.donate}
+                  </Link>
 
-            {/* CTA */}
-            <div className="bg-gradient-to-br from-purple-500 to-blue-500 text-white rounded-lg shadow-lg flex flex-col items-center justify-center p-6">
-              <h2 className="text-2xl font-bold mb-3 text-center">{t.cta.title}</h2>
-              <p className="text-sm mb-5 text-center">{t.cta.subtitle}</p>
-              <div className="flex flex-col gap-3 w-full">
-                <Link
-                  href="/get-involved#volunteer"
-                  className="w-full text-center bg-white text-purple-600 font-bold py-3 px-6 rounded-full shadow hover:bg-gray-100"
-                >
-                  {t.cta.volunteer}
-                </Link>
-                <Link
-                  href="/get-involved#donate"
-                  className="w-full text-center border-4 border-white text-white font-bold py-3 px-6 rounded-full shadow hover:bg-white hover:text-blue-600"
-                >
-                  {t.cta.donate}
-                </Link>
-                <Link
-                  href="/get-involved#partner"
-                  className="w-full text-center bg-yellow-400 text-purple-800 font-bold py-3 px-6 rounded-full shadow hover:bg-yellow-300"
-                >
-                  {t.cta.partner}
-                </Link>
+                  <Link
+                    href="/get-involved#partner"
+                    className="inline-flex items-center justify-center rounded-full bg-[#F2C94C] px-6 py-3 text-sm font-bold text-[#333333] hover:bg-yellow-300 transition-colors"
+                  >
+                    {t.cta.partner}
+                  </Link>
+                </div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Latest Impact Stories preview */}
         <section className="py-12 bg-white" aria-labelledby="home-impact-preview">
           <div className="max-w-7xl mx-auto px-4">
             <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-6">
@@ -393,7 +494,7 @@ export default function HomePage(){
 
             {!impactError&&impactItems.length===0&&(
               <div className="rounded-md border border-gray-200 bg-gray-50 px-4 py-6 text-sm text-gray-600">
-                No impact stories to show yet. Please check back soon.
+                {t.impact.empty}
               </div>
             )}
 
@@ -459,20 +560,21 @@ export default function HomePage(){
             )}
           </div>
         </section>
-{/* Lafaek Logo Banner */}
-<section className="py-12 bg-white">
-  <div className="max-w-7xl mx-auto px-4 flex justify-center">
-<div className="relative w-full max-w-3xl h-64">      <Image
-        src="/characters/0-lafaek-friends.png"
-        alt="Lafaek friends"
-        fill
-        className="object-contain"
-        priority
-      />
-    </div>
-  </div>
-</section>
-        {/* Social Enterprise */}
+
+        <section className="py-12 bg-white">
+          <div className="max-w-7xl mx-auto px-4 flex justify-center">
+            <div className="relative w-full max-w-3xl h-64">
+              <Image
+                src="/characters/0-lafaek-friends.png"
+                alt="Lafaek friends"
+                fill
+                className="object-contain"
+                priority
+              />
+            </div>
+          </div>
+        </section>
+
         <section className="py-20 bg-gradient-to-br from-green-50 to-blue-50 text-center" aria-labelledby="social-enterprise">
           <div className="max-w-7xl mx-auto px-4">
             <h2 id="social-enterprise" className="text-4xl font-bold text-green-800 mb-4">
@@ -490,8 +592,6 @@ export default function HomePage(){
           </div>
         </section>
 
-
-        {/* Donors & Sponsors */}
         <section className="bg-gray-50 border-t border-gray-200 py-12" aria-labelledby="sponsors">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h2 id="sponsors" className="text-4xl font-bold text-[#219653] mb-8">
@@ -499,8 +599,6 @@ export default function HomePage(){
             </h2>
 
             <div className="flex flex-wrap justify-center items-center gap-10">
-              
-
               <div className="relative h-16 w-40">
                 <Image
                   src="/sponsors/logo-mfat.jpg"
@@ -518,6 +616,7 @@ export default function HomePage(){
                   className="object-contain"
                 />
               </div>
+
               <div className="relative h-16 w-40">
                 <Image
                   src="/sponsors/logo-care.jpg"
