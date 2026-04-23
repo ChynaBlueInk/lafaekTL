@@ -1,22 +1,12 @@
-// app/stories/news/page.tsx
 "use client";
 
-import {useEffect,useState}from "react";
-import Image from "next/image";
+import {useEffect,useMemo,useState} from "react";
 import Link from "next/link";
-import {useLanguage}from "@/lib/LanguageContext";
-
-const S3_ORIGIN="https://lafaek-media.s3.ap-southeast-2.amazonaws.com";
-
-type ApiResponse={
-  ok:boolean;
-  items:any[];
-  error?:string;
-};
+import Image from "next/image";
+import {useLanguage} from "@/lib/LanguageContext";
 
 type NewsItem={
   id:string;
-  slug?:string;
   titleEn:string;
   titleTet?:string;
   excerptEn:string;
@@ -27,40 +17,38 @@ type NewsItem={
   image?:string;
   images?:string[];
   document?:string;
-  visible?:boolean;
+  slug?:string;
   externalUrl?:string;
   order?:number;
+  visible?:boolean;
   [key:string]:any;
 };
 
-const buildImageUrl=(src?:string)=>{
-  if(!src){
-    return"/placeholder.svg?height=200&width=300";
-  }
-  let clean=src.trim();
-  if(clean.startsWith("http://")||clean.startsWith("https://")){
-    return clean;
-  }
-  clean=clean.replace(/^\/+/,"");
-  return`${S3_ORIGIN}/${clean}`;
+type ApiResponse={
+  ok:boolean;
+  items?:any[];
+  error?:string;
 };
 
-const buildFileUrl=(src?:string)=>{
-  if(!src){return"";}
-  let clean=src.trim();
-  if(clean.startsWith("http://")||clean.startsWith("https://")||clean.startsWith(S3_ORIGIN)){
-    return clean;
-  }
-  clean=clean.replace(/^\/+/,"");
-  return`${S3_ORIGIN}/${clean}`;
-};
+const S3_ORIGIN="https://lafaek-media.s3.ap-southeast-2.amazonaws.com";
 
-const normaliseImages=(raw:any)=>{
+function toAssetUrl(src?:string){
+  if(!src){return undefined;}
+  const clean=src.trim();
+  if(!clean){return undefined;}
+  if(clean.startsWith("http://")||clean.startsWith("https://")){return clean;}
+  return `${S3_ORIGIN}/${clean.replace(/^\/+/,"")}`;
+}
+
+function normaliseImages(raw:any){
   const rawImages=Array.isArray(raw?.images)
-    ? raw.images.filter((img:any)=>typeof img==="string"&&img.trim()).map((x:string)=>x.trim())
+    ? raw.images.filter((img:any)=>typeof img==="string"&&img.trim()).map((img:string)=>img.trim())
     : [];
+
   const primaryImage=typeof raw?.image==="string"&&raw.image.trim()
     ? raw.image.trim()
+    : typeof raw?.imageUrl==="string"&&raw.imageUrl.trim()
+    ? raw.imageUrl.trim()
     : rawImages.length>0
     ? rawImages[0]
     : undefined;
@@ -69,7 +57,7 @@ const normaliseImages=(raw:any)=>{
     primaryImage,
     images:rawImages
   };
-};
+}
 
 export default function NewsPage(){
   const{language}=useLanguage();
@@ -93,7 +81,10 @@ export default function NewsPage(){
       sortLatest:"Latest first",
       sortAZ:"Title A–Z",
       sortCustom:"Editor order (featured first)",
-      morePhotos:(n:number)=>`+ ${n} more photos`
+      morePhotos:(n:number)=>`+ ${n} more photos`,
+      noItems:"No news items available yet.",
+      loading:"Loading news...",
+      errorTitle:"Could not load news."
     },
     tet:{
       heading:"Notísia & Istória",
@@ -105,7 +96,10 @@ export default function NewsPage(){
       sortLatest:"Foun liu ba leten",
       sortAZ:"Titulu A–Z",
       sortCustom:"Ordem editor (artigu destakadu leten)",
-      morePhotos:(n:number)=>`+ foto seluk ${n}`
+      morePhotos:(n:number)=>`+ foto seluk ${n}`,
+      noItems:"Seidauk iha notísia disponivel.",
+      loading:"Hein hela notísia sira...",
+      errorTitle:"La konsege karrega notísia sira."
     }
   }[L];
 
@@ -114,11 +108,21 @@ export default function NewsPage(){
       try{
         setLoading(true);
         setError(undefined);
-        const res=await fetch("/api/admin/news",{method:"GET",cache:"no-store"});
-        if(!res.ok){
-          throw new Error(`Failed to load news: ${res.status}`);
+
+        const res=await fetch("/api/news",{cache:"no-store"});
+        const text=await res.text();
+
+        let data:ApiResponse;
+        try{
+          data=JSON.parse(text) as ApiResponse;
+        }catch{
+          throw new Error(`Expected JSON but got: ${text.slice(0,200)}`);
         }
-        const data:ApiResponse=await res.json();
+
+        if(!res.ok){
+          throw new Error(data.error||`Failed to load news: ${res.status}`);
+        }
+
         if(!data.ok){
           throw new Error(data.error||"Unknown error from API");
         }
@@ -194,7 +198,7 @@ export default function NewsPage(){
     return String(base||"").toLowerCase();
   };
 
-  const filteredAndSortedItems=(()=>{
+  const filteredAndSortedItems=useMemo(()=>{
     let list=[...items];
 
     const term=searchTerm.trim().toLowerCase();
@@ -224,78 +228,73 @@ export default function NewsPage(){
       if(sortMode==="latest"){
         if(da!==db){return db-da;}
         if(oa!==ob){return oa-ob;}
-        return 0;
+        return getDisplayTitle(a).localeCompare(getDisplayTitle(b));
       }
 
-      if(sortMode==="az"){
-        const ta=getDisplayTitle(a);
-        const tb=getDisplayTitle(b);
-        if(ta<tb){return-1;}
-        if(ta>tb){return 1;}
+      if(sortMode==="custom"){
+        if(oa!==ob){return oa-ob;}
         if(da!==db){return db-da;}
-        return 0;
+        return getDisplayTitle(a).localeCompare(getDisplayTitle(b));
       }
 
-      if(oa!==ob){return oa-ob;}
-      if(da!==db){return db-da;}
-      return 0;
+      return getDisplayTitle(a).localeCompare(getDisplayTitle(b));
     });
 
     return list;
-  })();
+  },[items,searchTerm,sortMode]);
 
   return(
-    <div className="min-h-screen bg-white">
-      <main className="mx-auto max-w-7xl px-4 py-12">
-        <header className="mb-6 text-center md:mb-8">
-          <h1 className="text-4xl font-bold text-blue-800">{labels.heading}</h1>
-          <p className="mt-2 text-gray-600">{labels.intro}</p>
-        </header>
+    <main className="min-h-screen bg-[#f5f5f5] px-4 py-10">
+      <div className="mx-auto max-w-6xl">
+        <div className="mb-8">
+          <h1 className="text-4xl font-extrabold text-[#333333]">{labels.heading}</h1>
+          <p className="mt-3 max-w-3xl text-[#4F4F4F]">{labels.intro}</p>
+        </div>
 
-        <div className="mb-8 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <div className="w-full md:max-w-sm">
-            <input
-              type="text"
-              placeholder={labels.searchPlaceholder}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-[#219653] focus:outline-none focus:ring-1 focus:ring-[#219653]"
-              value={searchTerm}
-              onChange={(e)=>setSearchTerm(e.target.value)}
-            />
-          </div>
-          <div className="flex items-center gap-2 text-sm text-gray-700">
-            <span className="whitespace-nowrap">{labels.sortLabel}:</span>
+        <div className="mb-6 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e)=>setSearchTerm(e.target.value)}
+            placeholder={labels.searchPlaceholder}
+            className="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 shadow-sm focus:border-[#2F80ED] focus:outline-none md:max-w-md"
+          />
+
+          <div className="flex items-center gap-3">
+            <label className="text-sm font-medium text-[#4F4F4F]">{labels.sortLabel}</label>
             <select
-              className="rounded-md border border-gray-300 px-2 py-1 text-sm focus:border-[#219653] focus:outline-none focus:ring-1 focus:ring-[#219653]"
               value={sortMode}
               onChange={(e)=>setSortMode(e.target.value as "latest"|"custom"|"az")}
+              className="rounded-xl border border-gray-300 bg-white px-4 py-3 shadow-sm focus:border-[#2F80ED] focus:outline-none"
             >
               <option value="latest">{labels.sortLatest}</option>
-              <option value="az">{labels.sortAZ}</option>
               <option value="custom">{labels.sortCustom}</option>
+              <option value="az">{labels.sortAZ}</option>
             </select>
           </div>
         </div>
 
         {loading&&(
-          <div className="text-center text-sm text-gray-600">
-            Loading news...
+          <div className="rounded-2xl bg-white p-8 text-center text-[#4F4F4F] shadow-sm">
+            {labels.loading}
           </div>
         )}
 
         {error&&!loading&&(
-          <div className="mx-auto mb-6 max-w-xl rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-            {error}
+          <div className="rounded-2xl border border-red-200 bg-red-50 p-6 text-red-700 shadow-sm">
+            <p className="font-semibold">{labels.errorTitle}</p>
+            <p className="mt-2 text-sm">{error}</p>
           </div>
         )}
 
-        {!loading&&filteredAndSortedItems.length===0&&!error&&(
-          <div className="mx-auto max-w-xl rounded-md border border-gray-200 bg-gray-50 px-4 py-6 text-center text-sm text-gray-600">
-            No news to show yet. Please check back soon.
+        {!loading&&!error&&filteredAndSortedItems.length===0&&(
+          <div className="rounded-2xl bg-white p-8 text-center text-[#4F4F4F] shadow-sm">
+            {labels.noItems}
           </div>
         )}
 
-        {!loading&&filteredAndSortedItems.length>0&&(
-          <section className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+        {!loading&&!error&&filteredAndSortedItems.length>0&&(
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
             {filteredAndSortedItems.map((item)=>{
               const title=L==="tet"
                 ? item.titleTet||item.titleEn
@@ -305,108 +304,79 @@ export default function NewsPage(){
                 ? item.excerptTet||item.excerptEn
                 : item.excerptEn;
 
-              const heroImage=item.image||(Array.isArray(item.images)&&item.images[0])||undefined;
-              const imageSrc=buildImageUrl(heroImage);
+              const primaryImageUrl=toAssetUrl(item.image);
+              const galleryImages=(item.images||[])
+                .map((img)=>toAssetUrl(img))
+                .filter(Boolean) as string[];
 
-              const gallery=(item.images||[]).filter(Boolean);
-              const extraCount=heroImage
-                ? Math.max(0,gallery.length-1)
-                : gallery.length;
-
-              const internalIdOrSlug=item.slug||item.id;
-              const href=item.externalUrl
+              const extraPhotoCount=Math.max(galleryImages.length-1,0);
+              const pdfUrl=toAssetUrl(item.document);
+              const articleHref=item.externalUrl
                 ? item.externalUrl
-                : `/stories/news/${internalIdOrSlug}`;
-
-              const pdfUrl=item.document?buildFileUrl(item.document):"";
-
-              let dateLabel="";
-              if(item.date){
-                const d=new Date(item.date);
-                if(!Number.isNaN(d.getTime())){
-                  dateLabel=d.toLocaleDateString();
-                }
-              }
-
-              const stripThumbs=gallery
-                .filter((src)=>src!==heroImage)
-                .slice(0,3);
+                : item.slug
+                ? `/stories/news/${item.slug}`
+                : undefined;
 
               return(
                 <article
                   key={item.id}
-                  className="rounded-lg border border-gray-200 bg-gray-50 p-6"
+                  className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-md"
                 >
-                  <div className="relative mb-4 h-44 w-full">
-                    <Image
-                      src={imageSrc}
-                      alt={title}
-                      fill
-                      className="rounded object-cover"
-                    />
-                  </div>
-
-                  {extraCount>0&&(
-                    <div className="mb-3 flex items-center justify-between gap-3">
-                      <div className="flex items-center gap-2">
-                        {stripThumbs.map((src)=>(
-                          <div key={src} className="relative h-8 w-10 overflow-hidden rounded border border-gray-200 bg-white">
-                            <Image
-                              src={buildImageUrl(src)}
-                              alt=""
-                              fill
-                              className="object-cover"
-                            />
-                          </div>
-                        ))}
-                      </div>
-                      <div className="text-xs font-medium text-gray-600">
-                        {labels.morePhotos(extraCount)}
-                      </div>
+                  {primaryImageUrl&&(
+                    <div className="relative h-56 w-full bg-gray-100">
+                      <Image
+                        src={primaryImageUrl}
+                        alt={title}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
+                      />
                     </div>
                   )}
 
-                  {dateLabel&&(
-                    <div className="mb-3 text-xs text-gray-500">
-                      {dateLabel}
+                  <div className="p-5">
+                    <div className="text-sm font-medium text-[#828282]">{item.date}</div>
+
+                    <h2 className="mt-2 text-xl font-bold text-[#333333]">{title}</h2>
+
+                    {excerpt&&(
+                      <p className="mt-3 text-sm leading-6 text-[#4F4F4F]">{excerpt}</p>
+                    )}
+
+                    <div className="mt-5 flex flex-wrap gap-3">
+                      {articleHref&&(
+                        <Link
+                          href={articleHref}
+                          className="rounded-lg bg-[#219653] px-4 py-2 text-sm font-semibold text-white hover:bg-[#1b7f45]"
+                        >
+                          {labels.readMore}
+                        </Link>
+                      )}
+
+                      {pdfUrl&&(
+                        <a
+                          href={pdfUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="rounded-lg border border-[#2F80ED] px-4 py-2 text-sm font-semibold text-[#2F80ED] hover:bg-blue-50"
+                        >
+                          {labels.viewPdf}
+                        </a>
+                      )}
                     </div>
-                  )}
 
-                  <h2 className="mb-2 text-xl font-semibold">{title}</h2>
-
-                  {excerpt&&(
-                    <p className="mb-4 text-gray-700">
-                      {excerpt}
-                    </p>
-                  )}
-
-                  <div className="flex flex-wrap items-center gap-3">
-                    <Link
-                      href={href}
-                      className="inline-block font-semibold text-[#219653] hover:underline"
-                      target={item.externalUrl?"_blank":undefined}
-                      rel={item.externalUrl?"noopener noreferrer":undefined}
-                    >
-                      {labels.readMore}
-                    </Link>
-
-                    {pdfUrl&&(
-                      <a
-                        href={pdfUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-block font-semibold text-blue-700 hover:underline"
-                      >
-                        {labels.viewPdf}
-                      </a>
+                    {extraPhotoCount>0&&(
+                      <div className="mt-4 text-xs font-medium text-[#828282]">
+                        {labels.morePhotos(extraPhotoCount)}
+                      </div>
                     )}
                   </div>
                 </article>
               );
             })}
-          </section>
+          </div>
         )}
-      </main>
-    </div>
+      </div>
+    </main>
   );
 }

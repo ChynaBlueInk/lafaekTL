@@ -7,7 +7,7 @@ export const runtime="nodejs";
 const REGION=process.env.AWS_REGION||"ap-southeast-2";
 const BUCKET=process.env.AWS_S3_BUCKET||"";
 const BASE_PATH=(process.env.AWS_S3_BASE_PATH||"uploads").replace(/^\/+|\/+$/g,"");
-const IMPACT_JSON_KEY=process.env.AWS_S3_IMPACT_JSON_KEY||"content/impact.json";
+const NEWS_JSON_KEY=process.env.AWS_S3_NEWS_JSON_KEY||"content/news.json";
 
 const s3=new S3Client({region:REGION});
 
@@ -19,14 +19,6 @@ const streamToString=async(stream:any)=>{
   return Buffer.concat(chunks).toString("utf-8");
 };
 
-function safeStatus(item:any){
-  const status=typeof item?.status==="string"?item.status.trim().toLowerCase():"";
-  if(status==="draft"||status==="published"||status==="hidden"||status==="archived"){
-    return status;
-  }
-  return item?.visible===false?"hidden":"published";
-}
-
 export async function GET(){
   try{
     if(!BUCKET){
@@ -37,8 +29,8 @@ export async function GET(){
     }
 
     const keyCandidates=[
-      `${BASE_PATH}/${IMPACT_JSON_KEY}`.replace(/\/+/g,"/"),
-      IMPACT_JSON_KEY.replace(/^\/+/,"")
+      `${BASE_PATH}/${NEWS_JSON_KEY}`.replace(/\/+/g,"/"),
+      NEWS_JSON_KEY.replace(/^\/+/,"")
     ];
 
     let parsed:any=null;
@@ -66,7 +58,7 @@ export async function GET(){
     }
 
     if(!parsed){
-      throw lastError||new Error("Impact JSON file could not be loaded from S3");
+      throw lastError||new Error("News JSON file could not be loaded from S3");
     }
 
     const rawItems=Array.isArray(parsed)
@@ -76,10 +68,7 @@ export async function GET(){
       : [];
 
     const items=rawItems
-      .filter((item:any)=>{
-        const status=safeStatus(item);
-        return item?.visible!==false&&status!=="archived"&&status!=="draft";
-      })
+      .filter((item:any)=>item?.visible!==false)
       .sort((a:any,b:any)=>{
         const da=a?.date?new Date(a.date).getTime():0;
         const db=b?.date?new Date(b.date).getTime():0;
@@ -95,10 +84,10 @@ export async function GET(){
 
     return NextResponse.json({ok:true,items},{status:200});
   }catch(error:any){
-    console.error("[api/impact] GET error",error);
+    console.error("[api/news] GET error",error);
 
     return NextResponse.json(
-      {ok:false,error:error?.message||"Failed to load public impact stories"},
+      {ok:false,error:error?.message||"Failed to load public news"},
       {status:500}
     );
   }
