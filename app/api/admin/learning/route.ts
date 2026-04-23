@@ -23,7 +23,7 @@ const VALID_CATEGORY_SLUGS: LearningCategorySlug[] = [
   "stories",
   "natural-science",
   "social-science",
-  "history",
+  "physical-education",
   "literacy",
   "mathematics",
   "health",
@@ -37,7 +37,13 @@ function isValidCategorySlug(value: string): value is LearningCategorySlug {
 
 function normaliseLearningItem(raw: any): LearningItemRecord | null {
   const itemId = typeof raw?.itemId === "string" ? raw.itemId.trim() : "";
-  const categorySlug = typeof raw?.categorySlug === "string" ? raw.categorySlug.trim() : "";
+
+  let categorySlug =
+    typeof raw?.categorySlug === "string" ? raw.categorySlug.trim() : "";
+
+  if (categorySlug === "history") {
+    categorySlug = "physical-education";
+  }
 
   if (!itemId || !isValidCategorySlug(categorySlug)) {
     return null;
@@ -45,7 +51,7 @@ function normaliseLearningItem(raw: any): LearningItemRecord | null {
 
   return {
     itemId,
-    categorySlug,
+    categorySlug: categorySlug as LearningCategorySlug,
     titleEn: typeof raw?.titleEn === "string" ? raw.titleEn : "",
     titleTet: typeof raw?.titleTet === "string" ? raw.titleTet : "",
     descriptionEn: typeof raw?.descriptionEn === "string" ? raw.descriptionEn : "",

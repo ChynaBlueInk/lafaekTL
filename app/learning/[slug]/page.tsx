@@ -42,7 +42,7 @@ const SUBJECTS: Record<LearningCategorySlug, SubjectConfig> = {
     descTet: "Ema, komunidade, kultura, no oinsá sosiedade halo servisu.",
     image: "/learning/icons/socialscience.png",
   },
-  history: {
+  "physical-education": {
     titleEn: "Physical Education",
     titleTet: "Edukasãun Físika",
     descEn: "Sports and physical health.",

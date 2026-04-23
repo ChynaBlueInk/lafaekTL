@@ -9,7 +9,7 @@ const CATEGORY_OPTIONS: Array<{ value: LearningCategorySlug; label: string }> = 
   { value: "stories", label: "Stories" },
   { value: "natural-science", label: "Natural Science" },
   { value: "social-science", label: "Social Science" },
-  { value: "history", label: "History" },
+  { value: "physical-education", label: "Physical Education" },
   { value: "literacy", label: "Literacy" },
   { value: "mathematics", label: "Mathematics" },
   { value: "health", label: "Health" },

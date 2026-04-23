@@ -2,7 +2,7 @@ export type LearningCategorySlug =
   | "stories"
   | "natural-science"
   | "social-science"
-  | "history"
+  | "physical-education"
   | "literacy"
   | "mathematics"
   | "health"
