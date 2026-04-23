@@ -49,9 +49,9 @@ export default function HomePage(){
     en:{
       hero:{
         title:"Welcome to Lafaek Learning Media",
-        subtitle:"Empowering Timor-Leste through Education & Stories",
+        subtitle:"Supporting Timor-Leste through Education & Stories",
         supportText:
-          "You can support Lafaek by purchasing our magazines and products, sponsoring educational content, advertising with us, or hiring our talented team of writers, illustrators, and videographers."
+          "You can help support Lafaek by purchasing our magazines and products, sponsoring educational content, advertising with us, or hiring our talented team of writers, illustrators, and videographers."
       },
       news:{title:"Latest News",subtitle:"What's happening at Lafaek?",viewAll:"View all news"},
       socialEnterprise:{
