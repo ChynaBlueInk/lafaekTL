@@ -1,12 +1,13 @@
-//app/cyber/youth/game/page.tsx
+// app/cyber/youth/game/page.tsx
 "use client";
 
 import Link from "next/link";
 import React,{useEffect,useMemo,useRef,useState} from "react";
 import {motion} from "framer-motion";
+import {Gamepad2,Lock,RefreshCcw,SearchCheck,ShieldCheck} from "lucide-react";
 import {useLanguage} from "@/lib/LanguageContext";
 
-type Accent="cyan"|"emerald"|"purple"|"amber";
+type Accent="sky"|"green"|"purple";
 type Lang="en"|"tet";
 
 type ModuleItem={
@@ -25,7 +26,7 @@ type T={
   status:string;
   online:string;
   user:string;
-  recruit:string;
+  learner:string;
   level:string;
   levelValue:string;
   backToYouth:string;
@@ -33,18 +34,18 @@ type T={
   objectiveText:string;
   objectiveHint:string;
   scoreLabel:string;
-  missionLabel:string;
+  checksLabel:string;
   commandLabel:string;
   commandHint:string;
   quickGoals:string[];
-  launchModule:string;
-  terminalTitle:string;
-  terminalBoot:string[];
+  openActivity:string;
+  screenTitle:string;
+  screenBoot:string[];
   placeholder:string;
   unpinned:string;
   solvedText:string;
   clearLabel:string;
-  resetMission:string;
+  resetGame:string;
   moduleTitles:{
     deepfake:string;
     privacy:string;
@@ -61,227 +62,231 @@ type T={
 
 const TRANSLATIONS:Record<Lang,T>={
   en:{
-    title:"CYBER VANGUARD",
-    subtitle:"Training dashboard for spotting threats, checking scams, and choosing safer actions.",
-    status:"STATUS",
-    online:"ONLINE",
-    user:"USER",
-    recruit:"RECRUIT",
-    level:"LEVEL",
+    title:"Youth Cyber Safety Game",
+    subtitle:"Practise simple checks before you click, share, reply, or pay.",
+    status:"Status",
+    online:"Online",
+    user:"User",
+    learner:"Learner",
+    level:"Level",
     levelValue:"1",
-    backToYouth:"Back to Youth Cyber",
-    objectiveTitle:"MISSION OBJECTIVE",
-    objectiveText:"Use the terminal to investigate common scam situations. Each useful command earns points. Your goal is to complete the core checks before launching a module.",
-    objectiveHint:'Start with: help → scan → scam → verify',
-    scoreLabel:"MISSION SCORE",
-    missionLabel:"CORE COMMANDS COMPLETED",
-    commandLabel:"What this terminal is for",
-    commandHint:"This is not random typing practice. It simulates quick cyber decision-making. Run commands, read the intel, and build your scam radar.",
+    backToYouth:"Back to Youth Cyber Lab",
+    objectiveTitle:"What to do",
+    objectiveText:
+      "Use the scan screen to practise common online safety checks. Each useful command earns points. Try to complete the four core checks before opening another activity.",
+    objectiveHint:"Start with: help → scan → scam → verify",
+    scoreLabel:"Score",
+    checksLabel:"Checks completed",
+    commandLabel:"How this game helps",
+    commandHint:
+      "This is a quick practice activity. Type short commands, read the clues, and build the habit of stopping before you trust a message.",
     quickGoals:[
-      "Learn why OTP codes should never be shared",
-      "Recognise why urgency is a warning sign",
-      "Check how to handle short links and marketplace pressure"
+      "Know why OTP codes should never be shared",
+      "Notice when urgency is being used to pressure you",
+      "Check short links and marketplace messages before acting",
     ],
-    launchModule:"Launch Module",
-    terminalTitle:"THREAT ANALYSIS TERMINAL",
-    terminalBoot:[
-      "Cyber Vanguard System v2.0",
-      "Mission loaded: Threat Response Basics",
-      'Type "help" to see commands.',
-      'Recommended start: help, scan, scam, verify'
+    openActivity:"Open activity",
+    screenTitle:"Cyber Safety Scan",
+    screenBoot:[
+      "Welcome to the Youth Cyber Safety Game.",
+      "Practise: Stop, Think, Check.",
+      'Type "help" to see what you can try.',
+      'Good start: help, scan, scam, verify',
     ],
     placeholder:'Try: help',
-    unpinned:"You’ve scrolled up — new output won’t auto-jump. Scroll down to re-pin.",
-    solvedText:"Core mission complete. You can now launch a module or keep exploring.",
+    unpinned:"You have scrolled up. Scroll down to see new messages.",
+    solvedText:"Great work. You completed the core checks. You can keep playing or open another activity.",
     clearLabel:"clear",
-    resetMission:"Reset Mission",
+    resetGame:"Reset game",
     moduleTitles:{
-      deepfake:"AI Threat Detection",
-      privacy:"Privacy Shield",
-      social:"Social Engineering"
+      deepfake:"AI Image Check",
+      privacy:"Privacy Check",
+      social:"Scam & Social Tricks",
     },
     moduleDescs:{
-      deepfake:"Analyse media for deepfake signals and manipulation tricks.",
-      privacy:"Lock down your digital footprint and settings that matter.",
-      social:"Defend against manipulation, pressure tactics, and grooming."
+      deepfake:"Look for warning signs in AI images, videos, and voice messages.",
+      privacy:"Check settings that protect your account, photos, location, and personal details.",
+      social:"Learn how pressure, fake links, prizes, and urgent messages can trick people.",
     },
     commandResponses:{
       help:[
-        "Available commands:",
-        " help         show all commands",
-        " status       system + mission status",
-        " scan         run a quick threat scan",
-        " scam         core scam radar rules",
-        " otp          why one-time codes get stolen",
-        " shortlink    how to handle shortened links",
-        " marketplace  safe buying and selling basics",
-        " verify       STOP–THINK–CHECK script",
-        " clear        clear terminal"
+        "Useful commands:",
+        " help         show the commands",
+        " status       show the game status",
+        " scan         check for warning signs",
+        " scam         learn simple scam rules",
+        " otp          learn why codes must stay private",
+        " shortlink    learn how to check short links",
+        " marketplace  learn safer buying and selling tips",
+        " verify       practise Stop, Think, Check",
+        " clear        clear the screen",
       ],
       status:[
-        "System Status: ONLINE",
-        "Firewall: ACTIVE",
-        "Threat Level: MODERATE",
-        "Mission Focus: Human mistakes are the biggest attack surface.",
-        "Tip: attackers usually target people before they target devices."
+        "Game status: online",
+        "Safety habit: active",
+        "Risk level: medium",
+        "Focus: many scams work because people feel rushed.",
+        "Tip: slow down before you click, reply, share, or pay.",
       ],
       scan:[
-        "Initiating scan...",
-        "Checking for phishing signals... FOUND",
-        "Checking for urgency language... FOUND",
-        "Checking for account theft tactics... FOUND",
-        'Result: human pressure tactics detected. Run "scam" or "verify".'
+        "Running safety scan...",
+        "Checking for fake link signs... found",
+        "Checking for urgent language... found",
+        "Checking for account stealing tricks... found",
+        'Result: this message needs checking. Try "scam" or "verify".',
       ],
       scam:[
-        "SCAM RADAR:",
+        "Simple scam rules:",
         "1) Never share OTP or verification codes.",
-        "2) Real prizes do not require surprise payment fees.",
-        "3) Unknown short links should be treated as suspicious.",
-        "4) Urgency is often used to stop you from thinking.",
-        "5) If the message triggers panic or excitement, slow down."
+        "2) Real prizes should not ask for surprise payment fees.",
+        "3) Unknown short links may be risky.",
+        "4) Urgent messages are often used to stop you thinking.",
+        "5) If a message makes you panic or feel too excited, slow down.",
       ],
       otp:[
-        "OTP TRAP:",
-        "If someone asks for your code, they may be logging in as you.",
-        "Legitimate support does not ask for OTP codes.",
-        "If you shared one: change password, enable 2FA, check active sessions."
+        "OTP code safety:",
+        "If someone asks for your code, they may be trying to enter your account.",
+        "Real support teams should not ask for your OTP code.",
+        "If you shared a code, change your password, turn on 2FA, and check active sessions.",
       ],
       shortlink:[
-        "SHORT LINK CHECK:",
-        "Do not trust a short link just because a friend sent it.",
-        "Ask what it is first.",
-        "Open the official site or app yourself instead of tapping the link."
+        "Short link check:",
+        "Do not trust a short link only because a friend sent it.",
+        "Ask what the link is before opening it.",
+        "It is safer to open the official website or app yourself.",
       ],
       marketplace:[
-        "MARKETPLACE SAFETY:",
-        "Do not prepay to 'hold' an item.",
-        "Meet in a safe public place.",
-        "Bring an adult or trusted person if needed.",
-        "Pressure + urgency + deposit request = danger."
+        "Marketplace safety:",
+        "Do not pay early to hold an item unless you are sure it is safe.",
+        "Meet in a safe public place when possible.",
+        "Take a trusted person with you if needed.",
+        "Pressure + urgency + deposit request = warning sign.",
       ],
       verify:[
-        "STOP — THINK — CHECK",
-        "STOP: pause when something feels urgent, weird, or exciting.",
-        "THINK: what are they asking for — money, codes, photos, passwords?",
-        "CHECK: verify through another channel, inspect the URL, ask someone you trust."
-      ]
+        "STOP, THINK, CHECK",
+        "STOP: pause when something feels urgent, strange, or exciting.",
+        "THINK: what are they asking for? Money, codes, photos, passwords, or personal details?",
+        "CHECK: use another way to verify. Call the person, check the real website, or ask someone you trust.",
+      ],
     },
     unknown:(command)=>[
       `Command not found: ${command}`,
-      'Try "help".'
-    ]
+      'Try "help".',
+    ],
   },
   tet:{
-    title:"CYBER VANGUARD",
-    subtitle:"Painel treinu atu deteta ameasa, haree fraude, no hili resposta ne'ebé seguru liu.",
-    status:"ESTADU",
-    online:"ONLINE",
-    user:"UTILIZADÓR",
-    recruit:"RECRUIT",
-    level:"NIVEL",
+    title:"Jogu Seguransa Cyber ba Juventude",
+    subtitle:"Prátika cheka simples molok klik, fahe, hatán, ka selu.",
+    status:"Estadu",
+    online:"Online",
+    user:"Utilizadór",
+    learner:"Aprendiz",
+    level:"Nivel",
     levelValue:"1",
-    backToYouth:"Fila ba Youth Cyber",
-    objectiveTitle:"OBJETIVU MISAUN",
-    objectiveText:"Uza terminal atu investiga situasaun fraude komún sira. Kada komandú útil fó pontu. Ita-nia objetivu mak kompleta verifikasaun prinsipal sira molok lansa módulu ida.",
-    objectiveHint:'Hahu ho: help → scan → scam → verify',
-    scoreLabel:"PONTU MISAUN",
-    missionLabel:"KOMANDÚ PRINSIPAL SIRA KOMPLETA ONA",
-    commandLabel:"Terminal ida-ne'e ba saida",
-    commandHint:"Ne'e la'ós de'it typing aleatóriu. Nia simula desizaun cyber lalais. Halo komandú, lee intelijénsia, no hadia ita-nia scam radar.",
+    backToYouth:"Fila ba Youth Cyber Lab",
+    objectiveTitle:"Saida mak atu halo",
+    objectiveText:
+      "Uza ekran scan atu prátika verifikasaun seguransa online. Kada komandú útil fó pontu. Tenta kompleta verifikasaun prinsipál haat molok loke atividade seluk.",
+    objectiveHint:"Hahu ho: help → scan → scam → verify",
+    scoreLabel:"Pontu",
+    checksLabel:"Verifikasaun kompleta",
+    commandLabel:"Oinsá jogu ida-ne'e ajuda",
+    commandHint:
+      "Ne'e atividade prátika lalais. Hakerek komandú badak, lee pista sira, no aprende atu para uluk molok fiar mensajen ida.",
     quickGoals:[
-      "Aprende tanba sa OTP labele fahe",
-      "Hatene katak urjénsia mak sinal avisu ida",
-      "Haree oinsá atu trata short link no presaun marketplace"
+      "Hatene tanba sa OTP labele fahe",
+      "Haree bainhira ema uza presaun atu halo ita lalais",
+      "Cheka short link no mensajen marketplace molok halo buat ida",
     ],
-    launchModule:"Lansa Módulu",
-    terminalTitle:"TERMINAL ANÁLIZE AMEASA",
-    terminalBoot:[
-      "Cyber Vanguard System v2.0",
-      "Misaun ativa ona: Threat Response Basics",
-      'Hakerek "help" atu haree komandú sira.',
-      'Sujestaun hahu: help, scan, scam, verify'
+    openActivity:"Loke atividade",
+    screenTitle:"Scan Seguransa Cyber",
+    screenBoot:[
+      "Bem-vindu ba Jogu Seguransa Cyber ba Juventude.",
+      "Prátika: Para, Hanoin, Cheka.",
+      'Hakerek "help" atu haree buat neebé ita bele koko.',
+      'Hahu ho: help, scan, scam, verify',
     ],
     placeholder:'Koko: help',
-    unpinned:"Ita scrol ona ba leten — output foun sei la ba kraik automátiku. Scrol ba kraik atu pin fila fali.",
-    solvedText:"Misaun prinsipal kompleta ona. Agora ita bele lansa módulu ida ka kontinua esplora.",
+    unpinned:"Ita scrol ona ba leten. Scrol ba kraik atu haree mensajen foun.",
+    solvedText:"Di'ak tebes. Ita kompleta ona verifikasaun prinsipál. Ita bele kontinua jogu ka loke atividade seluk.",
     clearLabel:"clear",
-    resetMission:"Hahu Fali Misaun",
+    resetGame:"Hahu fali jogu",
     moduleTitles:{
-      deepfake:"AI Threat Detection",
-      privacy:"Privacy Shield",
-      social:"Social Engineering"
+      deepfake:"Cheka Imajen AI",
+      privacy:"Cheka Privasidade",
+      social:"Fraude & Bosok Online",
     },
     moduleDescs:{
-      deepfake:"Analiza média atu haree sinal deepfake no truque manipulasaun sira.",
-      privacy:"Taka metin ita-nia pegada dijitál no setting sira ne'ebé importante.",
-      social:"Defende an hosi manipulasaun, presaun no grooming."
+      deepfake:"Haree sinal avizu iha imajen, vídeo, no mensajen lian AI.",
+      privacy:"Cheka setting sira atu proteje konta, foto, lokasaun, no detallu pesoál.",
+      social:"Aprende oinsá presaun, link falsu, prémiu, no mensajen urjente bele bosok ema.",
     },
     commandResponses:{
       help:[
-        "Komandú disponivel sira:",
-        " help         hatudu komandú hotu",
-        " status       sistema + estadú misaun",
-        " scan         halao scan ameasa lalais",
-        " scam         regra prinsipál scam radar",
-        " otp          tanba sa ema na'ok OTP",
-        " shortlink    oinsá atu trata link badak",
-        " marketplace  báziku sosa no faan ho seguru",
-        " verify       script PARA–HANOÍN–CHEKA",
-        " clear        hamoos terminal"
+        "Komandú útil sira:",
+        " help         hatudu komandú sira",
+        " status       hatudu estadu jogu",
+        " scan         cheka sinal avizu",
+        " scam         aprende regra simples kona-ba fraude",
+        " otp          aprende tanba sa kódigu tenke hela privadu",
+        " shortlink    aprende oinsá atu cheka link badak",
+        " marketplace  aprende tips atu sosa no faan ho seguru",
+        " verify       prátika Para, Hanoin, Cheka",
+        " clear        hamoos ekran",
       ],
       status:[
-        "System Status: ONLINE",
-        "Firewall: ACTIVE",
-        "Threat Level: MODERATE",
-        "Foku Misaun: sala umanu mak fatin risku boot liu.",
-        "Sujestaun: atacante sira alvu ema uluk antes alvu dispozitivu."
+        "Estadu jogu: online",
+        "Hábito seguransa: ativu",
+        "Nivel risku: médiu",
+        "Foku: fraude barak funsiona tanba ema sente presa.",
+        "Sujestaun: la'o neineik molok klik, hatán, fahe, ka selu.",
       ],
       scan:[
-        "Halao scan...",
-        "Haree sinal phishing... HETAN",
-        "Haree liafuan urjénsia... HETAN",
-        "Haree taktika roubu konta... HETAN",
-        'Rezultadu: taktika presaun umanu detetadu. Halo "scam" ka "verify".'
+        "Hala'o scan seguransa...",
+        "Cheka sinal link falsu... hetan",
+        "Cheka liafuan urjente... hetan",
+        "Cheka truque atu na'ok konta... hetan",
+        'Rezultadu: mensajen ida-nee presiza cheka. Koko "scam" ka "verify".',
       ],
       scam:[
-        "SCAM RADAR:",
+        "Regra simples kona-ba fraude:",
         "1) Keta fahe OTP ka kódigu verifikasaun.",
-        "2) Prémiu loos la presiza taxa surpresa.",
-        "3) Short link ne'ebé la hatene tenke konsidera suspetu.",
-        "4) Urjénsia dala barak uza atu para ita hanoin.",
-        "5) Se mensajen kria pániku ka anima boot liu, para uluk."
+        "2) Prémiu loos la tenke husu taxa surpresa.",
+        "3) Short link ne'ebé ita la hatene bele risku.",
+        "4) Mensajen urjente dala barak uza atu para ita hanoin.",
+        "5) Se mensajen halo ita tauk ka kontenti demais, la'o neineik.",
       ],
       otp:[
-        "OTP TRAP:",
-        "Se ema husu ita-nia kódigu, bele nia tama hanesan ita.",
-        "Support loos la husu OTP.",
-        "Se ita fahe ona: troka password, ativa 2FA, no haree sesaun ativu."
+        "Seguransa kódigu OTP:",
+        "Se ema husu ita-nia kódigu, karik nia koko tama ba ita-nia konta.",
+        "Ekipa suporta loos la tenke husu ita-nia kódigu OTP.",
+        "Se ita fahe ona kódigu, troka password, liga 2FA, no cheka sesaun ativu.",
       ],
       shortlink:[
-        "SHORT LINK CHECK:",
-        "Keta fiar short link de'it tanba kolega haruka.",
+        "Cheka short link:",
+        "Keta fiar short link de'it tanba kolega ida haruka.",
         "Husu uluk link ne'e kona-ba saida.",
-        "Di'ak liu loke app ka site ofisiál rasik."
+        "Seguru liu atu loke website ka app ofisiál rasik.",
       ],
       marketplace:[
-        "MARKETPLACE SAFETY:",
-        "Keta selu uluk atu 'rai buat'.",
-        "Hasoru iha fatin públiku ne'ebé seguru.",
-        "Lori adultu ka ema konfiadu ida se presiza.",
-        "Presaun + urjénsia + depózitu = risku."
+        "Seguransa marketplace:",
+        "Keta selu uluk atu rai sasán se ita seidauk hatene seguru ka lae.",
+        "Hasoru iha fatin públiku ne'ebé seguru se bele.",
+        "Lori ema konfiadu ida hamutuk se presiza.",
+        "Presaun + urjénsia + pedidu depózitu = sinal avizu.",
       ],
       verify:[
-        "PARA — HANOÍN — CHEKA",
-        "PARA: para bainhira buat ida sente urgente, estranhu, ka anima boot liu.",
-        "HANOÍN: sira husu saida — osan, kódigu, foto, password?",
-        "CHEKA: verifika liu husi kanál seluk, haree URL, husu ema ne'ebé ita fiar."
-      ]
+        "PARA, HANOIN, CHEKA",
+        "PARA: para bainhira buat ida sente urjente, estranu, ka halo ita kontenti demais.",
+        "HANOIN: sira husu saida? Osan, kódigu, foto, password, ka detallu pesoál?",
+        "CHEKA: uza dalan seluk atu verifika. Bolu ema ne'e, cheka website loos, ka husu ema ne'ebé ita konfia.",
+      ],
     },
     unknown:(command)=>[
       `Komandú la existe: ${command}`,
-      'Koko "help".'
-    ]
-  }
+      'Koko "help".',
+    ],
+  },
 };
 
 export default function YouthDashboardPage(){
@@ -299,15 +304,18 @@ export default function YouthDashboardPage(){
     otp:false,
     shortlink:false,
     marketplace:false,
-    status:false
+    status:false,
   });
 
   useEffect(()=>{
     const tick=()=>{
       setClock(new Date().toLocaleTimeString());
     };
+
     tick();
+
     const id=window.setInterval(tick,1000);
+
     return()=>window.clearInterval(id);
   },[]);
 
@@ -316,36 +324,36 @@ export default function YouthDashboardPage(){
       id:"deepfake",
       title:t.moduleTitles.deepfake,
       desc:t.moduleDescs.deepfake,
-      accent:"cyan",
-      href:"/cyber/youth/deepfake"
+      accent:"sky",
+      href:"/cyber/youth/deepfake",
     },
     {
       id:"privacy",
       title:t.moduleTitles.privacy,
       desc:t.moduleDescs.privacy,
-      accent:"emerald",
-      href:"/cyber/youth/privacyshield"
+      accent:"green",
+      href:"/cyber/youth/privacyshield",
     },
     {
       id:"social",
       title:t.moduleTitles.social,
       desc:t.moduleDescs.social,
       accent:"purple",
-      href:"/cyber/youth/social"
-    }
+      href:"/cyber/youth/social",
+    },
   ],[t]);
 
   const completedCount=Object.values(completed).filter(Boolean).length;
-  const missionComplete=completed.help&&completed.scan&&completed.scam&&completed.verify;
+  const gameComplete=completed.help&&completed.scan&&completed.scam&&completed.verify;
 
   const markCommandComplete=(command:string)=>{
-    if(command in completed && !completed[command as keyof typeof completed]){
+    if(command in completed&&!completed[command as keyof typeof completed]){
       setCompleted((prev)=>({...prev,[command]:true}));
       setScore((prev)=>prev+100);
     }
   };
 
-  const resetMission=()=>{
+  const resetGame=()=>{
     setScore(0);
     setCompleted({
       help:false,
@@ -355,123 +363,199 @@ export default function YouthDashboardPage(){
       otp:false,
       shortlink:false,
       marketplace:false,
-      status:false
+      status:false,
     });
   };
 
   return(
-    <div className="min-h-screen bg-slate-950 text-cyan-400 font-mono p-4 md:p-8 selection:bg-cyan-900 selection:text-white">
-      <header className="mb-8 border-b border-slate-800 pb-4 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-        <div>
-          <h1 className="text-4xl md:text-6xl font-bold tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-600">
-            {t.title}
-          </h1>
-          <p className="text-slate-500 mt-2 text-sm md:text-base">
-            {t.status}: <span className="text-green-500 animate-pulse">{t.online}</span>{" "} |{" "}
-            {t.user}: <span className="text-white">{t.recruit}</span>{" "} |{" "}
-            {t.level}: <span className="text-yellow-500">{t.levelValue}</span>
+    <main className="min-h-screen bg-sky-50 text-slate-900">
+      <section className="border-b border-sky-300 bg-sky-200">
+        <div className="mx-auto flex max-w-6xl flex-col gap-4 px-5 py-6 md:flex-row md:items-end md:justify-between">
+          <div>
+            <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-bold text-sky-900 shadow-sm">
+              <Gamepad2 className="h-4 w-4" aria-hidden="true" />
+              {t.status}: <span className="text-green-700">{t.online}</span>
+            </div>
+
+            <h1 className="text-4xl font-black tracking-tight text-slate-950 md:text-6xl">
+              {t.title}
+            </h1>
+
+            <p className="mt-3 max-w-2xl text-base leading-7 text-slate-700 md:text-lg">
+              {t.subtitle}
+            </p>
+
+            <div className="mt-4 flex flex-wrap gap-3 text-sm">
+              <Link
+                href="/cyber/youth"
+                className="rounded-full border border-sky-400 bg-white px-4 py-2 font-bold text-sky-900 shadow-sm hover:bg-sky-50"
+              >
+                ← {t.backToYouth}
+              </Link>
+
+              <button
+                type="button"
+                onClick={resetGame}
+                className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 font-bold text-amber-800 shadow-sm ring-1 ring-amber-300 hover:bg-amber-50"
+              >
+                <RefreshCcw className="h-4 w-4" aria-hidden="true" />
+                {t.resetGame}
+              </button>
+            </div>
+          </div>
+
+          <div className="rounded-2xl border border-sky-300 bg-white px-5 py-4 text-left shadow-sm md:text-right">
+            <div className="text-xs font-bold uppercase tracking-wider text-slate-500">
+              {t.user}: {t.learner}
+            </div>
+            <div className="mt-1 text-sm font-bold text-slate-700">
+              {t.level}: {t.levelValue}
+            </div>
+            <div className="mt-1 text-sm text-slate-500">
+              {clock||"..."}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="px-5 py-8">
+        <div className="mx-auto grid max-w-6xl gap-4 md:grid-cols-3">
+          <InfoCard
+            label={t.scoreLabel}
+            value={String(score)}
+            valueClass="text-sky-800"
+          />
+
+          <InfoCard
+            label={t.checksLabel}
+            value={`${completedCount}/8`}
+            valueClass="text-green-700"
+          />
+
+          <div className="rounded-3xl border border-sky-100 bg-white p-5 shadow-sm">
+            <div className="text-xs font-bold uppercase tracking-wider text-slate-500">
+              {t.commandLabel}
+            </div>
+            <div className="mt-3 text-sm leading-6 text-slate-700">
+              {t.commandHint}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="px-5 pb-8">
+        <div className="mx-auto max-w-6xl rounded-3xl border border-sky-100 bg-white p-6 shadow-sm">
+          <div className="text-xl font-black text-slate-950">
+            {t.objectiveTitle}
+          </div>
+
+          <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-700">
+            {t.objectiveText}
           </p>
 
-          <div className="mt-3 flex flex-wrap gap-4 text-sm">
-            <Link
-              href="/cyber/youth"
-              className="text-cyan-300 hover:text-white underline underline-offset-4"
-            >
-              ← {t.backToYouth}
-            </Link>
+          <p className="mt-3 text-sm font-bold text-sky-800">
+            {t.objectiveHint}
+          </p>
 
-            <button
-              type="button"
-              onClick={resetMission}
-              className="text-amber-300 hover:text-white underline underline-offset-4"
-            >
-              {t.resetMission}
-            </button>
+          <ul className="mt-5 grid gap-3 md:grid-cols-3">
+            {t.quickGoals.map((goal,index)=>(
+              <li
+                key={index}
+                className="rounded-2xl border border-sky-100 bg-sky-50 px-4 py-3 text-sm leading-6 text-slate-700"
+              >
+                {goal}
+              </li>
+            ))}
+          </ul>
+
+          {gameComplete&&(
+            <div className="mt-5 rounded-2xl border border-green-300 bg-green-50 px-5 py-4 text-sm font-bold leading-6 text-green-800">
+              {t.solvedText}
+            </div>
+          )}
+        </div>
+      </section>
+
+      <section className="px-5 pb-10">
+        <div className="mx-auto grid max-w-6xl gap-6 lg:grid-cols-3">
+          <motion.div
+            initial={{opacity:0,y:20}}
+            animate={{opacity:1,y:0}}
+            transition={{duration:0.4}}
+            className="lg:col-span-2"
+          >
+            <div className="rounded-[2rem] bg-slate-300 p-3 shadow-xl">
+              <div className="overflow-hidden rounded-[1.5rem] border border-slate-300 bg-white">
+                <div className="flex items-center gap-2 border-b border-sky-300 bg-sky-200 px-5 py-4">
+                  <span className="h-3 w-3 rounded-full bg-red-400" />
+                  <span className="h-3 w-3 rounded-full bg-yellow-400" />
+                  <span className="h-3 w-3 rounded-full bg-green-400" />
+                  <span className="ml-3 text-sm font-black text-slate-700">
+                    {t.screenTitle}
+                  </span>
+                </div>
+
+                <div className="bg-slate-50 p-5">
+                  <ScanScreen
+                    t={t}
+                    onCommandComplete={markCommandComplete}
+                  />
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          <div className="flex flex-col gap-5">
+            {modules.map((m,idx)=>(
+              <ModuleLinkCard
+                key={m.id}
+                title={m.title}
+                desc={m.desc}
+                accent={m.accent}
+                delay={0.15+(idx*0.1)}
+                href={m.href}
+                buttonLabel={t.openActivity}
+                icon={m.id}
+              />
+            ))}
           </div>
         </div>
+      </section>
+    </main>
+  );
+}
 
-        <div className="hidden md:block text-right">
-          <div className="text-xs text-slate-600">SYSTEM TIME</div>
-          <div className="text-xl font-bold text-slate-300">{clock||"..."}</div>
-        </div>
-      </header>
-
-      <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-3">
-        <div className="rounded-xl border border-slate-800 bg-slate-900 p-4">
-          <div className="text-xs text-slate-500 uppercase tracking-wider">{t.scoreLabel}</div>
-          <div className="mt-2 text-3xl font-bold text-cyan-300">{score}</div>
-        </div>
-
-        <div className="rounded-xl border border-slate-800 bg-slate-900 p-4">
-          <div className="text-xs text-slate-500 uppercase tracking-wider">{t.missionLabel}</div>
-          <div className="mt-2 text-3xl font-bold text-emerald-300">{completedCount}/8</div>
-        </div>
-
-        <div className="rounded-xl border border-slate-800 bg-slate-900 p-4">
-          <div className="text-xs text-slate-500 uppercase tracking-wider">{t.commandLabel}</div>
-          <div className="mt-2 text-sm text-slate-300 leading-6">{t.commandHint}</div>
-        </div>
+function InfoCard({
+  label,
+  value,
+  valueClass,
+}:{
+  label:string;
+  value:string;
+  valueClass:string;
+}){
+  return(
+    <div className="rounded-3xl border border-sky-100 bg-white p-5 shadow-sm">
+      <div className="text-xs font-bold uppercase tracking-wider text-slate-500">
+        {label}
       </div>
-
-      <div className="mb-6 rounded-xl border border-slate-800 bg-slate-900 p-4">
-        <div className="text-sm font-bold text-white">{t.objectiveTitle}</div>
-        <p className="mt-2 text-sm text-slate-300 leading-6">{t.objectiveText}</p>
-        <p className="mt-2 text-sm text-amber-300">{t.objectiveHint}</p>
-
-        <ul className="mt-4 grid gap-2 md:grid-cols-3">
-          {t.quickGoals.map((goal,index)=>(
-            <li key={index} className="rounded-lg border border-slate-800 bg-slate-950 px-3 py-2 text-sm text-slate-300">
-              {goal}
-            </li>
-          ))}
-        </ul>
-
-        {missionComplete&&(
-          <div className="mt-4 rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-4 py-3 text-sm font-bold text-emerald-300">
-            {t.solvedText}
-          </div>
-        )}
+      <div className={`mt-3 text-4xl font-black ${valueClass}`}>
+        {value}
       </div>
-
-      <main className="grid grid-cols-1 gap-6 md:grid-cols-3">
-        <motion.div
-          initial={{opacity:0,y:20}}
-          animate={{opacity:1,y:0}}
-          transition={{duration:0.5}}
-          className="md:col-span-2 row-span-2 bg-black rounded-xl border border-slate-800 overflow-hidden shadow-2xl shadow-cyan-900/20"
-        >
-          <div className="bg-slate-900 p-2 flex items-center gap-2 border-b border-slate-800">
-            <div className="w-3 h-3 rounded-full bg-red-500" />
-            <div className="w-3 h-3 rounded-full bg-yellow-500" />
-            <div className="w-3 h-3 rounded-full bg-green-500" />
-            <span className="ml-2 text-xs text-slate-500">root@vanguard:~</span>
-            <span className="ml-auto mr-2 text-xs text-cyan-400">{t.terminalTitle}</span>
-          </div>
-
-          <div className="p-4 min-h-[320px] md:min-h-[520px]">
-            <Terminal
-              t={t}
-              onCommandComplete={markCommandComplete}
-            />
-          </div>
-        </motion.div>
-
-        <div className="flex flex-col gap-6">
-          {modules.map((m,idx)=>(
-            <ModuleLinkCard
-              key={m.id}
-              title={m.title}
-              desc={m.desc}
-              accent={m.accent}
-              delay={0.2+(idx*0.1)}
-              href={m.href}
-              buttonLabel={t.launchModule}
-            />
-          ))}
-        </div>
-      </main>
     </div>
   );
+}
+
+function ModuleIcon({icon}:{icon:"deepfake"|"privacy"|"social"}){
+  if(icon==="deepfake"){
+    return <SearchCheck className="h-7 w-7" aria-hidden="true" />;
+  }
+
+  if(icon==="privacy"){
+    return <ShieldCheck className="h-7 w-7" aria-hidden="true" />;
+  }
+
+  return <Lock className="h-7 w-7" aria-hidden="true" />;
 }
 
 function ModuleLinkCard({
@@ -480,7 +564,8 @@ function ModuleLinkCard({
   accent,
   delay,
   href,
-  buttonLabel
+  buttonLabel,
+  icon,
 }:{
   title:string;
   desc:string;
@@ -488,26 +573,30 @@ function ModuleLinkCard({
   delay:number;
   href:string;
   buttonLabel:string;
+  icon:"deepfake"|"privacy"|"social";
 }){
-  const accentBorder=(()=>{
-    if(accent==="cyan") return "hover:border-cyan-500/50";
-    if(accent==="emerald") return "hover:border-emerald-500/50";
-    if(accent==="purple") return "hover:border-purple-500/50";
-    return "hover:border-amber-500/50";
-  })();
+  const accentClasses=(()=>{
+    if(accent==="sky"){
+      return {
+        icon:"bg-sky-100 text-sky-800",
+        button:"bg-sky-700 hover:bg-sky-800",
+        border:"hover:border-sky-300",
+      };
+    }
 
-  const accentText=(()=>{
-    if(accent==="cyan") return "group-hover:text-cyan-400";
-    if(accent==="emerald") return "group-hover:text-emerald-400";
-    if(accent==="purple") return "group-hover:text-purple-400";
-    return "group-hover:text-amber-400";
-  })();
+    if(accent==="green"){
+      return {
+        icon:"bg-green-100 text-green-800",
+        button:"bg-green-700 hover:bg-green-800",
+        border:"hover:border-green-300",
+      };
+    }
 
-  const btn=(()=>{
-    if(accent==="cyan") return "hover:bg-cyan-600 text-cyan-400";
-    if(accent==="emerald") return "hover:bg-emerald-600 text-emerald-400";
-    if(accent==="purple") return "hover:bg-purple-600 text-purple-400";
-    return "hover:bg-amber-600 text-amber-400";
+    return {
+      icon:"bg-purple-100 text-purple-800",
+      button:"bg-purple-700 hover:bg-purple-800",
+      border:"hover:border-purple-300",
+    };
   })();
 
   return(
@@ -515,32 +604,39 @@ function ModuleLinkCard({
       initial={{opacity:0,x:20}}
       animate={{opacity:1,x:0}}
       transition={{delay}}
-      className={`bg-slate-900 rounded-xl border border-slate-800 p-1 ${accentBorder} transition-colors group`}
+      className={`rounded-3xl border border-sky-100 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-lg ${accentClasses.border}`}
     >
-      <div className="bg-slate-950 p-4 rounded-lg h-full">
-        <h3 className={`text-xl font-bold text-white mb-2 ${accentText} transition-colors`}>{title}</h3>
-        <p className="text-sm text-slate-400 mb-4">{desc}</p>
-
-        <Link
-          href={href}
-          className={`block text-center w-full py-2 bg-slate-800 ${btn} hover:text-white rounded transition-all text-sm font-bold uppercase tracking-wider`}
-        >
-          {buttonLabel}
-        </Link>
+      <div className={`mb-4 inline-flex rounded-2xl p-3 ${accentClasses.icon}`}>
+        <ModuleIcon icon={icon} />
       </div>
+
+      <h3 className="text-xl font-black text-slate-950">
+        {title}
+      </h3>
+
+      <p className="mt-3 text-sm leading-6 text-slate-700">
+        {desc}
+      </p>
+
+      <Link
+        href={href}
+        className={`mt-5 inline-flex w-full justify-center rounded-full px-4 py-3 text-sm font-bold text-white shadow-sm ${accentClasses.button}`}
+      >
+        {buttonLabel}
+      </Link>
     </motion.div>
   );
 }
 
-function Terminal({
+function ScanScreen({
   t,
-  onCommandComplete
+  onCommandComplete,
 }:{
   t:T;
   onCommandComplete:(command:string)=>void;
 }){
   const [input,setInput]=useState("");
-  const [output,setOutput]=useState<string[]>(t.terminalBoot);
+  const [output,setOutput]=useState<string[]>(t.screenBoot);
 
   const scrollRef=useRef<HTMLDivElement|null>(null);
   const inputRef=useRef<HTMLInputElement|null>(null);
@@ -550,15 +646,22 @@ function Terminal({
     inputRef.current?.focus({preventScroll:true});
   },[]);
 
+  useEffect(()=>{
+    setOutput(t.screenBoot);
+  },[t.screenBoot]);
+
   const append=(lines:string[])=>{
     setOutput((prev)=>[...prev,...lines]);
   };
 
   const handleCommand=(cmdRaw:string)=>{
     const cmd=cmdRaw.trim();
-    if(!cmd) return;
 
-    const command=cmd.toLowerCase() as CommandKey | string;
+    if(!cmd){
+      return;
+    }
+
+    const command=cmd.toLowerCase() as CommandKey|string;
 
     if(command===t.clearLabel){
       setOutput([]);
@@ -567,7 +670,16 @@ function Terminal({
 
     append([`> ${cmd}`]);
 
-    if(command==="help"||command==="status"||command==="scan"||command==="scam"||command==="otp"||command==="shortlink"||command==="marketplace"||command==="verify"){
+    if(
+      command==="help"||
+      command==="status"||
+      command==="scan"||
+      command==="scam"||
+      command==="otp"||
+      command==="shortlink"||
+      command==="marketplace"||
+      command==="verify"
+    ){
       append(t.commandResponses[command]);
       onCommandComplete(command);
       return;
@@ -585,49 +697,68 @@ function Terminal({
 
   const onScroll=()=>{
     const el=scrollRef.current;
-    if(!el) return;
+
+    if(!el){
+      return;
+    }
+
     const nearBottom=(el.scrollHeight-el.scrollTop-el.clientHeight)<24;
     setPinned(nearBottom);
   };
 
   useEffect(()=>{
     const el=scrollRef.current;
-    if(!el) return;
+
+    if(!el){
+      return;
+    }
+
     if(pinned){
       el.scrollTop=el.scrollHeight;
     }
   },[output,pinned]);
 
   return(
-    <div className="bg-black border-2 border-cyan-500/60 p-4 rounded-lg font-mono text-cyan-300 min-h-[320px] md:min-h-[520px] overflow-hidden flex flex-col shadow-[0_0_30px_rgba(0,255,255,0.12)]">
+    <div className="flex min-h-[360px] flex-col overflow-hidden rounded-2xl border border-sky-100 bg-white shadow-inner md:min-h-[520px]">
       <div
         ref={scrollRef}
         onScroll={onScroll}
-        className="flex-1 overflow-y-auto pr-2"
+        className="flex-1 overflow-y-auto bg-white p-5"
       >
         {output.map((line,i)=>(
-          <div key={i} className="mb-1 whitespace-pre-wrap">{line}</div>
+          <div
+            key={`${line}-${i}`}
+            className={`mb-2 whitespace-pre-wrap text-sm leading-6 ${
+              line.startsWith(">")
+                ? "font-black text-sky-800"
+                : "text-slate-700"
+            }`}
+          >
+            {line}
+          </div>
         ))}
       </div>
 
-      <div className="flex mt-2 items-center gap-2 border-t border-slate-800 pt-2">
-        <span className="text-cyan-400 font-bold">{">"}</span>
-        <input
-          ref={inputRef}
-          type="text"
-          value={input}
-          onChange={(e)=>setInput(e.target.value)}
-          onKeyDown={handleKeyDown}
-          className="bg-transparent border-none outline-none flex-1 text-cyan-200 placeholder:text-slate-600"
-          placeholder={t.placeholder}
-        />
-      </div>
+      <div className="border-t border-sky-100 bg-sky-50 p-4">
+        <label className="flex items-center gap-3 rounded-2xl border border-sky-200 bg-white px-4 py-3 shadow-sm">
+          <span className="font-black text-sky-800">{">"}</span>
+          <input
+            ref={inputRef}
+            type="text"
+            value={input}
+            onChange={(e)=>setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
+            className="min-w-0 flex-1 bg-transparent text-sm text-slate-800 outline-none placeholder:text-slate-400"
+            placeholder={t.placeholder}
+          />
+        </label>
 
-      {!pinned&&(
-        <div className="mt-2 text-xs text-slate-500">
-          {t.unpinned}
-        </div>
-      )}
+        {!pinned&&(
+          <div className="mt-2 text-xs text-slate-500">
+            {t.unpinned}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

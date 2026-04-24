@@ -1,816 +1,1066 @@
+// app/cyber/youth/social/page.tsx
 "use client";
 
 import Link from "next/link";
 import React,{useMemo,useState} from "react";
-import {motion,AnimatePresence} from "framer-motion";
+import {AnimatePresence,motion} from "framer-motion";
+import {
+  AlertTriangle,
+  ArrowLeft,
+  CheckCircle2,
+  MessageCircleWarning,
+  RefreshCcw,
+  ShieldCheck,
+} from "lucide-react";
 import {useLanguage} from "@/lib/LanguageContext";
 
+type Lang="en"|"tet";
+
 type ScenarioOption={
-  text:{en:string;tet:string};
+  text:Record<Lang,string>;
   correct:boolean;
-  feedback:{en:string;tet:string};
+  feedback:Record<Lang,string>;
 };
 
 type Scenario={
   id:number;
-  title:{en:string;tet:string};
-  description:{en:string;tet:string};
-  tags:{en:string[];tet:string[]};
-  telltales:{en:string[];tet:string[]};
-  safeMove:{en:string[];tet:string[]};
+  title:Record<Lang,string>;
+  description:Record<Lang,string>;
+  tags:Record<Lang,string[]>;
+  warningSigns:Record<Lang,string[]>;
+  saferMove:Record<Lang,string[]>;
   options:ScenarioOption[];
 };
 
+type UI={
+  title:string;
+  subtitle:string;
+  backGuide:string;
+  backGame:string;
+  scenario:string;
+  score:string;
+  streak:string;
+  reset:string;
+  warningSigns:string;
+  saferMove:string;
+  chooseAction:string;
+  good:string;
+  risky:string;
+  next:string;
+  showClues:string;
+  hideClues:string;
+  simpleRuleTitle:string;
+  simpleRule:string;
+  pressureTitle:string;
+  pressureItems:string[];
+  sentenceTitle:string;
+  sentenceText:string;
+  sentenceDesc:string;
+  completeTitle:string;
+  completeIntro:string;
+  restart:string;
+  resultExpert:string;
+  resultMid:string;
+  resultStart:string;
+  confidenceRightHigh:string;
+  confidenceRightLow:string;
+  confidenceWrongHigh:string;
+  confidenceWrongLow:string;
+  confidence:string;
+  lowConfidence:string;
+  highConfidence:string;
+  reminderTitle:string;
+  reminderText:string;
+  clueHiddenText:string;
+};
+
+const TRANSLATIONS:Record<Lang,UI>={
+  en:{
+    title:"Scam & Social Tricks",
+    subtitle:"Practise spotting pressure, fake messages, urgent requests, and tricks that try to make you act too fast.",
+    backGuide:"Back to Youth Cyber Lab",
+    backGame:"Back to game",
+    scenario:"Scenario",
+    score:"Score",
+    streak:"Streak",
+    reset:"Reset",
+    warningSigns:"Warning signs",
+    saferMove:"Safer move",
+    chooseAction:"What would you do?",
+    good:"Good call",
+    risky:"Risky move",
+    next:"Next scenario",
+    showClues:"Show clues",
+    hideClues:"Hide clues",
+    simpleRuleTitle:"Simple rule",
+    simpleRule:"If someone asks for money, codes, private photos, passwords, or secrets, stop and check another way.",
+    pressureTitle:"Three common tricks",
+    pressureItems:[
+      "Urgency: “Do it now or something bad will happen.”",
+      "Trust: “It’s me, your friend, don’t ask questions.”",
+      "Reward: “You won something, click or pay quickly.”",
+    ],
+    sentenceTitle:"One sentence that helps",
+    sentenceText:"“I do not share codes, money, or private details online.”",
+    sentenceDesc:"Then screenshot, block, report, and tell someone you trust.",
+    completeTitle:"Activity complete",
+    completeIntro:"You finished the practice scenarios.",
+    restart:"Restart activity",
+    resultExpert:"Scam Detector",
+    resultMid:"Risk Spotter",
+    resultStart:"Cyber Aware",
+    confidenceRightHigh:"You were confident and correct. Good spotting.",
+    confidenceRightLow:"You were cautious and still got it right. That is a good habit.",
+    confidenceWrongHigh:"You were confident, but the answer was risky. Slow down next time.",
+    confidenceWrongLow:"You were unsure, which is better than rushing. Now check the warning signs.",
+    confidence:"How confident are you?",
+    lowConfidence:"Not sure",
+    highConfidence:"Very sure",
+    reminderTitle:"Remember",
+    reminderText:"Scammers often try to make you feel rushed, scared, embarrassed, excited, or guilty. If you feel pressure, pause before you reply.",
+    clueHiddenText:"Try answering first, or use “Show clues” if you want help.",
+  },
+  tet:{
+    title:"Fraude & Bosok Online",
+    subtitle:"Prátika atu haree presaun, mensajen falsu, pedidu urjente, no truque sira ne'ebé koko halo ita atua lalais demais.",
+    backGuide:"Fila ba Youth Cyber Lab",
+    backGame:"Fila ba jogu",
+    scenario:"Senáriu",
+    score:"Pontu",
+    streak:"Seguidu",
+    reset:"Hahu fali",
+    warningSigns:"Sinal avizu",
+    saferMove:"Dalan seguru liu",
+    chooseAction:"Ita sei halo saida?",
+    good:"Hili di'ak",
+    risky:"Hili risku",
+    next:"Senáriu tuir mai",
+    showClues:"Hatudu pista",
+    hideClues:"Subar pista",
+    simpleRuleTitle:"Regra simples",
+    simpleRule:"Se ema husu osan, kódigu, foto privadu, password, ka segredu, para uluk no cheka liu husi dalan seluk.",
+    pressureTitle:"Truque komún tolu",
+    pressureItems:[
+      "Urjénsia: “Halo agora ka buat aat sei akontese.”",
+      "Fiar: “Hau mak ita-nia kolega, keta husu pergunta.”",
+      "Prémiu: “Ita manán ona, klik ka selu lalais.”",
+    ],
+    sentenceTitle:"Sentensa ida ne'ebé ajuda",
+    sentenceText:"“Hau la fahe kódigu, osan, ka detallu privadu online.”",
+    sentenceDesc:"Depois screenshot, blokeia, relata, no fó-hatene ba ema ne'ebé ita konfia.",
+    completeTitle:"Atividade remata",
+    completeIntro:"Ita kompleta ona senáriu prátika sira.",
+    restart:"Hahu fali atividade",
+    resultExpert:"Detetor Scam",
+    resultMid:"Haree Risku",
+    resultStart:"Cyber Aware",
+    confidenceRightHigh:"Ita konfiansa no resposta loos. Di'ak tebes.",
+    confidenceRightLow:"Ita kuidadu no resposta loos nafatin. Ida-ne'e hábitu di'ak.",
+    confidenceWrongHigh:"Ita konfiansa, maibé resposta ne'e risku. Tuir mai para uluk.",
+    confidenceWrongLow:"Ita seidauk certeza, ne'e di'ak liu duké halo lalais. Agora haree sinal avizu.",
+    confidence:"Ita sente konfiansa hira?",
+    lowConfidence:"La certeza",
+    highConfidence:"Certeza tebes",
+    reminderTitle:"Hanoin nafatin",
+    reminderText:"Fraudador sira dala barak koko halo ita sente presa, tauk, moe, kontenti demais, ka sala. Se ita sente presaun, para uluk molok hatán.",
+    clueHiddenText:"Koko hatán uluk, ka uza “Hatudu pista” se ita hakarak ajuda.",
+  },
+};
+
+const SCENARIOS:Scenario[]=[
+  {
+    id:1,
+    title:{
+      en:"Urgent money request",
+      tet:"Pedidu osan urjente",
+    },
+    description:{
+      en:"You receive a message from a friend’s account: “I’m stuck and lost my wallet. Can you send $50 now? I’ll pay you back tomorrow.”",
+      tet:"Ita simu mensajen hosi konta kolega ida: “Hau stuck no lakon carteira. Bele haruka $50 agora? Aban hau sei selu fila fali.”",
+    },
+    tags:{
+      en:["Urgency","Money request","Possible hacked account"],
+      tet:["Urjénsia","Pedidu osan","Konta bele hacked"],
+    },
+    warningSigns:{
+      en:[
+        "The message asks for money quickly.",
+        "The situation creates panic or guilt.",
+        "It comes through chat only, not a phone call or in-person request.",
+      ],
+      tet:[
+        "Mensajen husu osan lalais.",
+        "Situasaun halo ita sente pániku ka kulpa.",
+        "Mai liu husi chat de'it, la'ós telefonema ka hasoru malu.",
+      ],
+    },
+    saferMove:{
+      en:[
+        "Call your friend using a number you already know.",
+        "Ask a question only the real person would know.",
+        "Do not send money until you verify another way.",
+      ],
+      tet:[
+        "Bolu kolega ho numeru ne'ebé ita hatene ona.",
+        "Husu pergunta ne'ebé ema loos de'it bele hatene.",
+        "Keta haruka osan molok verifika liu husi dalan seluk.",
+      ],
+    },
+    options:[
+      {
+        text:{
+          en:"Send the money immediately.",
+          tet:"Haruka osan kedas.",
+        },
+        correct:false,
+        feedback:{
+          en:"Risky. If the account is hacked, you are talking to the scammer.",
+          tet:"Risku. Se konta ne'e hacked, ita ko'alia hela ho fraudador.",
+        },
+      },
+      {
+        text:{
+          en:"Call your friend another way before sending anything.",
+          tet:"Bolu kolega liu husi dalan seluk molok haruka buat ida.",
+        },
+        correct:true,
+        feedback:{
+          en:"Correct. Checking through another channel is the safest move.",
+          tet:"Loos. Cheka liu husi dalan seluk mak dalan seguru liu.",
+        },
+      },
+      {
+        text:{
+          en:"Ask for bank details instead.",
+          tet:"Husu detallu banku de'it.",
+        },
+        correct:false,
+        feedback:{
+          en:"Still risky. The scammer may still be controlling the account.",
+          tet:"Sei risku nafatin. Fraudador karik sei kontrola hela konta ne'e.",
+        },
+      },
+    ],
+  },
+  {
+    id:2,
+    title:{
+      en:"Fake account warning",
+      tet:"Avizu konta falsu",
+    },
+    description:{
+      en:"You receive an email saying: “Your account will be deleted in 24 hours. Click here to appeal.”",
+      tet:"Ita simu email ne'ebé dehan: “Ita-nia konta sei apaga iha oras 24. Klik iha ne'e atu apela.”",
+    },
+    tags:{
+      en:["Fear","Fake link","Urgency"],
+      tet:["Tauk","Link falsu","Urjénsia"],
+    },
+    warningSigns:{
+      en:[
+        "It threatens you with a short deadline.",
+        "It pushes you to click a link.",
+        "The sender name may look official, but the email address may be wrong.",
+      ],
+      tet:[
+        "Nia ameasa ita ho tempu badak.",
+        "Nia dudu ita atu klik link.",
+        "Naran remetente bele haree ofisiál, maibé email address bele sala.",
+      ],
+    },
+    saferMove:{
+      en:[
+        "Do not click the email link.",
+        "Open the real app or website yourself.",
+        "Check notifications inside the real account.",
+      ],
+      tet:[
+        "Keta klik link iha email.",
+        "Loke app ka website loos rasik.",
+        "Cheka notifikasaun iha konta loos.",
+      ],
+    },
+    options:[
+      {
+        text:{
+          en:"Click the link quickly because the account may be deleted.",
+          tet:"Klik link lalais tanba konta bele apaga.",
+        },
+        correct:false,
+        feedback:{
+          en:"Risky. Fear and urgency are common phishing tricks.",
+          tet:"Risku. Tauk no urjénsia mak truque phishing komún.",
+        },
+      },
+      {
+        text:{
+          en:"Ignore the link and check inside the real app.",
+          tet:"Ignora link no cheka iha app loos.",
+        },
+        correct:true,
+        feedback:{
+          en:"Correct. Go to the real app or website yourself instead of trusting a link.",
+          tet:"Loos. Tama ba app ka website loos rasik, keta fiar link de'it.",
+        },
+      },
+      {
+        text:{
+          en:"Forward the email to friends to ask what they think.",
+          tet:"Forward email ba kolega atu husu sira-nia opiniaun.",
+        },
+        correct:false,
+        feedback:{
+          en:"Not best. You may spread a risky link further.",
+          tet:"La di'ak. Ita bele fahe link risku ba ema seluk.",
+        },
+      },
+    ],
+  },
+  {
+    id:3,
+    title:{
+      en:"Verification code request",
+      tet:"Pedidu kódigu verifikasaun",
+    },
+    description:{
+      en:"Someone says they accidentally sent a code to your phone and asks you to send it back to them.",
+      tet:"Ema ida dehan nia haruka sala kódigu ba ita-nia telefone no husu ita haruka fali ba nia.",
+    },
+    tags:{
+      en:["OTP code","Account takeover","Private information"],
+      tet:["Kódigu OTP","Toma konta","Informasaun privadu"],
+    },
+    warningSigns:{
+      en:[
+        "Verification codes are used to enter accounts.",
+        "A real support team should not ask for your code.",
+        "The request sounds simple, but it can give away your account.",
+      ],
+      tet:[
+        "Kódigu verifikasaun uza atu tama ba konta.",
+        "Ekipa suporta loos la tenke husu ita-nia kódigu.",
+        "Pedidu haree simples, maibé bele fó ita-nia konta ba ema seluk.",
+      ],
+    },
+    saferMove:{
+      en:[
+        "Do not share the code.",
+        "Change your password if you already shared it.",
+        "Turn on 2FA and check active sessions.",
+      ],
+      tet:[
+        "Keta fahe kódigu.",
+        "Troka password se ita fahe ona.",
+        "Ativa 2FA no cheka sesaun ativu.",
+      ],
+    },
+    options:[
+      {
+        text:{
+          en:"Send the code because it is not your code anyway.",
+          tet:"Haruka kódigu tanba ne'e la'ós ita-nia kódigu.",
+        },
+        correct:false,
+        feedback:{
+          en:"Risky. If the code came to your phone, it is protecting your account or number.",
+          tet:"Risku. Se kódigu mai ba ita-nia telefone, nia proteje ita-nia konta ka numeru.",
+        },
+      },
+      {
+        text:{
+          en:"Do not send the code and block the person if they keep asking.",
+          tet:"Keta haruka kódigu no blokeia ema ne'e se nia kontinua husu.",
+        },
+        correct:true,
+        feedback:{
+          en:"Correct. Codes should stay private.",
+          tet:"Loos. Kódigu tenke hela privadu.",
+        },
+      },
+      {
+        text:{
+          en:"Send only part of the code.",
+          tet:"Haruka parte ida de'it hosi kódigu.",
+        },
+        correct:false,
+        feedback:{
+          en:"Still risky. Do not share any part of a verification code.",
+          tet:"Sei risku. Keta fahe parte ida hosi kódigu verifikasaun.",
+        },
+      },
+    ],
+  },
+  {
+    id:4,
+    title:{
+      en:"Private photo pressure",
+      tet:"Presaun ba foto privadu",
+    },
+    description:{
+      en:"Someone you like asks for a private photo and says, “If you trust me, you’ll send it. I promise no one else will see.”",
+      tet:"Ema ne'ebé ita gosta husu foto privadu no dehan, “Se ita fiar hau, ita sei haruka. Hau promete ema seluk sei la haree.”",
+    },
+    tags:{
+      en:["Pressure","Private photos","Trust trick"],
+      tet:["Presaun","Foto privadu","Truque fiar"],
+    },
+    warningSigns:{
+      en:[
+        "They connect trust with sending something private.",
+        "They pressure you instead of respecting your no.",
+        "Once an image is sent, you lose control of where it goes.",
+      ],
+      tet:[
+        "Sira liga fiar ho haruka buat privadu.",
+        "Sira pressiona ita duké respeita ita-nia lae.",
+        "Se imajen haruka ona, ita lakon kontrolu ba nia laloran.",
+      ],
+    },
+    saferMove:{
+      en:[
+        "Say no clearly.",
+        "Do not explain too much or argue.",
+        "Screenshot threats and ask for help if they pressure you.",
+      ],
+      tet:[
+        "Dehan lae ho klaru.",
+        "Keta esplika barak demais ka diskute kleur.",
+        "Screenshot ameasa no buka ajuda se sira pressiona ita.",
+      ],
+    },
+    options:[
+      {
+        text:{
+          en:"Send it because they promised to keep it private.",
+          tet:"Haruka tanba sira promete atu rai privadu.",
+        },
+        correct:false,
+        feedback:{
+          en:"Risky. A promise does not give you control once the image leaves your phone.",
+          tet:"Risku. Promesa la fó kontrolu ba ita bainhira imajen sai hosi ita-nia telefone ona.",
+        },
+      },
+      {
+        text:{
+          en:"Say no and stop replying if they keep pushing.",
+          tet:"Dehan lae no para hatán se sira kontinua pressiona.",
+        },
+        correct:true,
+        feedback:{
+          en:"Correct. Pressure is a warning sign, not proof of love or trust.",
+          tet:"Loos. Presaun mak sinal avizu, la'ós prova domin ka fiar.",
+        },
+      },
+      {
+        text:{
+          en:"Send a photo but hide your face.",
+          tet:"Haruka foto maibé subar ita-nia oin.",
+        },
+        correct:false,
+        feedback:{
+          en:"Still risky. Images can still be shared, saved, edited, or used to pressure you.",
+          tet:"Sei risku. Imajen bele fahe, rai, edita, ka uza atu pressiona ita.",
+        },
+      },
+    ],
+  },
+  {
+    id:5,
+    title:{
+      en:"Marketplace deposit",
+      tet:"Depózitu marketplace",
+    },
+    description:{
+      en:"A seller says many people want the item. They ask you to pay a small deposit now to hold it.",
+      tet:"Faan-na'in dehan ema barak hakarak sasán ne'e. Nia husu ita selu depózitu ki'ik agora atu rai ba ita.",
+    },
+    tags:{
+      en:["Online buying","Deposit","Urgency"],
+      tet:["Sosa online","Depózitu","Urjénsia"],
+    },
+    warningSigns:{
+      en:[
+        "They create pressure by saying other buyers are waiting.",
+        "They ask for money before you can verify the item.",
+        "The profile may be new or have little information.",
+      ],
+      tet:[
+        "Sira kria presaun ho dehan ema seluk hein hela.",
+        "Sira husu osan molok ita bele verifika sasán.",
+        "Perfil bele foun ka iha informasaun uitoan de'it.",
+      ],
+    },
+    saferMove:{
+      en:[
+        "Check the seller’s profile and history.",
+        "Ask for a new photo or video of the item.",
+        "Use a safe payment method or meet safely in a public place.",
+      ],
+      tet:[
+        "Cheka perfil no istória hosi faan-na'in.",
+        "Husu foto ka vídeo foun hosi sasán.",
+        "Uza dalan selu seguru ka hasoru iha fatin públiku ne'ebé seguru.",
+      ],
+    },
+    options:[
+      {
+        text:{
+          en:"Pay the deposit quickly so you do not miss out.",
+          tet:"Selu depózitu lalais atu keta lakon oportunidade.",
+        },
+        correct:false,
+        feedback:{
+          en:"Risky. Pressure plus early payment is a warning sign.",
+          tet:"Risku. Presaun ho pagamentu sedu mak sinal avizu.",
+        },
+      },
+      {
+        text:{
+          en:"Ask for proof and choose a safer way to pay or meet.",
+          tet:"Husu prova no hili dalan seguru liu atu selu ka hasoru.",
+        },
+        correct:true,
+        feedback:{
+          en:"Correct. Verify the item and seller before paying.",
+          tet:"Loos. Verifika sasán no faan-na'in molok selu.",
+        },
+      },
+      {
+        text:{
+          en:"Send half the deposit only.",
+          tet:"Haruka metade hosi depózitu de'it.",
+        },
+        correct:false,
+        feedback:{
+          en:"Still risky. Sending less money does not prove the seller is real.",
+          tet:"Sei risku. Haruka osan menus la prova katak faan-na'in ne'e loos.",
+        },
+      },
+    ],
+  },
+];
+
 export default function YouthSocialEngineeringPage(){
   const {language}=useLanguage();
-  const lang=language==="tet"?"tet":"en";
+  const lang:Lang=language==="tet"?"tet":"en";
+  const ui=TRANSLATIONS[lang];
 
-  const ui={
-    en:{
-      title:"SOCIAL ENGINEERING SIM",
-      subtitle:"Train your brain to spot pressure tactics, impersonation, and “act now” traps.",
-      backGuide:"← Back to Youth Cyber Guide",
-      backGame:"← Back to Cyber Vanguard",
-      backCyber:"← Back to Cyber",
-      toChildren:"Children",
-      toAdults:"Parents & Teachers",
-      score:"SCORE",
-      streak:"STREAK",
-      reset:"Reset",
-      scenario:"SCENARIO",
-      hideClues:"Hide clues",
-      showClues:"Show clues",
-      before:"Before you answer…",
-      confidence:"How confident are you right now?",
-      tip:"Tip: scammers want panic. Slow down and verify.",
-      analysis:"ANALYSIS",
-      good:"✅ Good call",
-      risky:"❌ Risky move",
-      telltales:"Warning signs",
-      safeMove:"Safer move",
-      rule:"Rule: if it asks for money, codes, photos, or secrets — verify using another channel.",
-      next:"Next Scenario →",
-      brief:"Mission Brief",
-      briefText:"Social engineering means tricking people into giving away information, money, or access. Defence habit: slow down → verify → refuse secrets, codes, money, and pressure.",
-      pressure:"3 pressure tactics",
-      sentence:"One sentence that saves you",
-      sentenceText:"“I don’t do secrets or codes online.”",
-      sentenceDesc:"Then: screenshot → block → report → tell someone you trust.",
-      complete:"Simulation Complete",
-      defence:"Your defence score:",
-      card1:"If it’s urgent…",
-      card1Desc:"Pause. Verify another way.",
-      card2:"If it asks for money or codes…",
-      card2Desc:"Assume scam until proven otherwise.",
-      card3:"If you clicked…",
-      card3Desc:"Change password, enable 2FA, report it, and get help.",
-      restart:"Restart Simulation",
-      backVanguard:"Back to Vanguard",
-      confidenceRightHigh:"You were confident and correct. Good spotting.",
-      confidenceRightLow:"You were cautious and still got it right. That’s a good habit.",
-      confidenceWrongHigh:"You were confident but the answer was risky. Slow down next time.",
-      confidenceWrongLow:"You were unsure, which is better than rushing. Now check the clues.",
-      resultExpert:"Scam Detector",
-      resultMid:"Risk Spotter",
-      resultStart:"Cyber Aware",
-      linksTitle:"Where to next?",
-    },
-    tet:{
-      title:"SIMULASAUN SOCIAL ENGINEERING",
-      subtitle:"Treina ita-nia hanoin atu deteta presaun, falsifikasaun identidade, no armadilha “halo agora”.",
-      backGuide:"← Fila ba Youth Cyber Guide",
-      backGame:"← Fila ba Cyber Vanguard",
-      backCyber:"← Fila ba Cyber",
-      toChildren:"Labarik",
-      toAdults:"Inan-Aman & Mestre",
-      score:"PONTU",
-      streak:"SEGUIDU",
-      reset:"Hahu Fali",
-      scenario:"SENÁRIU",
-      hideClues:"Subar pista sira",
-      showClues:"Hatudu pista sira",
-      before:"Molok ita responde…",
-      confidence:"Ita sente konfiansa hira agora?",
-      tip:"Sujestaun: fraudador sira hakarak pániku. Para uluk no verifika.",
-      analysis:"ANÁLIZE",
-      good:"✅ Hili loos",
-      risky:"❌ Hili risku",
-      telltales:"Sinais alerta",
-      safeMove:"Dalan seguru liu",
-      rule:"Regra: se husu osan, kódigu, foto, ka segredu — verifika liu hosi kanál seluk.",
-      next:"Senáriu Tuir Mai →",
-      brief:"Brief Misaun",
-      briefText:"Social engineering mak bainhira ema bosok ita atu fó informasaun, osan, ka asesu. Hábitu defesa mak: para → verifika → rejeita segredu, kódigu, osan, no presaun.",
-      pressure:"Tátika presaun 3",
-      sentence:"Sentensa ida ne'ebé salva ita",
-      sentenceText:"“Hau la halo segredu ka fó kódigu online.”",
-      sentenceDesc:"Depois: screenshot → blokeia → relata → hatete ba ema ida ne'ebé ita fiar.",
-      complete:"Simulasaun Remata",
-      defence:"Ita-nia pontu defesa:",
-      card1:"Se urgente…",
-      card1Desc:"Para. Verifika liu hosi dalan seluk.",
-      card2:"Se husu osan ka kódigu…",
-      card2Desc:"Hanoin katak scam to'o prova katak lae.",
-      card3:"Se ita klik ona…",
-      card3Desc:"Troka password, ativa 2FA, relata, no buka ajuda.",
-      restart:"Hahu Fali Simulasaun",
-      backVanguard:"Fila ba Vanguard",
-      confidenceRightHigh:"Ita konfiansa no loos. Di'ak tebes ita deteta.",
-      confidenceRightLow:"Ita kuidadu no loos nafatin. Ida-ne'e hábitu di'ak.",
-      confidenceWrongHigh:"Ita konfiansa maibé resposta ne'e risku. Tuir mai para uluk no hanoin.",
-      confidenceWrongLow:"Ita seidauk certeza, ne'e di'ak liu duké halo lalais. Agora haree pista sira.",
-      resultExpert:"Detetor Scam",
-      resultMid:"Haree Risku",
-      resultStart:"Cyber Aware",
-      linksTitle:"Depois ba ne'ebé?",
-    },
-  }[lang];
-
-  const scenarios=useMemo<Scenario[]>(()=>[
-    {
-      id:1,
-      title:{
-        en:"Urgent Request",
-        tet:"Pedidu Urjente",
-      },
-      description:{
-        en:`You receive a DM from a friend: "Hey! I’m stuck at the airport and lost my wallet. Can you send me $50 via GiftCard? I’ll pay you back tomorrow!"`,
-        tet:`Ita simu DM ida hosi kolega: "Hey! Hau hela iha airport no lakon carteira. Bele haruka $50 liu husi GiftCard? Aban hau sei selu fila fali!"`,
-      },
-      tags:{
-        en:["Urgency","Impersonation","Money request"],
-        tet:["Urjénsia","Falsifikasaun","Pedidu osan"],
-      },
-      telltales:{
-        en:[
-          "It asks for gift cards, which are hard to trace and hard to recover.",
-          "It pushes you to act fast, with no time to verify.",
-          "It uses emotion like panic or guilt to pressure you.",
-        ],
-        tet:[
-          "Husu gift card, ne'ebé susar atu tuir no susar atu fila.",
-          "Presaun atu halo lalais, laiha tempu atu verifika.",
-          "Uza emosaun hanesan pániku ka kulpa atu pressiona ita.",
-        ],
-      },
-      safeMove:{
-        en:[
-          "Verify another way, like calling, voice note, or asking in person.",
-          "Ask a question only your real friend would know.",
-          "If it is real, use a safer method after verification.",
-        ],
-        tet:[
-          "Verifika liu husi dalan seluk hanesan telefonema, voice note, ka hasoru malu.",
-          "Husu pergunta ida ne'ebé kolega loos de'it bele hatene.",
-          "Se loos, uza dalan seguru liu depois de verifika.",
-        ],
-      },
-      options:[
-        {
-          text:{
-            en:"Send the money immediately to help.",
-            tet:"Haruka osan kedas atu ajuda.",
-          },
-          correct:false,
-          feedback:{
-            en:"This is a classic hacked-account scam. Trust is what makes people move too fast.",
-            tet:"Ne'e scam klasiku ida hosi konta ne'ebé hacked. Fiar mak halo ema sira atua lalais demais.",
-          },
-        },
-        {
-          text:{
-            en:"Call your friend or ask for a voice note to verify.",
-            tet:"Telefonema ba kolega ka husu voice note atu verifika.",
-          },
-          correct:true,
-          feedback:{
-            en:"Correct. Checking through a different channel breaks the scammer’s advantage.",
-            tet:"Loos. Verifika liu husi kanál seluk estraga avantajen fraudador nian.",
-          },
-        },
-        {
-          text:{
-            en:"Ask for their bank details instead.",
-            tet:"Husu detallu banku de'it.",
-          },
-          correct:false,
-          feedback:{
-            en:"Still risky. If the account is compromised, the scammer is still replying to you.",
-            tet:"Sei risku nafatin. Se konta ne'e komprometidu, fraudador mak sei responde ba ita.",
-          },
-        },
-      ],
-    },
-    {
-      id:2,
-      title:{
-        en:`The "Official" Email`,
-        tet:`Email "Ofisiál"`,
-      },
-      description:{
-        en:`You get an email from "Insta-Support": "Copyright Violation Detected. Click here to appeal or your account will be deleted in 24 hours."`,
-        tet:`Ita simu email hosi "Insta-Support": "Copyright Violation Detected. Klik iha ne'e atu apela ka ita-nia konta sei apaga iha oras 24."`,
-      },
-      tags:{
-        en:["Fear","Urgency","Phishing link"],
-        tet:["Tauk","Urjénsia","Link phishing"],
-      },
-      telltales:{
-        en:[
-          "It threatens loss within 24 hours.",
-          "It pushes you toward a link.",
-          "The sender address often does not match the real company.",
-        ],
-        tet:[
-          "Ameaça katak ita sei lakon buat ida iha oras 24.",
-          "Koko lori ita ba link ida.",
-          "Remetente dala barak la hanesan ho kompanhia loos.",
-        ],
-      },
-      safeMove:{
-        en:[
-          "Do not click the email link.",
-          "Open the real app or site yourself and check notifications.",
-          "Check the sender address and report phishing.",
-        ],
-        tet:[
-          "Keta klik link iha email ne'e.",
-          "Loke app ka site loos rasik no haree notifikasaun sira.",
-          "Haree remetente didi'ak no relata hanesan phishing.",
-        ],
-      },
-      options:[
-        {
-          text:{
-            en:"Panic and click the link to appeal.",
-            tet:"Pániku no klik link atu apela.",
-          },
-          correct:false,
-          feedback:{
-            en:"That is exactly what the scam wants. Panic makes people skip checking the URL.",
-            tet:"Ne'e loos duni saida mak scam ne'e hakarak. Pániku halo ema la verifika URL.",
-          },
-        },
-        {
-          text:{
-            en:"Reply to the email asking for proof.",
-            tet:"Hatán email ne'e no husu prova.",
-          },
-          correct:false,
-          feedback:{
-            en:"Replying confirms your email is active and keeps you engaged with the scam.",
-            tet:"Hatán email konfirma katak ita-nia email ativu no halo ita sei envolve ho scam ne'e.",
-          },
-        },
-        {
-          text:{
-            en:"Check the sender address and log in through the real app or site yourself.",
-            tet:"Haree remetente no tama liu husi app ka site loos rasik.",
-          },
-          correct:true,
-          feedback:{
-            en:"Correct. Always go to the real app or website yourself instead of trusting the email link.",
-            tet:"Loos. Sempre ba app ka website loos rasik iha fatin fiar de'it iha link hosi email.",
-          },
-        },
-      ],
-    },
-    {
-      id:3,
-      title:{
-        en:"Too Good To Be True",
-        tet:"Di'ak Liutiha Atu Sai Loos",
-      },
-      description:{
-        en:`A popular influencer posts: "I’m giving away 1000 ETH! Send 0.1 ETH to verify your wallet and get 10x back!"`,
-        tet:`Influencer populár ida posta: "Hau sei fó 1000 ETH! Haruka 0.1 ETH atu verifika ita-nia wallet no simu fila 10x!"`,
-      },
-      tags:{
-        en:["Greed","Fake giveaway","Crypto trap"],
-        tet:["Ganánsia","Giveaway falsu","Armadilha crypto"],
-      },
-      telltales:{
-        en:[
-          "It asks you to pay first to ‘verify’.",
-          "It promises unrealistic returns.",
-          "Comments and social proof can be fake or bots.",
-        ],
-        tet:[
-          "Husu ita selu uluk atu ‘verifika’.",
-          "Promete resultadu ne'ebé la realistiku.",
-          "Komentáriu no prova sosiál bele falsu ka bot sira.",
-        ],
-      },
-      safeMove:{
-        en:[
-          "Never pay to receive a prize.",
-          "Report the post or account.",
-          "If money is involved, assume scam until proven otherwise.",
-        ],
-        tet:[
-          "Keta selu atu simu prémiu ida.",
-          "Relata post ka konta ne'e.",
-          "Se envolve osan, hanoin katak scam to'o prova katak lae.",
-        ],
-      },
-      options:[
-        {
-          text:{
-            en:"Send the 0.1 ETH quickly.",
-            tet:"Haruka 0.1 ETH lalais.",
-          },
-          correct:false,
-          feedback:{
-            en:"This is a classic doubling scam. Real giveaways do not ask you to pay first.",
-            tet:"Ne'e scam klasiku ida atu duplica osan. Giveaway loos la husu selu uluk.",
-          },
-        },
-        {
-          text:{
-            en:"Report the post as a scam.",
-            tet:"Relata post ne'e hanesan scam.",
-          },
-          correct:true,
-          feedback:{
-            en:"Correct. Reporting helps protect other people too.",
-            tet:"Loos. Relata ajuda proteje ema seluk mós.",
-          },
-        },
-        {
-          text:{
-            en:"Wait to see if others get paid.",
-            tet:"Hein haree se ema seluk simu loos ka lae.",
-          },
-          correct:false,
-          feedback:{
-            en:"Scammers can fake comments and fake proof. Waiting does not make it safer.",
-            tet:"Fraudador sira bele halo komentáriu no prova falsu. Hein de'it la halo ne'e seguru liu.",
-          },
-        },
-      ],
-    },
-    {
-      id:4,
-      title:{
-        en:"Verification Code Trap",
-        tet:"Armadilha Kódigu Verifikasaun",
-      },
-      description:{
-        en:`A message says: "I’m from support. To secure your account, send me the code you just received."`,
-        tet:`Mensajen ida dehan: "Hau hosi support. Atu seguru ita-nia konta, haruka mai kódigu ne'ebé ita simu foin."`,
-      },
-      tags:{
-        en:["Authority","OTP theft","Account takeover"],
-        tet:["Autoridade","Na'ok OTP","Na'ok konta"],
-      },
-      telltales:{
-        en:[
-          "Real support never asks for one-time codes.",
-          "That code can reset your password or confirm a login.",
-          "They are trying to access your account right now.",
-        ],
-        tet:[
-          "Support loos la husu kódigu ida-ne'e.",
-          "Kódigu ne'e bele reset password ka confirma login.",
-          "Sira daudaun ne'e koko asesu ita-nia konta.",
-        ],
-      },
-      safeMove:{
-        en:[
-          "Never share OTP or verification codes.",
-          "Change password and enable 2FA if needed.",
-          "Report and block the account.",
-        ],
-        tet:[
-          "Keta fahe OTP ka kódigu verifikasaun.",
-          "Troka password no ativa 2FA se presiza.",
-          "Relata no blokeia konta ne'e.",
-        ],
-      },
-      options:[
-        {
-          text:{
-            en:"Send the code so they can ‘secure’ the account.",
-            tet:"Haruka kódigu atu sira bele ‘segura’ konta.",
-          },
-          correct:false,
-          feedback:{
-            en:"That code is what lets them steal the account. It is not protection.",
-            tet:"Kódigu ne'e mak dalan sira atu na'ok konta. Ida-ne'e la'ós protesaun.",
-          },
-        },
-        {
-          text:{
-            en:"Ignore the message and report it. Keep your codes private.",
-            tet:"Ignora mensajen ne'e no relata. Rai ita-nia kódigu privadu.",
-          },
-          correct:true,
-          feedback:{
-            en:"Correct. Verification codes are for you only. If someone asks, treat it as a scam.",
-            tet:"Loos. Kódigu verifikasaun ba ita de'it. Se ema husu, trata hanesan scam.",
-          },
-        },
-        {
-          text:{
-            en:"Ask them to prove who they are first.",
-            tet:"Husu sira prova sé mak sira uluk.",
-          },
-          correct:false,
-          feedback:{
-            en:"You do not need to negotiate. Real support would not ask for the code at all.",
-            tet:"La presiza ko'alia naruk. Support loos la husu kódigu ida-ne'e atu hahú kedas.",
-          },
-        },
-      ],
-    },
-  ],[]);
-
-  const total=scenarios.length;
-
-  const [idx,setIdx]=useState(0);
+  const scenarios=useMemo(()=>SCENARIOS,[]);
+  const [index,setIndex]=useState(0);
   const [score,setScore]=useState(0);
   const [streak,setStreak]=useState(0);
-  const [chosen,setChosen]=useState<number|null>(null);
-  const [confidence,setConfidence]=useState(3);
-  const [showDetails,setShowDetails]=useState(true);
+  const [answered,setAnswered]=useState(false);
+  const [selected,setSelected]=useState<number|null>(null);
+  const [showClues,setShowClues]=useState(false);
+  const [confidence,setConfidence]=useState<"low"|"high">("low");
 
-  const finished=idx>=total;
-  const scenario=!finished?scenarios[idx]:undefined;
+  const complete=index>=scenarios.length;
+  const scenario=complete?null:scenarios[index]??null;
 
-  const resetAll=()=>{
-    setIdx(0);
+  const reset=()=>{
+    setIndex(0);
     setScore(0);
     setStreak(0);
-    setChosen(null);
-    setConfidence(3);
-    setShowDetails(true);
+    setAnswered(false);
+    setSelected(null);
+    setShowClues(false);
+    setConfidence("low");
   };
 
-  const pick=(optIndex:number)=>{
-    if(!scenario||chosen!==null) return;
+  const choose=(optionIndex:number)=>{
+    if(answered||complete||!scenario){
+      return;
+    }
 
-    const opt=scenario.options[optIndex];
-    if(!opt) return;
+    const option=scenario.options[optionIndex];
 
-    setChosen(optIndex);
+    if(!option){
+      return;
+    }
 
-    if(opt.correct){
-      setScore((s)=>s+1);
-      setStreak((s)=>s+1);
+    setSelected(optionIndex);
+    setAnswered(true);
+
+    if(option.correct){
+      setScore((prev)=>prev+100);
+      setStreak((prev)=>prev+1);
     }else{
       setStreak(0);
     }
   };
 
   const next=()=>{
-    setChosen(null);
-    setConfidence(3);
-    setShowDetails(true);
-    setIdx((v)=>v+1);
+    setIndex((prev)=>prev+1);
+    setAnswered(false);
+    setSelected(null);
+    setShowClues(false);
+    setConfidence("low");
   };
 
-  function confidenceMessage(isCorrect:boolean,level:number){
-    if(isCorrect&&level>=4) return ui.confidenceRightHigh;
-    if(isCorrect&&level<=3) return ui.confidenceRightLow;
-    if(!isCorrect&&level>=4) return ui.confidenceWrongHigh;
+  const resultLabel=()=>{
+    if(score>=400){
+      return ui.resultExpert;
+    }
+
+    if(score>=250){
+      return ui.resultMid;
+    }
+
+    return ui.resultStart;
+  };
+
+  const selectedOption=scenario&&selected!==null
+    ? scenario.options[selected]??null
+    : null;
+
+  const selectedCorrect=selectedOption?.correct??false;
+
+  const confidenceFeedback=()=>{
+    if(!answered){
+      return "";
+    }
+
+    if(selectedCorrect&&confidence==="high"){
+      return ui.confidenceRightHigh;
+    }
+
+    if(selectedCorrect&&confidence==="low"){
+      return ui.confidenceRightLow;
+    }
+
+    if(!selectedCorrect&&confidence==="high"){
+      return ui.confidenceWrongHigh;
+    }
+
     return ui.confidenceWrongLow;
+  };
+
+  if(complete){
+    return(
+      <main className="min-h-screen bg-sky-50 text-slate-900">
+        <TopBar ui={ui} />
+
+        <section className="bg-gradient-to-b from-sky-200 to-sky-50 px-5 py-12">
+          <div className="mx-auto max-w-6xl">
+            <div className="max-w-3xl">
+              <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-bold text-sky-900 shadow-sm">
+                <ShieldCheck className="h-4 w-4" aria-hidden="true" />
+                {lang==="tet"?"Atividade juventude":"Youth activity"}
+              </div>
+
+              <h1 className="text-4xl font-black tracking-tight text-slate-950 md:text-6xl">
+                {ui.completeTitle}
+              </h1>
+
+              <p className="mt-4 text-base leading-7 text-slate-700 md:text-lg">
+                {ui.completeIntro}
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section className="px-5 py-10">
+          <div className="mx-auto grid max-w-6xl gap-5 md:grid-cols-[minmax(0,1fr)_320px]">
+            <div className="rounded-3xl border border-sky-100 bg-white p-8 shadow-sm">
+              <div className="text-sm font-black uppercase tracking-wider text-slate-500">
+                {ui.score}
+              </div>
+
+              <div className="mt-3 text-6xl font-black text-sky-800">
+                {score}
+              </div>
+
+              <div className="mt-3 inline-flex rounded-full bg-green-100 px-4 py-2 text-sm font-black text-green-800">
+                {resultLabel()}
+              </div>
+
+              <div className="mt-6 flex flex-wrap gap-3">
+                <button
+                  type="button"
+                  onClick={reset}
+                  className="inline-flex items-center gap-2 rounded-full bg-sky-700 px-5 py-3 text-sm font-bold text-white shadow-sm hover:bg-sky-800"
+                >
+                  <RefreshCcw className="h-5 w-5" aria-hidden="true" />
+                  {ui.restart}
+                </button>
+
+                <Link
+                  href="/cyber/youth"
+                  className="inline-flex items-center rounded-full border border-sky-300 bg-white px-5 py-3 text-sm font-bold text-sky-900 shadow-sm hover:bg-sky-50"
+                >
+                  {ui.backGuide}
+                </Link>
+              </div>
+            </div>
+
+            <ReminderCard ui={ui} />
+          </div>
+        </section>
+      </main>
+    );
   }
 
-  function resultLabel(scoreValue:number,totalValue:number){
-    const ratio=scoreValue/totalValue;
-    if(ratio>=0.9) return ui.resultExpert;
-    if(ratio>=0.5) return ui.resultMid;
-    return ui.resultStart;
+  if(!scenario){
+    return(
+      <main className="min-h-screen bg-sky-50 px-5 py-10 text-slate-900">
+        <div className="mx-auto max-w-3xl rounded-3xl border border-rose-200 bg-white p-6 shadow-sm">
+          <h1 className="text-2xl font-black text-slate-950">
+            Scenario not found
+          </h1>
+
+          <p className="mt-3 text-sm leading-6 text-slate-700">
+            Please restart the activity.
+          </p>
+
+          <button
+            type="button"
+            onClick={reset}
+            className="mt-5 rounded-full bg-sky-700 px-5 py-3 text-sm font-bold text-white hover:bg-sky-800"
+          >
+            {ui.restart}
+          </button>
+        </div>
+      </main>
+    );
   }
 
   return(
-    <div className="min-h-screen bg-slate-950 text-purple-200 font-mono px-4 py-6 md:px-8 md:py-10 selection:bg-purple-900 selection:text-white">
-      <header className="max-w-5xl mx-auto mb-6 border-b border-slate-800 pb-4 flex flex-col gap-4">
-        <div className="flex flex-wrap gap-3">
-          <Link
-            href="/cyber"
-            className="inline-flex items-center rounded-full border border-slate-700 bg-slate-900 px-4 py-2 text-sm font-semibold text-slate-200 hover:border-purple-400/60 hover:text-white"
-          >
-            {ui.backCyber}
-          </Link>
-          <Link
-            href="/cyber/children"
-            className="inline-flex items-center rounded-full bg-[#FF6B6B] px-4 py-2 text-sm font-semibold text-white hover:opacity-90"
-          >
-            {ui.toChildren}
-          </Link>
-          <Link
-            href="/cyber/adults"
-            className="inline-flex items-center rounded-full bg-[#219653] px-4 py-2 text-sm font-semibold text-white hover:opacity-90"
-          >
-            {ui.toAdults}
-          </Link>
-        </div>
+    <main className="min-h-screen bg-sky-50 text-slate-900">
+      <TopBar ui={ui} />
 
-        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+      <section className="bg-gradient-to-b from-sky-200 to-sky-50 px-5 py-12">
+        <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-center">
           <div>
-            <h1 className="text-3xl md:text-5xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-fuchsia-500">
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-bold text-sky-900 shadow-sm">
+              <MessageCircleWarning className="h-4 w-4" aria-hidden="true" />
+              {lang==="tet"?"Atividade juventude":"Youth activity"}
+            </div>
+
+            <h1 className="text-4xl font-black tracking-tight text-slate-950 md:text-6xl">
               {ui.title}
             </h1>
-            <p className="mt-2 text-slate-400 text-sm md:text-base">
+
+            <p className="mt-4 max-w-3xl text-base leading-7 text-slate-700 md:text-lg">
               {ui.subtitle}
             </p>
-
-            <div className="mt-3 flex flex-wrap gap-3">
-              <Link
-                href="/cyber/youth"
-                className="text-sm text-purple-300 hover:text-white underline underline-offset-4"
-              >
-                {ui.backGuide}
-              </Link>
-              <Link
-                href="/cyber/youth/game"
-                className="text-sm text-purple-300 hover:text-white underline underline-offset-4"
-              >
-                {ui.backGame}
-              </Link>
-            </div>
           </div>
 
-          <div className="flex items-center gap-3">
-            <div className="bg-slate-900 border border-slate-800 rounded-xl px-3 py-2">
-              <div className="text-[10px] text-slate-500">{ui.score}</div>
-              <div className="text-lg font-bold text-white">{score}/{total}</div>
+          <div className="rounded-3xl border border-sky-100 bg-white p-6 shadow-sm">
+            <div className="grid grid-cols-2 gap-4">
+              <ScoreBox label={ui.score} value={String(score)} />
+              <ScoreBox label={ui.streak} value={String(streak)} />
             </div>
-            <div className="bg-slate-900 border border-slate-800 rounded-xl px-3 py-2">
-              <div className="text-[10px] text-slate-500">{ui.streak}</div>
-              <div className="text-lg font-bold text-white">{streak}</div>
-            </div>
+
             <button
-              onClick={resetAll}
-              className="bg-slate-900 border border-slate-800 hover:border-purple-400/60 text-slate-200 hover:text-white rounded-xl px-3 py-2 text-sm font-bold transition-colors"
+              type="button"
+              onClick={reset}
+              className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full border border-amber-300 bg-white px-5 py-3 text-sm font-bold text-amber-800 shadow-sm hover:bg-amber-50"
             >
+              <RefreshCcw className="h-5 w-5" aria-hidden="true" />
               {ui.reset}
             </button>
           </div>
         </div>
-      </header>
+      </section>
 
-      <main className="max-w-5xl mx-auto">
-        {!finished&&scenario?(
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <motion.div
-              key={scenario.id}
-              initial={{opacity:0,y:10}}
-              animate={{opacity:1,y:0}}
-              transition={{duration:0.2}}
-              className="lg:col-span-2 bg-slate-900 border border-purple-500/30 rounded-2xl shadow-lg overflow-hidden"
-            >
-              <div className="p-5 border-b border-slate-800 flex items-start justify-between gap-4">
-                <div>
-                  <div className="text-xs text-slate-500">{ui.scenario} {idx+1}/{total}</div>
-                  <h2 className="mt-1 text-xl md:text-2xl font-bold text-purple-200">
-                    {scenario.title[lang]}
-                  </h2>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {scenario.tags[lang].map((tag)=>(
-                      <span
-                        key={tag}
-                        className="text-[11px] px-2 py-1 rounded-full bg-slate-950 border border-slate-800 text-slate-300"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                </div>
+      <section className="px-5 py-8">
+        <div className="mx-auto grid max-w-6xl gap-5 md:grid-cols-3">
+          <InfoCard title={ui.simpleRuleTitle} body={ui.simpleRule} />
+          <InfoCard title={ui.sentenceTitle} body={`${ui.sentenceText} ${ui.sentenceDesc}`} />
 
-                <button
-                  onClick={()=>setShowDetails((v)=>!v)}
-                  className="shrink-0 text-xs bg-slate-950 border border-slate-800 hover:border-purple-400/60 rounded-lg px-3 py-2 text-slate-300 hover:text-white transition-colors"
-                >
-                  {showDetails?ui.hideClues:ui.showClues}
-                </button>
-              </div>
+          <div className="rounded-3xl border border-yellow-200 bg-yellow-50 p-6 shadow-sm">
+            <h2 className="text-xl font-black text-slate-950">
+              {ui.pressureTitle}
+            </h2>
 
-              <div className="p-5">
-                <p className="text-base md:text-lg text-white leading-relaxed">
-                  {scenario.description[lang]}
-                </p>
-
-                <div className="mt-6 bg-slate-950 border border-slate-800 rounded-xl p-4">
-                  <div className="flex items-center justify-between gap-3">
-                    <div>
-                      <div className="text-xs text-slate-500">{ui.before}</div>
-                      <div className="text-sm text-slate-200">
-                        {ui.confidence}
-                      </div>
-                    </div>
-                    <div className="text-sm font-bold text-white">{confidence}/5</div>
-                  </div>
-
-                  <input
-                    type="range"
-                    min={1}
-                    max={5}
-                    value={confidence}
-                    onChange={(e)=>setConfidence(Number(e.target.value))}
-                    className="mt-3 w-full accent-purple-400"
-                  />
-                  <div className="mt-2 text-[11px] text-slate-500">
-                    {ui.tip}
-                  </div>
-                </div>
-
-                <div className="mt-6 space-y-3">
-                  {scenario.options.map((o,i)=>{
-                    const locked=chosen!==null;
-                    const picked=chosen===i;
-
-                    const base="w-full text-left p-4 rounded-xl border transition-colors";
-                    const idle="bg-slate-800 border-slate-700 hover:bg-slate-700 text-slate-100 hover:border-purple-400/60";
-                    const good="bg-emerald-900/30 border-emerald-500/60 text-emerald-100";
-                    const badPicked="bg-red-900/30 border-red-500/60 text-red-100";
-                    const muted="bg-slate-900 border-slate-800 text-slate-500";
-
-                    const cls=(()=>{
-                      if(!locked) return `${base} ${idle}`;
-                      if(picked&&o.correct) return `${base} ${good}`;
-                      if(picked&&!o.correct) return `${base} ${badPicked}`;
-                      if(!picked&&o.correct) return `${base} ${good}`;
-                      return `${base} ${muted}`;
-                    })();
-
-                    return(
-                      <button
-                        key={i}
-                        disabled={locked}
-                        onClick={()=>pick(i)}
-                        className={cls}
-                      >
-                        <div className="flex items-start justify-between gap-3">
-                          <div className="font-semibold">{o.text[lang]}</div>
-                          {chosen!==null&&(
-                            <div className="text-sm">{o.correct?"✅":" "}</div>
-                          )}
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-
-                <AnimatePresence>
-                  {chosen!==null&&(
-                    <motion.div
-                      initial={{opacity:0,y:10}}
-                      animate={{opacity:1,y:0}}
-                      exit={{opacity:0,y:10}}
-                      className="mt-6 rounded-xl border p-4 bg-slate-950 border-slate-800"
-                    >
-                      <div className="text-xs text-slate-500">{ui.analysis}</div>
-
-                      <div className="mt-1 text-sm text-white font-bold">
-                        {scenario.options[chosen]?.correct ? ui.good : ui.risky}
-                        {" "}
-                        <span className="text-slate-400 font-normal">(confidence: {confidence}/5)</span>
-                      </div>
-
-                      <p className="mt-2 text-sm text-slate-200">
-                        {scenario.options[chosen]?.feedback[lang]||""}
-                      </p>
-
-                      <p className="mt-3 text-xs text-purple-300">
-                        {confidenceMessage(!!scenario.options[chosen]?.correct,confidence)}
-                      </p>
-
-                      {showDetails&&(
-                        <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3">
-                          <div className="rounded-lg border border-slate-800 bg-black/20 p-3">
-                            <div className="text-xs text-slate-500">{ui.telltales}</div>
-                            <ul className="mt-2 text-sm text-slate-200 list-disc list-inside space-y-1">
-                              {scenario.telltales[lang].map((x,i)=>(
-                                <li key={i}>{x}</li>
-                              ))}
-                            </ul>
-                          </div>
-                          <div className="rounded-lg border border-slate-800 bg-black/20 p-3">
-                            <div className="text-xs text-slate-500">{ui.safeMove}</div>
-                            <ul className="mt-2 text-sm text-slate-200 list-disc list-inside space-y-1">
-                              {scenario.safeMove[lang].map((x,i)=>(
-                                <li key={i}>{x}</li>
-                              ))}
-                            </ul>
-                          </div>
-                        </div>
-                      )}
-
-                      <div className="mt-4 flex items-center justify-between gap-3">
-                        <div className="text-[11px] text-slate-500">
-                          {ui.rule}
-                        </div>
-                        <button
-                          onClick={next}
-                          className="bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-purple-400/60 text-white px-4 py-2 rounded-lg text-sm font-bold transition-colors"
-                        >
-                          {ui.next}
-                        </button>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            </motion.div>
-
-            <div className="space-y-4">
-              <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
-                <div className="text-xs text-slate-500">{ui.brief}</div>
-                <div className="mt-2 text-sm text-slate-200">
-                  {ui.briefText}
-                </div>
-              </div>
-
-              <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
-                <div className="text-xs text-slate-500">{ui.pressure}</div>
-                <ul className="mt-2 text-sm text-slate-200 list-disc list-inside space-y-1">
-                  <li><span className="text-white font-bold">Urgency:</span> {lang==="tet"?"“agora / oras 24 / última oportunidade”.":"“now / 24 hours / last chance”."}</li>
-                  <li><span className="text-white font-bold">Emotion:</span> {lang==="tet"?"pániku, kulpa, romance, moe.":"panic, guilt, romance, shame."}</li>
-                  <li><span className="text-white font-bold">Authority:</span> {lang==="tet"?"“support”, “polísia”, “banku”.":"“support”, “police”, “bank”."}</li>
-                </ul>
-              </div>
-
-              <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
-                <div className="text-xs text-slate-500">{ui.sentence}</div>
-                <div className="mt-2 text-sm text-white font-bold">
-                  {ui.sentenceText}
-                </div>
-                <div className="mt-2 text-sm text-slate-200">
-                  {ui.sentenceDesc}
-                </div>
-              </div>
-            </div>
-          </div>
-        ):(
-          <div className="bg-slate-900 border border-purple-500/40 rounded-2xl p-8 text-center max-w-3xl mx-auto">
-            <h2 className="text-3xl font-bold text-purple-300">{ui.complete}</h2>
-            <p className="mt-3 text-lg text-white">
-              {ui.defence} <span className="font-bold">{score}/{total}</span>
-            </p>
-            <p className="mt-2 text-purple-300 font-semibold">
-              {resultLabel(score,total)}
-            </p>
-
-            <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-3 text-left">
-              <div className="bg-slate-950 border border-slate-800 rounded-xl p-4">
-                <div className="text-xs text-slate-500">{ui.card1}</div>
-                <div className="mt-2 text-sm text-slate-200">{ui.card1Desc}</div>
-              </div>
-              <div className="bg-slate-950 border border-slate-800 rounded-xl p-4">
-                <div className="text-xs text-slate-500">{ui.card2}</div>
-                <div className="mt-2 text-sm text-slate-200">{ui.card2Desc}</div>
-              </div>
-              <div className="bg-slate-950 border border-slate-800 rounded-xl p-4">
-                <div className="text-xs text-slate-500">{ui.card3}</div>
-                <div className="mt-2 text-sm text-slate-200">{ui.card3Desc}</div>
-              </div>
-            </div>
-
-            <div className="mt-7 flex flex-col sm:flex-row items-center justify-center gap-3">
-              <button
-                onClick={resetAll}
-                className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-xl font-bold transition-colors w-full sm:w-auto"
-              >
-                {ui.restart}
-              </button>
-              <Link
-                href="/cyber/youth/game"
-                className="bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-purple-400/60 text-white px-6 py-3 rounded-xl font-bold transition-colors w-full sm:w-auto text-center"
-              >
-                {ui.backVanguard}
-              </Link>
-            </div>
-          </div>
-        )}
-      </main>
-
-      <section className="max-w-5xl mx-auto mt-8">
-        <div className="rounded-2xl border border-slate-800 bg-slate-900 p-5">
-          <h3 className="text-lg font-bold text-purple-200">{ui.linksTitle}</h3>
-          <div className="mt-4 flex flex-wrap gap-3">
-            <Link
-              href="/cyber"
-              className="inline-flex items-center rounded-full border border-slate-700 bg-slate-950 px-4 py-2 text-sm font-semibold text-slate-200 hover:border-purple-400/60 hover:text-white"
-            >
-              {ui.backCyber}
-            </Link>
-            <Link
-              href="/cyber/children"
-              className="inline-flex items-center rounded-full bg-[#FF6B6B] px-4 py-2 text-sm font-semibold text-white hover:opacity-90"
-            >
-              {ui.toChildren}
-            </Link>
-            <Link
-              href="/cyber/adults"
-              className="inline-flex items-center rounded-full bg-[#219653] px-4 py-2 text-sm font-semibold text-white hover:opacity-90"
-            >
-              {ui.toAdults}
-            </Link>
+            <ul className="mt-4 space-y-3">
+              {ui.pressureItems.map((item)=>(
+                <li key={item} className="flex gap-3 text-sm leading-6 text-slate-700">
+                  <AlertTriangle className="mt-1 h-5 w-5 shrink-0 text-amber-700" aria-hidden="true" />
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       </section>
+
+      <section className="px-5 pb-12">
+        <div className="mx-auto grid max-w-6xl gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
+          <div className="rounded-3xl border border-sky-100 bg-white p-6 shadow-sm">
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <div>
+                <div className="text-sm font-black uppercase tracking-wider text-sky-800">
+                  {ui.scenario} {scenario.id}/{scenarios.length}
+                </div>
+
+                <h2 className="mt-2 text-3xl font-black text-slate-950">
+                  {scenario.title[lang]}
+                </h2>
+              </div>
+
+              <button
+                type="button"
+                onClick={()=>setShowClues((prev)=>!prev)}
+                className="rounded-full border border-sky-300 bg-sky-50 px-4 py-2 text-sm font-bold text-sky-900 hover:bg-sky-100"
+              >
+                {showClues?ui.hideClues:ui.showClues}
+              </button>
+            </div>
+
+            <p className="mt-5 rounded-2xl border border-sky-100 bg-sky-50 p-5 text-base leading-7 text-slate-800">
+              {scenario.description[lang]}
+            </p>
+
+            <div className="mt-5 flex flex-wrap gap-2">
+              {scenario.tags[lang].map((tag)=>(
+                <span
+                  key={tag}
+                  className="rounded-full bg-rose-100 px-3 py-1 text-xs font-black text-rose-700"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+
+            <div className="mt-6 rounded-2xl border border-sky-100 bg-white p-5">
+              <h3 className="text-lg font-black text-slate-950">
+                {ui.confidence}
+              </h3>
+
+              <div className="mt-3 flex flex-wrap gap-3">
+                <button
+                  type="button"
+                  onClick={()=>setConfidence("low")}
+                  disabled={answered}
+                  className={`rounded-full px-4 py-2 text-sm font-bold ${
+                    confidence==="low"
+                      ? "bg-sky-700 text-white"
+                      : "border border-sky-200 bg-white text-sky-900"
+                  }`}
+                >
+                  {ui.lowConfidence}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={()=>setConfidence("high")}
+                  disabled={answered}
+                  className={`rounded-full px-4 py-2 text-sm font-bold ${
+                    confidence==="high"
+                      ? "bg-sky-700 text-white"
+                      : "border border-sky-200 bg-white text-sky-900"
+                  }`}
+                >
+                  {ui.highConfidence}
+                </button>
+              </div>
+            </div>
+
+            <div className="mt-6">
+              <h3 className="text-xl font-black text-slate-950">
+                {ui.chooseAction}
+              </h3>
+
+              <div className="mt-4 grid gap-3">
+                {scenario.options.map((option,optionIndex)=>{
+                  const isSelected=selected===optionIndex;
+                  const showResult=answered&&isSelected;
+
+                  return(
+                    <button
+                      key={option.text[lang]}
+                      type="button"
+                      onClick={()=>choose(optionIndex)}
+                      disabled={answered}
+                      className={`rounded-2xl border p-4 text-left text-sm font-semibold leading-6 shadow-sm transition ${
+                        showResult&&option.correct
+                          ? "border-green-300 bg-green-50 text-green-900"
+                          : showResult&&!option.correct
+                            ? "border-rose-300 bg-rose-50 text-rose-900"
+                            : "border-sky-100 bg-sky-50 text-slate-800 hover:bg-sky-100"
+                      }`}
+                    >
+                      {option.text[lang]}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <AnimatePresence>
+              {answered&&selectedOption&&(
+                <motion.div
+                  initial={{opacity:0,y:10}}
+                  animate={{opacity:1,y:0}}
+                  exit={{opacity:0,y:10}}
+                  className={`mt-6 rounded-2xl border p-5 ${
+                    selectedCorrect
+                      ? "border-green-300 bg-green-50"
+                      : "border-rose-300 bg-rose-50"
+                  }`}
+                >
+                  <div className={`text-lg font-black ${
+                    selectedCorrect?"text-green-800":"text-rose-800"
+                  }`}>
+                    {selectedCorrect?ui.good:ui.risky}
+                  </div>
+
+                  <p className="mt-2 text-sm font-semibold leading-6 text-slate-800">
+                    {selectedOption.feedback[lang]}
+                  </p>
+
+                  <p className="mt-3 text-sm leading-6 text-slate-700">
+                    {confidenceFeedback()}
+                  </p>
+
+                  <button
+                    type="button"
+                    onClick={next}
+                    className="mt-5 rounded-full bg-sky-700 px-5 py-3 text-sm font-bold text-white shadow-sm hover:bg-sky-800"
+                  >
+                    {ui.next}
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
+          <aside className="lg:sticky lg:top-28 lg:self-start">
+            <div className="space-y-5">
+              <CluePanel
+                title={ui.warningSigns}
+                items={scenario.warningSigns[lang]}
+                show={showClues||answered}
+                tone="warning"
+                hiddenText={ui.clueHiddenText}
+              />
+
+              <CluePanel
+                title={ui.saferMove}
+                items={scenario.saferMove[lang]}
+                show={showClues||answered}
+                tone="safe"
+                hiddenText={ui.clueHiddenText}
+              />
+
+              <ReminderCard ui={ui} />
+            </div>
+          </aside>
+        </div>
+      </section>
+    </main>
+  );
+}
+
+function TopBar({ui}:{ui:UI}){
+  return(
+    <section className="border-b border-sky-300 bg-sky-200">
+      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-5 py-5">
+        <Link
+          href="/cyber/youth"
+          className="inline-flex items-center gap-2 rounded-full border border-sky-400 bg-white px-4 py-2 text-sm font-bold text-sky-900 shadow-sm hover:bg-sky-50"
+        >
+          <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+          {ui.backGuide}
+        </Link>
+
+        <Link
+          href="/cyber/youth/game"
+          className="rounded-full bg-sky-700 px-4 py-2 text-sm font-bold text-white shadow-sm hover:bg-sky-800"
+        >
+          {ui.backGame}
+        </Link>
+      </div>
+    </section>
+  );
+}
+
+function ScoreBox({label,value}:{label:string;value:string}){
+  return(
+    <div className="rounded-2xl border border-sky-100 bg-sky-50 p-4">
+      <div className="text-xs font-black uppercase tracking-wider text-slate-500">
+        {label}
+      </div>
+
+      <div className="mt-2 text-3xl font-black text-sky-800">
+        {value}
+      </div>
+    </div>
+  );
+}
+
+function InfoCard({title,body}:{title:string;body:string}){
+  return(
+    <div className="rounded-3xl border border-sky-100 bg-white p-6 shadow-sm">
+      <h2 className="text-xl font-black text-slate-950">
+        {title}
+      </h2>
+
+      <p className="mt-3 text-sm leading-7 text-slate-700">
+        {body}
+      </p>
+    </div>
+  );
+}
+
+function CluePanel({
+  title,
+  items,
+  show,
+  tone,
+  hiddenText,
+}:{
+  title:string;
+  items:string[];
+  show:boolean;
+  tone:"warning"|"safe";
+  hiddenText:string;
+}){
+  const isSafe=tone==="safe";
+
+  return(
+    <div className={`rounded-3xl border p-6 shadow-sm ${
+      isSafe
+        ? "border-green-200 bg-green-50"
+        : "border-yellow-200 bg-yellow-50"
+    }`}>
+      <h3 className="text-xl font-black text-slate-950">
+        {title}
+      </h3>
+
+      {show?(
+        <ul className="mt-4 space-y-3">
+          {items.map((item)=>(
+            <li key={item} className="flex gap-3 text-sm leading-6 text-slate-700">
+              {isSafe?(
+                <CheckCircle2 className="mt-1 h-5 w-5 shrink-0 text-green-700" aria-hidden="true" />
+              ):(
+                <AlertTriangle className="mt-1 h-5 w-5 shrink-0 text-amber-700" aria-hidden="true" />
+              )}
+              <span>{item}</span>
+            </li>
+          ))}
+        </ul>
+      ):(
+        <p className="mt-4 text-sm italic leading-6 text-slate-600">
+          {hiddenText}
+        </p>
+      )}
+    </div>
+  );
+}
+
+function ReminderCard({ui}:{ui:UI}){
+  return(
+    <div className="rounded-3xl border border-sky-100 bg-white p-6 shadow-sm">
+      <h3 className="text-xl font-black text-slate-950">
+        {ui.reminderTitle}
+      </h3>
+
+      <p className="mt-3 text-sm leading-7 text-slate-700">
+        {ui.reminderText}
+      </p>
     </div>
   );
 }
