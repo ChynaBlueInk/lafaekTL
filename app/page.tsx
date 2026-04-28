@@ -1,3 +1,4 @@
+// app/page.tsx
 "use client";
 
 import {useEffect,useState}from "react";
@@ -33,16 +34,20 @@ const buildImageUrl=(src?:string)=>{
   if(!src){
     return "/placeholder.svg?height=160&width=280";
   }
+
   let clean=src.trim();
+
   if(clean.startsWith("http://")||clean.startsWith("https://")){
     return clean;
   }
+
   clean=clean.replace(/^\/+/,"");
+
   return `${S3_ORIGIN}/${clean}`;
 };
 
 export default function HomePage(){
-  const {language}=useLanguage();
+  const{language}=useLanguage();
   const L=language==="tet"?"tet":"en";
 
   const content={
@@ -172,8 +177,8 @@ export default function HomePage(){
 
   const t=content[L];
 
-  const [impactItems,setImpactItems]=useState<ImpactItem[]>([]);
-  const [impactError,setImpactError]=useState<string|undefined>();
+  const[impactItems,setImpactItems]=useState<ImpactItem[]>([]);
+  const[impactError,setImpactError]=useState<string|undefined>();
 
   useEffect(()=>{
     const loadImpact=async()=>{
@@ -233,17 +238,23 @@ export default function HomePage(){
             const id=typeof raw.id==="string"&&raw.id.trim()
               ? raw.id.trim()
               : `impact-${index}`;
+
             const slug=typeof raw.slug==="string"&&raw.slug.trim()
               ? raw.slug.trim()
               : undefined;
+
             const titleEn=String(raw.titleEn??"Untitled");
+
             const titleTet=typeof raw.titleTet==="string"
               ? raw.titleTet
               : undefined;
+
             const excerptEn=String(raw.excerptEn??"");
+
             const excerptTet=typeof raw.excerptTet==="string"
               ? raw.excerptTet
               : undefined;
+
             const date=String(raw.date??"");
 
             const rawImages=Array.isArray(raw.images)
@@ -257,11 +268,12 @@ export default function HomePage(){
               : undefined;
 
             const visible=raw.visible!==false;
+
             const order=typeof raw.order==="number"
               ? raw.order
               : index+1;
 
-            return {
+            return{
               ...raw,
               id,
               slug,
@@ -281,11 +293,14 @@ export default function HomePage(){
         items.sort((a,b)=>{
           const da=a.date?new Date(a.date).getTime():0;
           const db=b.date?new Date(b.date).getTime():0;
+
           if(db!==da){
             return db-da;
           }
+
           const oa=a.order??0;
           const ob=b.order??0;
+
           return oa-ob;
         });
 
@@ -301,24 +316,24 @@ export default function HomePage(){
   },[]);
 
   return(
-    <div className="flex flex-col min-h-screen bg-white">
+    <div className="flex min-h-screen flex-col bg-white">
       <main className="flex-1">
         <Carousel />
 
-        <section className="bg-gray-50 py-12 px-4" aria-labelledby="social-and-cta">
-          <div className="max-w-7xl mx-auto">
+        <section className="bg-gray-50 px-4 py-12" aria-labelledby="social-and-cta">
+          <div className="mx-auto max-w-7xl">
             <div className="mb-8 text-center">
               <h2
                 id="social-and-cta"
-                className="text-3xl md:text-4xl font-bold text-[#219653]"
+                className="text-3xl font-bold text-[#219653] md:text-4xl"
               >
                 {t.social.title}
               </h2>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
-              <div className="lg:col-span-3 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden flex flex-col">
-                <div className="relative w-full h-40 bg-gray-100">
+            <div className="grid grid-cols-1 items-stretch gap-6 lg:grid-cols-12">
+              <div className="flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm lg:col-span-3">
+                <div className="relative h-40 w-full bg-gray-100">
                   <Image
                     src="/HomePage/LafaekFacebook.png"
                     alt="Lafaek Facebook"
@@ -329,18 +344,18 @@ export default function HomePage(){
                   />
                 </div>
 
-                <div className="p-5 flex flex-col flex-grow">
-                  <h3 className="text-xl font-bold text-blue-700 mb-2">
+                <div className="flex flex-grow flex-col p-5">
+                  <h3 className="mb-2 text-xl font-bold text-blue-700">
                     {t.social.facebookTitle}
                   </h3>
-                  <p className="text-sm text-gray-600 mb-4">
+                  <p className="mb-4 text-sm text-gray-600">
                     {t.social.facebookText}
                   </p>
                   <a
                     href="https://www.facebook.com/RevistaLafaek"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="mt-auto inline-flex items-center justify-center rounded-full bg-blue-600 px-5 py-3 text-sm font-bold text-white hover:bg-blue-700 transition-colors"
+                    className="mt-auto inline-flex items-center justify-center rounded-full bg-blue-600 px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-blue-700"
                     aria-label="Visit our Facebook page (opens in a new tab)"
                   >
                     {t.social.facebookButton}
@@ -348,8 +363,8 @@ export default function HomePage(){
                 </div>
               </div>
 
-              <div className="lg:col-span-3 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden flex flex-col">
-                <div className="relative w-full h-40 bg-gray-100">
+              <div className="flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm lg:col-span-3">
+                <div className="relative h-40 w-full bg-gray-100">
                   <Image
                     src="/HomePage/LafaekInstagram.png"
                     alt="Lafaek Instagram"
@@ -359,18 +374,18 @@ export default function HomePage(){
                   />
                 </div>
 
-                <div className="p-5 flex flex-col flex-grow">
-                  <h3 className="text-xl font-bold text-[#EB5757] mb-2">
+                <div className="flex flex-grow flex-col p-5">
+                  <h3 className="mb-2 text-xl font-bold text-[#EB5757]">
                     {t.social.instagramTitle}
                   </h3>
-                  <p className="text-sm text-gray-600 mb-4">
+                  <p className="mb-4 text-sm text-gray-600">
                     {t.social.instagramText}
                   </p>
                   <a
                     href="https://www.instagram.com/revistalafaek/"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="mt-auto inline-flex items-center justify-center rounded-full bg-[#EB5757] px-5 py-3 text-sm font-bold text-white hover:bg-red-600 transition-colors"
+                    className="mt-auto inline-flex items-center justify-center rounded-full bg-[#EB5757] px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-red-600"
                     aria-label="Visit our Instagram page (opens in a new tab)"
                   >
                     {t.social.instagramButton}
@@ -378,8 +393,8 @@ export default function HomePage(){
                 </div>
               </div>
 
-              <div className="lg:col-span-6 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden flex flex-col">
-                <div className="relative w-full h-56 md:h-72 bg-gray-100">
+              <div className="flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm lg:col-span-6">
+                <div className="relative h-56 w-full bg-gray-100 md:h-72">
                   <Image
                     src="/HomePage/LafaekWebsite.png"
                     alt="Lafaek YouTube"
@@ -390,12 +405,12 @@ export default function HomePage(){
                   />
                 </div>
 
-                <div className="p-6 flex flex-col flex-grow">
+                <div className="flex flex-grow flex-col p-6">
                   <div>
-                    <h3 className="text-2xl font-bold text-red-600 mb-2">
+                    <h3 className="mb-2 text-2xl font-bold text-red-600">
                       {t.social.youtubeTitle}
                     </h3>
-                    <p className="text-gray-600 text-sm md:text-base">
+                    <p className="text-sm text-gray-600 md:text-base">
                       {t.social.youtubeText}
                     </p>
                   </div>
@@ -405,7 +420,7 @@ export default function HomePage(){
                       href="https://www.youtube.com/@lafaek"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center justify-center rounded-full bg-red-600 px-6 py-3 text-sm font-bold text-white hover:bg-red-700 transition-colors"
+                      className="inline-flex items-center justify-center rounded-full bg-red-600 px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-red-700"
                       aria-label="Visit our YouTube channel (opens in a new tab)"
                     >
                       {t.social.youtubeButton}
@@ -415,7 +430,7 @@ export default function HomePage(){
                       href="https://www.youtube.com/@lafaek/videos"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center justify-center rounded-full border border-red-200 bg-white px-6 py-3 text-sm font-bold text-red-600 hover:bg-red-50 transition-colors"
+                      className="inline-flex items-center justify-center rounded-full border border-red-200 bg-white px-6 py-3 text-sm font-bold text-red-600 transition-colors hover:bg-red-50"
                     >
                       {t.social.youtubeSecondary}
                     </a>
@@ -424,35 +439,35 @@ export default function HomePage(){
               </div>
             </div>
 
-            <div className="mt-6 rounded-2xl bg-gradient-to-r from-[#219653] via-[#2F80ED] to-[#219653] p-6 md:p-8 text-white shadow-lg">
-              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+            <div className="mt-6 rounded-2xl bg-gradient-to-r from-[#219653] via-[#2F80ED] to-[#219653] p-6 text-white shadow-lg md:p-8">
+              <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
                 <div className="max-w-2xl">
-                  <h2 className="text-2xl md:text-3xl font-bold mb-2">
+                  <h2 className="mb-2 text-2xl font-bold md:text-3xl">
                     {t.cta.title}
                   </h2>
-                  <p className="text-sm md:text-base text-white/90">
+                  <p className="text-sm text-white/90 md:text-base">
                     {t.cta.subtitle}
                   </p>
                 </div>
 
-                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+                <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">
                   <Link
                     href="/get-involved#volunteer"
-                    className="inline-flex items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-bold text-[#219653] hover:bg-gray-100 transition-colors"
+                    className="inline-flex items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-bold text-[#219653] transition-colors hover:bg-gray-100"
                   >
                     {t.cta.volunteer}
                   </Link>
 
                   <Link
                     href="/get-involved#donate"
-                    className="inline-flex items-center justify-center rounded-full border-2 border-white px-6 py-3 text-sm font-bold text-white hover:bg-white hover:text-[#2F80ED] transition-colors"
+                    className="inline-flex items-center justify-center rounded-full border-2 border-white px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-white hover:text-[#2F80ED]"
                   >
                     {t.cta.donate}
                   </Link>
 
                   <Link
                     href="/get-involved#partner"
-                    className="inline-flex items-center justify-center rounded-full bg-[#F2C94C] px-6 py-3 text-sm font-bold text-[#333333] hover:bg-yellow-300 transition-colors"
+                    className="inline-flex items-center justify-center rounded-full bg-[#F2C94C] px-6 py-3 text-sm font-bold text-[#333333] transition-colors hover:bg-yellow-300"
                   >
                     {t.cta.partner}
                   </Link>
@@ -462,9 +477,9 @@ export default function HomePage(){
           </div>
         </section>
 
-        <section className="py-12 bg-white" aria-labelledby="home-impact-preview">
-          <div className="max-w-7xl mx-auto px-4">
-            <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-6">
+        <section className="bg-white py-12" aria-labelledby="home-impact-preview">
+          <div className="mx-auto max-w-7xl px-4">
+            <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
               <div>
                 <h2
                   id="home-impact-preview"
@@ -472,10 +487,11 @@ export default function HomePage(){
                 >
                   {t.impact.title}
                 </h2>
-                <p className="text-gray-700 mt-1">
+                <p className="mt-1 text-gray-700">
                   {t.impact.subtitle}
                 </p>
               </div>
+
               <div>
                 <Link
                   href="/stories/impact"
@@ -499,21 +515,25 @@ export default function HomePage(){
             )}
 
             {impactItems.length>0&&(
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
                 {impactItems.map((item)=>{
                   const title=L==="tet"
                     ? item.titleTet||item.titleEn
                     : item.titleEn;
+
                   const excerpt=L==="tet"
                     ? item.excerptTet||item.excerptEn
                     : item.excerptEn;
+
                   const heroImage=item.image||(Array.isArray(item.images)&&item.images[0])||undefined;
                   const imageSrc=buildImageUrl(heroImage);
                   const internalIdOrSlug=item.slug||item.id;
 
                   let dateLabel="";
+
                   if(item.date){
                     const d=new Date(item.date);
+
                     if(!Number.isNaN(d.getTime())){
                       dateLabel=d.toLocaleDateString();
                     }
@@ -522,29 +542,34 @@ export default function HomePage(){
                   return(
                     <article
                       key={item.id}
-                      className="rounded-lg border border-gray-200 bg-gray-50 p-4 flex flex-col"
+                      className="flex flex-col overflow-hidden rounded-[28px] border border-gray-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
                     >
-                      <div className="relative mb-3 h-40 w-full">
+                      <div className="relative mb-4 h-44 w-full overflow-hidden rounded-[24px] bg-gray-100">
                         <Image
                           src={imageSrc}
                           alt={title}
                           fill
-                          className="rounded object-cover"
+                          sizes="(min-width:768px) 33vw, 100vw"
+                          className="rounded-[24px] object-cover"
                         />
                       </div>
+
                       {dateLabel&&(
-                        <div className="mb-2 text-xs text-gray-500">
+                        <div className="mb-2 text-xs font-medium text-gray-500">
                           {dateLabel}
                         </div>
                       )}
-                      <h3 className="text-lg font-semibold mb-2">
+
+                      <h3 className="mb-2 text-lg font-semibold text-[#333333]">
                         {title}
                       </h3>
+
                       {excerpt&&(
-                        <p className="text-sm text-gray-700 mb-3 line-clamp-3">
+                        <p className="mb-4 line-clamp-3 text-sm leading-6 text-gray-700">
                           {excerpt}
                         </p>
                       )}
+
                       <div className="mt-auto">
                         <Link
                           href={`/stories/impact/${internalIdOrSlug}`}
@@ -561,9 +586,9 @@ export default function HomePage(){
           </div>
         </section>
 
-        <section className="py-12 bg-white">
-          <div className="max-w-7xl mx-auto px-4 flex justify-center">
-            <div className="relative w-full max-w-3xl h-64">
+        <section className="bg-white py-12">
+          <div className="mx-auto flex max-w-7xl justify-center px-4">
+            <div className="relative h-64 w-full max-w-3xl">
               <Image
                 src="/characters/0-lafaek-friends.png"
                 alt="Lafaek friends"
@@ -575,30 +600,50 @@ export default function HomePage(){
           </div>
         </section>
 
-        <section className="py-20 bg-gradient-to-br from-green-50 to-blue-50 text-center" aria-labelledby="social-enterprise">
-          <div className="max-w-7xl mx-auto px-4">
-            <h2 id="social-enterprise" className="text-4xl font-bold text-green-800 mb-4">
+        <section
+          className="bg-gradient-to-br from-green-50 to-blue-50 py-20 text-center"
+          aria-labelledby="social-enterprise"
+        >
+          <div className="mx-auto max-w-7xl px-4">
+            <h2
+              id="social-enterprise"
+              className="mb-4 text-4xl font-bold text-green-800"
+            >
               {t.socialEnterprise.title}
             </h2>
-            <p className="text-xl text-gray-700 mb-10">{t.socialEnterprise.subtitle}</p>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+
+            <p className="mb-10 text-xl text-gray-700">
+              {t.socialEnterprise.subtitle}
+            </p>
+
+            <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
               {t.socialEnterprise.stats.map((stat,index)=>(
-                <div key={index} className="bg-white shadow-md rounded-lg p-6">
-                  <div className="text-3xl font-bold text-green-700 mb-2">{stat.number}</div>
-                  <div className="text-gray-700">{stat.label}</div>
+                <div key={index} className="rounded-lg bg-white p-6 shadow-md">
+                  <div className="mb-2 text-3xl font-bold text-green-700">
+                    {stat.number}
+                  </div>
+                  <div className="text-gray-700">
+                    {stat.label}
+                  </div>
                 </div>
               ))}
             </div>
           </div>
         </section>
 
-        <section className="bg-gray-50 border-t border-gray-200 py-12" aria-labelledby="sponsors">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 id="sponsors" className="text-4xl font-bold text-[#219653] mb-8">
-              {language==="tet" ? "Ami nia Doador/Sponsor" : "Our Donors & Sponsors"}
+        <section
+          className="border-t border-gray-200 bg-gray-50 py-12"
+          aria-labelledby="sponsors"
+        >
+          <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
+            <h2
+              id="sponsors"
+              className="mb-8 text-4xl font-bold text-[#219653]"
+            >
+              {language==="tet"?"Ami nia Doador/Sponsor":"Our Donors & Sponsors"}
             </h2>
 
-            <div className="flex flex-wrap justify-center items-center gap-10">
+            <div className="flex flex-wrap items-center justify-center gap-10">
               <div className="relative h-16 w-40">
                 <Image
                   src="/sponsors/logo-mfat.jpg"
