@@ -20,6 +20,7 @@ type AdminKey =
   | "learning"
   | "news"
   | "impact"
+  | "reports"
   | "revistaMedia"
   | "careers"
 
@@ -102,6 +103,15 @@ export default function AdminHubPage() {
         titleTet: "Istória Impaktu",
         descEn: "Add impact stories and attach PDFs if needed.",
         descTet: "Hatama istória impaktu no tau PDF se presiza.",
+        allowed: canAccessAdminImpact,
+      },
+      {
+        key: "reports",
+        href: "/admin/reports",
+        titleEn: "Reports",
+        titleTet: "Relatóriu sira",
+        descEn: "Upload and manage PDF reports with title, date, short description, and category.",
+        descTet: "Upload no jere relatóriu PDF ho titulu, data, deskrisaun badak, no kategoría.",
         allowed: canAccessAdminImpact,
       },
       {
@@ -306,6 +316,36 @@ export default function AdminHubPage() {
         tipsTet: [
           "Upload no edit la auto-save.",
           "Uza archive ba item antigu sira duké delete se bele.",
+        ],
+      },
+      reports: {
+        titleEn: "How to update Reports",
+        titleTet: "Oinsá atu atualiza Relatóriu sira",
+        stepsEn: [
+          "Open the Reports admin page.",
+          "Enter the report title, date or year, category, and short description.",
+          "Upload the PDF file.",
+          "Click Upload report to save the report record.",
+          "Open the public Reports page to check that the PDF link works.",
+          "If a report should not appear anymore, delete it from the report list.",
+        ],
+        stepsTet: [
+          "Loke pájina admin Relatóriu sira.",
+          "Hatama titulu relatóriu, data ka tinan, kategoría, no deskrisaun badak.",
+          "Upload arquivo PDF.",
+          "Klik Upload report atu rai rekord relatóriu.",
+          "Loke pájina públiku Relatóriu sira atu haree se link PDF funsiona.",
+          "Se relatóriu ida la presiza mosu tan, delete husi lista relatóriu.",
+        ],
+        tipsEn: [
+          "Use clear report titles so visitors know what they are opening.",
+          "Keep descriptions short and easy to scan.",
+          "Deleting the report from the list does not delete the PDF from S3 yet.",
+        ],
+        tipsTet: [
+          "Uza titulu relatóriu ne’ebé klaru atu vizitante hatene saida mak sira sei loke.",
+          "Halo deskrisaun badak no fasil atu lee lalais.",
+          "Delete relatóriu husi lista seidauk delete PDF husi S3.",
         ],
       },
       revistaMedia: {

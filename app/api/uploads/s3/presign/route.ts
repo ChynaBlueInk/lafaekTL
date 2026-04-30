@@ -33,7 +33,8 @@ const ALLOWED_FOLDERS=[
   "careers/files",
   "books/covers",
   "books/pages",
-  "books/pdfs"
+  "books/pdfs",
+  "reports/pdfs"
 ] as const
 
 type AllowedFolder=(typeof ALLOWED_FOLDERS)[number]
