@@ -1,7 +1,7 @@
 // lib/content-team.ts
-import {S3Client, GetObjectCommand} from "@aws-sdk/client-s3";
+import {S3Client,GetObjectCommand} from "@aws-sdk/client-s3";
 
-export type MemberFile = {
+export type MemberFile={
   slug:string;
   name:string;
   role:string;
@@ -9,15 +9,15 @@ export type MemberFile = {
   photo?:string;
   sketch?:string;
   started?:string;
+  department?:string;
 };
 
 type Lang="en"|"tet";
 
-// Internal shape we will later move into a JSON file in S3
-type TeamMemberRecord = {
+type TeamMemberRecord={
+  id?:string;
   slug:string;
-  nameEn:string;
-  nameTet?:string;
+  name:string;
   roleEn:string;
   roleTet?:string;
   bioEn:string;
@@ -25,13 +25,16 @@ type TeamMemberRecord = {
   photo?:string;
   sketch?:string;
   started?:string;
+  department?:string;
   order?:number;
   visible?:boolean;
-};
 
-// ───────────────────────────────────────────────────────────
-// S3 config (server-side only)
-// ───────────────────────────────────────────────────────────
+  // Temporary compatibility while older S3 records still exist
+  nameEn?:string;
+  nameTet?:string;
+
+  [key:string]:any;
+};
 
 const REGION=process.env.AWS_REGION||"ap-southeast-2";
 const BUCKET=process.env.AWS_S3_BUCKET;
@@ -47,19 +50,15 @@ const s3=new S3Client({
     : undefined
 });
 
-// ───────────────────────────────────────────────────────────
-// Fallback local data (used if S3 is missing / broken)
-// ───────────────────────────────────────────────────────────
-
 const FALLBACK_TEAM_DATA:TeamMemberRecord[]=[
   {
     slug:"example-member",
-    nameEn:"Example Member",
-    nameTet:"Exemplu Membro",
+    name:"Example Member",
     roleEn:"Content Writer",
     roleTet:"Hakerek kontentu",
-    bioEn:"This is a sample bio in English so we can confirm the Our Team layout is working without Keystatic.",
-    bioTet:"Bio ne’e deit hanesan ezemplu iha Tetun atu haree katak pajina Our Team maka hodi halo servisu la’os Keystatic.",
+    bioEn:"This is a sample bio in English so we can confirm the Our Team layout is working.",
+    bioTet:"Bio ne’e deit hanesan ezemplu iha Tetun atu haree katak pajina Our Team maka hodi halo servisu.",
+    department:"Production",
     photo:undefined,
     sketch:undefined,
     started:"2024",
@@ -68,9 +67,36 @@ const FALLBACK_TEAM_DATA:TeamMemberRecord[]=[
   }
 ];
 
-// ───────────────────────────────────────────────────────────
-// Load team data from S3 JSON (with graceful fallback)
-// ───────────────────────────────────────────────────────────
+function safeString(value:any){
+  return typeof value==="string"?value.trim():"";
+}
+
+function getRecordName(record:Partial<TeamMemberRecord>){
+  return (
+    safeString(record.name)||
+    safeString(record.nameEn)||
+    safeString(record.nameTet)||
+    "Unnamed"
+  );
+}
+
+async function bodyToString(body:any):Promise<string>{
+  if(!body){
+    return "";
+  }
+
+  if(typeof body.transformToString==="function"){
+    return body.transformToString("utf-8");
+  }
+
+  return await new Promise<string>((resolve,reject)=>{
+    const chunks:Buffer[]=[];
+
+    body.on("data",(chunk:Buffer)=>chunks.push(chunk));
+    body.on("end",()=>resolve(Buffer.concat(chunks).toString("utf-8")));
+    body.on("error",reject);
+  });
+}
 
 async function loadTeamDataFromS3():Promise<TeamMemberRecord[]>{
   if(!BUCKET){
@@ -85,21 +111,7 @@ async function loadTeamDataFromS3():Promise<TeamMemberRecord[]>{
     });
 
     const res=await s3.send(cmd);
-
-    const body=await (async()=>{
-      const b=res.Body as any;
-      if(!b) return "";
-      if(typeof b.transformToString==="function"){
-        return b.transformToString("utf-8");
-      }
-      // Node stream fallback
-      return await new Promise<string>((resolve,reject)=>{
-        const chunks:Buffer[]=[];
-        b.on("data",(chunk:Buffer)=>chunks.push(chunk));
-        b.on("end",()=>resolve(Buffer.concat(chunks).toString("utf-8")));
-        b.on("error",reject);
-      });
-    })();
+    const body=await bodyToString(res.Body);
 
     if(!body){
       console.warn("[team] team.json empty, using fallback data");
@@ -111,29 +123,34 @@ async function loadTeamDataFromS3():Promise<TeamMemberRecord[]>{
     const arr:Array<Partial<TeamMemberRecord>>=Array.isArray(parsed)
       ? parsed
       : Array.isArray(parsed?.members)
-      ? parsed.members
-      : [];
+        ? parsed.members
+        : [];
 
     if(!arr.length){
       console.warn("[team] team.json has no members, using fallback data");
       return FALLBACK_TEAM_DATA;
     }
 
-    // Normalise and ensure required fields
-    const normalised:TeamMemberRecord[]=arr.map((raw,index)=>({
-      slug:(raw.slug as string)||`member-${index}`,
-      nameEn:(raw.nameEn as string)||"Unnamed",
-      nameTet:(raw.nameTet as string|undefined),
-      roleEn:(raw.roleEn as string)||"",
-      roleTet:(raw.roleTet as string|undefined),
-      bioEn:(raw.bioEn as string)||"",
-      bioTet:(raw.bioTet as string|undefined),
-      photo:(raw.photo as string|undefined),
-      sketch:(raw.sketch as string|undefined),
-      started:(raw.started as string|undefined),
-      order:typeof raw.order==="number"?raw.order:undefined,
-      visible:raw.visible!==false
-    }));
+    const normalised:TeamMemberRecord[]=arr.map((raw,index)=>{
+      const name=getRecordName(raw);
+
+      return {
+        ...raw,
+        id:safeString(raw.id)||undefined,
+        slug:safeString(raw.slug)||`member-${index+1}`,
+        name,
+        roleEn:safeString(raw.roleEn),
+        roleTet:safeString(raw.roleTet)||undefined,
+        bioEn:safeString(raw.bioEn),
+        bioTet:safeString(raw.bioTet)||undefined,
+        photo:safeString(raw.photo)||undefined,
+        sketch:safeString(raw.sketch)||undefined,
+        started:safeString(raw.started)||undefined,
+        department:safeString(raw.department)||"Production",
+        order:typeof raw.order==="number"?raw.order:index+1,
+        visible:raw.visible!==false
+      };
+    });
 
     return normalised;
   }catch(err){
@@ -142,29 +159,44 @@ async function loadTeamDataFromS3():Promise<TeamMemberRecord[]>{
   }
 }
 
-// ───────────────────────────────────────────────────────────
-// Public API
-// ───────────────────────────────────────────────────────────
-
 export async function getTeamMembers(lang:Lang):Promise<MemberFile[]>{
   const records=await loadTeamDataFromS3();
 
   const visibleSorted=records
-    .filter((r)=> r.visible!==false)
+    .filter((record)=>record.visible!==false)
     .sort((a,b)=>{
-      const ao=a.order??9999;
-      const bo=b.order??9999;
-      return ao-bo;
+      const departmentOrder:Record<string,number>={
+        "Senior Management Team (SMT)":1,
+        "Business Development":2,
+        "Production":3,
+        "Monitoring and Evaluation (MEL)":4,
+        "Logistics and Finance":5,
+        "Field Officers West":6,
+        "Field Officers East":7
+      };
+
+      const departmentA=departmentOrder[a.department||"Production"]??99;
+      const departmentB=departmentOrder[b.department||"Production"]??99;
+
+      if(departmentA!==departmentB){
+        return departmentA-departmentB;
+      }
+
+      const orderA=a.order??9999;
+      const orderB=b.order??9999;
+
+      return orderA-orderB;
     });
 
-  const mapped:MemberFile[]=visibleSorted.map((r)=>({
-    slug:r.slug,
-    name:lang==="tet"?(r.nameTet||r.nameEn):r.nameEn,
-    role:lang==="tet"?(r.roleTet||r.roleEn):r.roleEn,
-    bio:lang==="tet"?(r.bioTet||""):r.bioEn,
-    photo:r.photo,
-    sketch:r.sketch,
-    started:r.started
+  const mapped:MemberFile[]=visibleSorted.map((record)=>({
+    slug:record.slug,
+    name:record.name,
+    role:lang==="tet"?(record.roleTet||record.roleEn):record.roleEn,
+    bio:lang==="tet"?(record.bioTet||record.bioEn):record.bioEn,
+    photo:record.photo,
+    sketch:record.sketch,
+    started:record.started,
+    department:record.department||"Production"
   }));
 
   return mapped;
