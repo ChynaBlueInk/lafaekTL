@@ -1,31 +1,37 @@
 // app/our-team/team-client.tsx
 "use client";
 
-import {useMemo, useState} from "react";
-import {useLanguage} from "@/lib/LanguageContext";
-import {X} from "lucide-react";
-import type {MemberFile} from "@/lib/content-team";
+import {useMemo,useState}from "react";
+import {useLanguage}from "@/lib/LanguageContext";
+import {X}from "lucide-react";
+import type {MemberFile}from "@/lib/content-team";
 
 type Lang="en"|"tet";
-type Props={membersTet:MemberFile[]; membersEn:MemberFile[]};
-type Member=MemberFile&{started?:string;department?:string};
+type Props={membersTet:MemberFile[];membersEn:MemberFile[]};
+type Member=MemberFile&{started?:string;department?:string;visible?:boolean};
 
 const S3_ORIGIN="https://lafaek-media.s3.ap-southeast-2.amazonaws.com";
 
+const FALLBACK_IMAGE="/placeholder.svg?width=640&height=720";
+
 const buildS3ImageUrl=(src?:string)=>{
-  if(!src){return "/placeholder.svg?width=640&height=720";}
+  if(!src){return FALLBACK_IMAGE;}
 
-  let clean=src.trim();
+  const raw=String(src).trim();
 
-  if(clean.startsWith("http://")||clean.startsWith("https://")){
-    return clean;
+  if(!raw||raw==="undefined"||raw==="null"){
+    return FALLBACK_IMAGE;
   }
 
-  if(clean.startsWith(S3_ORIGIN)){
-    clean=clean.slice(S3_ORIGIN.length);
+  if(raw.startsWith("http://")||raw.startsWith("https://")){
+    return raw;
   }
 
-  clean=clean.replace(/^\/+/,"");
+  let clean=raw.replace(/^\/+/,"");
+
+  if(clean.startsWith("public/")){
+    clean=clean.replace(/^public\//,"");
+  }
 
   return `${S3_ORIGIN}/${clean}`;
 };
@@ -38,8 +44,20 @@ const getDepartment=(member:Member)=>{
   return member.department?.trim()||"General";
 };
 
+const getSafeName=(member:Member)=>{
+  return member.name?.trim()||"Team member";
+};
+
+const getSafeRole=(member:Member)=>{
+  return member.role?.trim()||"";
+};
+
+const getSafeBio=(member:Member)=>{
+  return member.bio?.trim()||"";
+};
+
 export default function TeamClient({membersTet,membersEn}:Props){
-  const {language}=useLanguage() as {language:Lang};
+  const {language}=useLanguage()as{language:Lang};
 
   const [active,setActive]=useState<Member|null>(null);
   const [searchTerm,setSearchTerm]=useState("");
@@ -75,9 +93,13 @@ export default function TeamClient({membersTet,membersEn}:Props){
       close:"Taka",
       clear:"Hamoos filtru"
     }
-  } as const)[language],[language]);
+  }as const)[language],[language]);
 
-  const members:Member[]=language==="tet"?membersTet:membersEn;
+  const rawMembers:Member[]=language==="tet"?membersTet:membersEn;
+
+  const members=useMemo(()=>{
+    return rawMembers.filter((member)=>member.visible!==false);
+  },[rawMembers]);
 
   const departments=useMemo(()=>{
     const unique=new Set<string>();
@@ -94,7 +116,6 @@ export default function TeamClient({membersTet,membersEn}:Props){
 
     return members.filter((member)=>{
       const department=getDepartment(member);
-
       const matchesDepartment=selectedDepartment==="all"||department===selectedDepartment;
 
       const searchableText=[
@@ -135,41 +156,49 @@ export default function TeamClient({membersTet,membersEn}:Props){
     setGroupByDepartment(false);
   };
 
+  const handleImageError=(event:React.SyntheticEvent<HTMLImageElement>)=>{
+    const image=event.currentTarget;
+
+    if(image.src.includes("placeholder.svg")){
+      return;
+    }
+
+    image.src=FALLBACK_IMAGE;
+  };
+
   const renderMemberCard=(member:Member)=>(
-    <article key={member.slug} className="group">
+    <article key={member.slug||member.name} className="group">
       <button
+        type="button"
         onClick={()=>setActive(member)}
-        className="relative block w-full aspect-[2/3] rounded-lg overflow-hidden shadow bg-white focus:outline-none focus:ring-4 focus:ring-[#2F80ED]/40 group"
-        aria-label={`Open details for ${member.name}`}
+        className="relative block w-full overflow-hidden rounded-2xl bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-[#2F80ED]/40"
+        aria-label={`Open details for ${getSafeName(member)}`}
       >
-        <div className="absolute inset-0">
+        <div className="aspect-[4/5] w-full bg-[#F5F5F5]">
           <img
             src={buildS3ImageUrl(member.photo)}
-            alt={member.name}
-            className="h-full w-full object-contain transition-opacity duration-300 group-hover:opacity-0"
+            alt={getSafeName(member)}
+            onError={handleImageError}
+            className="h-full w-full object-cover"
           />
         </div>
 
-        <div className="absolute inset-0">
-          <img
-            src={buildS3ImageUrl(member.sketch)}
-            alt={`${member.name} caricature`}
-            className="h-full w-full object-contain opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-          />
+        <div className="p-4 text-left">
+          <p className="mb-2 inline-flex rounded-full bg-[#219653]/10 px-3 py-1 text-xs font-semibold text-[#219653]">
+            {getDepartment(member)}
+          </p>
+
+          <h3 className="text-lg font-semibold text-[#333333]">
+            {getSafeName(member)}
+          </h3>
+
+          {getSafeRole(member)&&(
+            <p className="mt-1 text-sm text-[#4F4F4F]">
+              {copy.role}: {getSafeRole(member)}
+            </p>
+          )}
         </div>
       </button>
-
-      <div className="pt-4">
-        <p className="mb-2 inline-flex rounded-full bg-[#219653]/10 px-3 py-1 text-xs font-semibold text-[#219653]">
-          {getDepartment(member)}
-        </p>
-
-        <h3 className="text-lg font-semibold text-[#333333]">{member.name}</h3>
-
-        <p className="text-sm text-[#4F4F4F]">
-          {copy.role}: {member.role}
-        </p>
-      </div>
     </article>
   );
 
@@ -178,8 +207,13 @@ export default function TeamClient({membersTet,membersEn}:Props){
       <main className="flex-grow px-4 py-12">
         <div className="mx-auto max-w-7xl">
           <header className="mb-8 text-center">
-            <h1 className="text-4xl font-bold text-[#219653]">{copy.title}</h1>
-            <p className="mt-3 text-lg text-[#4F4F4F]">{copy.subtitle}</p>
+            <h1 className="text-4xl font-bold text-[#219653]">
+              {copy.title}
+            </h1>
+
+            <p className="mt-3 text-lg text-[#4F4F4F]">
+              {copy.subtitle}
+            </p>
           </header>
 
           <section className="mb-10 rounded-2xl bg-white p-4 shadow-sm md:p-6">
@@ -188,6 +222,7 @@ export default function TeamClient({membersTet,membersEn}:Props){
                 <span className="mb-2 block text-sm font-semibold text-[#333333]">
                   {copy.searchLabel}
                 </span>
+
                 <input
                   type="search"
                   value={searchTerm}
@@ -201,12 +236,14 @@ export default function TeamClient({membersTet,membersEn}:Props){
                 <span className="mb-2 block text-sm font-semibold text-[#333333]">
                   {copy.departmentLabel}
                 </span>
+
                 <select
                   value={selectedDepartment}
                   onChange={(event)=>setSelectedDepartment(event.target.value)}
                   className="w-full rounded-xl border border-[#BDBDBD] bg-white px-4 py-3 text-[#333333] outline-none focus:border-[#2F80ED] focus:ring-2 focus:ring-[#2F80ED]/20"
                 >
                   <option value="all">{copy.allDepartments}</option>
+
                   {departments.map((department)=>(
                     <option key={department} value={department}>
                       {department}
@@ -224,6 +261,7 @@ export default function TeamClient({membersTet,membersEn}:Props){
                   onChange={(event)=>setGroupByDepartment(event.target.checked)}
                   className="h-4 w-4 rounded border-[#BDBDBD] accent-[#219653]"
                 />
+
                 {copy.groupLabel}
               </label>
 
@@ -241,27 +279,32 @@ export default function TeamClient({membersTet,membersEn}:Props){
 
           {filteredMembers.length===0?(
             <div className="rounded-2xl bg-white p-8 text-center shadow-sm">
-              <p className="text-[#4F4F4F]">{copy.noResults}</p>
+              <p className="text-[#4F4F4F]">
+                {copy.noResults}
+              </p>
             </div>
           ):groupByDepartment?(
             <div className="space-y-12">
               {groupedMembers.map(([department,departmentMembers])=>(
                 <section key={department}>
                   <div className="mb-5 flex items-center gap-3">
-                    <h2 className="text-2xl font-bold text-[#219653]">{department}</h2>
-                    <span className="rounded-full bg-[#F5F5F5] px-3 py-1 text-sm text-[#4F4F4F]">
+                    <h2 className="text-2xl font-bold text-[#219653]">
+                      {department}
+                    </h2>
+
+                    <span className="rounded-full bg-white px-3 py-1 text-sm text-[#4F4F4F]">
                       {departmentMembers.length}
                     </span>
                   </div>
 
-                  <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
+                  <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
                     {departmentMembers.map((member)=>renderMemberCard(member))}
                   </div>
                 </section>
               ))}
             </div>
           ):(
-            <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
               {filteredMembers.map((member)=>renderMemberCard(member))}
             </div>
           )}
@@ -275,8 +318,9 @@ export default function TeamClient({membersTet,membersEn}:Props){
           aria-modal="true"
           aria-labelledby="member-title"
         >
-          <div className="relative flex max-h-[90vh] w-full max-w-3xl flex-col rounded-2xl bg-white shadow-2xl">
+          <div className="relative flex max-h-[90vh] w-full max-w-3xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
             <button
+              type="button"
               onClick={()=>setActive(null)}
               className="absolute right-3 top-3 z-20 rounded-full bg-white/90 p-2 shadow hover:bg-white"
               aria-label={copy.close}
@@ -285,11 +329,12 @@ export default function TeamClient({membersTet,membersEn}:Props){
             </button>
 
             <div className="grid md:grid-cols-2">
-              <div className="relative z-0 flex h-64 min-h-[280px] items-center justify-center bg-white md:h-full">
+              <div className="relative z-0 flex h-72 min-h-[280px] items-center justify-center bg-[#F5F5F5] md:h-full">
                 <img
                   src={buildS3ImageUrl(active.photo)}
-                  alt={active.name}
-                  className="max-h-full w-full object-contain"
+                  alt={getSafeName(active)}
+                  onError={handleImageError}
+                  className="h-full w-full object-cover"
                 />
               </div>
 
@@ -299,20 +344,27 @@ export default function TeamClient({membersTet,membersEn}:Props){
                 </p>
 
                 <h2 id="member-title" className="text-2xl font-bold text-[#219653]">
-                  {active.name}
+                  {getSafeName(active)}
                 </h2>
 
-                <p className="mt-1 text-sm text-[#4F4F4F]">
-                  <span className="font-semibold">{copy.role}:</span> {active.role}
-                </p>
+                {getSafeRole(active)&&(
+                  <p className="mt-1 text-sm text-[#4F4F4F]">
+                    <span className="font-semibold">{copy.role}:</span>{" "}
+                    {getSafeRole(active)}
+                  </p>
+                )}
 
-                <h3 className="mt-4 text-lg font-semibold text-[#2F80ED]">
-                  {copy.about}
-                </h3>
+                {getSafeBio(active)&&(
+                  <>
+                    <h3 className="mt-4 text-lg font-semibold text-[#2F80ED]">
+                      {copy.about}
+                    </h3>
 
-                <p className="mt-1 leading-relaxed text-[#4F4F4F]">
-                  {active.bio}
-                </p>
+                    <p className="mt-1 leading-relaxed text-[#4F4F4F]">
+                      {getSafeBio(active)}
+                    </p>
+                  </>
+                )}
               </div>
             </div>
           </div>

@@ -56,7 +56,7 @@ const emptyMember=(nextOrder:number):TeamMember=>({
   sketch:"",
   started:"",
   department:"Production",
-  visible:false,
+  visible:true,
   order:nextOrder
 })
 
