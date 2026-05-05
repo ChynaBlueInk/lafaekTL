@@ -8,14 +8,27 @@ import type {MemberFile}from "@/lib/content-team";
 
 type Lang="en"|"tet";
 type Props={membersTet:MemberFile[];membersEn:MemberFile[]};
-type Member=MemberFile&{started?:string;department?:string;visible?:boolean};
+
+type Member=MemberFile&{
+  id?:string;
+  slug?:string;
+  started?:string;
+  department?:string;
+  visible?:boolean;
+  photo?:string;
+  name?:string;
+  role?:string;
+  bio?:string;
+    order?:number;
+};
 
 const S3_ORIGIN="https://lafaek-media.s3.ap-southeast-2.amazonaws.com";
-
 const FALLBACK_IMAGE="/placeholder.svg?width=640&height=720";
 
 const buildS3ImageUrl=(src?:string)=>{
-  if(!src){return FALLBACK_IMAGE;}
+  if(!src){
+    return FALLBACK_IMAGE;
+  }
 
   const raw=String(src).trim();
 
@@ -24,16 +37,20 @@ const buildS3ImageUrl=(src?:string)=>{
   }
 
   if(raw.startsWith("http://")||raw.startsWith("https://")){
-    return raw;
+    return raw
+      .replace("https://lafaek-media.s3.ap-southeast-2.amazonaws.com//","https://lafaek-media.s3.ap-southeast-2.amazonaws.com/")
+      .replace(/\s/g,"%20");
   }
 
-  let clean=raw.replace(/^\/+/,"");
+  let clean=raw
+    .replace(/^\/+/,"")
+    .replace(/^public\//,"");
 
-  if(clean.startsWith("public/")){
-    clean=clean.replace(/^public\//,"");
+  if(clean.startsWith("uploads/uploads/")){
+    clean=clean.replace(/^uploads\/uploads\//,"uploads/");
   }
 
-  return `${S3_ORIGIN}/${clean}`;
+  return `${S3_ORIGIN}/${clean}`.replace(/\s/g,"%20");
 };
 
 const normaliseText=(value?:string)=>{
@@ -98,7 +115,9 @@ export default function TeamClient({membersTet,membersEn}:Props){
   const rawMembers:Member[]=language==="tet"?membersTet:membersEn;
 
   const members=useMemo(()=>{
-    return rawMembers.filter((member)=>member.visible!==false);
+    return rawMembers
+      .filter((member)=>member.visible!==false)
+      .sort((a,b)=>(a.order||999)-(b.order||999));
   },[rawMembers]);
 
   const departments=useMemo(()=>{
@@ -167,7 +186,7 @@ export default function TeamClient({membersTet,membersEn}:Props){
   };
 
   const renderMemberCard=(member:Member)=>(
-    <article key={member.slug||member.name} className="group">
+    <article key={member.slug||member.id||member.name} className="group">
       <button
         type="button"
         onClick={()=>setActive(member)}
