@@ -433,32 +433,44 @@ export default function Navigation(){
     ...(canAccessAdmin?[{key:"admin" as const,label:t.admin,group:t.groups.admin}]:[])
   ];
 
-  const renderLanguageButtons=()=>(
+  const renderLanguageToggle=()=>{
+  const languageOptions:[Lang,string,string][]= [
+    ["tet","TET","Troka lian ba Tetun"],
+    ["en","EN","Switch language to English"]
+  ];
+
+  return(
     <div
       role="group"
-      aria-label="Language selection"
-      className="flex items-center gap-1 rounded-full bg-white/10 p-1"
+      aria-label="Language selector"
+      className="inline-flex min-h-10 overflow-hidden rounded-full border border-white/70 bg-white p-1 shadow-sm"
     >
-      {(["en","tet"] as const).map((lang)=>(
-        <button
-          key={lang}
-          type="button"
-          onClick={()=>{
-            setLanguage(lang);
-            setOpenMenu(null);
-          }}
-          aria-pressed={language===lang}
-          className={`rounded-full px-3 py-1 text-xs font-black transition ${
-            language===lang
-              ?"bg-[#F2C94C] text-[#1B7F46]"
-              :"text-white hover:bg-white/15"
-          }`}
-        >
-          {lang==="en"?t.en:t.tet}
-        </button>
-      ))}
+      {languageOptions.map(([value,label,ariaLabel])=>{
+        const active=L===value;
+
+        return(
+          <button
+            key={value}
+            type="button"
+            onClick={()=>{
+              setLanguage(value);
+              setOpenMenu(null);
+            }}
+            aria-label={ariaLabel}
+            aria-pressed={active}
+            className={`min-h-8 min-w-12 rounded-full px-3 text-sm font-black transition focus:outline-none focus:ring-2 focus:ring-[#F2C94C] ${
+              active
+                ?"bg-[#F2C94C] text-[#333333] shadow-sm"
+                :"bg-white text-[#1B7F46] hover:bg-[#EAF8F0]"
+            }`}
+          >
+            {label}
+          </button>
+        );
+      })}
     </div>
   );
+};
 
   const renderMegaMenu=(group:NavGroup)=>(
     <div className="absolute left-1/2 top-full z-[10000] mt-4 w-[min(960px,calc(100vw-2rem))] -translate-x-1/2 rounded-3xl border border-gray-200 bg-white p-6 shadow-2xl">
@@ -617,7 +629,7 @@ export default function Navigation(){
         </div>
 
         <div className="hidden items-center gap-3 lg:flex">
-          {renderLanguageButtons()}
+          {renderLanguageToggle()}
 
           {isSignedIn?(
             <>
@@ -659,57 +671,7 @@ export default function Navigation(){
         </button>
       </nav>
 
-      {isSignedIn&&(
-        <div className="hidden border-t border-white/15 bg-[#1B7F46] lg:block">
-          <div className="mx-auto flex max-w-7xl items-center gap-2 px-4 py-2 lg:px-6">
-            <span className="mr-2 text-xs font-bold uppercase tracking-wide text-white/70">
-              {t.memberArea}
-            </span>
 
-            <Link
-              href="/learning"
-              className="rounded-full px-3 py-1.5 text-sm font-bold text-white hover:bg-white/10 hover:text-[#F2C94C]"
-            >
-              {L==="tet"?"Aprendizajen":"Learning"}
-            </Link>
-
-            <Link
-              href="/friends-of-lafaek"
-              className="rounded-full px-3 py-1.5 text-sm font-bold text-white hover:bg-white/10 hover:text-[#F2C94C]"
-            >
-              {L==="tet"?"Belun Lafaek":"Friends of Lafaek"}
-            </Link>
-
-            <Link
-              href="/careers"
-              className="rounded-full px-3 py-1.5 text-sm font-bold text-white hover:bg-white/10 hover:text-[#F2C94C]"
-            >
-              {L==="tet"?"Karreira":"Careers"}
-            </Link>
-
-            <Link
-              href="/revista-media"
-              className="rounded-full px-3 py-1.5 text-sm font-bold text-white hover:bg-white/10 hover:text-[#F2C94C]"
-            >
-              {L==="tet"?"Vídeu":"Videos"}
-            </Link>
-
-            <Link
-              href="/services"
-              className="rounded-full px-3 py-1.5 text-sm font-bold text-white hover:bg-white/10 hover:text-[#F2C94C]"
-            >
-              {L==="tet"?"Servisu":"Services"}
-            </Link>
-
-            <Link
-              href="/temp/books"
-              className="rounded-full px-3 py-1.5 text-sm font-bold text-white hover:bg-white/10 hover:text-[#F2C94C]"
-            >
-              {L==="tet"?"Livru sira":"Books"}
-            </Link>
-          </div>
-        </div>
-      )}
 
       {mobileOpen&&(
         <div
@@ -717,7 +679,7 @@ export default function Navigation(){
           className="relative z-[10000] border-t border-white/15 bg-[#219653] px-4 pb-5 pt-3 shadow-lg lg:hidden"
         >
           <div className="mb-3 flex items-center justify-between gap-3 px-1">
-            {renderLanguageButtons()}
+            {renderLanguageToggle()}
 
             {isSignedIn?(
               <button
@@ -745,42 +707,6 @@ export default function Navigation(){
           )}
 
           {visibleMenus.map((menu)=>renderMobileGroup(menu))}
-
-          {isSignedIn&&(
-            <div className="mt-4 rounded-2xl bg-white/10 p-3">
-              <p className="mb-2 px-1 text-xs font-bold uppercase tracking-wide text-white/70">
-                {t.memberArea}
-              </p>
-
-              {[
-                {href:"/learning",label:L==="tet"?"Aprendizajen":"Learning"},
-                {href:"/friends-of-lafaek",label:L==="tet"?"Belun Lafaek":"Friends of Lafaek"},
-                {href:"/careers",label:L==="tet"?"Karreira":"Careers"},
-                {href:"/revista-media",label:L==="tet"?"Vídeu":"Videos"},
-                {href:"/services",label:L==="tet"?"Servisu":"Services"},
-                {href:"/temp/books",label:L==="tet"?"Livru sira":"Books"}
-              ].map((item)=>(
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={closeMenus}
-                  className="block rounded-xl px-4 py-3 text-sm font-bold text-white hover:bg-white/10"
-                >
-                  {item.label}
-                </Link>
-              ))}
-
-              {canAccessAdmin&&(
-                <Link
-                  href="/admin"
-                  onClick={closeMenus}
-                  className="block rounded-xl px-4 py-3 text-sm font-bold text-white hover:bg-white/10"
-                >
-                  {t.admin}
-                </Link>
-              )}
-            </div>
-          )}
         </div>
       )}
     </header>

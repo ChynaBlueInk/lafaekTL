@@ -1,9 +1,13 @@
 // components/LanguageProvider.tsx
-"use client"
+"use client";
 
-import { LanguageProvider, useLanguage } from "@/lib/LanguageContext"
-export { LanguageProvider, useLanguage }
-export type { Lang } from "@/lib/LanguageContext"
+import {
+  LanguageProvider,
+  useLanguage,
+} from "@/lib/LanguageContext";
 
-// Optional: keep backward compatibility if anything still imports/useLang
-export const useLang = useLanguage
+export {LanguageProvider,useLanguage};
+
+export const useLang = useLanguage;
+
+export type Lang = "tet" | "en";

@@ -8,6 +8,8 @@ import Image from "next/image";
 import Link from "next/link";
 
 const S3_ORIGIN="https://lafaek-media.s3.ap-southeast-2.amazonaws.com";
+const YOUTUBE_CHANNEL_URL="https://www.youtube.com/@lafaek";
+const YOUTUBE_VIDEOS_URL="https://www.youtube.com/@lafaek/videos";
 
 type ImpactItem={
   id:string;
@@ -17,6 +19,8 @@ type ImpactItem={
   excerptEn:string;
   excerptTet?:string;
   date:string;
+  createdAt?:string;
+  updatedAt?:string;
   image?:string;
   images?:string[];
   visible?:boolean;
@@ -44,6 +48,24 @@ const buildImageUrl=(src?:string)=>{
   clean=clean.replace(/^\/+/,"");
 
   return `${S3_ORIGIN}/${clean}`;
+};
+
+const getImpactTimestamp=(item:ImpactItem)=>{
+  const possibleDates=[item.updatedAt,item.createdAt,item.date];
+
+  for(const value of possibleDates){
+    if(!value){
+      continue;
+    }
+
+    const timestamp=new Date(value).getTime();
+
+    if(!Number.isNaN(timestamp)){
+      return timestamp;
+    }
+  }
+
+  return 0;
 };
 
 export default function HomePage(){
@@ -255,7 +277,15 @@ export default function HomePage(){
               ? raw.excerptTet
               : undefined;
 
-            const date=String(raw.date??"");
+            const date=String(raw.date??raw.createdAt??raw.updatedAt??"");
+
+            const createdAt=typeof raw.createdAt==="string"
+              ? raw.createdAt
+              : undefined;
+
+            const updatedAt=typeof raw.updatedAt==="string"
+              ? raw.updatedAt
+              : undefined;
 
             const rawImages=Array.isArray(raw.images)
               ? raw.images.filter((img:any)=>typeof img==="string"&&img.trim())
@@ -282,6 +312,8 @@ export default function HomePage(){
               excerptEn,
               excerptTet,
               date,
+              createdAt,
+              updatedAt,
               image:primaryImage,
               images:rawImages,
               visible,
@@ -291,11 +323,10 @@ export default function HomePage(){
           .filter((item)=>item.visible!==false);
 
         items.sort((a,b)=>{
-          const da=a.date?new Date(a.date).getTime():0;
-          const db=b.date?new Date(b.date).getTime():0;
+          const newestFirst=getImpactTimestamp(b)-getImpactTimestamp(a);
 
-          if(db!==da){
-            return db-da;
+          if(newestFirst!==0){
+            return newestFirst;
           }
 
           const oa=a.order??0;
@@ -394,16 +425,27 @@ export default function HomePage(){
               </div>
 
               <div className="flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm lg:col-span-6">
-                <div className="relative h-56 w-full bg-gray-100 md:h-72">
+                <a
+                  href={YOUTUBE_VIDEOS_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group relative block aspect-video w-full overflow-hidden bg-gray-100"
+                  aria-label="Open Lafaek YouTube videos in a new tab"
+                >
                   <Image
                     src="/HomePage/LafaekWebsite.png"
-                    alt="Lafaek YouTube"
+                    alt="Lafaek YouTube videos"
                     fill
                     sizes="(min-width:1024px) 50vw, 100vw"
-                    className="object-cover"
+                    className="object-cover transition duration-300 group-hover:scale-105"
                     priority
                   />
-                </div>
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/25">
+                    <span className="rounded-full bg-red-600 px-6 py-3 text-sm font-black text-white shadow-lg transition group-hover:bg-red-700 md:text-base">
+                      ▶ {t.social.youtubeButton}
+                    </span>
+                  </div>
+                </a>
 
                 <div className="flex flex-grow flex-col p-6">
                   <div>
@@ -417,7 +459,7 @@ export default function HomePage(){
 
                   <div className="mt-6 flex flex-wrap gap-3">
                     <a
-                      href="https://www.youtube.com/@lafaek"
+                      href={YOUTUBE_CHANNEL_URL}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center justify-center rounded-full bg-red-600 px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-red-700"
@@ -427,7 +469,7 @@ export default function HomePage(){
                     </a>
 
                     <a
-                      href="https://www.youtube.com/@lafaek/videos"
+                      href={YOUTUBE_VIDEOS_URL}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center justify-center rounded-full border border-red-200 bg-white px-6 py-3 text-sm font-bold text-red-600 transition-colors hover:bg-red-50"

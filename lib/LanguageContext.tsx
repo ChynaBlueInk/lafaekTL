@@ -1,63 +1,76 @@
-"use client"
+"use client";
 
-import {createContext,useContext,useEffect,useMemo,useState,type ReactNode} from "react"
+import {createContext,useContext,useEffect,useMemo,useState}from "react";
 
-export type Lang="en"|"tet"
+type Language="tet"|"en";
 
-type Ctx={
-  language:Lang
-  setLanguage:(l:Lang)=>void
-}
+type LanguageContextValue={
+  language:Language;
+  setLanguage:(language:Language)=>void;
+  toggleLanguage:()=>void;
+};
 
-const LanguageContext=createContext<Ctx|null>(null)
+const LANGUAGE_STORAGE_KEY="lafaek-language";
 
-export function LanguageProvider({children}:{children:ReactNode}){
-  // Always start the same on server + client to avoid hydration mismatch
-  const[language,setLanguageState]=useState<Lang>("tet")
+const LanguageContext=createContext<LanguageContextValue|undefined>(undefined);
 
-  const setLanguage=(l:Lang)=>{
-    setLanguageState(l)
-    try{
-      window.localStorage.setItem("lafaek:lang",l)
-    }catch{}
-    window.dispatchEvent(new CustomEvent("lafaek:language-change",{detail:l}))
-  }
-
-  // After mount, sync from localStorage (client-only)
-  useEffect(()=>{
-    try{
-      const saved=window.localStorage.getItem("lafaek:lang")
-      if(saved==="en"||saved==="tet"){
-        setLanguageState(saved as Lang)
-      }
-    }catch{}
-  },[])
+export function LanguageProvider({children}:{children:React.ReactNode}){
+  const[language,setLanguageState]=useState<Language>("tet");
+  const[hasMounted,setHasMounted]=useState(false);
 
   useEffect(()=>{
-    const onCustom=(e:Event)=>{
-      const l=(e as CustomEvent).detail as Lang
-      if(l==="en"||l==="tet") setLanguageState(l)
-    }
-    const onStorage=(e:StorageEvent)=>{
-      if(e.key==="lafaek:lang"&&(e.newValue==="en"||e.newValue==="tet")){
-        setLanguageState(e.newValue as Lang)
+    setHasMounted(true);
+
+    try{
+      const savedLanguage=window.localStorage.getItem(LANGUAGE_STORAGE_KEY);
+
+      if(savedLanguage==="en"||savedLanguage==="tet"){
+        setLanguageState(savedLanguage);
+      }else{
+        window.localStorage.setItem(LANGUAGE_STORAGE_KEY,"tet");
       }
+    }catch{
+      setLanguageState("tet");
     }
-    window.addEventListener("lafaek:language-change",onCustom as EventListener)
-    window.addEventListener("storage",onStorage)
-    return()=>{
-      window.removeEventListener("lafaek:language-change",onCustom as EventListener)
-      window.removeEventListener("storage",onStorage)
+  },[]);
+
+  const setLanguage=(nextLanguage:Language)=>{
+    setLanguageState(nextLanguage);
+
+    try{
+      window.localStorage.setItem(LANGUAGE_STORAGE_KEY,nextLanguage);
+      document.documentElement.lang=nextLanguage;
+    }catch{}
+  };
+
+  const toggleLanguage=()=>{
+    setLanguage(language==="tet"?"en":"tet");
+  };
+
+  useEffect(()=>{
+    if(hasMounted){
+      document.documentElement.lang=language;
     }
-  },[])
+  },[hasMounted,language]);
 
-  const value=useMemo(()=>({language,setLanguage}),[language])
+  const value=useMemo(
+    () => ({language,setLanguage,toggleLanguage}),
+    [language]
+  );
 
-  return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>
+  return(
+    <LanguageContext.Provider value={value}>
+      {children}
+    </LanguageContext.Provider>
+  );
 }
 
 export function useLanguage(){
-  const ctx=useContext(LanguageContext)
-  if(!ctx) throw new Error("useLanguage must be used within LanguageProvider")
-  return ctx
+  const context=useContext(LanguageContext);
+
+  if(!context){
+    throw new Error("useLanguage must be used inside LanguageProvider");
+  }
+
+  return context;
 }
