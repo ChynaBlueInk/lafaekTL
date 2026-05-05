@@ -49,7 +49,7 @@ export default function TeamClient({membersTet,membersEn}:Props){
   const copy=useMemo(() => ({
     en:{
       title:"Our Team",
-      subtitle:"Meet the people behind Lafaek — designers, educators, writers and production teams working across Timor-Leste.",
+      subtitle:"Meet the people behind Lafaek — teams working across Timor-Leste.",
       searchLabel:"Search team members",
       searchPlaceholder:"Search by name, role, department or bio...",
       departmentLabel:"Department",
@@ -63,7 +63,7 @@ export default function TeamClient({membersTet,membersEn}:Props){
     },
     tet:{
       title:"Ami-nia Ekipá",
-      subtitle:"Hasoru ema sira ne’ebé hala’o Lafaek — dezenhadór, edukadór, hakerek-na’in, no ekipa produsaun sira iha Timor-Leste tomak.",
+      subtitle:"Hasoru ema sira ne’ebé hala’o Lafaek — ekipa sira iha Timor-Leste tomak.",
       searchLabel:"Buka membru ekipa",
       searchPlaceholder:"Buka tuir naran, kargu, departamentu ka bio...",
       departmentLabel:"Departamentu",
