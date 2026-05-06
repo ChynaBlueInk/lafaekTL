@@ -3,7 +3,7 @@
 
 import {useMemo,useState}from "react";
 import {useLanguage}from "@/lib/LanguageContext";
-import {X}from "lucide-react";
+import {ChevronDown,X}from "lucide-react";
 import type {MemberFile}from "@/lib/content-team";
 
 type Lang="en"|"tet";
@@ -19,11 +19,30 @@ type Member=MemberFile&{
   name?:string;
   role?:string;
   bio?:string;
-    order?:number;
+  order?:number;
 };
 
 const S3_ORIGIN="https://lafaek-media.s3.ap-southeast-2.amazonaws.com";
 const FALLBACK_IMAGE="/placeholder.svg?width=640&height=720";
+
+const SENIOR_MANAGEMENT="Senior Management Team (SMT)";
+
+const DEPARTMENT_ORDER=[
+  SENIOR_MANAGEMENT,
+  "Business Development",
+  "Production",
+  "Monitoring and Evaluation (MEL)",
+  "Logistics and Finance",
+  "Field Officers West",
+  "Field Officers East",
+  "General"
+];
+
+const getDepartmentOrder=(department:string)=>{
+  const index=DEPARTMENT_ORDER.indexOf(department);
+
+  return index===-1?999:index;
+};
 
 const buildS3ImageUrl=(src?:string)=>{
   if(!src){
@@ -79,7 +98,8 @@ export default function TeamClient({membersTet,membersEn}:Props){
   const [active,setActive]=useState<Member|null>(null);
   const [searchTerm,setSearchTerm]=useState("");
   const [selectedDepartment,setSelectedDepartment]=useState("all");
-  const [groupByDepartment,setGroupByDepartment]=useState(false);
+  const [groupByDepartment,setGroupByDepartment]=useState(true);
+  const [openDepartments,setOpenDepartments]=useState<string[]>([SENIOR_MANAGEMENT]);
 
   const copy=useMemo(() => ({
     en:{
@@ -94,7 +114,9 @@ export default function TeamClient({membersTet,membersEn}:Props){
       role:"Role",
       about:"About",
       close:"Close",
-      clear:"Clear filters"
+      clear:"Clear filters",
+      openTeam:"Open team",
+      closeTeam:"Close team"
     },
     tet:{
       title:"Ami-nia Ekipá",
@@ -108,7 +130,9 @@ export default function TeamClient({membersTet,membersEn}:Props){
       role:"Kargu",
       about:"Kona-ba",
       close:"Taka",
-      clear:"Hamoos filtru"
+      clear:"Hamoos filtru",
+      openTeam:"Loke ekipa",
+      closeTeam:"Taka ekipa"
     }
   }as const)[language],[language]);
 
@@ -117,7 +141,18 @@ export default function TeamClient({membersTet,membersEn}:Props){
   const members=useMemo(()=>{
     return rawMembers
       .filter((member)=>member.visible!==false)
-      .sort((a,b)=>(a.order||999)-(b.order||999));
+      .sort((a,b)=>{
+        const departmentA=getDepartment(a);
+        const departmentB=getDepartment(b);
+        const departmentOrderA=getDepartmentOrder(departmentA);
+        const departmentOrderB=getDepartmentOrder(departmentB);
+
+        if(departmentOrderA!==departmentOrderB){
+          return departmentOrderA-departmentOrderB;
+        }
+
+        return (a.order||999)-(b.order||999);
+      });
   },[rawMembers]);
 
   const departments=useMemo(()=>{
@@ -127,7 +162,16 @@ export default function TeamClient({membersTet,membersEn}:Props){
       unique.add(getDepartment(member));
     });
 
-    return Array.from(unique).sort((a,b)=>a.localeCompare(b));
+    return Array.from(unique).sort((a,b)=>{
+      const orderA=getDepartmentOrder(a);
+      const orderB=getDepartmentOrder(b);
+
+      if(orderA!==orderB){
+        return orderA-orderB;
+      }
+
+      return a.localeCompare(b);
+    });
   },[members]);
 
   const filteredMembers=useMemo(()=>{
@@ -164,7 +208,16 @@ export default function TeamClient({membersTet,membersEn}:Props){
       groups[department].push(member);
     });
 
-    return Object.entries(groups).sort(([a],[b])=>a.localeCompare(b));
+    return Object.entries(groups).sort(([a],[b])=>{
+      const orderA=getDepartmentOrder(a);
+      const orderB=getDepartmentOrder(b);
+
+      if(orderA!==orderB){
+        return orderA-orderB;
+      }
+
+      return a.localeCompare(b);
+    });
   },[filteredMembers]);
 
   const hasActiveFilters=searchTerm.trim()!==""||selectedDepartment!=="all"||groupByDepartment;
@@ -172,7 +225,18 @@ export default function TeamClient({membersTet,membersEn}:Props){
   const clearFilters=()=>{
     setSearchTerm("");
     setSelectedDepartment("all");
-    setGroupByDepartment(false);
+    setGroupByDepartment(true);
+    setOpenDepartments([SENIOR_MANAGEMENT]);
+  };
+
+  const toggleDepartment=(department:string)=>{
+    setOpenDepartments((prev)=>{
+      if(prev.includes(department)){
+        return prev.filter((item)=>item!==department);
+      }
+
+      return [...prev,department];
+    });
   };
 
   const handleImageError=(event:React.SyntheticEvent<HTMLImageElement>)=>{
@@ -303,24 +367,48 @@ export default function TeamClient({membersTet,membersEn}:Props){
               </p>
             </div>
           ):groupByDepartment?(
-            <div className="space-y-12">
-              {groupedMembers.map(([department,departmentMembers])=>(
-                <section key={department}>
-                  <div className="mb-5 flex items-center gap-3">
-                    <h2 className="text-2xl font-bold text-[#219653]">
-                      {department}
-                    </h2>
+            <div className="space-y-6">
+              {groupedMembers.map(([department,departmentMembers])=>{
+                const forcedOpen=selectedDepartment!=="all";
+                const isOpen=forcedOpen||openDepartments.includes(department);
 
-                    <span className="rounded-full bg-white px-3 py-1 text-sm text-[#4F4F4F]">
-                      {departmentMembers.length}
-                    </span>
-                  </div>
+                return (
+                  <section key={department} className="overflow-hidden rounded-2xl bg-white shadow-sm">
+                    <button
+                      type="button"
+                      onClick={()=>toggleDepartment(department)}
+                      disabled={forcedOpen}
+                      className="flex w-full items-center justify-between gap-4 border-b border-[#F5F5F5] px-5 py-4 text-left hover:bg-[#F5F5F5] disabled:cursor-default disabled:hover:bg-white"
+                    >
+                      <div>
+                        <h2 className="text-2xl font-bold text-[#219653]">
+                          {department}
+                        </h2>
 
-                  <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-                    {departmentMembers.map((member)=>renderMemberCard(member))}
-                  </div>
-                </section>
-              ))}
+                        <p className="mt-1 text-sm text-[#4F4F4F]">
+                          {departmentMembers.length} {departmentMembers.length===1?"member":"members"}
+                        </p>
+                      </div>
+
+                      {!forcedOpen&&(
+                        <span className="flex items-center gap-2 rounded-full border border-[#219653] px-3 py-2 text-sm font-semibold text-[#219653]">
+                          {isOpen?copy.closeTeam:copy.openTeam}
+
+                          <ChevronDown
+                            className={`h-4 w-4 transition ${isOpen?"rotate-180":""}`}
+                          />
+                        </span>
+                      )}
+                    </button>
+
+                    {isOpen&&(
+                      <div className="grid gap-8 p-5 sm:grid-cols-2 lg:grid-cols-4">
+                        {departmentMembers.map((member)=>renderMemberCard(member))}
+                      </div>
+                    )}
+                  </section>
+                );
+              })}
             </div>
           ):(
             <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">

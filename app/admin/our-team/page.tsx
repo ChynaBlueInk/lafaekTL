@@ -43,7 +43,6 @@ const DEPARTMENT_ORDER:Record<string,number>={
   "Field Officers West":6,
   "Field Officers East":7
 }
-
 const emptyMember=(nextOrder:number):TeamMember=>({
   id:`temp-${Date.now()}-${Math.random().toString(16).slice(2)}`,
   slug:"",
@@ -455,21 +454,25 @@ export default function OurTeamAdminPage(){
     setIsModalOpen(true)
   }
 
-  const closeModal=()=>{
-    if(canEdit&&modalDirty){
-      const confirmed=window.confirm("Discard changes in this popup?")
+const resetModal=()=>{
+  setIsModalOpen(false)
+  setModalDraft(null)
+  setModalIndex(null)
+  setModalMode("view")
+  setModalDirty(false)
+}
 
-      if(!confirmed){
-        return
-      }
+const closeModal=()=>{
+  if(canEdit&&modalDirty){
+    const confirmed=window.confirm("Discard changes in this popup?")
+
+    if(!confirmed){
+      return
     }
-
-    setIsModalOpen(false)
-    setModalDraft(null)
-    setModalIndex(null)
-    setModalMode("view")
-    setModalDirty(false)
   }
+
+  resetModal()
+}
 
   const updateDraftField=(field:keyof TeamMember,value:any)=>{
     setModalDraft((prev)=>{
@@ -486,73 +489,77 @@ export default function OurTeamAdminPage(){
     setModalDirty(true)
   }
 
-  const applyModalChanges=()=>{
-    if(!modalDraft){
-      return
-    }
-
-    const trimmedName=getName(modalDraft).trim()
-    const trimmedDepartment=getDepartment(modalDraft).trim()||"Production"
-
-    if(!trimmedName){
-      setError("Each member must have a name.")
-      return
-    }
-
-    if(!trimmedDepartment){
-      setError("Each member must have a department.")
-      return
-    }
-
-    const cleaned:TeamMember={
-      ...modalDraft,
-      name:trimmedName,
-      department:trimmedDepartment
-    }
-
-    if(modalMode==="create"){
-      setMembers((prev)=>{
-        const updated=[...prev,cleaned]
-        return updated.map((member,index)=>({
-          ...member,
-          order:index+1
-        }))
-      })
-
-      markChanged()
-      setMessage("New member added locally. Click Save Changes to publish.")
-      setModalDirty(false)
-      closeModal()
-      return
-    }
-
-    if(modalMode==="edit"&&modalIndex!==null){
-      setMembers((prev)=>{
-        if(modalIndex<0||modalIndex>=prev.length){
-          return prev
-        }
-
-        const copy=[...prev]
-        const existing=copy[modalIndex]
-
-        if(!existing){
-          return prev
-        }
-
-        copy[modalIndex]={
-          ...existing,
-          ...cleaned
-        }
-
-        return copy
-      })
-
-      markChanged()
-      setMessage("Member updated locally. Click Save Changes to publish.")
-      setModalDirty(false)
-      closeModal()
-    }
+ const applyModalChanges=()=>{
+  if(!modalDraft){
+    return
   }
+function makeSlug(value:string){
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g,"")
+    .replace(/\s+/g,"-")
+    .replace(/-+/g,"-")
+    .replace(/^-+|-+$/g,"")
+}
+  const cleaned:TeamMember={
+    ...modalDraft,
+slug:modalDraft.slug?.trim()||makeSlug(modalDraft.name||"team-member"),
+    name:modalDraft.name?.trim()||"Team member",
+    roleEn:modalDraft.roleEn?.trim()||"",
+    roleTet:modalDraft.roleTet?.trim()||"",
+    bioEn:modalDraft.bioEn?.trim()||"",
+    bioTet:modalDraft.bioTet?.trim()||"",
+    photo:modalDraft.photo?.trim()||"",
+    sketch:modalDraft.sketch?.trim()||"",
+    started:modalDraft.started?.trim()||"",
+    department:modalDraft.department?.trim()||"Production",
+    visible:modalDraft.visible!==false,
+    order:modalDraft.order||members.length+1
+  }
+
+  if(modalMode==="create"){
+    setMembers((prev)=>{
+      const updated=[...prev,cleaned]
+
+      return updated.map((member,index)=>({
+        ...member,
+        order:index+1
+      }))
+    })
+
+    markChanged()
+    setMessage("New member added locally. Click Save Changes to publish.")
+    resetModal()
+    return
+  }
+
+  if(modalMode==="edit"&&modalIndex!==null){
+    setMembers((prev)=>{
+      if(modalIndex<0||modalIndex>=prev.length){
+        return prev
+      }
+
+      const copy=[...prev]
+      const existing=copy[modalIndex]
+
+      if(!existing){
+        return prev
+      }
+
+      copy[modalIndex]={
+        ...existing,
+        ...cleaned
+      }
+
+      return copy
+    })
+
+    markChanged()
+    setMessage("Member updated locally. Click Save Changes to publish.")
+    resetModal()
+  }
+}
 
   const handleModalUpload=async(
     event:ChangeEvent<HTMLInputElement>,
