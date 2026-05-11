@@ -1,3 +1,4 @@
+//app/admin/magazines/page.tsx
 "use client"
 
 import { useEffect, useMemo, useState, ChangeEvent } from "react"
