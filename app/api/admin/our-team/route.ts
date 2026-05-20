@@ -1,251 +1,240 @@
 // app/api/admin/our-team/route.ts
-export const runtime="nodejs";
-export const dynamic="force-dynamic";
 
-import {NextResponse} from "next/server";
-import {S3Client,GetObjectCommand,PutObjectCommand} from "@aws-sdk/client-s3";
+import {NextRequest,NextResponse} from "next/server";
+
+import {DynamoDBClient} from "@aws-sdk/client-dynamodb";
+
+import {
+  DynamoDBDocumentClient,
+  ScanCommand,
+  PutCommand
+} from "@aws-sdk/lib-dynamodb";
 
 const REGION=process.env.AWS_REGION||"ap-southeast-2";
-const BUCKET=process.env.AWS_S3_BUCKET;
-const TEAM_JSON_KEY=process.env.AWS_S3_TEAM_JSON_KEY||"content/team.json";
 
-const DEPARTMENTS=[
-  "Senior Management Team (SMT)",
-  "Business Development",
-  "Production",
-  "Monitoring and Evaluation (MEL)",
-  "Logistics and Finance",
-  "Field Officers West",
-  "Field Officers East"
-];
+const TABLE_NAME="LafaekTeam";
 
-const s3=new S3Client({
-  region:REGION,
-  credentials:BUCKET
-    ? {
-        accessKeyId:process.env.AWS_ACCESS_KEY_ID||"",
-        secretAccessKey:process.env.AWS_SECRET_ACCESS_KEY||""
-      }
-    : undefined
+const dynamoClient=new DynamoDBClient({
+  region:REGION
 });
 
-type TeamMemberRecord={
-  id?:string;
+const docClient=DynamoDBDocumentClient.from(dynamoClient);
+
+export interface TeamMemberRecord{
+  id:string;
   slug:string;
   name:string;
-  roleEn:string;
-  roleTet?:string;
-  bioEn:string;
-  bioTet?:string;
-  photo?:string;
-  sketch?:string;
-  started?:string;
+  role?:string;
   department?:string;
+  image?:string;
   order?:number;
   visible?:boolean;
-  [key:string]:any;
-};
 
-function safeString(value:any){
-  return typeof value==="string"?value.trim():"";
+  bio?:{
+    en?:string;
+    tet?:string;
+  };
+
+  roleTranslations?:{
+    en?:string;
+    tet?:string;
+  };
+
+  departmentTranslations?:{
+    en?:string;
+    tet?:string;
+  };
 }
 
-function makeSlug(value:string,index:number){
-  const base=value
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g,"")
-    .replace(/[^a-z0-9]+/g,"-")
-    .replace(/^-+|-+$/g,"");
-
-  return base||`member-${index+1}`;
-}
-
-function cleanDepartment(value:any){
-  const department=safeString(value);
-
-  if(!department){
-    return "Production";
-  }
-
-  return department;
-}
-
-function normaliseMember(raw:any,index:number):TeamMemberRecord{
-  const photoFromRaw=safeString(raw.photoUrl)||safeString(raw.photo);
-  const sketchFromRaw=safeString(raw.sketchUrl)||safeString(raw.sketch);
-
-  const name=
-    safeString(raw.name)||
-    safeString(raw.nameEn)||
-    safeString(raw.nameTet)||
-    "Unnamed";
-
-  const slug=safeString(raw.slug)||makeSlug(name,index);
-
-  const department=cleanDepartment(raw.department);
+function cleanMember(
+  member:any,
+  index:number
+):TeamMemberRecord{
 
   return {
-    id:safeString(raw.id)||undefined,
-    slug,
-    name,
-    roleEn:safeString(raw.roleEn),
-    roleTet:safeString(raw.roleTet)||undefined,
-    bioEn:safeString(raw.bioEn),
-    bioTet:safeString(raw.bioTet)||undefined,
-    photo:photoFromRaw||undefined,
-    sketch:sketchFromRaw||undefined,
-    started:safeString(raw.started)||undefined,
-    department,
-    order:typeof raw.order==="number"?raw.order:index+1,
-    visible:raw.visible!==false
+
+    id:
+      String(
+        member.id||
+        `team-${Date.now()}-${index}`
+      ),
+
+    slug:
+      String(
+        member.slug||
+        ""
+      ),
+
+    name:
+      String(
+        member.name||
+        ""
+      ),
+
+    role:
+      member.role?
+        String(member.role):
+        "",
+
+    department:
+      member.department?
+        String(member.department):
+        "",
+
+    image:
+      member.image?
+        String(member.image):
+        "",
+
+    order:
+      typeof member.order==="number"
+        ?member.order
+        :index+1,
+
+    visible:
+      member.visible!==false,
+
+    bio:{
+      en:
+        member.bio?.en?
+          String(member.bio.en):
+          "",
+
+      tet:
+        member.bio?.tet?
+          String(member.bio.tet):
+          ""
+    },
+
+    roleTranslations:{
+      en:
+        member.roleTranslations?.en?
+          String(member.roleTranslations.en):
+          "",
+
+      tet:
+        member.roleTranslations?.tet?
+          String(member.roleTranslations.tet):
+          ""
+    },
+
+    departmentTranslations:{
+      en:
+        member.departmentTranslations?.en?
+          String(member.departmentTranslations.en):
+          "",
+
+      tet:
+        member.departmentTranslations?.tet?
+          String(member.departmentTranslations.tet):
+          ""
+    }
   };
-}
-
-async function bodyToString(body:any):Promise<string>{
-  if(!body){
-    return "";
-  }
-
-  if(typeof body.transformToString==="function"){
-    return body.transformToString("utf-8");
-  }
-
-  return await new Promise<string>((resolve,reject)=>{
-    const chunks:Buffer[]=[];
-
-    body.on("data",(chunk:Buffer)=>chunks.push(chunk));
-    body.on("end",()=>resolve(Buffer.concat(chunks).toString("utf-8")));
-    body.on("error",reject);
-  });
-}
-
-async function readTeamJsonFromS3():Promise<TeamMemberRecord[]>{
-  if(!BUCKET){
-    console.warn("[api/admin/our-team] AWS_S3_BUCKET not set, returning empty members list");
-    return [];
-  }
-
-  const cmd=new GetObjectCommand({
-    Bucket:BUCKET,
-    Key:TEAM_JSON_KEY
-  });
-
-  const res=await s3.send(cmd);
-  const body=await bodyToString(res.Body);
-
-  if(!body){
-    return [];
-  }
-
-  let parsed:any;
-
-  try{
-    parsed=JSON.parse(body);
-  }catch(err){
-    console.error("[api/admin/our-team] Invalid JSON in team.json",err);
-    throw new Error("Failed to parse team.json. Check for missing commas or broken JSON.");
-  }
-
-  const arr:Array<any>=Array.isArray(parsed)
-    ? parsed
-    : Array.isArray(parsed?.members)
-      ? parsed.members
-      : [];
-
-  return arr.map((raw,index)=>normaliseMember(raw,index));
-}
-
-async function writeTeamJsonToS3(members:TeamMemberRecord[]):Promise<void>{
-  if(!BUCKET){
-    throw new Error("AWS_S3_BUCKET is not configured");
-  }
-
-  const cleanedMembers=members.map((member,index)=>normaliseMember(member,index));
-
-  const payload={
-    members:cleanedMembers
-  };
-
-  const cmd=new PutObjectCommand({
-    Bucket:BUCKET,
-    Key:TEAM_JSON_KEY,
-    Body:JSON.stringify(payload,null,2),
-    ContentType:"application/json"
-  });
-
-  await s3.send(cmd);
 }
 
 export async function GET(){
+
   try{
-    const members=await readTeamJsonFromS3();
+
+    console.log("[team-admin] loading members");
+
+    const result=await docClient.send(
+      new ScanCommand({
+        TableName:TABLE_NAME
+      })
+    );
+
+    const members=(result.Items||[]) as TeamMemberRecord[];
+
+    members.sort(
+      (a,b)=>(a.order||0)-(b.order||0)
+    );
 
     return NextResponse.json({
-      ok:true,
-      departments:DEPARTMENTS,
+      success:true,
       members
     });
-  }catch(err:any){
-    console.error("[api/admin/our-team] GET error",err);
+
+  }catch(err){
+
+    console.error(
+      "[team-admin] GET failed",
+      err
+    );
 
     return NextResponse.json(
       {
-        ok:false,
-        error:err?.message||"Failed to load team data"
+        success:false,
+        error:"Failed to load team members"
       },
-      {status:500}
+      {
+        status:500
+      }
     );
   }
 }
 
-export async function PUT(req:Request){
-  try{
-    const body=await req.json().catch(()=>null);
+export async function PUT(req:NextRequest){
 
-    if(!body||!Array.isArray(body.members)){
+  try{
+
+    const body=await req.json();
+
+    const incomingMembers=Array.isArray(body)
+      ?body
+      :body.members;
+
+    if(!Array.isArray(incomingMembers)){
+
       return NextResponse.json(
         {
-          ok:false,
-          error:"Request body must be {members:[...]}"
+          success:false,
+          error:"Invalid members payload"
         },
-        {status:400}
+        {
+          status:400
+        }
       );
     }
 
-    const cleaned:TeamMemberRecord[]=body.members.map((raw:any,index:number)=>{
-      const member=normaliseMember(raw,index);
+    const cleaned=incomingMembers.map(
+      (member,index)=>cleanMember(member,index)
+    );
 
-      if(!member.name){
-        throw new Error(`Member ${index+1} is missing a name.`);
-      }
+    console.log(
+      `[team-admin] saving ${cleaned.length} members`
+    );
 
-      if(!member.department){
-        throw new Error(`Member ${index+1} is missing a department.`);
-      }
+    for(const member of cleaned){
 
-      return {
-        ...member,
-        order:index+1
-      };
-    });
-
-    await writeTeamJsonToS3(cleaned);
+      await docClient.send(
+        new PutCommand({
+          TableName:TABLE_NAME,
+          Item:member
+        })
+      );
+    }
 
     return NextResponse.json({
-      ok:true,
-      departments:DEPARTMENTS,
-      members:cleaned
+      success:true,
+      count:cleaned.length
     });
-  }catch(err:any){
-    console.error("[api/admin/our-team] PUT error",err);
+
+  }catch(err){
+
+    console.error(
+      "[team-admin] PUT failed",
+      err
+    );
 
     return NextResponse.json(
       {
-        ok:false,
-        error:err?.message||"Failed to save team data"
+        success:false,
+        error:"Failed to save team members"
       },
-      {status:500}
+      {
+        status:500
+      }
     );
   }
 }

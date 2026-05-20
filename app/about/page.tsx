@@ -44,7 +44,7 @@ export default function AboutPage(){
         title:"Our Team",
         description:
           "We are a passionate team of educators, writers, artists, and community development specialists, all committed to the future of Timor-Leste. Our team is predominantly Timorese, bringing invaluable local knowledge and dedication to our work.",
-        image:"/placeholder.svg?height=300&width=500",
+        image:"/team/LLM-05582 1.jpg?height=300&width=500",
       },
       future:{
         title:"Our Vision for the Future",
@@ -100,7 +100,7 @@ export default function AboutPage(){
         title:"Ami-nia Ekipa",
         description:
           "Ami mak ekipa ida ne'ebé paixaun ho edukadór, eskrivan, artista, no espesialista dezenvolvimentu komunidade, hotu-hotu komprometidu ba futuru Timor-Leste nian. Ami-nia ekipa maioria Timor-oan, lori koñesimentu lokál no dedikasaun valiozu ba ami-nia servisu.",
-        image:"/placeholder.svg?height=300&width=500",
+        image:"/team/LLM-05582 1.jpg?height=300&width=500",
       },
       future:{
         title:"Vizaun Ami-Nian Ba Futuru",
