@@ -28,6 +28,8 @@ const ALLOWED_FOLDERS=[
   "magazines/covers",
   "magazines/pdfs",
   "magazines/samples",
+  "magazines/covers",
+"magazines/pages",
   "careers/images",
   "careers/pdfs",
   "careers/files",
