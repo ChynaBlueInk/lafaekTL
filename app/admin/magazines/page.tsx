@@ -298,8 +298,7 @@ export default function AdminMagazinesPage(){
   const [dirtyIds,setDirtyIds] = useState<Set<string>>(new Set())
 
   const [newCode,setNewCode] = useState("")
-  const [newTitleEn,setNewTitleEn] = useState("")
-  const [newTitleTet,setNewTitleTet] = useState("")
+  const [newTitle,setNewTitle] = useState("")
 
   const [uploadingId,setUploadingId] = useState<string>()
   const [uploadingType,setUploadingType] = useState<
@@ -446,14 +445,13 @@ export default function AdminMagazinesPage(){
 
     const next = emptyMagazineFromCode(code)
 
-    next.titleEn = newTitleEn.trim()
-    next.titleTet = newTitleTet.trim()
+    next.titleEn = newTitle.trim()
+    next.titleTet = newTitle.trim()
 
     setItems((prev) => sortMagazines([next,...prev]))
 
     setNewCode("")
-    setNewTitleEn("")
-    setNewTitleTet("")
+    setNewTitle("")
 
     markChanged(next.id)
 
@@ -791,7 +789,7 @@ export default function AdminMagazinesPage(){
             Add new magazine
           </h2>
 
-          <div className="grid gap-3 md:grid-cols-[1.5fr,2fr,2fr,auto]">
+          <div className="grid gap-3 md:grid-cols-[1.5fr,2fr,auto]">
 
             <div className="space-y-1">
               <label className="text-xs font-semibold text-slate-700">
@@ -809,26 +807,13 @@ export default function AdminMagazinesPage(){
 
             <div className="space-y-1">
               <label className="text-xs font-semibold text-slate-700">
-                English title
+                Title
               </label>
 
               <input
                 type="text"
-                value={newTitleEn}
-                onChange={(e) => setNewTitleEn(e.target.value)}
-                className="w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm"
-              />
-            </div>
-
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-slate-700">
-                Tetun title
-              </label>
-
-              <input
-                type="text"
-                value={newTitleTet}
-                onChange={(e) => setNewTitleTet(e.target.value)}
+                value={newTitle}
+                onChange={(e) => setNewTitle(e.target.value)}
                 className="w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm"
               />
             </div>
@@ -957,39 +942,16 @@ export default function AdminMagazinesPage(){
                       <div className="space-y-1">
 
                         <label className="text-xs font-semibold text-slate-700">
-                          English title
+                          Title
                         </label>
 
                         <input
                           type="text"
                           value={m.titleEn || ""}
-                          onChange={(e) =>
-                            handleFieldChange(
-                              m.id,
-                              "titleEn",
-                              e.target.value
-                            )
-                          }
-                          className="w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm"
-                        />
-                      </div>
-
-                      <div className="space-y-1">
-
-                        <label className="text-xs font-semibold text-slate-700">
-                          Tetun title
-                        </label>
-
-                        <input
-                          type="text"
-                          value={m.titleTet || ""}
-                          onChange={(e) =>
-                            handleFieldChange(
-                              m.id,
-                              "titleTet",
-                              e.target.value
-                            )
-                          }
+                          onChange={(e) => {
+                            handleFieldChange(m.id,"titleEn",e.target.value)
+                            handleFieldChange(m.id,"titleTet",e.target.value)
+                          }}
                           className="w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm"
                         />
                       </div>
