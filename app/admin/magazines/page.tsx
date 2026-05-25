@@ -1030,7 +1030,7 @@ const filteredItems = useMemo(() => {
   <button
     type="button"
     onClick={() =>
-      toggleExpanded(m.id)
+toggleExpanded(m.id || "")
     }
     className="rounded-md border border-slate-300 bg-white px-3 py-1 text-xs font-medium text-slate-700 hover:bg-slate-100"
   >
@@ -1072,7 +1072,7 @@ const filteredItems = useMemo(() => {
   <button
     type="button"
     onClick={() =>
-      handleDeleteMagazine(m.id)
+handleDeleteMagazine(m.id || "")
     }
     className="rounded-md border border-red-200 bg-red-50 px-3 py-1 text-xs font-medium text-red-700 hover:bg-red-100"
   >
