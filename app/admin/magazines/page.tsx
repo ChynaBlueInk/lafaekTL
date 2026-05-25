@@ -304,7 +304,13 @@ export default function AdminMagazinesPage(){
   const [uploadingType,setUploadingType] = useState<
     "cover" | "pages"
   >()
+const [expandedIds,setExpandedIds] = useState<Set<string>>(
+  new Set()
+)
 
+const [searchTerm,setSearchTerm] = useState("")
+
+const [seriesFilter,setSeriesFilter] = useState<string>("all")
   useEffect(() => {
 
     const load = async() => {
@@ -615,7 +621,21 @@ export default function AdminMagazinesPage(){
       setUploadingType(undefined)
     }
   }
+const toggleExpanded = (id:string) => {
 
+  setExpandedIds((prev) => {
+
+    const next = new Set(prev)
+
+    if(next.has(id)){
+      next.delete(id)
+    }else{
+      next.add(id)
+    }
+
+    return next
+  })
+}
   const handleDeleteMagazine = (id:string) => {
 
     const confirmed =
@@ -641,7 +661,68 @@ export default function AdminMagazinesPage(){
 
     setMessage("Magazine deleted. Click Save Changes.")
   }
+const handleRemovePage = (
+  id:string,
+  pageIndex:number
+) => {
 
+  setItems((prev) =>
+    prev.map((m) => {
+
+      if(m.id !== id){
+        return m
+      }
+
+      return {
+        ...m,
+        pageImageUrls:(m.pageImageUrls || [])
+          .filter((_,i) => i !== pageIndex)
+      }
+    })
+  )
+
+  markChanged(id)
+}
+
+const handleMovePage = (
+  id:string,
+  from:number,
+  to:number
+) => {
+
+  setItems((prev) =>
+    prev.map((m) => {
+
+      if(m.id !== id){
+        return m
+      }
+
+      const pages = [...(m.pageImageUrls || [])]
+
+      if(
+        to < 0 ||
+        to >= pages.length
+      ){
+        return m
+      }
+
+const moved = pages[from]
+
+if(!moved){
+  return m
+}
+      pages.splice(from,1)
+      pages.splice(to,0,moved)
+
+      return {
+        ...m,
+        pageImageUrls:pages,
+      }
+    })
+  )
+
+  markChanged(id)
+}
   const handleSaveChanges = async() => {
 
     try{
@@ -713,7 +794,37 @@ export default function AdminMagazinesPage(){
       setSaving(false)
     }
   }
+const filteredItems = useMemo(() => {
 
+  return items.filter((m) => {
+
+    const matchesSearch =
+      searchTerm.trim() === "" ||
+      [
+        m.code,
+        m.titleEn,
+        m.titleTet,
+        m.year,
+      ]
+        .join(" ")
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase())
+
+    const matchesSeries =
+      seriesFilter === "all" ||
+      m.series === seriesFilter
+
+    return (
+      matchesSearch &&
+      matchesSeries
+    )
+  })
+
+},[
+  items,
+  searchTerm,
+  seriesFilter,
+])
   const totalVisible = useMemo(
     () =>
       items.filter(
@@ -746,7 +857,43 @@ export default function AdminMagazinesPage(){
               <span className="font-semibold">
                 {" "}{items.length}
               </span>
+<input
+  type="text"
+  value={searchTerm}
+  onChange={(e) =>
+    setSearchTerm(e.target.value)
+  }
+  placeholder="Search magazines..."
+  className="rounded-md border border-slate-300 px-3 py-2 text-sm"
+/>
 
+<select
+  value={seriesFilter}
+  onChange={(e) =>
+    setSeriesFilter(e.target.value)
+  }
+  className="rounded-md border border-slate-300 px-3 py-2 text-sm"
+>
+  <option value="all">
+    All Types
+  </option>
+
+  <option value="LK">
+    Lafaek Kiik
+  </option>
+
+  <option value="LP">
+    Lafaek Prima
+  </option>
+
+  <option value="LM">
+    Manorin
+  </option>
+
+  <option value="LBK">
+    Komunidade
+  </option>
+</select>
               {" "}• Visible:
               <span className="font-semibold">
                 {" "}{totalVisible}
@@ -783,53 +930,53 @@ export default function AdminMagazinesPage(){
           </div>
         )}
 
-        <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+      <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
 
-          <h2 className="mb-3 text-sm font-semibold text-slate-800">
-            Add new magazine
-          </h2>
+  <h2 className="mb-3 text-sm font-semibold text-slate-800">
+    Add new magazine
+  </h2>
 
-          <div className="grid gap-3 md:grid-cols-[1.5fr,2fr,auto]">
+<div className="grid gap-4 xl:grid-cols-[1.2fr,1fr,1fr]">
+    <div className="space-y-1">
+      <label className="text-xs font-semibold text-slate-700">
+        Code
+      </label>
 
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-slate-700">
-                Code
-              </label>
+      <input
+        type="text"
+        value={newCode}
+        onChange={(e) => setNewCode(e.target.value)}
+        placeholder="LK-1-2018"
+        className="w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+      />
+    </div>
 
-              <input
-                type="text"
-                value={newCode}
-                onChange={(e) => setNewCode(e.target.value)}
-                placeholder="LK-1-2018"
-                className="w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm"
-              />
-            </div>
+    <div className="space-y-1">
+      <label className="text-xs font-semibold text-slate-700">
+        Title
+      </label>
 
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-slate-700">
-                Title
-              </label>
+      <input
+        type="text"
+        value={newTitle}
+        onChange={(e) => setNewTitle(e.target.value)}
+        className="w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+      />
+    </div>
 
-              <input
-                type="text"
-                value={newTitle}
-                onChange={(e) => setNewTitle(e.target.value)}
-                className="w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm"
-              />
-            </div>
+    <div className="flex items-end">
+      <button
+        type="button"
+        onClick={handleAddMagazine}
+        className="w-full rounded-md bg-emerald-600 px-3 py-2 text-sm font-medium text-white shadow-sm hover:bg-emerald-700"
+      >
+        + Add
+      </button>
+    </div>
 
-            <div className="flex items-end">
-              <button
-                type="button"
-                onClick={handleAddMagazine}
-                className="w-full rounded-md bg-emerald-600 px-3 py-2 text-sm font-medium text-white shadow-sm hover:bg-emerald-700"
-              >
-                + Add
-              </button>
-            </div>
+</div>
 
-          </div>
-        </section>
+</section>
 
         {loading && (
           <div className="text-sm text-slate-600">
@@ -841,8 +988,7 @@ export default function AdminMagazinesPage(){
 
           <div className="space-y-4">
 
-            {items.map((m,index) => {
-
+{filteredItems.map((m,index) => {
               const coverUrl =
                 buildFileUrl(m.coverImage)
 
@@ -851,6 +997,8 @@ export default function AdminMagazinesPage(){
 
               const lastUpdated =
                 formatLastUpdated(m)
+                const expanded =
+  expandedIds.has(m.id)
 
               return(
 
@@ -879,63 +1027,68 @@ export default function AdminMagazinesPage(){
 
                     <div className="flex flex-wrap items-center gap-2">
 
-                      <span
-                        className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                          m.visible === false
-                            ? "border border-red-200 bg-red-50 text-red-700"
-                            : "border border-emerald-200 bg-emerald-50 text-emerald-700"
-                        }`}
-                      >
-                        {m.visible === false
-                          ? "Hidden"
-                          : "Visible"}
-                      </span>
+  <button
+    type="button"
+    onClick={() =>
+      toggleExpanded(m.id)
+    }
+    className="rounded-md border border-slate-300 bg-white px-3 py-1 text-xs font-medium text-slate-700 hover:bg-slate-100"
+  >
+    {expanded
+      ? "▼ Close"
+      : "▶ Edit"}
+  </button>
 
-                      <button
-                        type="button"
-                        onClick={() =>
-                          handleFieldChange(
-                            m.id,
-                            "visible",
-                            m.visible === false
-                              ? true
-                              : false
-                          )
-                        }
-                        className="rounded-md border border-slate-300 bg-white px-3 py-1 text-xs font-medium text-slate-700 hover:bg-slate-100"
-                      >
-                        {m.visible === false
-                          ? "Show"
-                          : "Hide"}
-                      </button>
+  <span
+    className={`rounded-full px-3 py-1 text-xs font-semibold ${
+      m.visible === false
+        ? "border border-red-200 bg-red-50 text-red-700"
+        : "border border-emerald-200 bg-emerald-50 text-emerald-700"
+    }`}
+  >
+    {m.visible === false
+      ? "Hidden"
+      : "Visible"}
+  </span>
 
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const el = document.getElementById(`edit-${m.id}`)
-                          el?.scrollIntoView({behavior:"smooth",block:"start"})
-                        }}
-                        className="rounded-md border border-blue-200 bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700 hover:bg-blue-100"
-                      >
-                        Edit
-                      </button>
+  <button
+    type="button"
+    onClick={() =>
+      handleFieldChange(
+        m.id,
+        "visible",
+        m.visible === false
+          ? true
+          : false
+      )
+    }
+    className="rounded-md border border-slate-300 bg-white px-3 py-1 text-xs font-medium text-slate-700 hover:bg-slate-100"
+  >
+    {m.visible === false
+      ? "Show"
+      : "Hide"}
+  </button>
 
-                      <button
-                        type="button"
-                        onClick={() => handleDeleteMagazine(m.id)}
-                        className="rounded-md border border-red-200 bg-red-50 px-3 py-1 text-xs font-medium text-red-700 hover:bg-red-100"
-                      >
-                        Delete
-                      </button>
+  <button
+    type="button"
+    onClick={() =>
+      handleDeleteMagazine(m.id)
+    }
+    className="rounded-md border border-red-200 bg-red-50 px-3 py-1 text-xs font-medium text-red-700 hover:bg-red-100"
+  >
+    Delete
+  </button>
 
-                    </div>
+</div>
 
                   </div>
 
-                  <div
-                    id={`edit-${m.id}`}
-                    className="grid gap-4 xl:grid-cols-[1.2fr,1fr,1fr]"
-                  >
+                  {expanded && (
+
+<div
+  id={`edit-${m.id}`}
+  className="grid gap-4 xl:grid-cols-[1.2fr,1fr,1fr]"
+>
 
                     <div className="space-y-4">
 
@@ -1129,9 +1282,58 @@ export default function AdminMagazinesPage(){
 
                                   </div>
 
-                                  <div className="text-xs text-slate-500">
-                                    Page {pageIndex + 1}
-                                  </div>
+                                  <div className="flex items-center justify-between gap-2">
+
+  <div className="text-xs text-slate-500">
+    Page {pageIndex + 1}
+  </div>
+
+  <div className="flex gap-1">
+
+    <button
+      type="button"
+      onClick={() =>
+        handleMovePage(
+          m.id,
+          pageIndex,
+          pageIndex - 1
+        )
+      }
+      className="rounded border border-slate-300 px-2 py-1 text-xs hover:bg-slate-100"
+    >
+      ←
+    </button>
+
+    <button
+      type="button"
+      onClick={() =>
+        handleMovePage(
+          m.id,
+          pageIndex,
+          pageIndex + 1
+        )
+      }
+      className="rounded border border-slate-300 px-2 py-1 text-xs hover:bg-slate-100"
+    >
+      →
+    </button>
+
+    <button
+      type="button"
+      onClick={() =>
+        handleRemovePage(
+          m.id,
+          pageIndex
+        )
+      }
+      className="rounded border border-red-200 bg-red-50 px-2 py-1 text-xs text-red-700 hover:bg-red-100"
+    >
+      Remove
+    </button>
+
+  </div>
+
+</div>
 
                                 </div>
 
@@ -1159,8 +1361,9 @@ export default function AdminMagazinesPage(){
 
                     </div>
 
-                  </div>
+</div>
 
+)}
                 </section>
 
               )
