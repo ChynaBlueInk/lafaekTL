@@ -32,7 +32,7 @@ type Series=
   | "LK"
   | "LBK"
   | "LP"
-  | "LM";
+  | "LBM";
 
 type MagazineLanguage=
   | "Tetun"
@@ -76,13 +76,18 @@ function safeSeries(raw:any):Series{
 
   const s=String(raw??"").trim();
 
+  const normalised =
+    s === "LM" || s === "LMB"
+      ? "LBM"
+      : s;
+
   return(
-    s==="LK"||
-    s==="LBK"||
-    s==="LP"||
-    s==="LM"
+    normalised==="LK"||
+    normalised==="LBK"||
+    normalised==="LP"||
+    normalised==="LBM"
   )
-    ? (s as Series)
+    ? (normalised as Series)
     : "LK";
 }
 

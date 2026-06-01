@@ -23,7 +23,7 @@ type Series =
   | "LK"
   | "LBK"
   | "LP"
-  | "LM"
+  | "LBM"
 
 type PublicMagazine = {
   id:string
@@ -135,7 +135,7 @@ const seriesLabel = (s:Series) =>
         en:"Lafaek Prima",
         tet:"Lafaek Prima",
       }
-    : s === "LM"
+    : s === "LBM"
     ? {
         en:"Manorin",
         tet:"Manorin",
@@ -150,31 +150,15 @@ const seriesLabel = (s:Series) =>
         tet:"Lafaek Kiik",
       }
 
+      
+
 const makeName = (m:PublicMagazine) => {
-
-  const isMonth = m.series === "LBK"
-
-  const when = isMonth
-    ? monthName(m.issue)
-    : {
-        en:`Issue ${m.issue}`,
-        tet:`Numeru ${m.issue}`,
-      }
 
   const s = seriesLabel(m.series)
 
   return {
-    en:(
-      m.titleEn
-        ? m.titleEn
-        : `${s.en} ${when.en} ${m.year}`
-    ).trim(),
-
-    tet:(
-      m.titleTet
-        ? m.titleTet
-        : `${s.tet} ${when.tet} ${m.year}`
-    ).trim(),
+    en:`${s.en} Edisaun ${m.issue}, ${m.year}`,
+    tet:`${s.tet} Edisaun ${m.issue}, ${m.year}`,
   }
 }
 
@@ -324,15 +308,36 @@ export default function MagazinesPage(){
           )
         }
 
-       const visible =
-  data.items.filter(
-    (m) =>
-      m.visible === false
-        ? false
-        : true
-  )
+ const visible =
+  data.items
+    .filter(
+      (m) =>
+        m.visible === false
+          ? false
+          : true
+    )
+    .map((m:any) => ({
+      ...m,
+      series:
+        String(m.series) === "LM" ||
+        String(m.series) === "LMB"
+          ? "LBM"
+          : m.series,
+    }))
 
-        setMags(visible)
+console.log(
+  visible
+    .filter((m) =>
+      m.code.includes("LBM") ||
+      m.code.includes("LMB")
+    )
+    .map((m) => ({
+      code:m.code,
+      series:m.series,
+    }))
+)
+
+setMags(visible)
 
       }catch(err:any){
 
@@ -370,7 +375,12 @@ export default function MagazinesPage(){
   },[mags])
 
   const filteredAndSorted = useMemo(() => {
-
+const SERIES_ORDER = {
+  LK: 1,
+  LP: 2,
+  LBM: 3,
+  LBK: 4,
+}
     const q =
       search.trim().toLowerCase()
 
@@ -418,27 +428,63 @@ export default function MagazinesPage(){
 
       switch(sortBy){
 
-        case "newest":
-          return (
-            by - ay ||
-            a.code.localeCompare(b.code)
-          )
+    case "newest": {
 
-        case "oldest":
-          return (
-            ay - by ||
-            a.code.localeCompare(b.code)
-          )
+  const ai =
+    parseInt(a.issue || "0",10)
 
-        case "seriesAZ":
-          return (
-            seriesLabel(a.series).en.localeCompare(
-              seriesLabel(b.series).en
-            ) ||
-            by - ay
-          )
+  const bi =
+    parseInt(b.issue || "0",10)
 
-        case "seriesZA":
+  return (
+    by - ay ||
+    bi - ai ||
+    b.code.localeCompare(a.code)
+  )
+}
+
+      case "oldest": {
+
+  const ai =
+    parseInt(a.issue || "0",10)
+
+  const bi =
+    parseInt(b.issue || "0",10)
+
+  return (
+    ay - by ||
+    ai - bi ||
+    a.code.localeCompare(b.code)
+  )
+}
+
+       case "seriesAZ": {
+
+  const sa =
+    SERIES_ORDER[a.series] || 999
+
+  const sb =
+    SERIES_ORDER[b.series] || 999
+
+  return (
+    sa - sb ||
+    by - ay
+  )
+}
+
+case "seriesZA": {
+
+  const sa =
+    SERIES_ORDER[a.series] || 999
+
+  const sb =
+    SERIES_ORDER[b.series] || 999
+
+  return (
+    sb - sa ||
+    by - ay
+  )
+}
           return (
             seriesLabel(b.series).en.localeCompare(
               seriesLabel(a.series).en
@@ -569,8 +615,8 @@ export default function MagazinesPage(){
               {seriesLabel("LP").en}
             </option>
 
-            <option value="LM">
-              {seriesLabel("LM").en}
+            <option value="LBM">
+              {seriesLabel("LBM").en}
             </option>
 
           </select>

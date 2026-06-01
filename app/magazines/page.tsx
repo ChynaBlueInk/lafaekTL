@@ -7,7 +7,7 @@ import Link from "next/link";
 import {useLanguage}from "@/lib/LanguageContext";
 
 type Lang="en"|"tet";
-type Series="LK"|"LBK"|"LP"|"LM";
+type Series="LK"|"LBK"|"LP"|"LBM";
 type AccessType="public"|"approval_required"|"private";
 
 type MagazineBase={
@@ -139,7 +139,7 @@ const seriesInfo:Record<
         "Lafaek Prima suporta estudante primária sira ho leitura, matemátika, siénsia, ambiente, kultura, no atividade rezolve-problema.",
     },
   },
-  LM:{
+  LBM:{
     en:{
       title:"Lafaek Manorin",
       body:
@@ -188,7 +188,7 @@ function seriesLabel(series:Series){
     return{en:"Lafaek Prima",tet:"Lafaek Prima"};
   }
 
-  if(series==="LM"){
+  if(series==="LBM"){
     return{en:"Manorin",tet:"Manorin"};
   }
 
@@ -267,7 +267,7 @@ function isProbablyPdf(src?:string):boolean{
 function safeSeries(raw:any):Series{
   const value=String(raw??"").trim();
 
-  if(value==="LK"||value==="LBK"||value==="LP"||value==="LM"){
+  if(value==="LK"||value==="LBK"||value==="LP"||value==="LBM"){
     return value;
   }
 

@@ -11,7 +11,7 @@ import {
 
 const S3_ORIGIN = "https://lafaek-media.s3.ap-southeast-2.amazonaws.com"
 
-type Series = "LK" | "LBK" | "LP" | "LM"
+type Series = "LK" | "LBK" | "LP" | "LBM"
 type MagazineLanguage = "Tetun" | "English" | "Tetun + English"
 type AccessType = "public" | "approval_required" | "private"
 
@@ -69,7 +69,7 @@ const seriesOptions:Array<{value:Series;label:string}> = [
   {value:"LK",label:"Lafaek Kiik"},
   {value:"LBK",label:"Lafaek Komunidade"},
   {value:"LP",label:"Lafaek Prima"},
-  {value:"LM",label:"Manorin"},
+  {value:"LBM",label:"Manorin"},
 ]
 
 const languageOptions:MagazineLanguage[] = [
@@ -100,27 +100,34 @@ const accessOptions:Array<{
   },
 ]
 
-const seriesLabel = (s:Series) =>
+const seriesLabel = (s:string) =>
   s === "LP"
     ? "Lafaek Prima"
-    : s === "LM"
+: s === "LBM"
     ? "Manorin"
     : s === "LBK"
     ? "Lafaek Komunidade"
-    : "Lafaek Kiik"
+    : s === "LK"
+    ? "Lafaek Kiik"
+    : "Unknown Series"
 
 const deriveFromCode = (codeRaw:string) => {
   const code = String(codeRaw || "").trim()
 
   const [seriesRaw,issueRaw = "",yearRaw = ""] = code.split("-")
 
-  const series =
-    seriesRaw === "LK" ||
-    seriesRaw === "LBK" ||
-    seriesRaw === "LP" ||
-    seriesRaw === "LM"
-      ? seriesRaw
-      : "LK"
+const normalisedSeries =
+  seriesRaw === "LM" || seriesRaw === "LMB"
+    ? "LBM"
+    : seriesRaw
+
+const series =
+  normalisedSeries === "LK" ||
+  normalisedSeries === "LBK" ||
+  normalisedSeries === "LP" ||
+  normalisedSeries === "LBM"
+    ? normalisedSeries
+    : "LK"
 
   return {
     series:series as Series,
@@ -239,15 +246,26 @@ function sortMagazines(list:AdminMagazine[]){
     if(by !== ay){
       return by - ay
     }
+const SERIES_ORDER = {
+  LK: 1,
+  LP: 2,
+  LBM: 3,
+  LBK: 4,
+}
+    const sa =
+  SERIES_ORDER[a.series as keyof typeof SERIES_ORDER] || 999
 
-    return String(a.code || "").localeCompare(
-      String(b.code || ""),
-      undefined,
-      {
-        numeric:true,
-        sensitivity:"base",
-      }
-    )
+const sb =
+  SERIES_ORDER[b.series as keyof typeof SERIES_ORDER] || 999
+
+if(sa !== sb){
+  return sa - sb
+}
+
+return String(a.code || "")
+  .localeCompare(
+    String(b.code || "")
+  )
   })
 }
 
@@ -328,11 +346,20 @@ const [seriesFilter,setSeriesFilter] = useState<string>("all")
           throw new Error(`Failed to load magazines`)
         }
 
-        const data:ApiResponse = await res.json()
+  const contentType =
+  res.headers.get("content-type") || ""
 
-        if(!data.ok){
-          throw new Error(data.error || "API error")
-        }
+if(!contentType.includes("application/json")){
+  throw new Error(
+    "Server returned non-JSON response. Session may have expired."
+  )
+}
+
+const data:ApiResponse = await res.json()
+
+if(!data.ok){
+  throw new Error(data.error || "API error")
+}
 
         const list:AdminMagazine[] =
           (data.items || []).map((raw:any,index:number) => {
@@ -395,7 +422,12 @@ const [seriesFilter,setSeriesFilter] = useState<string>("all")
       }
     }
 
-    void load()
+const timer = setTimeout(() => {
+  void load()
+},300)
+
+return () => clearTimeout(timer)
+
 
   },[])
 
@@ -412,28 +444,44 @@ const [seriesFilter,setSeriesFilter] = useState<string>("all")
     }
   }
 
-  const handleFieldChange = (
-    id:string,
-    field:keyof AdminMagazine,
-    value:any
-  ) => {
+ const handleFieldChange = (
+  id:string,
+  field:keyof AdminMagazine,
+  value:any
+) => {
 
-    setItems((prev) =>
-      prev.map((m) => {
+  setItems((prev) =>
+    prev.map((m) => {
 
-        if(m.id !== id){
-          return m
-        }
+      if(m.id !== id){
+        return m
+      }
+
+      if(field === "code"){
+
+        const derived =
+          deriveFromCode(
+            String(value)
+          )
 
         return {
           ...m,
-          [field]:value,
+          code:String(value).toUpperCase(),
+          series:derived.series,
+          issue:derived.issue,
+          year:derived.year,
         }
-      })
-    )
+      }
 
-    markChanged(id)
-  }
+      return {
+        ...m,
+        [field]:value,
+      }
+    })
+  )
+
+  markChanged(id)
+}
 
   const handleAddMagazine = () => {
 
@@ -454,13 +502,14 @@ const [seriesFilter,setSeriesFilter] = useState<string>("all")
     next.titleEn = newTitle.trim()
     next.titleTet = newTitle.trim()
 
-    setItems((prev) => sortMagazines([next,...prev]))
-
+setItems((prev) => [next,...prev])
     setNewCode("")
     setNewTitle("")
 
     markChanged(next.id)
-
+setExpandedIds(
+  new Set([next.id])
+)
     setMessage("Magazine created")
   }
 
@@ -886,7 +935,7 @@ const filteredItems = useMemo(() => {
     Lafaek Prima
   </option>
 
-  <option value="LM">
+  <option value="LBM">
     Manorin
   </option>
 
@@ -1016,9 +1065,9 @@ const filteredItems = useMemo(() => {
                       </h2>
 
                       <p className="mt-1 text-sm text-slate-600">
-                        {seriesLabel(m.series)}
-                        {" • "}
-                        Issue {m.issue}
+{seriesLabel(m.series)}                     
+  {" • "}
+Edisaun {m.issue}
                         {" • "}
                         {m.year}
                       </p>
@@ -1036,7 +1085,7 @@ toggleExpanded(m.id || "")
   >
     {expanded
       ? "▼ Close"
-      : "▶ Edit"}
+      : "▶ Open"}
   </button>
 
   <span
@@ -1086,12 +1135,74 @@ handleDeleteMagazine(m.id || "")
                   {expanded && (
 
 <div
-  id={`edit-${m.id}`}
+  id={`open-${m.id}`}
   className="grid gap-4 xl:grid-cols-[1.2fr,1fr,1fr]"
 >
 
                     <div className="space-y-4">
+                      <div className="space-y-1">
 
+  <label className="text-xs font-semibold text-slate-700">
+    Code
+  </label>
+
+  <input
+    type="text"
+    value={m.code}
+    onChange={(e) =>
+      handleFieldChange(
+        m.id,
+        "code",
+        e.target.value.toUpperCase()
+      )
+    }
+    className="w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+  />
+
+  <p className="text-[11px] text-slate-500">
+    Example: LK-1-2025
+  </p>
+
+</div>
+<div className="space-y-1">
+
+  <label className="text-xs font-semibold text-slate-700">
+    Magazine Type
+  </label>
+
+  <select
+  value={m.series}
+  onChange={(e) => {
+
+    const value = e.target.value
+
+    handleFieldChange(
+      m.id,
+      "series",
+      value
+    )
+
+  }}
+  className="w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+>
+  <option value="LK">
+    Lafaek Kiik
+  </option>
+
+  <option value="LP">
+    Lafaek Prima
+  </option>
+
+  <option value="LBM">
+    Manorin
+  </option>
+
+  <option value="LBK">
+    Lafaek Komunidade
+  </option>
+</select>
+
+</div>
                       <div className="space-y-1">
 
                         <label className="text-xs font-semibold text-slate-700">

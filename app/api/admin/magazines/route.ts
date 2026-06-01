@@ -1,3 +1,4 @@
+//app/api/admin/magazines/route.ts
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
 
@@ -97,16 +98,20 @@ function safeSeries(raw:any):Series{
   const s =
     String(raw ?? "").trim()
 
+  const normalised =
+    s === "LM" || s === "LMB"
+      ? "LBM"
+      : s
+
   return (
-    s === "LK" ||
-    s === "LBK" ||
-    s === "LP" ||
-    s === "LM"
+    normalised === "LK" ||
+    normalised === "LBK" ||
+    normalised === "LP" ||
+    normalised === "LBM"
   )
-    ? s
+    ? normalised as Series
     : "LK"
 }
-
 function safeLanguage(
   raw:any
 ):MagazineLanguage{
