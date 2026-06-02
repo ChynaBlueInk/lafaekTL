@@ -349,7 +349,28 @@ const [seriesFilter,setSeriesFilter] = useState<string>("all")
   const contentType =
   res.headers.get("content-type") || ""
 
+console.log(
+  "[MAGAZINES LOAD]",
+  {
+    status:res.status,
+    contentType,
+    url:res.url,
+  }
+)
+
 if(!contentType.includes("application/json")){
+  const text = await res.text()
+
+  console.error(
+    "[MAGAZINES LOAD FAILED]",
+    {
+      status:res.status,
+      contentType,
+      url:res.url,
+      response:text.slice(0,500),
+    }
+  )
+
   throw new Error(
     "Server returned non-JSON response. Session may have expired."
   )
