@@ -192,11 +192,7 @@ export default function Navigation(){
                 href:"/services",
                 description:"Work with the Lafaek creative team."
               },
-              {
-                label:"Friends of Lafaek",
-                href:"/friends-of-lafaek",
-                description:"Support and stay connected with Lafaek."
-              },
+              
               {
                 label:"Careers",
                 href:"/careers",
@@ -342,11 +338,7 @@ export default function Navigation(){
                 href:"/services",
                 description:"Servisu hamutuk ho ekipa kriativu Lafaek."
               },
-              {
-                label:"Belun Lafaek",
-                href:"/friends-of-lafaek",
-                description:"Apoia no kontinua konekta ho Lafaek."
-              },
+            
               {
                 label:"Karreira",
                 href:"/careers",
@@ -573,10 +565,12 @@ export default function Navigation(){
     </div>
   );
 
-  return(
-    <header className="sticky top-0 z-[9999] border-b-2 border-[#F2C94C] bg-[#219653] shadow-md">
+return(
+    <header
+      ref={navRef}
+      className="sticky top-0 z-[9999] border-b-2 border-[#F2C94C] bg-[#219653] shadow-md"
+    >
       <nav
-        ref={navRef}
         className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 lg:px-6"
         aria-label="Main navigation"
       >
