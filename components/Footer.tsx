@@ -44,7 +44,6 @@ export function Footer(){
         ],
         extras:[
           {label:"Services",href:"/services"},
-          {label:"Friends of Lafaek",href:"/friends-of-lafaek"},
           {label:"Careers",href:"/careers"}
         ],
         admin:[
@@ -81,7 +80,6 @@ export function Footer(){
         ],
         extras:[
           {label:"Servisu sira",href:"/services"},
-          {label:"Belun Lafaek",href:"/friends-of-lafaek"},
           {label:"Karreira",href:"/careers"}
         ],
         admin:[
