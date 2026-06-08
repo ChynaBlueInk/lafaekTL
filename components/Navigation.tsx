@@ -42,7 +42,7 @@ export default function Navigation(){
 
   const L:Lang=language==="tet"?"tet":"en";
 
-  useEffect(()=>{
+useEffect(()=>{
     const handleClickOutside=(event:MouseEvent)=>{
       if(navRef.current&&!navRef.current.contains(event.target as Node)){
         setOpenMenu(null);
@@ -56,7 +56,7 @@ export default function Navigation(){
       }
     };
 
-    document.addEventListener("mousedown",handleClickOutside);
+    document.addEventListener("mousedown",handleClickOutside);  // ← back to mousedown
     document.addEventListener("keydown",handleEscape);
 
     return()=>{
