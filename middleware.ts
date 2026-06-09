@@ -62,10 +62,17 @@ if(
     res.headers.set("x-robots-tag","noindex, nofollow")
     res.headers.set("x-lafaek-protected","admin")
     return res
-  }catch{
-    return buildLoginRedirect(req)
-  }
+  }catch(err){
+
+  console.error(
+    "[MIDDLEWARE AUTH ERROR]",
+    err
+  )
+
+  return buildLoginRedirect(req)
 }
+}
+
 export const config={
 matcher:["/api/admin/:path*"],
 }

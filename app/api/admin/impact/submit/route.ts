@@ -1,4 +1,4 @@
-// app/api/impact/submit/route.ts
+// app/api/admin/submit/route.ts
 export const runtime="nodejs";
 export const dynamic="force-dynamic";
 

@@ -71,34 +71,36 @@ export default function ImpactPage(){
 
   const labels={
     en:{
-      heading:"Impact Stories",
-      intro:"See how Lafaek Learning Media is making a difference in communities across Timor-Leste.",
-      readMore:"Read more",
+      heading:"Impact & Success Stories",
+      intro:"Read stories of positive change, educational success, community impact and personal journeys from across Timor-Leste.",
+      readMore:"Read More",
       viewPdf:"View PDF",
-      searchPlaceholder:"Search impact stories...",
+      shareStory:"Share Your Story",
+      searchPlaceholder:"Search impact & success stories...",
       sortLabel:"Sort by",
       sortLatest:"Latest first",
       sortAZ:"Title A–Z",
       sortCustom:"Editor order (featured first)",
       morePhotos:(n:number)=>`+ ${n} more photos`,
-      noItems:"No impact stories available yet.",
-      loading:"Loading impact stories...",
-      errorTitle:"Could not load impact stories."
+      noItems:"No impact or success stories available yet.",
+      loading:"Loading impact & success stories...",
+      errorTitle:"Could not load impact & success stories."
     },
     tet:{
-      heading:"Istória Impaktu",
-      intro:"Haree oinsá Lafaek Learning Media halo diferensa iha komunidade sira iha Timor-Leste.",
+      heading:"Istória Impaktu no Susesu",
+      intro:"Lee istória kona-ba mudansa positivu, suksesu edukasaun, impaktu iha komunidade no viajen pesoál husi rai-laran Timor-Leste.",
       readMore:"Lee liu tan",
       viewPdf:"Haree PDF",
-      searchPlaceholder:"Buka istória impaktu...",
+      shareStory:"Fahe Ita-nia Istória",
+      searchPlaceholder:"Buka istória impaktu no suksesu...",
       sortLabel:"Ordena tuir",
       sortLatest:"Foun liu ba leten",
       sortAZ:"Titulu A–Z",
       sortCustom:"Ordem editor (artigu destakadu leten)",
       morePhotos:(n:number)=>`+ foto seluk ${n}`,
-      noItems:"Seidauk iha istória impaktu disponivel.",
-      loading:"Hein hela istória impaktu sira...",
-      errorTitle:"La konsege karrega istória impaktu sira."
+      noItems:"Seidauk iha istória impaktu ka suksesu disponivel.",
+      loading:"Hein hela istória impaktu no suksesu sira...",
+      errorTitle:"La konsege karrega istória impaktu no suksesu sira."
     }
   }[L];
 
@@ -253,9 +255,21 @@ export default function ImpactPage(){
   return(
     <main className="min-h-screen bg-[#f5f5f5] px-4 py-10">
       <div className="mx-auto max-w-6xl">
-        <div className="mb-8">
-          <h1 className="text-4xl font-extrabold text-[#333333]">{labels.heading}</h1>
-          <p className="mt-3 max-w-3xl text-[#4F4F4F]">{labels.intro}</p>
+        <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+          <div>
+            <h1 className="text-4xl font-extrabold text-[#333333]">
+              {labels.heading}
+            </h1>
+            <p className="mt-3 max-w-3xl text-[#4F4F4F]">
+              {labels.intro}
+            </p>
+          </div>
+          <Link
+            href="/stories/impact/submit"
+            className="inline-flex items-center justify-center rounded-lg bg-[#219653] px-5 py-3 font-semibold text-white shadow-sm hover:bg-[#1b7f45]"
+          >
+            {labels.shareStory}
+          </Link>
         </div>
 
         <div className="mb-6 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
@@ -346,6 +360,13 @@ export default function ImpactPage(){
                     )}
 
                     <div className="mt-5 flex flex-wrap gap-3">
+                      <Link
+                        href={`/stories/impact/${item.id}`}
+                        className="rounded-lg bg-[#2F80ED] px-4 py-2 text-sm font-semibold text-white hover:opacity-90"
+                      >
+                        {labels.readMore}
+                      </Link>
+
                       {pdfUrl&&(
                         <a
                           href={pdfUrl}

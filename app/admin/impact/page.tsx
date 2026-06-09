@@ -1,6 +1,7 @@
 "use client";
 
 import {useEffect,useMemo,useState,ChangeEvent}from "react";
+import Link from "next/link";
 import {getUserDisplayName,getUserEmail}from "@/lib/auth";
 
 const S3_ORIGIN="https://lafaek-media.s3.ap-southeast-2.amazonaws.com";
@@ -396,7 +397,7 @@ export default function ImpactAdminPage(){
   };
 
   const handleArchive=(id:string)=>{
-    const ok=window.confirm("Archive this story? It will stay in AWS but won’t show on the public site.");
+    const ok=window.confirm("Archive this story? It will stay in AWS but won't show on the public site.");
     if(!ok){return;}
     handleFieldChange(id,"status","archived");
     handleFieldChange(id,"visible",false);
@@ -757,6 +758,14 @@ export default function ImpactAdminPage(){
               </div>
 
               <div className="flex items-center gap-3">
+                {/* ── Submitted Stories navigation button ───────────────── */}
+                <Link
+                  href="/admin/submitted-stories"
+                  className="rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50"
+                >
+                  Submitted Stories
+                </Link>
+
                 <button
                   type="button"
                   onClick={handleAddNew}
@@ -1073,16 +1082,6 @@ export default function ImpactAdminPage(){
 
                       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
                         <div className="space-y-2">
-                          <label className="text-xs font-semibold uppercase tracking-wide text-slate-500">Title (English)</label>
-                          <input
-                            type="text"
-                            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
-                            value={item.titleEn}
-                            onChange={(e)=>handleFieldChange(item.id,"titleEn",e.target.value)}
-                          />
-                        </div>
-
-                        <div className="space-y-2">
                           <label className="text-xs font-semibold uppercase tracking-wide text-slate-500">Title (Tetun)</label>
                           <input
                             type="text"
@@ -1093,12 +1092,12 @@ export default function ImpactAdminPage(){
                         </div>
 
                         <div className="space-y-2">
-                          <label className="text-xs font-semibold uppercase tracking-wide text-slate-500">Excerpt (English)</label>
-                          <textarea
-                            rows={3}
+                          <label className="text-xs font-semibold uppercase tracking-wide text-slate-500">Title (English) — optional</label>
+                          <input
+                            type="text"
                             className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
-                            value={item.excerptEn}
-                            onChange={(e)=>handleFieldChange(item.id,"excerptEn",e.target.value)}
+                            value={item.titleEn}
+                            onChange={(e)=>handleFieldChange(item.id,"titleEn",e.target.value)}
                           />
                         </div>
 
@@ -1113,12 +1112,12 @@ export default function ImpactAdminPage(){
                         </div>
 
                         <div className="space-y-2">
-                          <label className="text-xs font-semibold uppercase tracking-wide text-slate-500">Body (English)</label>
+                          <label className="text-xs font-semibold uppercase tracking-wide text-slate-500">Excerpt (English) — optional</label>
                           <textarea
-                            rows={7}
+                            rows={3}
                             className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
-                            value={item.bodyEn}
-                            onChange={(e)=>handleFieldChange(item.id,"bodyEn",e.target.value)}
+                            value={item.excerptEn}
+                            onChange={(e)=>handleFieldChange(item.id,"excerptEn",e.target.value)}
                           />
                         </div>
 
@@ -1129,6 +1128,16 @@ export default function ImpactAdminPage(){
                             className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
                             value={item.bodyTet}
                             onChange={(e)=>handleFieldChange(item.id,"bodyTet",e.target.value)}
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <label className="text-xs font-semibold uppercase tracking-wide text-slate-500">Body (English) — optional</label>
+                          <textarea
+                            rows={7}
+                            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+                            value={item.bodyEn}
+                            onChange={(e)=>handleFieldChange(item.id,"bodyEn",e.target.value)}
                           />
                         </div>
                       </div>
@@ -1271,16 +1280,6 @@ export default function ImpactAdminPage(){
 
               <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <label className="text-xs font-semibold uppercase tracking-wide text-slate-500">Title (English)</label>
-                  <input
-                    type="text"
-                    className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
-                    value={newItem.titleEn}
-                    onChange={(e)=>setNewItem((prev)=>({...prev,titleEn:e.target.value}))}
-                  />
-                </div>
-
-                <div className="space-y-2">
                   <label className="text-xs font-semibold uppercase tracking-wide text-slate-500">Title (Tetun)</label>
                   <input
                     type="text"
@@ -1290,8 +1289,28 @@ export default function ImpactAdminPage(){
                   />
                 </div>
 
+                <div className="space-y-2">
+                  <label className="text-xs font-semibold uppercase tracking-wide text-slate-500">Title (English) — optional</label>
+                  <input
+                    type="text"
+                    className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+                    value={newItem.titleEn}
+                    onChange={(e)=>setNewItem((prev)=>({...prev,titleEn:e.target.value}))}
+                  />
+                </div>
+
                 <div className="space-y-2 md:col-span-2">
-                  <label className="text-xs font-semibold uppercase tracking-wide text-slate-500">Excerpt (English)</label>
+                  <label className="text-xs font-semibold uppercase tracking-wide text-slate-500">Excerpt (Tetun)</label>
+                  <textarea
+                    rows={3}
+                    className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+                    value={newItem.excerptTet}
+                    onChange={(e)=>setNewItem((prev)=>({...prev,excerptTet:e.target.value}))}
+                  />
+                </div>
+
+                <div className="space-y-2 md:col-span-2">
+                  <label className="text-xs font-semibold uppercase tracking-wide text-slate-500">Excerpt (English) — optional</label>
                   <textarea
                     rows={3}
                     className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
