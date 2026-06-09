@@ -1,6 +1,6 @@
 "use client";
 
-import {useEffect,useMemo,useState,ChangeEvent}from "react";
+import {useEffect,useLayoutEffect,useMemo,useRef,useState,ChangeEvent}from "react";
 import Link from "next/link";
 import {getUserDisplayName,getUserEmail}from "@/lib/auth";
 
@@ -173,6 +173,11 @@ export default function ImpactAdminPage(){
 
   const[dirtyIds,setDirtyIds]=useState<Set<string>>(new Set());
 
+  // ── Mobile filter collapse ─────────────────────────────────────────────────
+  const[showFilters,setShowFilters]=useState<boolean>(false);
+  const stickyRef=useRef<HTMLDivElement>(null);
+  const[stickyHeight,setStickyHeight]=useState<number>(0);
+
   useEffect(()=>{
     const load=async()=>{
       try{
@@ -279,6 +284,18 @@ export default function ImpactAdminPage(){
       document.removeEventListener("click",handleDocumentClick,true);
     };
   },[hasChanges]);
+
+  // ── Measure sticky bar height so the spacer div is always exact ───────────
+  useLayoutEffect(()=>{
+    const el=stickyRef.current;
+    if(!el){return;}
+    const observer=new ResizeObserver(()=>{
+      setStickyHeight(el.offsetHeight);
+    });
+    observer.observe(el);
+    setStickyHeight(el.offsetHeight);
+    return()=>observer.disconnect();
+  },[showFilters]);
 
   const markChanged=(id?:string)=>{
     if(!hasChanges){
@@ -747,7 +764,8 @@ export default function ImpactAdminPage(){
     <div className="min-h-screen bg-slate-50">
       <div className="mx-auto max-w-7xl px-4 py-8">
         <div
-         className="sticky top-28 z-30 -mx-4 mb-6 border-b border-slate-200 bg-white/95 px-4 py-3 backdrop-blur md:top-32">
+          ref={stickyRef}
+          className="sticky top-28 z-30 -mx-4 mb-6 border-b border-slate-200 bg-white/95 px-4 py-3 backdrop-blur md:top-32">
           <div className="mx-auto max-w-7xl px-4 py-3">
             <div className="flex flex-col justify-between gap-3 md:flex-row md:items-center">
               <div>
@@ -758,7 +776,6 @@ export default function ImpactAdminPage(){
               </div>
 
               <div className="flex items-center gap-3">
-                {/* ── Submitted Stories navigation button ───────────────── */}
                 <Link
                   href="/admin/submitted-stories"
                   className="rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50"
@@ -793,7 +810,7 @@ export default function ImpactAdminPage(){
                   value={query}
                   onChange={(e)=>setQuery(e.target.value)}
                 />
-                <label className="inline-flex items-center gap-2 text-sm text-slate-700">
+                <label className="hidden items-center gap-2 text-sm text-slate-700 md:inline-flex">
                   <input
                     type="checkbox"
                     className="h-4 w-4 rounded border-slate-300"
@@ -804,15 +821,46 @@ export default function ImpactAdminPage(){
                 </label>
               </div>
 
-              {hasChanges&&(
-                <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
-                  Unsaved changes
-                </div>
-              )}
+              <div className="flex items-center gap-2">
+                {/* Mobile-only filter toggle */}
+                <button
+                  type="button"
+                  onClick={()=>setShowFilters((v)=>!v)}
+                  className="inline-flex items-center gap-1.5 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 md:hidden"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z"/>
+                  </svg>
+                  {showFilters?"Hide filters":"Filters"}
+                  {(filterMode!=="all"||statusFilter!=="all"||dateFrom||dateTo||onlyWithImage||onlyWithPdf)&&(
+                    <span className="ml-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-blue-600 text-[10px] font-bold text-white">
+                      !
+                    </span>
+                  )}
+                </button>
+
+                {hasChanges&&(
+                  <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+                    Unsaved changes
+                  </div>
+                )}
+              </div>
             </div>
 
-            <div className="mt-3 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            {/* Filter row — always visible on desktop, collapsible on mobile */}
+            <div className={`mt-3 flex-col gap-3 md:flex md:flex-row md:items-center md:justify-between ${showFilters?"flex":"hidden"}`}>
               <div className="flex flex-wrap items-center gap-3 text-sm text-slate-700">
+                {/* Show S3 keys — in filter panel on mobile, in search row on desktop */}
+                <label className="inline-flex items-center gap-2 md:hidden">
+                  <input
+                    type="checkbox"
+                    className="h-4 w-4 rounded border-slate-300"
+                    checked={showKeys}
+                    onChange={(e)=>setShowKeys(e.target.checked)}
+                  />
+                  Show S3 keys
+                </label>
+
                 <div className="flex items-center gap-2">
                   <span className="text-xs text-slate-500">Show</span>
                   <select
@@ -916,7 +964,8 @@ export default function ImpactAdminPage(){
           </div>
         </div>
 
-        <div className="h-72 md:h-52" />
+        {/* Spacer sized to the exact sticky bar height — no hardcoded guessing */}
+        <div style={{height:stickyHeight||0}} />
 
         {hasChanges&&(
           <div className="mb-4 rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
