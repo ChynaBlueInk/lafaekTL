@@ -16,7 +16,6 @@ import {
 type AdminKey =
   | "team"
   | "magazines"
-  | "books"
   | "learning"
   | "news"
   | "impact"
@@ -69,15 +68,7 @@ export default function AdminHubPage() {
         descTet: "Upload capa, pájina amostra, no PDF revista.",
         allowed: canAccessAdminMagazines,
       },
-      {
-        key: "books",
-        href: "/admin/books",
-        titleEn: "Books",
-        titleTet: "Livru sira",
-        descEn: "Add and manage children’s books, cover images, descriptions, and reading files.",
-        descTet: "Hatama no jere livru labarik, imajen kapa, deskrisaun, no arquivo leitura.",
-        allowed: canAccessAdminMagazines,
-      },
+      
       {
         key: "learning",
         href: "/admin/learning",
@@ -199,36 +190,7 @@ export default function AdminHubPage() {
           "Uza pájina amostra ba preview públiku.",
           "Verifika imajen kapa iha karta.",
         ],
-      },
-      books: {
-        titleEn: "How to update Books",
-        titleTet: "Oinsá atu atualiza Livru sira",
-        stepsEn: [
-          "Open the Books admin page.",
-          "Add a new book or edit an existing one.",
-          "Choose the level, add English and Tetun titles, and write short descriptions.",
-          "Upload the cover image and page images in reading order.",
-          "Upload the source PDF if you have one.",
-          "Click Save Changes at the top to publish the updates to the site.",
-        ],
-        stepsTet: [
-          "Loke pájina admin Livru sira.",
-          "Hatama livru foun ka edit ida ne'ebé iha ona.",
-          "Hili level, hatama titulu Inglés no Tetun, no hakerek deskrisaun badak.",
-          "Upload imajen kapa no imajen pajina tuir ordem leitura.",
-          "Upload source PDF se iha.",
-          "Klik Save Changes iha leten atu publika mudansa sira ba website.",
-        ],
-        tipsEn: [
-          "Add page images in the order you want them read.",
-          "Use edit later to add more pages when new content is created.",
-          "Books stay in their own section, separate from Learning items.",
-        ],
-        tipsTet: [
-          "Hatama imajen pajina tuir ordem leitura.",
-          "Uza edit depois atu aumenta tan pajina foun bainhira kontentu foun kria.",
-          "Livru sira hela iha seksaun rasik, ketak husi item Learning.",
-        ],
+
       },
       learning: {
         titleEn: "How to update Learning",

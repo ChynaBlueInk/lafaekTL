@@ -86,7 +86,7 @@ useEffect(()=>{
         groups:{
           programs:{
             title:"Programs",
-            description:"Explore Lafaek magazines, stories, videos, books, and learning resources.",
+            description:"Explore Lafaek magazines, stories, videos, and learning resources.",
             links:[
               {
                 label:"Magazines",
@@ -113,12 +113,7 @@ useEffect(()=>{
                 href:"/learning",
                 description:"Learning resources and activities."
               },
-              {
-                label:"Books",
-                href:"/temp/books",
-                description:"Children’s books and reading resources."
-              }
-            ]
+             ]
           },
           keepSafe:{
             title:"Keep Safe Online",
@@ -259,11 +254,7 @@ useEffect(()=>{
                 href:"/learning",
                 description:"Rekursu aprendizajen no atividade sira."
               },
-              {
-                label:"Livru sira",
-                href:"/temp/books",
-                description:"Livru labarik no rekursu leitura."
-              }
+            
             ]
           },
           keepSafe:{
