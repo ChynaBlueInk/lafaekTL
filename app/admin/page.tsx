@@ -9,8 +9,11 @@ import {
   canAccessAdminMagazines,
   canAccessAdminNews,
   canAccessAdminImpact,
+  canAccessAdminReports,
   canAccessAdminRevistaMedia,
   canAccessAdminCareers,
+  canAccessAdminUsers,
+  canAccessAdminLearning,
 } from "@/lib/auth"
 
 type AdminKey =
@@ -22,6 +25,7 @@ type AdminKey =
   | "reports"
   | "revistaMedia"
   | "careers"
+  | "users"
 
 type AdminLink = {
   key: AdminKey
@@ -76,7 +80,7 @@ export default function AdminHubPage() {
         titleTet: "Aprendizajen",
         descEn: "Add category-based learning flipbooks and readers for the Learning section.",
         descTet: "Hatama flipbook no leitór kategoría ba seksaun Aprendizajen.",
-        allowed: canAccessAdminMagazines,
+        allowed: canAccessAdminLearning,
       },
       {
         key: "news",
@@ -103,7 +107,7 @@ export default function AdminHubPage() {
         titleTet: "Relatóriu sira",
         descEn: "Upload and manage PDF reports with title, date, short description, and category.",
         descTet: "Upload no jere relatóriu PDF ho titulu, data, deskrisaun badak, no kategoría.",
-        allowed: canAccessAdminImpact,
+        allowed: canAccessAdminReports,
       },
       {
         key: "revistaMedia",
@@ -122,6 +126,15 @@ export default function AdminHubPage() {
         descEn: "Review submitted jobs, publish approved roles, archive old listings, or reject unsuitable submissions.",
         descTet: "Haree vaga ne'ebé submete ona, publika vaga ne'ebé aprova, arkiva lista antigu, ka rejeita submisaun ne'ebé la apropriadu.",
         allowed: canAccessAdminCareers,
+      },
+      {
+        key: "users" as AdminKey,
+        href: "/admin/users",
+        titleEn: "User Management",
+        titleTet: "Jestaun Utilizadór sira",
+        descEn: "Add, edit, and disable admin users. Assign roles and manage access.",
+        descTet: "Aumenta, edit, no desativa utilizadór admin. Atribui funsaun no jere asesu.",
+        allowed: canAccessAdminUsers,
       },
     ],
     []
@@ -366,6 +379,38 @@ export default function AdminHubPage() {
           "Uza formulariu edit ba detalhu vaga tomak.",
         ],
       },
+      users: {
+        titleEn: "How to manage Users",
+        titleTet: "Oinsá atu jere Utilizadór sira",
+        stepsEn: [
+          "Open the User Management page.",
+          "Click Add User to create a new admin account.",
+          "Enter the user’s full name, email, and assign a role.",
+          "The user will receive an automatic email to set their password.",
+          "To change a role, click Edit next to the user.",
+          "To block access, click Disable — this disables their Cognito account immediately.",
+          "To restore access, click Enable.",
+        ],
+        stepsTet: [
+          "Loke pájina Jestaun Utilizadór.",
+          "Klik Add User atu kria konta admin foun.",
+          "Hatama naran kompletu, email, no atribui funsaun.",
+          "Utilizadór sei simu email automátiku atu define password.",
+          "Atu muda funsaun, klik Edit iha sorin utilizadór.",
+          "Atu blokeia asesu, klik Disable — ne’e desativa konta Cognito imediatamente.",
+          "Atu fó fali asesu, klik Enable.",
+        ],
+        tipsEn: [
+          "Only SuperAdmins can see this page.",
+          "Roles: SuperAdmin (full), Magazine, Impact, Learning.",
+          "Disable is a soft block — it can be reversed. It does not delete the account.",
+        ],
+        tipsTet: [
+          "De’it SuperAdmin bele haree pájina ida ne’e.",
+          "Funsaun: SuperAdmin (tomak), Magazine, Impact, Learning.",
+          "Disable blokeia asesu maibé la apaga konta — bele reverte.",
+        ],
+      },
     }),
     []
   )
@@ -398,7 +443,7 @@ export default function AdminHubPage() {
   }[L]
 
   return (
-    <AdminGuard allowedRoles={["Admin", "ContentEditor", "MagazineAdmin", "Communications", "ImpactStoryContributor"]}>
+    <AdminGuard allowedRoles={["Admin", "ContentEditor", "MagazineAdmin", "Communications", "ImpactStoryContributor", "SuperAdmin", "Magazine", "Impact", "Learning"]}>
       <div className="min-h-screen bg-slate-50">
         <main className="mx-auto max-w-6xl px-4 py-10">
           <header className="mb-8">

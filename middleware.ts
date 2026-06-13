@@ -12,7 +12,22 @@ const CLIENT_ID=process.env.COGNITO_CLIENT_ID||"30g26p9ts1baddag42g747snp3"
 const ISSUER=`https://cognito-idp.${REGION}.amazonaws.com/${USER_POOL_ID}`
 const JWKS=createRemoteJWKSet(new URL(`${ISSUER}/.well-known/jwks.json`))
 
-const ADMIN_GROUPS=["admin","contenteditor","impactstorycontributor","magazineadmin"]
+const ADMIN_GROUPS=[
+  "admin",
+  "contenteditor",
+  "impactstorycontributor",
+  "magazineadmin",
+  "superadmin",
+  "magazine",
+  "impact",
+  "learning",
+  "news",
+  "ourteam",
+  "videos",
+  "careers",
+  "reports",
+  "books",
+]
 
 function buildLoginRedirect(req:NextRequest){
   const url=req.nextUrl.clone()

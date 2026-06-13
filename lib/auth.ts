@@ -7,6 +7,10 @@ export type LafaekRole=
   |"MagazineBuyer"
   |"FriendsOfLafaek"
   |"ImpactStoryContributor"
+  |"SuperAdmin"
+  |"Learning"
+  |"Magazine"
+  |"Impact"
 
 const AUTHORITY=
   process.env.NEXT_PUBLIC_COGNITO_AUTHORITY||
@@ -96,30 +100,51 @@ export function hasAnyRole(allowedRoles:LafaekRole[]){
 }
 
 // --- Admin access model ---
-// Everyone in these roles can VIEW /admin (landing page)
-export function canAccessAdminHome(){
-  return hasAnyRole(["Admin","ContentEditor","MagazineAdmin","Communications","ImpactStoryContributor"])
+// Each function checks both legacy Cognito groups and the new per-section groups.
+
+export function isSuperAdmin(){
+  const groups=getUserGroupsFromSessionStorage()
+  return groups.map((g)=>g.toLowerCase()).includes("superadmin")
 }
 
-// Page-level permissions (what they can click into)
 export function canAccessAdminNews(){
-  return hasAnyRole(["Admin","ContentEditor","Communications"])
+  return isSuperAdmin()||hasAnyRole(["Admin","ContentEditor","Communications","News"])
 }
 
 export function canAccessAdminImpact(){
-  return hasAnyRole(["Admin","ContentEditor","Communications","ImpactStoryContributor"])
+  return isSuperAdmin()||hasAnyRole(["Admin","ContentEditor","Communications","ImpactStoryContributor","Impact"])
 }
 
 export function canAccessAdminMagazines(){
-  return hasAnyRole(["Admin","MagazineAdmin"])
+  return isSuperAdmin()||hasAnyRole(["Admin","MagazineAdmin","Magazine"])
+}
+
+export function canAccessAdminLearning(){
+  return isSuperAdmin()||hasAnyRole(["Admin","MagazineAdmin","Learning"])
 }
 
 export function canAccessAdminOurTeam(){
-  return hasAnyRole(["Admin"])
+  return isSuperAdmin()||hasAnyRole(["Admin","OurTeam"])
 }
 
 export function canAccessAdminRevistaMedia(){
-  return hasAnyRole(["Admin","Communications","ContentEditor"])
+  return isSuperAdmin()||hasAnyRole(["Admin","Communications","ContentEditor","Videos"])
+}
+
+export function canAccessAdminReports(){
+  return isSuperAdmin()||hasAnyRole(["Admin","ContentEditor","Communications","ImpactStoryContributor","Reports"])
+}
+
+export function canAccessAdminCareers(){
+  return isSuperAdmin()||hasAnyRole(["Admin","ContentEditor","Careers"])
+}
+
+export function canAccessAdminUsers(){
+  return isSuperAdmin()
+}
+
+export function isAdmin(){
+  return isSuperAdmin()||hasAnyRole(["Admin"])
 }
 
 // Backwards-compatible alias
@@ -127,10 +152,21 @@ export function canAccessAdminArea(){
   return canAccessAdminHome()
 }
 
-export function isAdmin(){
-  return hasAnyRole(["Admin"])
-}
-
-export function canAccessAdminCareers(){
-  return canAccessAdminArea();
+export function canAccessAdminHome(){
+  return isSuperAdmin()||hasAnyRole([
+    "Admin",
+    "ContentEditor",
+    "MagazineAdmin",
+    "Communications",
+    "ImpactStoryContributor",
+    "Magazine",
+    "Learning",
+    "Impact",
+    "News",
+    "OurTeam",
+    "Videos",
+    "Careers",
+    "Reports",
+    "Books",
+  ])
 }
