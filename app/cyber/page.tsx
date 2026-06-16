@@ -65,6 +65,154 @@ type T = {
 // ─── Translations ─────────────────────────────────────────────────────────────
 
 const TRANSLATIONS: Record<Lang, T> = {
+  tet: {
+    heroLabel: "SEGURANSA DIJITÁL LAFAEK",
+    heroTitle: "Internét",
+    heroTitle2: "ba ema hotu.",
+    heroSubtitle:
+      "Ida-ne'e mós ita-nia responsabilidade atu uza teknolojia ho seguru. Seguransa sibernétika la'ós de'it ba ema espesialista sira — ida-ne'e proteje família, komunidade, no Timor-Leste nia futuru.",
+
+    whatTitle: "Saida mak Seguransa Sibernétika?",
+    whatLead:
+      "Seguransa sibernétika mak oinsá ita proteje ita-nia an, ita-nia informasaun, no ita-nia sasán teknolojia sira husi perigu iha mundu dijitál laran. Ida-ne'e inklui buat hotu, hahú husi kria kódigu (password) ne'ebé forte to'o koñese se mak tenta atu lohi ka utiliza ita.",
+    whatCards: [
+      {
+        icon: "shield",
+        title: "Proteje ita-nia identidade",
+        desc: "Ita-nia naran, foto, hela-fatin, no dokumentu pesoál sira mak valiozu. Seguransa sibernétika ajuda rai sira hosi liman sala.",
+      },
+      {
+        icon: "globe",
+        title: "Nafatin seguru iha plataforma sira",
+        desc: "Rede sosiál, aplikasaun mensajen, no sítiu web sira bele fó risku ba fraude, konteúdu ne'ebé fo prejuízu, no ema sira ne'ebé laiha intensaun di'ak.",
+      },
+      {
+        icon: "lock",
+        title: "Seguransa ita-nia Konta",
+        desc: "Email, banku, plataforma eskola nian, no servisu governu nian, sira hotu presiza protezaun — password ne'ebé fraku ida de'it bele loke buat hotu.",
+      },
+      {
+        icon: "phone",
+        title: "Uza dispozitivu ho matenek",
+        desc: "Telemovel no laptop sira rai dadus pesoál ne'ebé barak tebes. Hatene oinsá atu proteje ekipamentu sira-ne'e, katak Ita mós proteje Ita-nia moris tomak.",
+      },
+    ],
+
+    whyTitle: "Tamba Saida Ne'e Importante Agora",
+    whyLead:
+      "Ameasa dijitál la'ós buat ne'ebé imajináriu de'it — sira afeta ema loloos loron-loron. Bainhira Timor-Leste sai konektadu liu, risku sira mós boot liu.",
+    whyPoints: [
+      {
+        stat: "3.4B",
+        label: "E-mail lasu (phishing) haruka sai loron-loron.",
+        desc: "Mensajen lasu (scam) billiaun ba billiaun haruka sai loron-loron. Ida-ne'e tama ba nasaun hotu no ema hotu nia inbox",
+      },
+      {
+        stat: "95%",
+        label: "Atake envolve erru umanu",
+        desc: "Atake barak susesu tanba ema klike ba link ruma, fahe sira-nia password, ka fiar ema ne'ebé ladi'ak.",
+      },
+      {
+        stat: "↑62%",
+        label: "Fraude iha telemovel aumenta",
+        desc: "Atake ba smartphone sira aumenta lalais liu fali kómputer—no ita hatene katak ema barak liu iha Timor-Leste uza telemóvel de'it atu asesu ba internet.",
+      },
+    ],
+
+    nationTitle: "Tamba Saida Mak Ida Ne'e Importante ba Timor-Leste",
+    nationLead:
+      "Nu'udar nasaun ida ne'ebé foin foin sa'e iha mundu, Timor-Leste harii daudaun ninia futuru dijitál agora. Ida-ne'e kria oportunidade ne'ebé di'ak—maibé mós kria kbiit-fraku ne'ebé reál.",
+    nationPoints: [
+      "Uza internet iha telemóvel aumenta lalais tebes, ida-ne'e lori ema milliaun ba milliaun atu asesu ba mundu dijitál ba dala uluk, maibé barak mak seidauk iha koñesimentu kona-ba oinsá atu uza internet ho seguru.",
+      "Servisu Governu nian, banku, no negósiu sira agora uza ona sistema dijitál—tanba ne'e, importante tebes ba ita atu aprende oinsá uza teknolojia ho seguru hodi bele partisipa iha dezenvolvimentu ekonómiku.",
+      "Ema foin-sa'e sira mak sai maioria iha ita-nia populasaun. Sira-nia lala'ok iha mundu dijitál ohin loron nian sei fó influénsia ba Timor-Leste nia kultura teknolojia ba jerasaun foun tuir mai.",
+      "Nasaun ki'ik sira bele sai targetu tanba de'it sira iha rekursu ba seguransa sibernétika ne'ebé uitoan no mós konsiénsia públiku nian ne'ebé sei menus.",
+      "Kampaña dezinformasaun no manipulasaun sira bele espalla ho lalais iha komunidade ne'ebé besik malu no iha ekosistema informasaun ne'ebé ki'ik.",
+      "Atake boot ida de'it ba sistema ne'ebé importante—hanesan saúde, finansa, ka infrastruktura—sei fó impaktu ne'ebé boot tebes ba ita-nia populasaun ne'ebé ki'ik.",
+    ],
+    nationClosing:
+      "Seguransa dijitál la'ós de'it hili-ba-an-rasik. Iha Timor-Leste, ida-ne'e mak responsabilidade komunidade nian no sai mós forsa ida atu proteje ita-nia nasaun.",
+
+    consequencesTitle: "Konsekuénsia ne'ebé Realidade",
+    consequencesLead:
+      "Bainhira ita la fó atensaun ba Seguransa sibernétika, ninia rezultadu ladi'ak ne'e reál tebes—ba ita-nia an, família, instituisaun sira, no ba nasaun tomak.",
+    consequences: [
+      {
+        label: "Na'ok identidade",
+        desc: "Dokumentu pesoál, konta banku, no identidade online sira ema na'ok no uza sala—dala ruma durante tinan barak mak vítima foin hatene.",
+        severity: "critical",
+      },
+      {
+        label: "Lakon Finanseiru",
+        desc: "Lasu (scam), oferese serbisu falsu, no lohi-teen banku nian bele hamoos ita-nia osan ne'ebé rai hela. Ba família sira ne'ebé kbiit-laek, atake ida de'it bele lori sira ba situasaun ne'ebé susar tebes.",
+        severity: "critical",
+      },
+      {
+        label: "Asédiu no Xantajen Seksuál",
+        desc: "Imajen ka mensajen privadu sira uza hanesan kilat atu kobra osan, hamoe, ka kontrola vítima sira—baibain sira mak foka liu ba foin-sa'e sira.",
+        severity: "high",
+      },
+      {
+        label: "Espalla dezinformasaun",
+        desc: "Informasaun falsu kona-ba saúde, polítika, ka seguransa naklekar iha komunidade laran, ida-ne'e harahun konfiansa no lori mós perigu ba ita hotu.",
+        severity: "high",
+      },
+      {
+        label: "Estragu instituisionál",
+        desc: "Eskola, ospitál, no eskritóriu governu ne'ebé hetan atake bele lakon sira-nia dadus no mós kapasidade operasionál, ida-ne'e fó impaktu ba komunidade tomak.",
+        severity: "critical",
+      },
+      {
+        label: "Lakon fiar",
+        desc: "Bainhira ema la fiar ona ba sistema dijitál sira, sira sei hadook an husi ida-ne'e—ida-ne'e sei hametin dezenvolvimentu ekonómiku no hanetik ita-nia asesu ba servisu sira ne'ebé importante.",
+        severity: "medium",
+      },
+    ],
+
+    audienceTitle: "Hili Ita-nia Dalan",
+    audienceSubtitle: "Seguransa online haree diferente iha kada etapa moris. Hili guia ne'ebé tuir ho ita.",
+    audiences: [
+      {
+        href: "/cyber/children",
+        age: "Tinan 7–14",
+        title: "Esploradór Foin-sa'e",
+        desc: "Aventura divertidu no interativu ne'ebé hanorin fundamentu ba labarik sira atu nafatin seguru online — liu husi jogu, karakter, no regra simples.",
+        cta: "Hahu aventura",
+        theme: "children",
+      },
+      {
+        href: "/cyber/youth",
+        age: "Tinan 15–25",
+        title: "Guardiaun Siber",
+        desc: "Kbiit prátiku ba rede sosiál, jogu, estudu, no servisu — identifika fraude, proteje konta, no kuidadu privasidade.",
+        cta: "Tama misaun",
+        theme: "youth",
+      },
+      {
+        href: "/cyber/adults",
+        age: "Adultu no Família",
+        title: "Protetor Komunidade",
+        desc: "Orientasaun ba inan-aman, profisionál, no membru komunidade — proteje família, servisu, finansa, no ema sira iha ita-nia sorin.",
+        cta: "Harii protesaun",
+        theme: "adults",
+      },
+    ],
+
+    togetherTitle: "Seguransa Mak Esforsu Komunidade",
+    togetherLead:
+      "Konsiensia individuál importante — maibé forsa ne'ebé loos mosu bainhira família, eskola, no komunidade hotu prátika hábitu seguru hamutuk.",
+    togetherPoints: [
+      "Fahe saida mak ita aprende ho ita-nia família, liuliu inan-aman ka avó sira ne'ebé bele seidauk hatene di'ak kona-ba ameasa dijitál.",
+      "Ko'alia livre kona-ba esperiénsia online — halakon moe kona-ba sala sira, hodi nune'e fasil liu atu husu ajuda.",
+      "Eskola no fatin servisu ne'ebé harii konsiensia siberseguransa proteje ema hotu iha sira-nia rede, la'ós de'it ema ida-idak.",
+      "Relata lalais fraude no konteúdu suspetu — ita-nia asaun ne'e proteje ema seluk ne'ebé bele simu mensajen hanesan.",
+    ],
+
+    quoteText:
+      "Korente ida nia forsa depende ba nia elo ne'ebé fraku liu. Iha sosiedade ne'ebé konektadu, seguransa ema hotu nian depende ba koñesimentu husi ema hotu.",
+    quoteSource: "Prinsípiu ba forsa siberseguransa hamutuk",
+  },
+
   en: {
     heroLabel: "LAFAEK DIGITAL SAFETY",
     heroTitle: "The Internet",
@@ -211,154 +359,6 @@ const TRANSLATIONS: Record<Lang, T> = {
     quoteText:
       "A chain is only as strong as its weakest link. In a connected society, everyone's security depends on everyone else's awareness.",
     quoteSource: "Principle of collective cyber resilience",
-  },
-
-  tet: {
-    heroLabel: "SEGURANSA DIJITÁL LAFAEK",
-    heroTitle: "Internét",
-    heroTitle2: "ba ema hotu.",
-    heroSubtitle:
-      "Responsabilidade atu uza ho seguru mós ba ema hotu. Siberseguransa la'ós de'it ba espesialista — nia proteje família, komunidade, no futuru Timor-Leste nian.",
-
-    whatTitle: "Saida mak Siberseguransa?",
-    whatLead:
-      "Siberseguransa mak prátika atu proteje an rasik, informasaun, no dispozitivu hosi ameasa online. Nia kobre buat hotu hosi halo password forte to'o hatene bainhira ema ida hakarak halu ka manipula ita.",
-    whatCards: [
-      {
-        icon: "shield",
-        title: "Proteje ita-nia identidade",
-        desc: "Ita-nia naran, foto, hela-fatin, no dokumentu pesoál sira mak valiozu. Siberseguransa ajuda rai sira hosi liman sala.",
-      },
-      {
-        icon: "globe",
-        title: "Nafatin seguru iha plataforma sira",
-        desc: "Rede sosiál, app mensajen, no website sira bele ekspoze ita ba fraude, konteúdu aat, no ema la iha intensaun di'ak.",
-      },
-      {
-        icon: "lock",
-        title: "Segura ita-nia konta sira",
-        desc: "Email, banku, plataforma eskola, no servisu governu hotu presiza protesaun — password fraku ida bele loke buat hotu.",
-      },
-      {
-        icon: "phone",
-        title: "Uza dispozitivu ho matenek",
-        desc: "Telemovel no laptop rai data pesoál barak tebes. Hatene oinsá atu segura sira proteje ita-nia moris hotu.",
-      },
-    ],
-
-    whyTitle: "Tamba Saida Ne'e Importante Agora",
-    whyLead:
-      "Ameasa dijitál la'ós abstrata — sira afeta ema loloos loron-loron. Bainhira Timor-Leste sai konektadu liu, risku sira mós boot liu.",
-    whyPoints: [
-      {
-        stat: "3.4B",
-        label: "Email phishing haruka loron-loron",
-        desc: "Mensajen fraude haruka biliaun barak loron-loron. Sira to'o iha nasaun hotu-hotu, inbox hotu-hotu.",
-      },
-      {
-        stat: "95%",
-        label: "Atake envolve erru umanu",
-        desc: "Atake barak liu susesu tanba ema klik link ida, fahe password, ka fiar ema sala.",
-      },
-      {
-        stat: "↑62%",
-        label: "Fraude iha telemovel aumenta",
-        desc: "Atake iha smartphone sae lalais liu hosi komputadór — no telemovel mak oinsá ema barak iha Timor-Leste asesu internét.",
-      },
-    ],
-
-    nationTitle: "Tamba Saida Ne'e Importante ba Timor-Leste",
-    nationLead:
-      "Hanesan nasaun foun ida iha mundu, Timor-Leste konstrui nia futuru dijitál agora. Ne'e kria oportunidade loos — no vulnerabilidade loos.",
-    nationPoints: [
-      "Adopsaun internét iha telemovel sae lalais, lori millaun ema online ba dala primeiru ho edukasaun seguransa dijitál ki'ik.",
-      "Servisu governu, banku, no negósiu sai dijitál liu — halo prátika seguru sai esensiál ba partisipasaun ekonómiku.",
-      "Foin-sa'e sira halo maioria populasaun nian. Sira-nia hábitu dijitál agora sei forma kultura siberseguransa nasaun nian ba jerasaun ida.",
-      "Nasaun ki'ik sira bele sai alvu tamba iha rekursu siberseguransa uitoan no konsiensia públiku menus.",
-      "Kampaña dezinformasaun no manipulasaun bele espalla lalais iha komunidade ne'ebé iha ligasaun forte no ekosistema informasaun ki'ik.",
-      "Violasaun boot ida hosi sistema krítiku — saúde, finansa, ka infraestrutura — sei iha impaktu boot ba populasaun ki'ik.",
-    ],
-    nationClosing:
-      "Seguransa online la'ós de'it hili pesoál. Iha Timor-Leste, ne'e responsabilidade komunidade no forma reziliénsia nasionál.",
-
-    consequencesTitle: "Konsekuénsia Loloos",
-    consequencesLead:
-      "Bainhira siberseguransa hetan ignoradu, estragu loos — ba ema, família, instituisaun, no nasaun.",
-    consequences: [
-      {
-        label: "Roubu identidade",
-        desc: "Dokumentu pesoál, konta banku, no identidade online roubadu no uza sala — beibeik tinan barak antes vítima hatene.",
-        severity: "critical",
-      },
-      {
-        label: "Lakon osan",
-        desc: "Fraude, oferta servisu falsu, no fraude banku husik poupansa mamuk. Ba família rendimentu kraik, atake ida bele sai katástrofe.",
-        severity: "critical",
-      },
-      {
-        label: "Asédiu no sextortion",
-        desc: "Imajen ka mensajen privadu uza hanesan arma atu estorika, humilia, ka kontrola vítima — beibeik alvu foin-sa'e sira.",
-        severity: "high",
-      },
-      {
-        label: "Espalla dezinformasaun",
-        desc: "Informasaun falsu kona-ba saúde, polítika, ka seguransa espalla iha komunidade, estraga fiar no kauza estragu.",
-        severity: "high",
-      },
-      {
-        label: "Estragu instituisionál",
-        desc: "Eskola, ospitál, no eskritóriu governu ne'ebé hetan atake lakon data no kapasidade operasionál, afeta komunidade hotu.",
-        severity: "critical",
-      },
-      {
-        label: "Lakon fiar",
-        desc: "Bainhira ema la fiar sistema dijitál ona, sira evita sira — taka dezenvolvimentu ekonómiku no asesu ba servisu esensiál.",
-        severity: "medium",
-      },
-    ],
-
-    audienceTitle: "Hili Ita-nia Dalan",
-    audienceSubtitle: "Seguransa online haree diferente iha kada etapa moris. Hili guia ne'ebé tuir ho ita.",
-    audiences: [
-      {
-        href: "/cyber/children",
-        age: "Tinan 7–14",
-        title: "Eksplorادór Ki'ik",
-        desc: "Aventura divertidu no interativu ne'ebé hanorin labarik sira báziku atu nafatin seguru online — liu husi jogu, karakter, no regra simples.",
-        cta: "Hahu aventura",
-        theme: "children",
-      },
-      {
-        href: "/cyber/youth",
-        age: "Tinan 15–25",
-        title: "Cyber Vanguard",
-        desc: "Kbiit prátiku ba rede sosiál, jogu, estudu, no servisu — hatene fraude, taka konta, no proteje privasidade.",
-        cta: "Tama misaun",
-        theme: "youth",
-      },
-      {
-        href: "/cyber/adults",
-        age: "Adultu no Família",
-        title: "Protetor Komunidade",
-        desc: "Orientasaun ba inan-aman, profisionál, no membru komunidade — proteje família, servisu, finansa, no ema sira iha nia leet.",
-        cta: "Harii protesaun",
-        theme: "adults",
-      },
-    ],
-
-    togetherTitle: "Seguransa Mak Esforsu Komunidade",
-    togetherLead:
-      "Konsiensia individuál importante — maibé reziliénsia loos mosu bainhira família, eskola, no komunidade hotu prátika hábitu seguru hamutuk.",
-    togetherPoints: [
-      "Fahe saida mak ita aprende ho ita-nia família, liuliu parente tuan sira ne'ebé bele menus familiarizadu ho ameasa dijitál.",
-      "Ko'alia livre kona-ba esperiénsia online — hasai vergonha kona-ba sala sira halo seguru liu atu husu ajuda.",
-      "Eskola no fatin servisu ne'ebé harii konsiensia siberseguransa proteje ema hotu iha sira-nia rede, la'ós de'it individuál sira.",
-      "Relata fraude no konteúdu suspetu — ita-nia asaun proteje ema tuir mai ne'ebé bele simu mensajen hanesan.",
-    ],
-
-    quoteText:
-      "Kadeia ida forte de'it to'o nia elo ne'ebé maka'as liu. Iha sosiedade konektadu, seguransa ema hotu depende ba konsiensia ema hotu.",
-    quoteSource: "Prinsípiu reziliénsia siberseguransa koletiva",
   },
 };
 

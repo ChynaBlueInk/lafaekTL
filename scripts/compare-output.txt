@@ -1,0 +1,297 @@
+
+============================================================
+Cyber Translations
+  -> app/cyber/page.tsx (EXISTS)
+  rows: 79
+  keys matched in file: 70/79
+  UNMATCHED (9):
+    - basicsEyebrow
+    - heroChildren
+    - heroYouth
+    - heroAdults
+    - scaleEyebrow
+    - contextEyebrow
+    - stakeEyebrow
+    - guideEyebrow
+    - collectiveEyebrow
+  UNCERTAIN Tetun (?): 1
+    - whatTitle: Saida mak Seguransa Sibernétika?
+
+============================================================
+Adults cyber translations
+  -> app/cyber/adults/page.tsx (EXISTS)
+  rows: 89
+  keys matched in file: 89/89
+  UNCERTAIN Tetun (?): 1
+    - linksTitle: "Saida mak tuir mai?"
+
+============================================================
+Adults interactive guide
+  -> app/cyber/adults/guardians/page.tsx (EXISTS)
+  rows: 114
+  keys matched in file: 77/114
+  UNMATCHED (37):
+    - topicLabel (UI hardcoded)
+    - strengthLabel>=80
+    - strengthLabel>=55
+    - strengthLabel>=35
+    - strengthLabel<35
+    - agreementHeader dynamic
+    - agreementFooter dynamic
+    - privacySafeNote dynamic
+    - scenarioCounterLabel dynamic
+    - scenarioGoodChoice
+    - scenarioBadChoice
+    - nextScenario
+    - script.passwords.16+
+    - script.privacy.16+
+    - script.boundaries.16+
+    - script.strangers.16+
+    - scenario.en.1.tag1
+    - scenario.en.1.tag2
+    - scenario.en.1.tag3
+    - scenario.en.1.option1
+    ... +17 more
+
+============================================================
+Childrens cyber translations
+  -> app/cyber/children/page.tsx (EXISTS)
+  rows: 51
+  keys matched in file: 49/51
+  UNMATCHED (2):
+    - sectionTitle_collect
+    - tapToCollect
+  UNCERTAIN Tetun (?): 6
+    - stopThinkAskLead: Haree mensajen ka link ruma ne'ebé kestionável? Sempre uza etapa 3 ne'e!
+    - thinkDesc: “Ema ne'ebé ha'u koñese mak haruka mensajen ne'e? Sira husu ha'u-nia informasaun
+    - quizQ: Ema ne’ebé ó la koñese husu ó-nia hela-fatin. Saida mak ó sei halo?
+    - helpTitle: 🤝 Sé Maka Bele Ajuda Ita?
+    - gameCalloutTitle: 🏰 Prontu ona ba Reinu Siber (Cyber Kingdom)?
+    - linksTitle: Depois ba ne'ebé?
+
+============================================================
+Childrens cyber game
+  -> app/cyber/children/game/page.tsx (EXISTS)
+  rows: 169
+  keys matched in file: 0/169
+  BLANK Tetun: 147
+  UNMATCHED (169):
+    - outfit_label_1
+    - outfit_label_2
+    - outfit_label_3
+    - outfit_label_4
+    - outfit_label_5
+    - outfit_label_6
+    - background_label_1
+    - background_label_2
+    - background_label_3
+    - background_label_4
+    - background_label_5
+    - background_label_6
+    - badge_password
+    - badge_phishing
+    - badge_social
+    - badge_trustedadult
+    - default_hero_name
+    - rank_0
+    - rank_1
+    - rank_2
+    ... +149 more
+  UNCERTAIN Tetun (?): 6
+    - outfit_label_5: Lila?
+    - background_label_6: Neon?
+    - badge_password: Manorin Password?
+    - badge_phishing: Detetiva Lasu?
+    - badge_trustedadult: Buka Ajuda?
+    - rank_1: Kadete?
+
+============================================================
+Youth cyber security
+  -> app/cyber/youth/page.tsx (EXISTS)
+  rows: 82
+  keys matched in file: 77/82
+  UNMATCHED (5):
+    - heroTitle
+    - missionLabel
+    - footerGameTitle
+    - footerGameDesc
+    - footerGameCta
+  UNCERTAIN Tetun (?): 2
+    - stopThinkCheck[2].text: Saida mak sira husu — osan, kódigu, foto, password? Bele impostór ka lae?
+    - linksTitle: Depois ba ne'ebé?
+
+============================================================
+Youth Cyber Deepfake
+  -> app/cyber/youth/deepfake/page.tsx (EXISTS)
+  rows: 0
+
+============================================================
+Youth Cyber Game
+  -> app/cyber/youth/game/page.tsx (EXISTS)
+  rows: 81
+  keys matched in file: 27/81
+  UNMATCHED (54):
+    - recruit
+    - missionLabel
+    - launchModule
+    - terminalTitle
+    - terminalBoot[0]
+    - terminalBoot[1]
+    - terminalBoot[2]
+    - terminalBoot[3]
+    - resetMission
+    - commandResponses.help[0]
+    - commandResponses.help[1]
+    - commandResponses.help[2]
+    - commandResponses.help[3]
+    - commandResponses.help[4]
+    - commandResponses.help[5]
+    - commandResponses.help[6]
+    - commandResponses.help[7]
+    - commandResponses.help[8]
+    - commandResponses.help[9]
+    - commandResponses.status[0]
+    ... +34 more
+  UNCERTAIN Tetun (?): 1
+    - commandResponses.verify[2]: HANOÍN: sira husu saida — osan, kódigu, foto, password?
+
+============================================================
+Youth Cyber Privacy
+  -> app/cyber/youth/privacyshield/page.tsx (EXISTS)
+  rows: 92
+  keys matched in file: 73/92
+  UNMATCHED (19):
+    - vulnerable
+    - secure
+    - offRisky
+    - onSafer
+    - offSafer
+    - onRisky
+    - missing
+    - enabled
+    - tapMore
+    - saferNow
+    - stillRisky
+    - ads/data
+    - 2fa
+    - location_ok
+    - profile_ok
+    - tagging_ok
+    - ads/data_ok
+    - 2fa_enabled
+    - deviceLock_enabled
+
+============================================================
+Youth Cyber Social
+  -> app/cyber/youth/social/page.tsx (EXISTS)
+  rows: 121
+  keys matched in file: 37/121
+  UNMATCHED (84):
+    - backCyber
+    - toChildren
+    - toAdults
+    - tip
+    - analysis
+    - telltales
+    - safeMove
+    - brief
+    - briefText
+    - defence
+    - card1
+    - card1Desc
+    - card2
+    - card2Desc
+    - card3
+    - card3Desc
+    - backVanguard
+    - linksTitle
+    - pressure_tactic_label_urgency
+    - pressure_tactic_text_urgency
+    ... +64 more
+  UNCERTAIN Tetun (?): 3
+    - confidence: Ita sente konfiansa hira agora?
+    - linksTitle: Depois ba ne'ebé?
+    - description: Ita simu DM ida hosi kolega: "Hey! Hau hela iha airport no lakon carteira. Bele 
+
+============================================================
+Careers
+  -> app/careers/page.tsx (EXISTS)
+  rows: 56
+  keys matched in file: 55/56
+  UNMATCHED (1):
+    - jobSeekerHelp.cta
+  UNCERTAIN Tetun (?): 1
+    - submitHelp: Ita iha vaga loos ida atu fahe? Submete ba ami-nia ekipa atu revee uluk.
+
+============================================================
+Job Help
+  -> app/careers/job-help/page.tsx (EXISTS)
+  rows: 162
+  keys matched in file: 56/162
+  UNMATCHED (106):
+    - closingBullet_1
+    - closingBullet_2
+    - closingBullet_3
+    - closingBullet_4
+    - bullet_1
+    - bullet_2
+    - bullet_3
+    - bullet_4
+    - bullet_5
+    - bullet_6
+    - bullet_7
+    - bullet_1
+    - bullet_2
+    - bullet_3
+    - bullet_4
+    - bullet_5
+    - bullet_6
+    - bullet_1
+    - bullet_2
+    - bullet_3
+    ... +86 more
+  UNCERTAIN Tetun (?): 6
+    - quizTitle: Iha Ne'ebé Ita Tenke Foka?
+    - bullet_4: Prepara resposta loloos ba: 'Konta kona-ba ita rasik' no 'Saida mak ita-nia frak
+    - question: Iha ne'ebé ita iha iha buka servisu agora?
+    - question: Oinsá ita-nia CV agora?
+    - question: Saida mak sente difísil liu ba ita?
+    - question: Hira esperiénsia servisu mak ita iha?
+
+============================================================
+Careers Submit
+  -> app/careers/submit/page.tsx (EXISTS)
+  rows: 92
+  keys matched in file: 92/92
+  UNCERTAIN Tetun (?): 2
+    - sourceNote: Oinsá ita hatene katak oportunidade ida ne'e loos?
+    - resetConfirm: Hamoos kampu hotu? La bele fila fali.
+
+============================================================
+Services
+  -> app/services/page.tsx (EXISTS)
+  rows: 49
+  keys matched in file: 12/49
+  BLANK Tetun: 49
+  UNMATCHED (37):
+    - hero_title
+    - hero_intro_1
+    - hero_intro_2
+    - cta_title
+    - cta_body
+    - cta_button
+    - card_button
+    - bullet_1
+    - bullet_2
+    - bullet_3
+    - bullet_4
+    - bullet_5
+    - bullet_1
+    - bullet_2
+    - bullet_3
+    - bullet_4
+    - bullet_5
+    - bullet_1
+    - bullet_2
+    - bullet_3
+    ... +17 more

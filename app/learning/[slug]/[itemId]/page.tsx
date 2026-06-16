@@ -154,7 +154,17 @@ export default function LearningItemPage() {
 
         <div className="w-[64px]" />
       </div>
+<div className="mb-4 rounded-xl border border-green-200 bg-green-50 p-3 text-center">
 
+  <p className="text-sm font-medium text-green-800">
+    📖 Click the magazine cover to open. Click page corners or swipe to turn pages.
+  </p>
+
+  <p className="mt-1 text-sm text-green-700">
+    📖 Klik iha kapa revista atu loke. Klik iha kantu pájina ka desliza liman atu muda ba pájina tuir mai.
+  </p>
+
+</div>
       <main className="px-4 py-8">
         <div className="mx-auto max-w-6xl">
           {flipbookPages.length > 0 ? (

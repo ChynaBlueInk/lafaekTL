@@ -284,7 +284,17 @@ export default async function MagazineReaderPage({
             </div>
 
           )}
+<div className="mb-4 rounded-xl border border-green-200 bg-green-50 p-3 text-center">
 
+  <p className="text-sm font-medium text-green-800">
+    📖 Click the magazine cover to open. Click page corners or swipe to turn pages.
+  </p>
+
+  <p className="mt-1 text-sm text-green-700">
+    📖 Klik iha kapa revista atu loke. Klik iha kantu pájina ka desliza liman atu muda ba pájina tuir mai.
+  </p>
+
+</div>
           {/* FLIPBOOK */}
           {flipbookPages.length > 0 ? (
 

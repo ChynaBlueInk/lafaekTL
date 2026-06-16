@@ -26,7 +26,15 @@ const Page = forwardRef<HTMLDivElement, PageProps>(function Page(
       <img
         src={src}
         alt={alt}
-        className="h-full w-full object-contain"
+className="
+  h-full
+  w-full
+  cursor-pointer
+  object-contain
+  transition-transform
+  duration-200
+  hover:scale-[1.01]
+"
         draggable={false}
       />
     </div>

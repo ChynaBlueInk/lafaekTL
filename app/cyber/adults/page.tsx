@@ -205,98 +205,98 @@ export default function CyberAdultsPage(){
       title:"Proteje labarik sira online",
       subtitle:
         "Orientasaun prátiku ba inan-aman, kuidadór no mestre sira atu hamenus risku online, harii hábitu seguru, no ajuda labarik sira sedu bainhira buat ida la'o sala.",
-      heroBadge:"Inan-Aman, Kuidadór & Mestre sira",
+      heroBadge:"Inan-Aman, Kuidadór & Manorin sira",
       introLead:
-        "Labarik sira moris online lorloron. Sira aprende, halimar, ko'alia, haree, fahe, no esplora iha espasu dijitál sira. Ne'e fó oportunidade, maibé mós fó risku ne'ebé sira la sempre mature o suficiente atu reconhece ka jere rasik.",
-      back:"Fila ba Cyber",
+        "Labarik sira moris online lorloron. Sira aprende, halimar, ko'alia, haree, fahe, no esplora iha espasu dijitál sira. Ne'e fó oportunidade, maibé mós fó risku ne'ebé sira la sempre maduru to'o atu identifika ka jere rasik.",
+      back:"Fila ba Siber",
       toChildren:"Labarik",
       toYouth:"Joventude",
 
       whyAdultsTitle:"Tanba sa mak adultu informadu importante",
       whyAdultsLead:
-        "Labarik sira la presiza de'it dispozitivu no regra. Sira presiza adultu informadu iha sira-nia leet. Inan-aman no mestre sira dala barak mak ema dahuluk ne'ebé nota bainhira buat ida la loos, esplika saida mak comportamentu seguru, no intervém antes problema ida sai grave.",
+        "Labarik sira la presiza de'it dispozitivu no regra. Sira presiza adultu informadu iha sira-nia leet. Inan-aman no manorin sira dala barak mak ema dahuluk ne'ebé nota bainhira buat ida la loos, esplika saida mak comportamentu seguru, no intervém antes problema ida sai grave.",
       whyAdultsCards:[
         {
           icon:<HeartHandshake className="h-6 w-6" />,
-          title:"Labarik sira presiza adultu konfiadu",
-          desc:"Se labarik ida sente moe, pressiona, ka ta'uk online, nia sei ko'alia liu ba adultu ne'ebé hakmatek, informadu, no fasil atu aproxima.",
+          title:"Labarik sira presiza adultu ne'ebé sira fiar",
+          desc:"Se labarik ida sente moe, hetan presaun, ka ta'uk online, nia sei nakloke liu ba adultu ne'ebé hakmatek, informadu, no fasil atu hakbesik.",
         },
         {
           icon:<GraduationCap className="h-6 w-6" />,
-          title:"Mestre sira bele nota padrão sedu",
-          desc:"Mestre sira dala barak nota bullying, distraisaun, mudansa emosionál, ka partilha aat antes família nota. Mestre informadu bele responde sedu no ho konfiansa.",
+          title:"Manorin sira bele nota padróun sedu",
+          desc:"Manorin sira dala barak nota bullying, distraisaun, mudansa emosionál, ka fahe informasaun ne'ebé ladi'ak antes família sira nota. Manorin ne'ebé informadu bele foti asaun sedu no ho konfiansa.",
         },
         {
           icon:<ShieldCheck className="h-6 w-6" />,
-          title:"Adultu sira molda hábitu online",
-          desc:"Labarik sira aprende hosi adultu sira. Se adultu sira komprende privasidade, oversharing, password, no respeitu online, labarik sira sei aprende buat hanesan.",
+          title:"Adultu sira fó ezemplu ba hábitu online.",
+          desc:"Labarik sira banati-tuir saida mak adultu sira halo. Se adultu sira komprende privasidade, oversharing, password, no respeitu online, labarik sira mós sei aprende hábitu sira-ne'e.",
         },
       ],
 
-      risksTitle:"Tanba sa mak importante agora",
+      risksTitle:"Tanba sa mak ida-ne'e importante agora",
       risksLead:
-        "Labarik ida bele seguru iha uma maibé sei vulnerável online. Adultu sira presiza komprende o suficiente atu orienta, nota, no responde.",
+        "Labarik ida bele seguru fízikamente iha uma, maibé sei vulnerável online. Adultu sira presiza komprende natoon atu orienta, nota, no foti asaun.",
       risks:[
-        "Labarik sira bele la reconhece grooming, scams, ka manipulasaun to'o bainhira sira hetan ona presaun.",
-        "Sira dala barak la komprende informasaun hira mak foto, vídeo, ka post ida bele revela.",
-        "Sira bele subar problema tanba ta'uk kastigu, kulpa, ka lakon asesu ba dispozitivu.",
-        "Danu online bele afeta konfiansa, aprendizajen, toba, amizade, reputasaun, no seguransa iha moris loloos.",
+        "Labarik sira bele la identifika (grooming), fraude/lasu (scams), ka manipulasaun to'o bainhira sira hetan ona presaun.",
+        "Sira dala barak la komprende informasaun hira mak foto, vídeo, ka post ida bele hatudu.",
+        "Sira bele subar problema tanba ta'uk hetan kastigu, kulpa, ka lakon asesu ba dispozitivu.",
+        "Prejuízu online bele afeta konfiansa, aprendizajen, toba, amizade, reputasaun, no seguransa iha moris loloos.",
       ],
 
-      interactiveTitle:"Matadalan interativu ba prátika loos",
+      interactiveTitle:"Matadalan interativu ba prátika loron-loron",
       interactiveDesc:
-        "Guia ida-ne'e fó atividade prátiku, conversa starters, privacy checklist, no senáriu red-flag atu prátika ho grupu idade diferente.",
-      interactiveBtn:"Loke matadalan interativu",
+        "Guia ida-ne'e fó atividade prátiku, hahu konversa, lista kontrolu ba privasidade (privacy checklist), no senáriu perigozu atu prátika ho grupu idade diferente.",
+      interactiveBtn:"Loke no lee matadalan interativu",
 
       learnTitle:"Saida mak ita sei aprende iha pájina ida-ne'e",
       learnItems:[
         {
           icon:<LockKeyhole className="h-6 w-6" />,
-          title:"Seguru dispozitivu & konta sira",
-          desc:"Password forte, multi-factor authentication, atualizasaun, no trava ekran.",
+          title:"Seguru ba dispozitivu & konta sira",
+          desc:"Uza password ne'ebé forte, ativa autentikasaun ho modelu (MFA), halo atualizasaun (update) sistema beibeik, no xave ekran (lock screen) bainhira la uza.",
         },
         {
           icon:<Users className="h-6 w-6" />,
-          title:"Regra família no sala aula nian",
-          desc:"Akordu simples, expetativa sira, no rotina sira ne'ebé hamenus risku la halo teknolojia sai funu constante.",
+          title:"Regra família no sala-aula nian",
+          desc:"Akordu simples, espetativa, no rotina sira ne'ebé hamenus risku la halo teknolojia sai hanesan funu.",
         },
         {
           icon:<Eye className="h-6 w-6" />,
-          title:"Privasidade, partilha, no sinais alerta",
-          desc:"Foto seguru liu, limite lokasaun, detallu pesoál, no sinais katak labarik ida presiza ajuda.",
+          title:"Privasidade, fahe informasaun, no sinais alerta",
+          desc:"Fahe foto seguru, limite lokasaun, detallu pesoál, no sinais katak labarik presiza ajuda.",
         },
       ],
 
-      checklistTitle:"Lista adultu ho etapa 8",
+      checklistTitle:"Lista verifikasaun ba adultu ho etapa 8",
       checklist:[
-        "Uza fraze-xave úniku ba konta ida-idak. Loke MFA ba email, banku, rede sosiál no loja aplikasaun.",
-        "Mantein dispozitivu sira atualizadu. Habilita atualizasaun automátika ba telefone, tablet, laptop no browser sira.",
-        "Hatur kódigu-pasajen ka biométriku no trava automátika menus husi minutu 1. Habilita Find My Device.",
-        "Kria Akordu Teknolojia Família nian ka regra dijitál sala aula nian.",
-        "Hatur kontrolu inan-aman apropriadu ba idade iha dispozitivu, loja aplikasaun no aplikasaun importante sira. Reviza regularmente.",
-        "Hametin privasidade iha aplikasaun sosiál. Limita sé maka bele manda mensajen, marka ka haree story, no hamate precise location.",
-        "Ko'alia sedu no beibeik kona-ba scams, grooming, bully no presaun atu fahe imajen. Mantén konversa loke.",
+        "Uza fraze-xave úniku ba konta ida-idak. Ativa MFA ba email, banku, rede sosiál no loja aplikasaun.",
+        "Mantein dispozitivu sira atualizadu. Ativa atualizasaun automátika ba telefone, tablet, laptop no browser sira.",
+        "Kria kódigu-pasajen ka biométriku no trava ekran automátiku menus husi minutu 1. Ativa 'Find My Device.'",
+        "Kria Akordu Teknolojia Família nian ka regra dijitál ba sala-aula.",
+        "Hatur kontrolu inan-aman ne'ebé tuir idade iha dispozitivu, loja aplikasaun, no aplikasaun importante sira. Reviza beibeik.",
+        "Hametin privasidade iha aplikasaun sosiál. Limita sé mak bele manda mensajen, marka (tag), ka haree story, no hamate lokasaun loloos (precise location).",
+        "Ko'alia sedu no beibeik kona-ba scams, grooming, bullying, no presaun atu fahe imajen. Mantén konversa nakloke.",
         "Halo backup ba foto importante sira no serbisu eskola nian. Hatene oinsá atu restaura dispozitivu se presiza.",
       ],
 
       childSafetyTitle:"Regra adisionál ba seguransa labarik iha mundu online",
       childSafetyLead:
-        "Risku barak mosu hosi informasaun ne'ebé fahe de'it hanesan normal. Detallu ki'ik sira-ne'e hamutuk bele revela buat barak liu duké ema pensa.",
+        "Risku boot balun mosu hosi informasaun ne'ebé fahe de'it. Detallu ki'ik sira-ne'e bele hatudu buat barak liu fali saida mak ita hanoin.",
       childSafetyCards:[
         {
           icon:<MapPin className="h-5 w-5" />,
           title:"Keta fahe lokasaun atual",
-          desc:"Keta posta iha ne'ebé labarik ida iha agora, eskola ne'ebé nia ba, desportu ne'ebé nia halo, ka fatin ne'ebé nia ba beibeik. Padrão rotina bele uza hosi ema estranjeiru.",
+          desc:"Keta posta labarik nia lokasaun agora, eskola ne'ebé nia ba, desportu ne'ebé nia halo, ka fatin ne'ebé nia ba beibeik. Padróun rotina bele uza hosi ema estranjeiru.",
         },
         {
           icon:<Camera className="h-5 w-5" />,
-          title:"Hanoin molok posta foto",
-          desc:"Foto bele hatudu uniforme eskola, naran rua, númeru uma, númeru kareta, landmark, ka sinal iha kotuk. Haree imajen tomak uluk.",
+          title:"Hanoin molok atu posta foto",
+          desc:"Foto bele hatudu uniforme eskola, naran rua/bairo, númeru uma, númeru kareta, fatin kuñesidu ruma (landmark), ka sinal iha kotuk. Tenke cek imajen sira uluk.",
         },
         {
           icon:<Clock3 className="h-5 w-5" />,
-          title:"Evita fahe oráriu",
-          desc:"Keta posta tempu lori ba eskola, atividade depois escola, aula extra, planu viajen, ka bainhira labarik sira hela mesak.",
+          title:"Labele fahe oráriu",
+          desc:"Keta posta tempu lori ba eskola, atividade depois escola, aula extra, planu viajen, ka bainhira labarik sira hela mesak iha uma.",
         },
         {
           icon:<UserRoundSearch className="h-5 w-5" />,
@@ -305,73 +305,73 @@ export default function CyberAdultsPage(){
         },
       ],
 
-      familyRulesTitle:"Akordu dijitál família ka sala aula nian — pontu inísiu",
+      familyRulesTitle:"Akordu dijitál família ka sala-aula nian — pontu inísiu",
       familyRules:[
-        "Dispozitivu sira uza iha fatin partilhadu se bele, liuliu ba labarik ki'ik sira.",
-        "Husu-molok-klik: link, download, no oferta 'gratuita' sira presiza haree hosi adultu ka mestre ida.",
-        "Pauza–Hanoin–Hatete: se mensajen ida sente urjente, segredu, ka ameasadu, hatudu ba adultu ida.",
+        "Dispozitivu sira uza iha fatin ne'ebé nakloke se bele, liuliu ba labarik ki'ik sira.",
+        "Husu-molok-klik: link, download, no oferta gratuitu sira presiza adultu ka manorin sira mak haree uluk.",
+        "Pauza–Hanoin–Hatete: se mensajen ida sente urjente, segredu, ka ameasadu, hatudu kedas ba adultu ida.",
         "Labele fahe detallu pesoál hanesan naran kompletu, eskola, enderesu, telefone, ka lokasaun atual.",
       ],
 
       controlsTitle:"Kontrolu inan-aman no setting konta — matadalan lalais",
       controlsNote:
-        "Kontrolu sira hamenus risku maibé la perfeitu. Sira di'ak liu bainhira hamutuk ho konversa, fiar, no revizaun regulár.",
+        "Kontrolu sira hamenus risku maibé la perfeitu. Sira di'ak liu bainhira hamutuk ho konversa, fiar, no revizaun beibeik.",
       controls:[
-        {icon:<Smartphone className="h-5 w-5" />,text:"Setting dispozitivu: filtru konteúdu, limite app, tempu ekran, no restrisaun kompras."},
+        {icon:<Smartphone className="h-5 w-5" />,text:"Setting dispozitivu: filtru konteúdu, limite app, tempu ekran, no restrisaun sosa buat ruma."},
         {icon:<KeyRound className="h-5 w-5" />,text:"Loja aplikasaun: presiza aprovasaun ba instalasaun no kompras iha aplikasaun."},
-        {icon:<Router className="h-5 w-5" />,text:"Wi-Fi/router uma nian: family filtering no oráriu bainhira disponivel."},
+        {icon:<Router className="h-5 w-5" />,text:"Wi-Fi uma nian: filtiraun ba família no oráriu bainhira disponivel."},
       ],
 
-      scamsTitle:"Scams, grooming, no mensajen ne'ebé 'di'ak liu atu sai loos'",
+      scamsTitle:"Lia-bosok (scams), finje sai belun hodi lohi (grooming), no promesa sira ne'ebé la lojika.",
       scamsPoints:[
-        "Kuidadu ho pedidu osan, kódigu, prémiu, giveaway, ka oferta servisu derepente. Verifika liu hosi kanál seluk.",
-        "Hanorin labarik sira atu labele fahe imajen privadu. Se hetan presaun, ameasa, ka blackmail, para no hatete kedas ba adultu ida.",
-        "Rai evidénsia hanesan screenshot no URL. Relata iha aplikasaun no blokeia konta.",
+        "Keta fiar lalais pedidu osan, kódigu, prémiu, ka oferta servisu ne'ebé mai derepente. Verifika fali informasaun ne'e liuhosi dalan seluk.",
+        "Hanorin labarik sira atu keta haruka foto privadu ba ema seluk. Se ema ruma ameasa ka obriga sira, husu sira atu keta responde ona no konta kedas ba inan-aman ka ema boot ne'ebé sira fiar.",
+        "Rai evidénsia hanesan screenshot no link (URL). Report ka fó hatene iha aplikasaun laran, no blokeia kedas konta ne'e.",
       ],
 
-      warningTitle:"Sinais alerta ne'ebé adultu sira tenke nota",
+      warningTitle:"Sinais alerta ne'ebé inan-aman ka ema boot sira tenke atensaun",
       warningPoints:[
-        "Labarik ida derepente subar tela, muda humor depois online, ka sai segredu liu kona-ba kontaktu ida.",
-        "Kolega 'foun' ida muda lalais konversa ba private message ka husu segredu.",
-        "Mensajen sira sai sexual, manipulativu, pushy, ka husu imajen, osan, ka hasoru malu.",
-        "Labarik ida ta'uk atu hetan kastigu no la hakarak hatete saida mak akontese.",
+        "Labarik derepente subar telefone ka laptop, sira-nia laran-triste ka hirus fali depois uza internet, no sai segredu liu kona-ba ema foun ne'ebé sira ko'alia ba.",
+        "Kolega 'foun' ida ne'ebé dudu lalais atu ko'alia de'it iha 'inbox' (mensajen privadu) no husu atu keta fó hatene ema seluk.",
+        "Mensajen sira ne'ebé dudu ho kloot, ko'alia buat fo'er (sexual), obriga, lohi, ka husu foto, osan, no obriga atu hasoru malu",
+        "Labarik sai ta'uk tanba sente katak nia halo sala ka sei hetan si'ak, nune'e nia subar fali saida mak akontese loloos.",
       ],
 
       wifiTitle:"Wi-Fi públiku — kuidadu",
       wifiList:[
-        {icon:<WifiOff className="h-5 w-5" />,text:"Prefere hotspot dadus móvel ba login. Evita banku iha Wi-Fi kafé nian."},
-        {icon:<ShieldCheck className="h-5 w-5" />,text:"Sai depois uza no hamate auto-connect iha dispozitivu labarik sira nian."},
+        {icon:<WifiOff className="h-5 w-5" />,text:"Uza liu hotspot (dadus telemóvel) hodi login. Keta loke aplikasaun banku nian uza Wi-Fi iha kafé ka fatin públiku."},
+        {icon:<ShieldCheck className="h-5 w-5" />,text:"Sempre log out depois uza, no hamate 'auto-connect' iha labarik sira-nia handphone ka tablet."},
       ],
 
       reportTitle:"Se buat ida la'o sala",
       reportSteps:[
-        "Suporta uluk. Hakmatek no agradese ba labarik tanba nia hatete ba ita.",
-        "Halibur evidénsia ho seguru: screenshot, URL, username, oras.",
-        "Troka password, ativa MFA, no sai hosi sesaun sira seluk.",
+        "Suporta sira uluk. Hakmatek no fó agradese ba labarik tanba brani atu konta problema ne'e ba ita.",
+        "Rai evidénsia ho seguru: foti screenshot, rai link (URL), naran user, no mós oras akontesimentu.",
+        "Troka password kedas, ativa autentikasaun (MFA), no log out hosi kualkér fatin seluk ne'ebé ita-nia konta nakloke hela.",
         "Blokeia no relata iha aplikasaun ka plataforma.",
-        "Kontaktu telekomunikasaun, eskola, banku ka autoridade lokál se iha osan, ameasa, ka detallu identidade envolvidu.",
+        "Kontaktu operadór telkom, eskola, banku, ka Polísia se kazu ne'e envolve osan, ameasa fíziku, ka na'ok identidade.",
       ],
 
-      resourcesTitle:"Rekursu no orientasaun gratuita",
+      resourcesTitle:"Informasaun no matadalan gratuitu (la selu).",
       resourcesIntro:
-        "Matadalan ofisiál sira-ne'e hatudu setting etapa-ba-etapa no pontu ko'alia nian ba família no edukadór sira.",
+        "Matadalan ofisiál sira-ne'e hatudu pasu-ba-pasu oinsá atu halo setting no fó mós ideia oinsá inan-aman ho profesór sira bele ko'alia ho labarik sira.",
       resources:[
         {
-          text:"Protect your children online — Australian Cyber Security Centre (ACSC)",
+          text:"Proteje ita-nia oan iha internet — Australian Cyber Security Centre (ACSC)",
           href:"https://www.cyber.gov.au/protect-yourself/staying-secure-online/protecting-your-family/protect-your-children-online",
         },
         {
-          text:"Secure your user account (inklui parental controls) — ACSC",
+          text:"Proteje ita-nia konta uza-na'in (inklui kontrolu ba inan-aman) — ACSC.",
           href:"https://www.cyber.gov.au/protect-yourself/securing-your-devices/how-secure-your-device/secure-your-user-account",
         },
         {
-          text:"eSafety Guide — apps, jogus no sites komún sira",
+          text:"Matadalan eSafety — aplikasaun, jogu, no sítiu sira ne'ebé baibain uza.",
           href:"https://www.esafety.gov.au/key-topics/esafety-guide",
         },
       ],
-      posterCta:"Download poster/lista verifikasaun uma nian (sei mai iha tempu badak)",
-      note:"Pájina ida-ne'e fo orientasaun orijinál Lafaek no link ba ACSC/eSafety ba aprendizajen adisionál.",
-      linksTitle:"Depois ba ne'ebé?",
+      posterCta:"Download poster ka lista kontrolu ba uma nian (sei fali mai iha tempu badak).",
+      note:"Pájina ida-ne'e fó matadalan orijinál husi Lafaek no ligasaun (link) ba ACSC/eSafety hodi aprende liután.",
+      linksTitle:"Saida mak tuir mai?",
     },
   }[language==="tet"?"tet":"en"];
 

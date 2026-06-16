@@ -120,47 +120,47 @@ const TRANSLATIONS:Record<Lang,UI>={
     securityOff:"Protection off",
   },
   tet:{
-    title:"Cheka Privasidade",
-    subtitle:"Cheka setting simples iha telefone no app atu ajuda proteje lokasaun, konta, foto, no informasaun pesoál.",
-    backGuide:"Fila ba Youth Cyber Lab",
-    backGame:"Fila ba jogu",
-    riskScore:"Pontu risku privasidade",
-    high:"Risku aas",
-    medium:"Risku médiu",
-    low:"Risku ki'ik",
-    useTitle:"Oinsá atu uza atividade ida-ne'e",
+    title:"Konfigurasaun Privacy Shield",
+    subtitle:"Objetivu: hamenus buat ne'ebé ema estranjeiru sira bele aprende kona-ba ita no halo roubu konta sai susar liu.",
+    backGuide:"Fila ba Youth Guide",
+    backGame:"Fila ba Youth Game",
+    riskScore:"PONTU RISKU",
+    high:"RISKU AAS",
+    medium:"RISKU MÉDIU",
+    low:"RISKU KI'IK",
+    useTitle:"Oinsá atu uza módulu ida-ne'e",
     useItems:[
-      "Loke karta ida-idak atu aprende tanba sa setting ne'e importante.",
-      "Uza switch atu hili setting ne'ebé seguru liu.",
-      "Koko atu hamenus pontu risku privasidade.",
+      "Loke karta setting ida atu aprende tanba sa mak importante.",
+      "Uza switch iha karta ida-idak atu halo seguru liu.",
+      "Koko atu hamenus ita-nia pontu risku jerál.",
     ],
-    apply:"Aplika setting seguru liu",
+    apply:"Aplika Recomendadu",
     reset:"Hahu fali atividade",
-    why:"Tanba sa importante",
+    why:"Tanba sa mak importante",
     whatToDo:"Saida atu halo",
     where:"Iha ne'ebé atu muda",
     risk:"Risku",
     ok:"Di'ak",
-    risky:"Risku",
-    safer:"Seguru liu",
-    openDetails:"Loke detallu",
+    risky:"VULNERÁVEL",
+    safer:"SEGURU",
+    openDetails:"Klik atu haree detallu",
     hideDetails:"Subar detallu",
-    quickTitle:"Lista lalais ba privasidade",
+    quickTitle:"Lista lalais ba hadia",
     quickItems:[
-      "Halo konta rede sosiál pesoál sai privadu.",
-      "Hamate precise location ba app sosiál.",
+      "Halo rede sosiál privadu.",
+      "Hamate precise location.",
       "Ativa 2FA ba email uluk.",
-      "Uza screen lock no auto-lock tempu badak.",
+      "Hatur auto-lock menus husi minutu ida.",
       "Reviza permisaun app kada fulan.",
     ],
-    tip:"Sujestaun: se ita labele hetan setting ida, buka iha app laran ho liafuan privacy, security, location, permissions, ka account.",
-    summaryGood:"Di'ak. Ita-nia setting privasidade sai forte liu no konta susar liu atu ema toma.",
-    summaryWarn:"Sei iha lacuna balu. Hamenus buat ne'ebé ema estranju bele haree no hametin protesaun login.",
+    tip:"Sujestaun: se susar atu buka setting ida, buka iha app laran ho liafuan \"privacy\", \"security\", ka \"permissions\".",
+    summaryGood:"Privasidade di'ak no protesaun konta forte ativu ona.",
+    summaryWarn:"Sei iha lacuna sira. Hamenus data ne'ebé sai no hametin login sira.",
     statusTitle:"Setting agora",
-    privacyOn:"Fahe barak liu",
-    privacyOff:"Fahe menus",
-    securityOn:"Protesaun ativa",
-    securityOff:"Protesaun la ativa",
+    privacyOn:"ON = risku liu (data sai barak)",
+    privacyOff:"OFF = seguru liu (data sai menus)",
+    securityOn:"ON = seguru liu (protesaun ativa)",
+    securityOff:"OFF = risku (laiha protesaun)",
   },
 };
 
@@ -174,15 +174,15 @@ export default function DataPrivacy(){
       key:"location",
       title:{
         en:"Location sharing",
-        tet:"Fahe lokasaun",
+        tet:"Servisu Lokasaun",
       },
       subtitle:{
         en:"Apps may see where you are now or where you often go.",
-        tet:"App sira bele haree ita iha ne'ebé agora ka fatin ne'ebé ita ba beibeik.",
+        tet:"App sira bele tuir iha ne’ebé ita iha agora ka iha tempu nia laran.",
       },
       why:{
         en:"Location information can show home, school, work, favourite places, and daily routines. That can make stalking, fake messages, or scams easier.",
-        tet:"Informasaun lokasaun bele hatudu uma, eskola, servisu, fatin favoritu, no rotina loron-loron. Ida-ne'e bele halo stalking, mensajen falsu, ka scam sai fasil liu.",
+        tet:"Dadus lokasaun bele hatudu rotina sira hanesan uma, eskola, servisu, no fatin ne’ebé ita ba beibeik. Ne’e bele fasilita stalking, falsifikasaun identidade, ka scam ne’ebé depende ba oras.",
       },
       whatToDo:{
         en:[
@@ -191,14 +191,14 @@ export default function DataPrivacy(){
           "Remove location access from apps that do not need it.",
         ],
         tet:[
-          "Hamate precise location ba app rede sosiál.",
-          "Uza ‘Durante uza app’ iha fatin ‘Sempre’.",
-          "Hasai asesu lokasaun hosi app ne'ebé la presiza.",
+          "Hamate precise location ba app sosiál sira.",
+          "Uza ‘Durante uza de’it’ iha fatin ‘Sempre’.",
+          "Hasai asesu lokasaun hosi app sira ne’ebé la presiza.",
         ],
       },
       where:{
         en:"Phone Settings → Privacy / Location → App permissions",
-        tet:"Setting telefone → Privacy / Lokasaun → Permisaun app",
+        tet:"Setting Telefone → Privacy/Lokasaun → Permisaun App",
       },
       impact:25,
       saferWhenOn:false,
@@ -208,15 +208,15 @@ export default function DataPrivacy(){
       key:"publicProfile",
       title:{
         en:"Public profile",
-        tet:"Perfil públiku",
+        tet:"Vizibilidade Perfil",
       },
       subtitle:{
         en:"Strangers may be able to see your photos, posts, friends, and personal details.",
-        tet:"Ema estranju bele haree ita-nia foto, post, kolega, no detallu pesoál.",
+        tet:"Ita-nia perfil bele haree hosi ema estranjeiru sira.",
       },
       why:{
         en:"Public profiles make it easier for people to copy your photos, learn about you, or create fake accounts using your information.",
-        tet:"Perfil públiku halo fasil liu ba ema atu kopia ita-nia foto, aprende kona-ba ita, ka kria konta falsu ho ita-nia informasaun.",
+        tet:"Perfil públiku fasilita ema atu halibur ita-nia foto, kolega sira, detallu pesoál, no hábitu sira. Informasaun ne’e bele uza ba scam ka konta falsu.",
       },
       whatToDo:{
         en:[
@@ -225,14 +225,14 @@ export default function DataPrivacy(){
           "Hide your friends list if the app allows it.",
         ],
         tet:[
-          "Halo konta pesoál sai privadu ka ba kolega de'it.",
+          "Halo ita-nia konta privadu ka ba kolega de’it.",
           "Subar numeru telefone no email hosi perfil.",
-          "Subar lista kolega se app permite.",
+          "Subar lista kolega se plataforma permite.",
         ],
       },
       where:{
         en:"App Settings → Privacy → Account visibility",
-        tet:"Setting app → Privacy → Vizibilidade konta",
+        tet:"Setting App → Privacy → Konta/Vizibilidade",
       },
       impact:20,
       saferWhenOn:false,
@@ -242,15 +242,15 @@ export default function DataPrivacy(){
       key:"tagging",
       title:{
         en:"Photo tags and mentions",
-        tet:"Tag foto no mentions",
+        tet:"Tag iha Foto",
       },
       subtitle:{
         en:"Other people may tag you in photos or posts without asking first.",
-        tet:"Ema seluk bele tag ita iha foto ka post sein husu uluk.",
+        tet:"Ema seluk bele tag ita laiha aprovasaun.",
       },
       why:{
         en:"Tags can connect your name to places, people, events, and photos, even when you did not choose to share that information.",
-        tet:"Tag bele liga ita-nia naran ba fatin, ema, eventu, no foto, maski ita la hili atu fahe informasaun ne'e.",
+        tet:"Tag sira bele liga ita-nia naran ba fatin, ema, no eventu sira, maski ita la hili atu fahe informasaun ne’e rasik.",
       },
       whatToDo:{
         en:[
@@ -259,14 +259,14 @@ export default function DataPrivacy(){
           "Review old tagged photos and remove risky ones.",
         ],
         tet:[
-          "Ativa aprovasaun molok tag mosu iha perfil.",
-          "Limita sé mak bele tag ka mention ita.",
-          "Reviza foto tag tuan no hasai sira ne'ebé risku.",
+          "Presiza aprovasaun molok tag sira mosu.",
+          "Limita sé maka bele tag ita.",
+          "Reviza post tag tuan sira no hasai sira ne’ebé risku.",
         ],
       },
       where:{
         en:"App Settings → Privacy → Tags / Mentions",
-        tet:"Setting app → Privacy → Tags / Mentions",
+        tet:"Setting App → Privacy → Tags/Mentions",
       },
       impact:15,
       saferWhenOn:false,
@@ -276,15 +276,15 @@ export default function DataPrivacy(){
       key:"dataCollection",
       title:{
         en:"Ad and data sharing",
-        tet:"Anúnsiu no fahe dadus",
+        tet:"Personalizasaun Anúnsiu / Partilha Dadus",
       },
       subtitle:{
         en:"Apps may use your activity to build a profile about your interests.",
-        tet:"App sira bele uza ita-nia atividade atu kria perfil kona-ba ita-nia interese.",
+        tet:"Plataforma no parseiru sira uza ita-nia dadus ba target.",
       },
       why:{
         en:"This information can be used to target you with ads, scams, or content designed to keep your attention. Less sharing means less tracking.",
-        tet:"Informasaun ida-ne'e bele uza atu target ita ho anúnsiu, scam, ka konteúdu ne'ebé halo ita kontinua haree. Fahe menus signifika tracking menus.",
+        tet:"Ida-ne’e la’ós kona-ba anúnsiu de’it. Partilha dadus halo perfil ida kona-ba ita-nia interese, hábitu, no vulnerabilidade sira iha tempu.",
       },
       whatToDo:{
         en:[
@@ -293,14 +293,14 @@ export default function DataPrivacy(){
           "Limit partner data sharing where the app allows it.",
         ],
         tet:[
-          "Hamate personalizasaun anúnsiu se bele.",
-          "Hamate tracking atividade liu husi app seluk se iha.",
-          "Limita fahe dadus ho parseiru se app permite.",
+          "Hamate personalizasaun anúnsiu.",
+          "Hamate off-platform activity se iha.",
+          "Sai hosi partilha dadus ho parseiru sira se bele.",
         ],
       },
       where:{
         en:"App Settings → Account / Ads → Ad preferences",
-        tet:"Setting app → Konta / Anúnsiu → Preferénsia anúnsiu",
+        tet:"Setting App → Konta/Anúnsiu → Preferénsia Anúnsiu",
       },
       impact:15,
       saferWhenOn:false,
@@ -310,15 +310,15 @@ export default function DataPrivacy(){
       key:"twoFactor",
       title:{
         en:"2FA or passkeys",
-        tet:"2FA ka passkeys",
+        tet:"2FA / Passkeys",
       },
       subtitle:{
         en:"Adds extra protection if someone gets your password.",
-        tet:"Aumenta protesaun se ema ida hetan ita-nia password.",
+        tet:"Protesaun login adisionál liu husi password.",
       },
       why:{
         en:"If someone learns your password, 2FA or passkeys can stop them getting into your account. Email should be protected first because it resets many other accounts.",
-        tet:"Se ema aprende ita-nia password, 2FA ka passkeys bele para sira tama ba konta. Email tenke proteje uluk tanba nia bele reset konta barak seluk.",
+        tet:"Se ema ida hetan ita-nia password, 2FA ka passkeys bele para sira atu la toma ita-nia konta.",
       },
       whatToDo:{
         en:[
@@ -327,14 +327,14 @@ export default function DataPrivacy(){
           "Save backup codes somewhere safe.",
         ],
         tet:[
-          "Ativa 2FA ba email uluk.",
-          "Uza authenticator app ka passkey se iha.",
+          "Ativa 2FA ho authenticator app se bele.",
           "Rai backup code iha fatin seguru.",
+          "Segura email konta uluk tanba nia reset buat hotu seluk.",
         ],
       },
       where:{
         en:"App Settings → Security → 2FA / Passkeys",
-        tet:"Setting app → Security → 2FA / Passkeys",
+        tet:"Setting App → Security → 2FA/Passkeys",
       },
       impact:15,
       saferWhenOn:true,
@@ -344,15 +344,15 @@ export default function DataPrivacy(){
       key:"deviceLock",
       title:{
         en:"Phone lock",
-        tet:"Tranka telefone",
+        tet:"Tranka Dispozitivu",
       },
       subtitle:{
         en:"A passcode, fingerprint, face unlock, and short auto-lock time protect your phone.",
-        tet:"Passcode, fingerprint, face unlock, no auto-lock tempu badak proteje ita-nia telefone.",
+        tet:"Passcode, auto-lock, no biometria iha ita-nia telefone.",
       },
       why:{
         en:"If your phone is unlocked, a person may get into messages, photos, banking, email, or social media before you can stop them.",
-        tet:"Se telefone loke hela, ema ida bele tama ba mensajen, foto, banku, email, ka rede sosiál molok ita para sira.",
+        tet:"Se ita-nia dispozitivu loke hela, protesaun barak seluk sai menus útil tanba ema ne’e iha asesu direta ona.",
       },
       whatToDo:{
         en:[
@@ -361,14 +361,14 @@ export default function DataPrivacy(){
           "Turn on Find My Device and test it once.",
         ],
         tet:[
-          "Uza passcode forte, la'ós 0000 ka data moris.",
-          "Hatur auto-lock minutu ida ka menus.",
+          "Hatur passcode forte, la’ós 0000 ka data moris.",
+          "Ativa auto-lock menus husi minutu ida.",
           "Ativa Find My Device no testa dala ida.",
         ],
       },
       where:{
         en:"Phone Settings → Security / Lock screen",
-        tet:"Setting telefone → Security / Lock screen",
+        tet:"Setting Telefone → Security/Lock Screen",
       },
       impact:10,
       saferWhenOn:true,

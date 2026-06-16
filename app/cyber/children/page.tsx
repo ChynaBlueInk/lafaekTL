@@ -56,6 +56,9 @@ type T={
   gameCalloutTitle:string;
   gameCalloutDesc:string;
 
+  sectionTitle_collect:string;
+  tapToCollect:string;
+
   linksTitle:string;
 };
 
@@ -121,69 +124,73 @@ const TRANSLATIONS:Record<Lang,T>={
     gameCalloutTitle:"🏰 Ready for the Cyber Kingdom?",
     gameCalloutDesc:
       "Play the game to practise your new superpowers — and earn your Cyber Hero badge!",
+    sectionTitle_collect:"🦸 Collect Your 3 Superpowers!",
+    tapToCollect:"👆 Tap to collect!",
     linksTitle:"Where to next?",
   },
   tet:{
-    heroTitle:"Sai Herói Cyber! 🦸",
-    heroSubtitle:"Aprende oinsá atu nafatin seguru online — no halo ho divertimentu!",
+    heroTitle:"Sai Herói Sibernétiku! 🦸",
+    heroSubtitle:"Aprende oinsá atu seguru iha internet laran — no halo ida-ne'e ho ksolok!",
     heroBadge:"Ba idade tinan 7–14 🌟",
-    gameButton:"Halimar Jogu Cyber Kingdom 🏰",
+    gameButton:"Hahú Jogu Reinu Siber 🏰",
     mascotSpeech:
-      "Olá! Hau mak Shield, ita-nia ajudante Herói Cyber. Ami aprende kbiit 3 atu proteje ita online!",
-    backToCyber:"Fila ba Cyber",
+      "Olá! Ha'u mak Shield, ó-nia ajudante Herói Sibernétiku. Mai ita aprende kbiit super 3 hodi ó bele seguru iha internet laran!",
+    backToCyber:"Fila fali ba Sibernétiku",
     nextYouth:"Ba Joventude",
-    nextAdults:"Ba Inan-Aman & Mestre",
+    nextAdults:"Ba Inan-Aman & Manorin sira",
 
     power1Title:"🔒 Rai Segredu",
     power1Desc:
-      "Ita-nia naran, hela-fatin, eskola, numeru telefone, no liafuan-xave mak SEGREDU ITA NIA. Keta fahe sira online!",
-    power1Check:"Hau hatene saida atu rai segretu! ✅",
+      "Ita-nia naran, hela-fatin, eskola, numeru telefone, no liafuan-xave mak SEGREDU ITA MAK HATENE. Keta fahe iha online - kolega sira iha online mos labele hotu!",
+    power1Check:"Ha'u hatene ona saida mak tenke rai ba segredu! ✅",
 
-    power2Title:"💚 Halo Di'ak Online",
+    power2Title:"💚 Hatudu Laran-di'ak iha Internet",
     power2Desc:
       "Uza liafuan di'ak online, hanesan iha moris loloos. Se ema ko'alia aat ba ita, labele responde — fó-hatene kedas ba ema boot!",
-    power2Check:"Hau sei halo di'ak online! ✅",
+    power2Check:"Ha'u sei uza liafuan di'ak online! ✅",
 
     power3Title:"🙋 Husu Ajuda",
     power3Desc:
-      "Se buat ida online sente estranhu, ta'uk, ka la komprende — PARA! Ita labele iha sala. Fó-hatene ba ema boot ne'ebé ita fiar.",
-    power3Check:"Hau hatene sé atu husu! ✅",
+      "Se buat ida online sente estranhu, ta'uk, ka la komprende — PARA! Ita sei lasala. Fó-hatene ba ema boot ne'ebé ita fiar.",
+    power3Check:"Hau hatene atu husu iha sé! ✅",
 
-    allPowersTitle:"🎉 Ita iha kbiit 3 hotu!",
-    allPowersDesc:"Ita prontu atu sai Herói Cyber. Kontinua lee!",
+    allPowersTitle:"🎉 Ita iha kbiit tolu ne'e hotu!",
+    allPowersDesc:"Ita prontu ona atu sai Herói Sibernétiku. Kontinua lee hodi aprende liután!",
 
     stopTitle:"🛑 PARA",
-    stopDesc:"Keta klik buat ida lai. Para badak.",
-    thinkTitle:"🤔 HANOÍN",
-    thinkDesc:"Husi ema ne'ebé hau hatene? Husu informasaun privadu ka lae?",
+    stopDesc:"Keta klik buat ruma. Para uitoan.",
+    thinkTitle:"🤔 HANOIN",
+    thinkDesc:"Ema ne'ebé ha'u koñese mak haruka mensajen ne'e? Sira husu ha'u-nia informasaun privadu ka lae?",
     askTitle:"🙋 HUSU",
-    askDesc:"Haree ho ema boot molok halo buat ida.",
+    askDesc:"Husu ba ema boot lai antes ita halo buat ruma.",
     stopThinkAskLead:
-      "Haree mensajen ka link estranhu? Uza pasu 3 sira-ne'e!",
+      "Haree mensajen ka link ruma ne'ebé kestionável? Sempre uza etapa 3 ne'e!",
 
-    rulesTitle:"🏆 Regra Osan-Mutin 5",
+    rulesTitle:"🏆 Regra Osan-Mean 5",
     rules:[
-      "🔐 Keta fahe ita-nia liafuan-xave ba ema — nunka!",
-      "📵 Keta ko'alia privadu ho ema ne'ebé ita la hatene iha moris loloos.",
-      "🖼️ Uza avatar divertidu la'ós ita-nia foto loloos.",
-      "🤥 Buat hotu online la loloos — foto bele falsu!",
+      "🔐 Keta fahe ó-nia pasword ba ema ruma - nunka!",
+      "📵 Keta ko'alia privadu ho ema ne'ebé ita la hatene iha moris realidade.",
+      "🖼️ Uza imajen avatar ne'ebé kapas duké uza ó-nia foto loloos.",
+      "🤥 La'ós buat hotu iha online mak tebes — foto sira bele bosok!",
       "🤝 Se halo sala, fó-hatene ba ema boot. Sira sei ajuda ita!",
     ],
 
-    quizTitle:"⚡ Quiz Lalais!",
-    quizQ:"Ema estranjeiru online husu ita-nia hela-fatin. Saida ita halo?",
-    quizA:["Fó ba sira 😬","Husu ema boot kedas! 🙋","Ignora de'it"],
+    quizTitle:"⚡ Kuis Lalais!",
+    quizQ:"Ema ne'ebé ó la koñese husu ó-nia hela-fatin. Saida mak ó sei halo?",
+    quizA:["Fó de'it ba sira 😬","Husu ba ema boot kedas! 🙋","Ignora de'it"],
     quizCorrect:1,
-    quizRight:"🎉 LOOS! Fó-hatene sempre ba ema boot bainhira ema estranjeiru husu informasaun!",
-    quizWrong:"🤔 La loos! Resposta di'ak liu mak fó-hatene ba ema boot kedas.",
+    quizRight:"🎉 SIN! Fó-hatene nafatin ba adultu ida bainhira ema ne'ebé ó la koñese husu informasaun privadu!",
+    quizWrong:"🤔 Hmm, ladún loos! Resposta ne'ebé di'ak liu mak fó-hatene kedas ba adultu ida.",
 
     helpTitle:"🤝 Sé Maka Bele Ajuda Ita?",
-    helpDesc:"Sira mak herói moris loloos ita nian — bele ba sira sempre!",
-    helpPeople:["👩‍👧 Inan ka aman","👴👵 Avó","👩‍🏫 Mestra","🧑‍🤝‍🧑 Maun ka Mana","🏠 Ema iha uma ne'ebé ita fiar"],
+    helpDesc:"Sira ne'e mak ita-nia erói iha mundu loloos — ita bele ba buka sira nafatin!",
+    helpPeople:["👩‍👧 Inan ka aman","👴👵 Avo sira","👩‍🏫 Manorin","🧑‍🤝‍🧑 Maun ka Mana","🏠 Ema iha uma ne'ebé ita fiar"],
 
-    gameCalloutTitle:"🏰 Prontu ba Cyber Kingdom?",
+    gameCalloutTitle:"🏰 Prontu ona ba Reinu Siber (Cyber Kingdom)?",
     gameCalloutDesc:
-      "Halimar jogu atu prátika kbiit foun sira — no hetan ita-nia badge Herói Cyber!",
+      "Halimar game ne'e atu prátika ó-nia super-podér foun — no manán ó-nia badge Erói Siber!",
+    sectionTitle_collect:"🦸 Koleita Ita-nia Kbiit 3!",
+    tapToCollect:"👆 Klik hodi simu!",
     linksTitle:"Depois ba ne'ebé?",
   },
 };
@@ -765,7 +772,7 @@ export default function CyberChildrenPage(){
         </section>
 
         <section className="section">
-          <h2 className="section-title">🦸 Collect Your 3 Superpowers!</h2>
+          <h2 className="section-title">{t.sectionTitle_collect}</h2>
           <div className="powers-grid">
             {[
               {
@@ -811,10 +818,7 @@ export default function CyberChildrenPage(){
                     collectPower(p.idx);
                   }}
                 >
-                  {powers[p.idx]
-                    ? p.check
-                    : (lang==="tet" ? "👆 Taka atu koleita!" : "👆 Tap to collect!")
-                  }
+                  {powers[p.idx] ? p.check : t.tapToCollect}
                 </button>
               </div>
             ))}
