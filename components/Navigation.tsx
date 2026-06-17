@@ -86,7 +86,7 @@ useEffect(()=>{
         groups:{
           programs:{
             title:"Programs",
-            description:"Explore Lafaek magazines, stories, videos, and learning resources.",
+            description:"Explore Lafaek magazines, stories, and learning resources.",
             links:[
               {
                 label:"Magazines",
@@ -103,11 +103,7 @@ useEffect(()=>{
                 href:"/stories/news",
                 description:"Updates and announcements from Lafaek."
               },
-              {
-                label:"Videos",
-                href:"/revista-media",
-                description:"Watch learning, community, and media content."
-              },
+              
               {
                 label:"Learning",
                 href:"/learning",
@@ -170,12 +166,7 @@ useEffect(()=>{
                 href:"/contact",
                 description:"Get in touch with the Lafaek team."
               },
-              {
-                label:"Reports",
-                href:"/reports",
-                description:"Annual reports and key documents.",
-                note:"Coming soon"
-              }
+             
             ]
           },
           extras:{
@@ -245,11 +236,6 @@ useEffect(()=>{
                 description:"Atualizasaun no anúnsio husi Lafaek."
               },
               {
-                label:"Vídeu",
-                href:"/revista-media",
-                description:"Haree konteúdu aprendizajen, komunidade, no média."
-              },
-              {
                 label:"Aprendizajen",
                 href:"/learning",
                 description:"Rekursu aprendizajen no atividade sira."
@@ -312,12 +298,7 @@ useEffect(()=>{
                 href:"/contact",
                 description:"Kontaktu ho ekipa Lafaek."
               },
-              {
-                label:"Relatóriu sira",
-                href:"/reports",
-                description:"Relatóriu anuál no dokumentu importante sira.",
-                note:"Sei mai"
-              }
+            
             ]
           },
           extras:{
