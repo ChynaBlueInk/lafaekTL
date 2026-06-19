@@ -1,3 +1,4 @@
+//app/admin/our-team/page.tsx
 "use client"
 
 import {useEffect,useMemo,useRef,useState,ChangeEvent} from "react"
@@ -26,7 +27,7 @@ type ModalMode="view"|"edit"|"create"
 
 const DEPARTMENTS=[
   "Senior Management Team (SMT)",
-  "Business Development",
+  "Business Development & Marketing",
   "Production",
   "Monitoring and Evaluation (MEL)",
   "Logistics and Finance",
@@ -36,7 +37,7 @@ const DEPARTMENTS=[
 
 const DEPARTMENT_ORDER:Record<string,number>={
   "Senior Management Team (SMT)":1,
-  "Business Development":2,
+  "Business Development & Marketing":2,
   "Production":3,
   "Monitoring and Evaluation (MEL)":4,
   "Logistics and Finance":5,

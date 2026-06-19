@@ -29,7 +29,7 @@ const SENIOR_MANAGEMENT="Senior Management Team (SMT)";
 
 const DEPARTMENT_ORDER=[
   SENIOR_MANAGEMENT,
-  "Business Development",
+  "Business Development & Marketing",
   "Production",
   "Monitoring and Evaluation (MEL)",
   "Logistics and Finance",

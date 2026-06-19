@@ -141,7 +141,7 @@ export default function HomePage() {
         title: "Benvindu mai Lafaek Learning Media",
         subtitle: "Empodera Timor-Leste liuhusi Edukasaun & Istoria sira",
         supportText:
-          "Ita boot bele suporta Lafaek lihusi sosa ami nia Revista no produtu sira, sponsor konteudu edukasaun, halo publisidade iha ami nia Revista, ou bele aluga/selu ami nia ekipa hakerek nain, Ilustrador no videografer.",
+          "Ita boot bele suporta Lafaek lihusi halo doasaun hodi sosa,ami nia revista no produtu sira, sponsor konteudu edukasaun, halo publisidade iha ami nia Revista, ou bele aluga/selu ami nia ekipa hakerek nain, Ilustrador no videografer.",
       },
       news: { title: "Notísia Foun", subtitle: "Saida mak akontese iha Lafaek?", viewAll: "Haree hotu notísia" },
       socialEnterprise: {
@@ -177,7 +177,7 @@ export default function HomePage() {
         features: [],
       },
       cta: {
-        title: "Tama ba Misaun Ami",
+        title: "Hola parte iha ami nia misaun",
         subtitle: "Ajuda ami kontinua hodi empodera Timor-Leste liuhosi edukasaun",
         volunteer: "Voluntáriu",
         donate: "Suporta Ami",
@@ -376,7 +376,7 @@ export default function HomePage() {
             {/* Dropdown navigation */}
             <div className="mb-8 rounded-xl bg-gray-50 p-6 shadow-sm">
               <h2 className="mb-3 text-2xl font-bold text-[#219653]">
-                {L === "tet" ? "Buka saida ohin?" : "What are you looking for today?"}
+                {L === "tet" ? "Saida mak ita boot sira hakarak atu buka hatene ohin loron?" : "What are you looking for today?"}
               </h2>
 
               <select
