@@ -4,6 +4,9 @@ import {NextRequest,NextResponse}from "next/server"
 import {DynamoDBClient}from "@aws-sdk/client-dynamodb"
 import {DynamoDBDocumentClient,ScanCommand,PutCommand}from "@aws-sdk/lib-dynamodb"
 
+export const dynamic = "force-dynamic"
+export const revalidate = 0
+
 const REGION=process.env.AWS_REGION||"ap-southeast-2"
 const TABLE_NAME="LafaekTeam"
 
