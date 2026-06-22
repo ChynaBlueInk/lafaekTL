@@ -258,13 +258,13 @@ export default function TeamClient({membersTet,membersEn}:Props){
         aria-label={`Open details for ${getSafeName(member)}`}
       >
         <div className="aspect-[4/5] w-full bg-[#F5F5F5]">
-          <img
-            src={buildS3ImageUrl(member.photo)}
-            alt={getSafeName(member)}
-            onError={handleImageError}
-            className="h-full w-full object-cover"
-          />
-        </div>
+  <img
+    src={buildS3ImageUrl(member.photo)}
+    alt={getSafeName(member)}
+    onError={handleImageError}
+    className="h-full w-full object-cover object-top"
+  />
+</div>
 
         <div className="p-4 text-left">
           <p className="mb-2 inline-flex rounded-full bg-[#219653]/10 px-3 py-1 text-xs font-semibold text-[#219653]">
@@ -420,13 +420,13 @@ export default function TeamClient({membersTet,membersEn}:Props){
 
       {active&&(
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+  className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4"
+
           role="dialog"
           aria-modal="true"
           aria-labelledby="member-title"
         >
-          <div className="relative flex max-h-[90vh] w-full max-w-3xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
-            <button
+<div className="relative flex max-h-[75vh] w-full max-w-3xl flex-col overflow-y-auto rounded-2xl bg-white shadow-2xl">            <button
               type="button"
               onClick={()=>setActive(null)}
               className="absolute right-3 top-3 z-20 rounded-full bg-white/90 p-2 shadow hover:bg-white"
@@ -437,13 +437,13 @@ export default function TeamClient({membersTet,membersEn}:Props){
 
             <div className="grid md:grid-cols-2">
               <div className="relative z-0 flex h-72 min-h-[280px] items-center justify-center bg-[#F5F5F5] md:h-full">
-                <img
-                  src={buildS3ImageUrl(active.photo)}
-                  alt={getSafeName(active)}
-                  onError={handleImageError}
-                  className="h-full w-full object-cover"
-                />
-              </div>
+  <img
+    src={buildS3ImageUrl(active.photo)}
+    alt={getSafeName(active)}
+    onError={handleImageError}
+    className="h-full w-full object-cover object-top"
+  />
+</div>
 
               <div className="relative z-10 max-h-[80vh] overflow-y-auto p-6 md:p-8">
                 <p className="mb-3 inline-flex rounded-full bg-[#219653]/10 px-3 py-1 text-xs font-semibold text-[#219653]">
