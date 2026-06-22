@@ -141,8 +141,8 @@ export default function HomePage() {
         title: "Benvindu mai Lafaek Learning Media",
         subtitle: "Empodera Timor-Leste liuhusi Edukasaun & Istoria sira",
         supportText:
-          "Ita boot bele suporta Lafaek lihusi halo doasaun hodi sosa,ami nia revista no produtu sira, sponsor konteudu edukasaun, halo publisidade iha ami nia Revista, ou bele aluga/selu ami nia ekipa hakerek nain, Ilustrador no videografer.",
-      },
+          "Ita-boot bele apoiu Lafaek liuhusi halo doasaun hodi sosa ami-nia revista no produtu sira, patrosina konteúdu edukativu, halo publisidade ho ami, ka kontrata ami-nia ekipa talentozu hosi hakerek-na'in, ilustradór, no videografu sira."
+          },
       news: { title: "Notísia Foun", subtitle: "Saida mak akontese iha Lafaek?", viewAll: "Haree hotu notísia" },
       socialEnterprise: {
         title: "Lafaek Enmpreza Social",

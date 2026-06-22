@@ -70,26 +70,26 @@ const TRANSLATIONS: Record<Lang, T> = {
     heroTitle: "Internét",
     heroTitle2: "ba ema hotu.",
     heroSubtitle:
-      "Ida-ne'e mós ita-nia responsabilidade atu uza teknolojia ho seguru. Seguransa sibernétika la'ós de'it ba ema espesialista sira — ida-ne'e proteje família, komunidade, no Timor-Leste nia futuru.",
+      "Nune’e mos responsabilidade atu utiliza technologia ho seguru. Seguransa sibernétika la'ós de'it ba ema espesialista sira — ida-ne'e mos bele proteje família, komunidade, no Timor-Leste nia futuru.",
 
-    whatTitle: "Saida mak Seguransa Sibernétika?",
+    whatTitle: "Saida mak Siberseguransa?",
     whatLead:
-      "Seguransa sibernétika mak oinsá ita proteje ita-nia an, ita-nia informasaun, no ita-nia sasán teknolojia sira husi perigu iha mundu dijitál laran. Ida-ne'e inklui buat hotu, hahú husi kria kódigu (password) ne'ebé forte to'o koñese se mak tenta atu lohi ka utiliza ita.",
+      "Seguransa sibernétika mak oinsá ita proteje ita-nia an, ita-nia informasaun, no ita-nia sasán teknolojia sira husi perigu iha mundu dijitál laran. Nia kobre buat hotu hahu husi  kria password forte to'o hatene bainhira ema ida hakarak halu ka manipula ita.",
     whatCards: [
       {
         icon: "shield",
         title: "Proteje ita-nia identidade",
-        desc: "Ita-nia naran, foto, hela-fatin, no dokumentu pesoál sira mak valiozu. Seguransa sibernétika ajuda rai sira hosi liman sala.",
+        desc: "Ita-nia naran, foto, hela-fatin, no dokumentu pesoál sira mak valiozu. Siberseguransa ajuda asegura ita nia informasaun sira nee protegido no seguro.",
       },
       {
         icon: "globe",
         title: "Nafatin seguru iha plataforma sira",
-        desc: "Rede sosiál, aplikasaun mensajen, no sítiu web sira bele fó risku ba fraude, konteúdu ne'ebé fo prejuízu, no ema sira ne'ebé laiha intensaun di'ak.",
+        desc: "Rede sosiál, app mensajen, no website sira bele ekspoze ita ba fraude, konteúdu aat, no ema ho intensaun aat.",
       },
       {
         icon: "lock",
-        title: "Seguransa ita-nia Konta",
-        desc: "Email, banku, plataforma eskola nian, no servisu governu nian, sira hotu presiza protezaun — password ne'ebé fraku ida de'it bele loke buat hotu.",
+        title: "Asegura ita nia konta sira",
+        desc: "Email, banku, plataforma eskola nian, no servisu governu nian, sira hotu presiza protezaun. Kria  password fraku bele lori risku ba ita nia seguransa no bele facilita ema seluk atu asesu ba ita informasaun privadu.",
       },
       {
         icon: "phone",
@@ -98,24 +98,24 @@ const TRANSLATIONS: Record<Lang, T> = {
       },
     ],
 
-    whyTitle: "Tamba Saida Ne'e Importante Agora",
+    whyTitle: "Tamba saida presija tau Atensaun agora.",
     whyLead:
-      "Ameasa dijitál la'ós buat ne'ebé imajináriu de'it — sira afeta ema loloos loron-loron. Bainhira Timor-Leste sai konektadu liu, risku sira mós boot liu.",
+      "Ameasa dijitál la'ós buat ne'ebé imajináriu de'it — sira afeta bain bain loron-loron. Bainhira Timor-Leste sai konektadu, risku sira mós boot liu.",
     whyPoints: [
       {
         stat: "3.4B",
-        label: "E-mail lasu (phishing) haruka sai loron-loron.",
-        desc: "Mensajen lasu (scam) billiaun ba billiaun haruka sai loron-loron. Ida-ne'e tama ba nasaun hotu no ema hotu nia inbox",
+        label: "Informasaun falsu (phising)  sira haruka ba ita nia email loron-loron.",
+        desc: "Mensajen hirak ne’e haruka ba nasaun hotu-hotu no tama ita nia email  liu husi  inbox.  ",
       },
       {
         stat: "95%",
-        label: "Atake envolve erru umanu",
-        desc: "Atake barak susesu tanba ema klike ba link ruma, fahe sira-nia password, ka fiar ema ne'ebé ladi'ak.",
+        label: "Atake ligado ho erro humano.",
+        desc: "Barak liu akontese tamba klik iha sítio phishing, simu mensajen husi ema deskonhesidu, fahe password, ka fiar ema sala hodi asesu ita nia informasaun.",
       },
       {
         stat: "↑62%",
-        label: "Fraude iha telemovel aumenta",
-        desc: "Atake ba smartphone sira aumenta lalais liu fali kómputer—no ita hatene katak ema barak liu iha Timor-Leste uza telemóvel de'it atu asesu ba internet.",
+        label: "Numero fraude liu husi  kanal sira hanesan  telemovel aumenta loron ba loron.",
+        desc: "Atake liu husi kanal telemovel aumneta lalais liu kompara ho kanal  sira hanesan  Komputador no  ita hatene katak ema barak liu iha Timor-Leste mak utilija  telemóvel hodi asesu ba internet.",
       },
     ],
 
@@ -978,7 +978,7 @@ export default function CyberLandingPage() {
             <div>
               <div className="cl-eyebrow">
                 <Globe style={{ width: 14, height: 14 }} aria-hidden="true" />
-                {lang === "en" ? "Our context" : "Ita-nia kontekstu"}
+                {lang === "en" ? "Our context" : "Ita-nia kontestu"}
               </div>
               <h2 className="cl-h2">{t.nationTitle}</h2>
               <p className="cl-lead" style={{ marginBottom: 0 }}>{t.nationLead}</p>
