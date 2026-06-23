@@ -1,3 +1,4 @@
+//app/admin/impact/page.tsx
 "use client";
 
 import {useEffect,useLayoutEffect,useMemo,useRef,useState,ChangeEvent}from "react";
@@ -174,9 +175,14 @@ export default function ImpactAdminPage(){
   const[dirtyIds,setDirtyIds]=useState<Set<string>>(new Set());
 
   // ── Mobile filter collapse ─────────────────────────────────────────────────
-  const[showFilters,setShowFilters]=useState<boolean>(false);
-  const stickyRef=useRef<HTMLDivElement>(null);
-  const[stickyHeight,setStickyHeight]=useState<number>(0);
+// ── Mobile filter collapse ─────────────────────────────────────────────────
+const[showFilters,setShowFilters]=useState<boolean>(false);
+
+// ── Story accordion ────────────────────────────────────────────────────────
+const[expandedStoryId,setExpandedStoryId]=useState<string|null>(null);
+
+const stickyRef=useRef<HTMLDivElement>(null);
+const[stickyHeight,setStickyHeight]=useState<number>(0);
 
   useEffect(()=>{
     const load=async()=>{
@@ -826,7 +832,7 @@ export default function ImpactAdminPage(){
                 <button
                   type="button"
                   onClick={()=>setShowFilters((v)=>!v)}
-                  className="inline-flex items-center gap-1.5 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 md:hidden"
+                  className="inline-flex items-center gap-1.5 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 hover:bg-slate-50"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z"/>
@@ -848,10 +854,10 @@ export default function ImpactAdminPage(){
             </div>
 
             {/* Filter row — always visible on desktop, collapsible on mobile */}
-            <div className={`mt-3 flex-col gap-3 md:flex md:flex-row md:items-center md:justify-between ${showFilters?"flex":"hidden"}`}>
-              <div className="flex flex-wrap items-center gap-3 text-sm text-slate-700">
+<div className={`mt-3 flex-col gap-3 ${showFilters?"flex":"hidden"}`}>
+                <div className="flex flex-wrap items-center gap-3 text-sm text-slate-700">
                 {/* Show S3 keys — in filter panel on mobile, in search row on desktop */}
-                <label className="inline-flex items-center gap-2 md:hidden">
+                <label className="inline-flex items-center gap-1.5 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">
                   <input
                     type="checkbox"
                     className="h-4 w-4 rounded border-slate-300"
@@ -998,6 +1004,7 @@ export default function ImpactAdminPage(){
         {!loading&&filteredItems.length>0&&(
           <div className="space-y-4">
             {filteredItems.map((item)=>{
+              const isExpanded=expandedStoryId===item.id;
               const imageSrc=buildImageUrl(item.image||item.imageUrl);
               const documentUrl=buildFileUrl(item.document);
               const status=(item.status||safeStatus(item)) as ImpactStatus;
@@ -1009,8 +1016,36 @@ export default function ImpactAdminPage(){
 
               return(
                 <div key={item.id} className="rounded-lg border border-slate-200 bg-white shadow-sm">
-                  <div className="flex flex-col gap-3 p-4 md:flex-row md:items-start md:justify-between">
-                    <div className="flex flex-1 flex-col gap-3">
+                  <div
+  className="cursor-pointer border-b border-slate-200 p-4 hover:bg-slate-50"
+  onClick={()=>
+    setExpandedStoryId(
+      isExpanded
+        ? null
+        : item.id
+    )
+  }
+>
+  <div className="flex items-center justify-between">
+
+    <div>
+      <div className="font-semibold text-slate-900">
+        {item.titleTet||item.titleEn||"Untitled Story"}
+      </div>
+
+      <div className="mt-1 text-sm text-slate-500">
+        {item.location?.municipality||"No municipality"}
+      </div>
+    </div>
+
+    <div className="text-slate-400">
+      {isExpanded?"▲":"▼"}
+    </div>
+
+  </div>
+</div>
+{isExpanded&&(
+  <div className="flex flex-col gap-3 p-4 md:flex-row md:items-start md:justify-between">                    <div className="flex flex-1 flex-col gap-3">
                       <div className="flex flex-wrap items-center gap-3">
                         <div className="inline-flex items-center gap-2">
                           <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-slate-100 text-xs font-medium text-slate-700">
@@ -1031,8 +1066,9 @@ export default function ImpactAdminPage(){
                             >
                               ↓
                             </button>
-                          </div>
                         </div>
+
+</div>
 
                         <span className={`rounded-md border px-2 py-1 text-xs font-medium ${getStatusClasses(status)}`}>
                           {statusLabel}
@@ -1316,8 +1352,10 @@ export default function ImpactAdminPage(){
                 </div>
               );
             })}
+  
           </div>
         )}
+        
 
         {showAddModal&&(
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">

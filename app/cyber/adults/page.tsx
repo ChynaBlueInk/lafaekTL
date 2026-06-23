@@ -202,19 +202,19 @@ export default function CyberAdultsPage(){
     },
 
     tet:{
-      title:"Proteje labarik sira online",
+      title:"Proteje labarik sira iha Plataforma online",
       subtitle:
-        "Orientasaun prátiku ba inan-aman, kuidadór no mestre sira atu hamenus risku online, harii hábitu seguru, no ajuda labarik sira sedu bainhira buat ida la'o sala.",
+        "Orientasaun prátiku ba inan-aman, mestre no manorin sira atu hamenus risku online, harii hábitu seguru, no ajuda labarik sira imediatamente bainhira buat ruma la'o Lalos.",
       heroBadge:"Inan-Aman, Kuidadór & Manorin sira",
       introLead:
-        "Labarik sira moris online lorloron. Sira aprende, halimar, ko'alia, haree, fahe, no esplora iha espasu dijitál sira. Ne'e fó oportunidade, maibé mós fó risku ne'ebé sira la sempre maduru to'o atu identifika ka jere rasik.",
+        "Labarik sira moris online lorloron. Sira aprende, halimar, ko'alia, haree, fahe, no esplora iha espasu dijitál sira. Alen de  fó oportunidade,  ida-ne’e mós fó risku ba labarik sira tamba sira nia kapasidade lato’o hodi identifika ka jere risku hirak nee",
       back:"Fila ba Siber",
       toChildren:"Labarik",
       toYouth:"Joventude",
 
       whyAdultsTitle:"Tanba sa mak adultu informadu importante",
       whyAdultsLead:
-        "Labarik sira la presiza de'it dispozitivu no regra. Sira presiza adultu informadu iha sira-nia leet. Inan-aman no manorin sira dala barak mak ema dahuluk ne'ebé nota bainhira buat ida la loos, esplika saida mak comportamentu seguru, no intervém antes problema ida sai grave.",
+        "Labarik sira la presiza de'it dispozitivu no regra. Sira presiza adultu informadu iha sira-nia leet. Inan-aman no manorin sira dala barak mak ema dahuluk ne'ebé nota bainhira buat ida la loos, esplika saida mak komportamentu seguru, no intervém antes problema ida sai grave.",
       whyAdultsCards:[
         {
           icon:<HeartHandshake className="h-6 w-6" />,
@@ -223,24 +223,24 @@ export default function CyberAdultsPage(){
         },
         {
           icon:<GraduationCap className="h-6 w-6" />,
-          title:"Manorin sira bele nota padróun sedu",
-          desc:"Manorin sira dala barak nota bullying, distraisaun, mudansa emosionál, ka fahe informasaun ne'ebé ladi'ak antes família sira nota. Manorin ne'ebé informadu bele foti asaun sedu no ho konfiansa.",
+          title:"Manorin sira bele nota  sinal sira ne’e sedu",
+          desc:"Manorin sira dala barak nota intimidasaun, distraisaun, mudansa emosionál, ka fahe informasaun ne'ebé ladi'ak antes família sira nota. Manorin ne'ebé informadu bele foti asaun sedu no ho konfiansa.",
         },
         {
           icon:<ShieldCheck className="h-6 w-6" />,
           title:"Adultu sira fó ezemplu ba hábitu online.",
-          desc:"Labarik sira banati-tuir saida mak adultu sira halo. Se adultu sira komprende privasidade, oversharing, password, no respeitu online, labarik sira mós sei aprende hábitu sira-ne'e.",
+          desc:"Labarik sira banati-tuir saida mak adultu sira halo. Se adultu sira komprende privasidade, password, no respeitu online, labarik sira mós sei aprende hábitu sira-ne'e.",
         },
       ],
 
       risksTitle:"Tanba sa mak ida-ne'e importante agora",
       risksLead:
-        "Labarik ida bele seguru fízikamente iha uma, maibé sei vulnerável online. Adultu sira presiza komprende natoon atu orienta, nota, no foti asaun.",
+        "Labarik ida bele seguru fízikamente iha uma, maibé sei vulnerável online. Adultu sira presiza iha kompresaun oituan atu orienta, nota, no foti asaun.",
       risks:[
-        "Labarik sira bele la identifika (grooming), fraude/lasu (scams), ka manipulasaun to'o bainhira sira hetan ona presaun.",
-        "Sira dala barak la komprende informasaun hira mak foto, vídeo, ka post ida bele hatudu.",
+        "Labarik seidauk bele la identifika (grooming), fraude/lasu (scams), ka manipulasaun to'o bainhira sira hetan ona presaun.",
+        "Sira dala barak la komprende informasaun hira mak foto, vídeo, ka post ida bele fo sai.",
         "Sira bele subar problema tanba ta'uk hetan kastigu, kulpa, ka lakon asesu ba dispozitivu.",
-        "Prejuízu online bele afeta konfiansa, aprendizajen, toba, amizade, reputasaun, no seguransa iha moris loloos.",
+        "Prejuízu online bele afeta konfiansa, aprendizajen, toba/deskansa, amizade, reputasaun, no seguransa iha moris loloos.",
       ],
 
       interactiveTitle:"Matadalan interativu ba prátika loron-loron",
@@ -257,8 +257,8 @@ export default function CyberAdultsPage(){
         },
         {
           icon:<Users className="h-6 w-6" />,
-          title:"Regra família no sala-aula nian",
-          desc:"Akordu simples, espetativa, no rotina sira ne'ebé hamenus risku la halo teknolojia sai hanesan funu.",
+          title:"Regulamentu familia no sala de aprendizazen",
+          desc:"Akordu simples, no rotina sira La hamosu problema hela deit konaba technologia.",
         },
         {
           icon:<Eye className="h-6 w-6" />,
@@ -275,7 +275,7 @@ export default function CyberAdultsPage(){
         "Kria Akordu Teknolojia Família nian ka regra dijitál ba sala-aula.",
         "Hatur kontrolu inan-aman ne'ebé tuir idade iha dispozitivu, loja aplikasaun, no aplikasaun importante sira. Reviza beibeik.",
         "Hametin privasidade iha aplikasaun sosiál. Limita sé mak bele manda mensajen, marka (tag), ka haree story, no hamate lokasaun loloos (precise location).",
-        "Ko'alia sedu no beibeik kona-ba scams, grooming, bullying, no presaun atu fahe imajen. Mantén konversa nakloke.",
+        "Ko'alia sedu no beibeik kona-ba scams, grooming, intimidasaun, no presaun atu fahe imajen. Mantén konversa nakloke.",
         "Halo backup ba foto importante sira no serbisu eskola nian. Hatene oinsá atu restaura dispozitivu se presiza.",
       ],
 
@@ -286,7 +286,7 @@ export default function CyberAdultsPage(){
         {
           icon:<MapPin className="h-5 w-5" />,
           title:"Keta fahe lokasaun atual",
-          desc:"Keta posta labarik nia lokasaun agora, eskola ne'ebé nia ba, desportu ne'ebé nia halo, ka fatin ne'ebé nia ba beibeik. Padróun rotina bele uza hosi ema estranjeiru.",
+          desc:"Keta posta labarik nia lokasaun presente , eskola ne'ebé nia ba, desportu ne'ebé nia halo, ka fatin ne'ebé nia ba beibeik. Padraun rotina bele uza hosi ema estranjeiru.",
         },
         {
           icon:<Camera className="h-5 w-5" />,
@@ -307,7 +307,7 @@ export default function CyberAdultsPage(){
 
       familyRulesTitle:"Akordu dijitál família ka sala-aula nian — pontu inísiu",
       familyRules:[
-        "Dispozitivu sira uza iha fatin ne'ebé nakloke se bele, liuliu ba labarik ki'ik sira.",
+        " Dispozitivu sira se bele uja  iha fatin nakloke, liuliu ba labarik ki'ik sira.",
         "Husu-molok-klik: link, download, no oferta gratuitu sira presiza adultu ka manorin sira mak haree uluk.",
         "Pauza–Hanoin–Hatete: se mensajen ida sente urjente, segredu, ka ameasadu, hatudu kedas ba adultu ida.",
         "Labele fahe detallu pesoál hanesan naran kompletu, eskola, enderesu, telefone, ka lokasaun atual.",
@@ -319,7 +319,7 @@ export default function CyberAdultsPage(){
       controls:[
         {icon:<Smartphone className="h-5 w-5" />,text:"Setting dispozitivu: filtru konteúdu, limite app, tempu ekran, no restrisaun sosa buat ruma."},
         {icon:<KeyRound className="h-5 w-5" />,text:"Loja aplikasaun: presiza aprovasaun ba instalasaun no kompras iha aplikasaun."},
-        {icon:<Router className="h-5 w-5" />,text:"Wi-Fi uma nian: filtiraun ba família no oráriu bainhira disponivel."},
+        {icon:<Router className="h-5 w-5" />,text:"Wi-Fi uma nian: halo filtrasaun ba familia ho ninia orario sira nebe disponivel"},
       ],
 
       scamsTitle:"Lia-bosok (scams), finje sai belun hodi lohi (grooming), no promesa sira ne'ebé la lojika.",
@@ -345,7 +345,7 @@ export default function CyberAdultsPage(){
 
       reportTitle:"Se buat ida la'o sala",
       reportSteps:[
-        "Suporta sira uluk. Hakmatek no fó agradese ba labarik tanba brani atu konta problema ne'e ba ita.",
+        "Suporta sira uluk. kalma no fó agradese ba labarik tanba brani atu konta problema ne'e ba ita.",
         "Rai evidénsia ho seguru: foti screenshot, rai link (URL), naran user, no mós oras akontesimentu.",
         "Troka password kedas, ativa autentikasaun (MFA), no log out hosi kualkér fatin seluk ne'ebé ita-nia konta nakloke hela.",
         "Blokeia no relata iha aplikasaun ka plataforma.",

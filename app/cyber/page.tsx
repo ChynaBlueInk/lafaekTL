@@ -121,21 +121,21 @@ const TRANSLATIONS: Record<Lang, T> = {
 
     nationTitle: "Tamba Saida Mak Ida Ne'e Importante ba Timor-Leste",
     nationLead:
-      "Nu'udar nasaun ida ne'ebé foin foin sa'e iha mundu, Timor-Leste harii daudaun ninia futuru dijitál agora. Ida-ne'e kria oportunidade ne'ebé di'ak—maibé mós kria kbiit-fraku ne'ebé reál.",
+      "Nu'udar nasaun ida ne'ebé foin  sa'e iha mundu,  Timor-Leste, foin mak kria nia  futuru dijitál. Ne’e  ajuda loke oportunidade barak  ba nasaun  maibé mos aumenta risku no vulnerabilidade. ",
     nationPoints: [
-      "Uza internet iha telemóvel aumenta lalais tebes, ida-ne'e lori ema milliaun ba milliaun atu asesu ba mundu dijitál ba dala uluk, maibé barak mak seidauk iha koñesimentu kona-ba oinsá atu uza internet ho seguru.",
+      "Numero  utilizasaun   internet liu husi telemovel aumenta lalais tebes. No ema barak mak foin uja primeira vez ho nune laiha konhesimentu konaba seguransa digital.",
       "Servisu Governu nian, banku, no negósiu sira agora uza ona sistema dijitál—tanba ne'e, importante tebes ba ita atu aprende oinsá uza teknolojia ho seguru hodi bele partisipa iha dezenvolvimentu ekonómiku.",
-      "Ema foin-sa'e sira mak sai maioria iha ita-nia populasaun. Sira-nia lala'ok iha mundu dijitál ohin loron nian sei fó influénsia ba Timor-Leste nia kultura teknolojia ba jerasaun foun tuir mai.",
-      "Nasaun ki'ik sira bele sai targetu tanba de'it sira iha rekursu ba seguransa sibernétika ne'ebé uitoan no mós konsiénsia públiku nian ne'ebé sei menus.",
-      "Kampaña dezinformasaun no manipulasaun sira bele espalla ho lalais iha komunidade ne'ebé besik malu no iha ekosistema informasaun ne'ebé ki'ik.",
+      "Joventude representa maioria husi ita nia  populasaun, Sira-nia lala'ok iha mundu dijitál ohin loron nian sei fó influénsia ba Timor-Leste nia kultura teknolojia ba jerasaun foun tuir mai.",
+      "Nasaun ki'ik sira bele sai targetu tanba sira iha rekursu ba seguransa sibernétika ne'ebé uitoan no mós konsiénsia públiku nian ne'ebé sei menus.",
+      "Informasaun Lalos sira no manipulasaun bele espalla lalais iha komunidade sira ne’ebé besik malu iha ekosistema informasaun ne'ebé ki'ik.",
       "Atake boot ida de'it ba sistema ne'ebé importante—hanesan saúde, finansa, ka infrastruktura—sei fó impaktu ne'ebé boot tebes ba ita-nia populasaun ne'ebé ki'ik.",
     ],
     nationClosing:
-      "Seguransa dijitál la'ós de'it hili-ba-an-rasik. Iha Timor-Leste, ida-ne'e mak responsabilidade komunidade nian no sai mós forsa ida atu proteje ita-nia nasaun.",
+      "Seguransa siber la’ós de’it desizaun pesoál. Iha Timor-Leste maibe hanesan responsabilidade komunidade no parte importante atu hametin reziliénsia nasaun.",
 
-    consequencesTitle: "Konsekuénsia ne'ebé Realidade",
+    consequencesTitle: "Konsekuénsia nee real.",
     consequencesLead:
-      "Bainhira ita la fó atensaun ba Seguransa sibernétika, ninia rezultadu ladi'ak ne'e reál tebes—ba ita-nia an, família, instituisaun sira, no ba nasaun tomak.",
+      "Bainhira ita la fó atensaun ba Seguransa sibernétika, ninia rezultadu negativu .   ne'e reál tebes—ba ita-nia an, família, instituisaun sira, no ba nasaun tomak.",
     consequences: [
       {
         label: "Na'ok identidade",
@@ -144,33 +144,33 @@ const TRANSLATIONS: Record<Lang, T> = {
       },
       {
         label: "Lakon Finanseiru",
-        desc: "Lasu (scam), oferese serbisu falsu, no lohi-teen banku nian bele hamoos ita-nia osan ne'ebé rai hela. Ba família sira ne'ebé kbiit-laek, atake ida de'it bele lori sira ba situasaun ne'ebé susar tebes.",
+        desc: "Lasu (scam), oferese serbisu falsu, fraude iha sitema bankaria banku nian bele hamoos ita-nia osan ne'ebé rai hela. Ba família sira ne'ebé kbiit-laek, atake ida de'it bele lori sira ba situasaun ne'ebé susar tebes.",
         severity: "critical",
       },
       {
-        label: "Asédiu no Xantajen Seksuál",
-        desc: "Imajen ka mensajen privadu sira uza hanesan kilat atu kobra osan, hamoe, ka kontrola vítima sira—baibain sira mak foka liu ba foin-sa'e sira.",
+        label: "Asediu no abuzu online",
+        desc: "Imajen ka mensajen privadu sira utiliza   hodi ameasa,  bosok ka kontrola vítima  barak liu targeta joven sira.",
         severity: "high",
       },
       {
-        label: "Espalla dezinformasaun",
-        desc: "Informasaun falsu kona-ba saúde, polítika, ka seguransa naklekar iha komunidade laran, ida-ne'e harahun konfiansa no lori mós perigu ba ita hotu.",
+        label: "Espalla informasaun falsu sira",
+        desc: "Informasaun falsu sira  ligadu ho  saúde, polítika, ka seguransa espalla iha komunidade laran, sei  harahun konfiansa no lori mós perigu ba ita hotu.",
         severity: "high",
       },
       {
         label: "Estragu instituisionál",
-        desc: "Eskola, ospitál, no eskritóriu governu ne'ebé hetan atake bele lakon sira-nia dadus no mós kapasidade operasionál, ida-ne'e fó impaktu ba komunidade tomak.",
+        desc: "Eskola, ospitál, no eskritóriu governu ne'ebé hetan atake bele lakon sira-nia dadus no mós kapasidade operasionál, sei fó impaktu ba komunidade tomak.",
         severity: "critical",
       },
       {
         label: "Lakon fiar",
-        desc: "Bainhira ema la fiar ona ba sistema dijitál sira, sira sei hadook an husi ida-ne'e—ida-ne'e sei hametin dezenvolvimentu ekonómiku no hanetik ita-nia asesu ba servisu sira ne'ebé importante.",
+        desc: "Bainhira ema la fiar ona ba sistema dijitál sira, sira sei hadook an ida-ne'e sei hametin dezenvolvimentu ekonómiku no prevene ita-nia asesu ba servisu sira ne'ebé importante.",
         severity: "medium",
       },
     ],
 
     audienceTitle: "Hili Ita-nia Dalan",
-    audienceSubtitle: "Seguransa online haree diferente iha kada etapa moris. Hili guia ne'ebé tuir ho ita.",
+    audienceSubtitle: "Seguransa online la hanesan kada etapa iha ita nia  moris laran tomak . Hili dalan ne’ebé diak liu ba ita an.",
     audiences: [
       {
         href: "/cyber/children",
@@ -183,7 +183,7 @@ const TRANSLATIONS: Record<Lang, T> = {
       {
         href: "/cyber/youth",
         age: "Tinan 15–25",
-        title: "Guardiaun Siber",
+        title: "Salva guarda Siber",
         desc: "Kbiit prátiku ba rede sosiál, jogu, estudu, no servisu — identifika fraude, proteje konta, no kuidadu privasidade.",
         cta: "Tama misaun",
         theme: "youth",
@@ -191,26 +191,26 @@ const TRANSLATIONS: Record<Lang, T> = {
       {
         href: "/cyber/adults",
         age: "Adultu no Família",
-        title: "Protetor Komunidade",
+        title: "Protesaun Komunidade",
         desc: "Orientasaun ba inan-aman, profisionál, no membru komunidade — proteje família, servisu, finansa, no ema sira iha ita-nia sorin.",
         cta: "Harii protesaun",
         theme: "adults",
       },
     ],
 
-    togetherTitle: "Seguransa Mak Esforsu Komunidade",
+    togetherTitle: "Seguransa mak responsabilidade kolectivu  iha komunidade",
     togetherLead:
       "Konsiensia individuál importante — maibé forsa ne'ebé loos mosu bainhira família, eskola, no komunidade hotu prátika hábitu seguru hamutuk.",
     togetherPoints: [
       "Fahe saida mak ita aprende ho ita-nia família, liuliu inan-aman ka avó sira ne'ebé bele seidauk hatene di'ak kona-ba ameasa dijitál.",
       "Ko'alia livre kona-ba esperiénsia online — halakon moe kona-ba sala sira, hodi nune'e fasil liu atu husu ajuda.",
-      "Eskola no fatin servisu ne'ebé harii konsiensia siberseguransa proteje ema hotu iha sira-nia rede, la'ós de'it ema ida-idak.",
-      "Relata lalais fraude no konteúdu suspetu — ita-nia asaun ne'e proteje ema seluk ne'ebé bele simu mensajen hanesan.",
+      "Eskola no fatin servisu ne'ebé harii konsiensia siberseguransa proteje ema hotu iha sira-nia rede, la'ós de'it ema.",
+      "Relata lalais fraude no konteúdu suspetu — ita-nia asaun ne'e sei proteje ema seluk ne'ebé bele simu mensajen hanesan.",
     ],
 
     quoteText:
       "Korente ida nia forsa depende ba nia elo ne'ebé fraku liu. Iha sosiedade ne'ebé konektadu, seguransa ema hotu nian depende ba koñesimentu husi ema hotu.",
-    quoteSource: "Prinsípiu ba forsa siberseguransa hamutuk",
+    quoteSource: "Prinsípiu reziliénsia siber kolektiv",
   },
 
   en: {
@@ -1001,7 +1001,7 @@ export default function CyberLandingPage() {
         <section className="cl-section">
           <div className="cl-eyebrow">
             <AlertTriangle style={{ width: 14, height: 14 }} aria-hidden="true" />
-            {lang === "en" ? "What's at stake" : "Saida mak iha risku"}
+            {lang === "en" ? "What's at stake" : "Risku saida mak iha"}
           </div>
           <h2 className="cl-h2">{t.consequencesTitle}</h2>
           <p className="cl-lead">{t.consequencesLead}</p>

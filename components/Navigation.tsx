@@ -245,7 +245,7 @@ useEffect(()=>{
           },
           keepSafe:{
             title:"Uza internet ho Seguro, manten seguransa iha online",
-            description:"Matadalan kona-ba seguransa online ba labarik, joven, inan-aman, mestre, no komunidade.",
+            description:"Matadalan kona-ba seguransa online ba labarik, joven, inan-aman, manorin, no komunidade.",
             links:[
               {
                 label:"Uza internet ho Seguro, manten seguransa iha online",
@@ -263,7 +263,7 @@ useEffect(()=>{
                 description:"Tópiku seguransa cyber ba joven sira."
               },
               {
-                label:"Inan-aman no Mestre",
+                label:"Inan-aman no Manorin",
                 href:"/cyber/adults",
                 description:"Matadalan ba adultu sira atu apoia labarik no joven online."
               }
