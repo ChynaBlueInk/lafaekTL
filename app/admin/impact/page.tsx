@@ -1346,12 +1346,13 @@ const[stickyHeight,setStickyHeight]=useState<number>(0);
                             Delete
                           </button>
                         </div>
-                      </div>
-                    </div>
-                  </div>
+               </div>
                 </div>
-              );
-            })}
+              </div>
+            )}
+          </div>
+        );
+      })}
   
           </div>
         )}
