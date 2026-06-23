@@ -130,7 +130,7 @@ export default function SubmitImpactStoryPage(){
       <main className="mx-auto max-w-4xl px-4 py-10">
 
         {showGuide&&(
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+          <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/60 p-4 pt-28">
             <div className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-xl bg-white p-6 shadow-xl">
 
               <div className="mb-6 flex items-center justify-between">
