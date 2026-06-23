@@ -94,7 +94,7 @@ useEffect(()=>{
                 description:"Read Lafaek magazine editions."
               },
               {
-                label:"Impact Stories",
+                label:"Impact & Success Stories",
                 href:"/stories/impact",
                 description:"Stories showing Lafaek’s work in communities."
               },
