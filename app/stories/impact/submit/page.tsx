@@ -131,7 +131,7 @@ export default function SubmitImpactStoryPage(){
 
         {showGuide&&(
           <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/60 p-4 pt-28">
-            <div className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-xl bg-white p-6 shadow-xl">
+            <div className="max-h-[75vh] w-full max-w-3xl overflow-y-auto rounded-xl bg-white p-6 shadow-xl">
 
               <div className="mb-6 flex items-center justify-between">
                 <h2 className="text-2xl font-bold text-[#219653]">
