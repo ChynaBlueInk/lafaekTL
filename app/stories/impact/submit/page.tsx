@@ -1,8 +1,11 @@
+//app/stories/impact/submit/page.tsx
 "use client";
 
 import {useState} from "react";
 import Link from "next/link";
-import {useLanguage} from "@/lib/LanguageContext"; // adjust path if needed
+import {useLanguage} from "@/lib/LanguageContext";
+
+type StoryType="impact"|"success"|"other";
 
 export default function SubmitImpactStoryPage(){
 
@@ -16,6 +19,7 @@ export default function SubmitImpactStoryPage(){
     phone:"",
     municipality:"",
     suco:"",
+    storyType:"impact" as StoryType,
     storySummary:"",
     permissionsConfirmed:false
   });
@@ -73,6 +77,7 @@ export default function SubmitImpactStoryPage(){
         phone:"",
         municipality:"",
         suco:"",
+        storyType:"impact",
         storySummary:"",
         permissionsConfirmed:false
       });
@@ -110,7 +115,7 @@ export default function SubmitImpactStoryPage(){
 
     help:
       language==="tet"
-        ?"Oinsá Hakerek Istória Di’ak"
+        ?"Oinsá Hakerek Istória Di'ak"
         :"How to Write a Good Story",
 
     submit:
@@ -121,7 +126,32 @@ export default function SubmitImpactStoryPage(){
     submitting:
       language==="tet"
         ?"Hein hela..."
-        :"Submitting..."
+        :"Submitting...",
+
+    storyTypeLabel:
+      language==="tet"
+        ?"Tipu Istória *"
+        :"Story Type *",
+
+    storyTypeSubLabel:
+      language==="tet"
+        ?"Hili tipu istória ne'ebé diak liu ba istória ita-nian"
+        :"Choose the type that best fits your story",
+
+    storyTypeOptions:{
+      impact:
+        language==="tet"
+          ?"Istória Impaktu (grupu, eskola ka komunidade)"
+          :"Impact Story (group, school or community)",
+      success:
+        language==="tet"
+          ?"Istória Susesu (ema ida ka família)"
+          :"Success Story (individual or family)",
+      other:
+        language==="tet"
+          ?"Seluk"
+          :"Other"
+    }
   };
 
   return(
@@ -136,7 +166,7 @@ export default function SubmitImpactStoryPage(){
               <div className="mb-6 flex items-center justify-between">
                 <h2 className="text-2xl font-bold text-[#219653]">
                   {language==="tet"
-                    ?"Oinsá Hakerek Istória Impaktu ka Susesu Di’ak"
+                    ?"Oinsá Hakerek Istória Impaktu ka Susesu Di'ak"
                     :"How to Write a Good Impact or Success Story"}
                 </h2>
 
@@ -164,7 +194,7 @@ export default function SubmitImpactStoryPage(){
 
                   <div>
                     <h3 className="mb-2 font-semibold text-[#219653]">
-                      Estrutura Istória Di’ak
+                      Estrutura Istória Di'ak
                     </h3>
 
                     <p><strong>1. Antes</strong></p>
@@ -305,132 +335,150 @@ export default function SubmitImpactStoryPage(){
             className="space-y-6"
           >
 
-            {/* Keep all your existing form fields exactly as they are here */}
+            {/* ── Name + Email ─────────────────────────────────────────── */}
+            <div className="grid gap-6 md:grid-cols-2">
 
-  {/* ── Name + Email ─────────────────────────────────────────── */}
-<div className="grid gap-6 md:grid-cols-2">
+              <div>
+                <label className="mb-1 block font-medium">
+                  Naran Kompletu *
+                </label>
+                <p className="mb-2 text-xs text-gray-500">Full Name *</p>
+                <input
+                  type="text"
+                  required
+                  value={form.fullName}
+                  onChange={(e)=>updateField("fullName",e.target.value)}
+                  className="w-full rounded-lg border border-gray-300 p-3 focus:border-[#219653] focus:outline-none"
+                />
+              </div>
 
-  <div>
-    <label className="mb-1 block font-medium">
-      Naran Kompletu *
-    </label>
-    <p className="mb-2 text-xs text-gray-500">Full Name *</p>
-    <input
-      type="text"
-      required
-      value={form.fullName}
-      onChange={(e)=>updateField("fullName",e.target.value)}
-      className="w-full rounded-lg border border-gray-300 p-3 focus:border-[#219653] focus:outline-none"
-    />
-  </div>
+              <div>
+                <label className="mb-1 block font-medium">
+                  Email *
+                </label>
+                <p className="mb-2 text-xs text-gray-500">Email Address *</p>
+                <input
+                  type="email"
+                  required
+                  value={form.email}
+                  onChange={(e)=>updateField("email",e.target.value)}
+                  className="w-full rounded-lg border border-gray-300 p-3 focus:border-[#219653] focus:outline-none"
+                />
+              </div>
 
-  <div>
-    <label className="mb-1 block font-medium">
-      Email *
-    </label>
-    <p className="mb-2 text-xs text-gray-500">Email Address *</p>
-    <input
-      type="email"
-      required
-      value={form.email}
-      onChange={(e)=>updateField("email",e.target.value)}
-      className="w-full rounded-lg border border-gray-300 p-3 focus:border-[#219653] focus:outline-none"
-    />
-  </div>
+            </div>
 
-</div>
+            {/* ── Phone ────────────────────────────────────────────────── */}
+            <div>
+              <label className="mb-1 block font-medium">
+                Númeru Telefone
+              </label>
+              <p className="mb-2 text-xs text-gray-500">Phone Number</p>
+              <input
+                type="text"
+                value={form.phone}
+                onChange={(e)=>updateField("phone",e.target.value)}
+                className="w-full rounded-lg border border-gray-300 p-3 focus:border-[#219653] focus:outline-none"
+              />
+            </div>
 
-{/* ── Phone ────────────────────────────────────────────────── */}
-<div>
-  <label className="mb-1 block font-medium">
-    Númeru Telefone
-  </label>
-  <p className="mb-2 text-xs text-gray-500">Phone Number</p>
-  <input
-    type="text"
-    value={form.phone}
-    onChange={(e)=>updateField("phone",e.target.value)}
-    className="w-full rounded-lg border border-gray-300 p-3 focus:border-[#219653] focus:outline-none"
-  />
-</div>
+            {/* ── Municipality + Suco ──────────────────────────────────── */}
+            <div className="grid gap-6 md:grid-cols-2">
 
-{/* ── Municipality + Suco ──────────────────────────────────── */}
-<div className="grid gap-6 md:grid-cols-2">
+              <div>
+                <label className="mb-1 block font-medium">
+                  Munisípiu *
+                </label>
+                <p className="mb-2 text-xs text-gray-500">Municipality *</p>
+                <input
+                  type="text"
+                  required
+                  value={form.municipality}
+                  onChange={(e)=>updateField("municipality",e.target.value)}
+                  className="w-full rounded-lg border border-gray-300 p-3 focus:border-[#219653] focus:outline-none"
+                />
+              </div>
 
-  <div>
-    <label className="mb-1 block font-medium">
-      Munisípiu *
-    </label>
-    <p className="mb-2 text-xs text-gray-500">Municipality *</p>
-    <input
-      type="text"
-      required
-      value={form.municipality}
-      onChange={(e)=>updateField("municipality",e.target.value)}
-      className="w-full rounded-lg border border-gray-300 p-3 focus:border-[#219653] focus:outline-none"
-    />
-  </div>
+              <div>
+                <label className="mb-1 block font-medium">
+                  Suco *
+                </label>
+                <p className="mb-2 text-xs text-gray-500">Suco *</p>
+                <input
+                  type="text"
+                  required
+                  value={form.suco}
+                  onChange={(e)=>updateField("suco",e.target.value)}
+                  className="w-full rounded-lg border border-gray-300 p-3 focus:border-[#219653] focus:outline-none"
+                />
+              </div>
 
-  <div>
-    <label className="mb-1 block font-medium">
-      Suco *
-    </label>
-    <p className="mb-2 text-xs text-gray-500">Suco *</p>
-    <input
-      type="text"
-      required
-      value={form.suco}
-      onChange={(e)=>updateField("suco",e.target.value)}
-      className="w-full rounded-lg border border-gray-300 p-3 focus:border-[#219653] focus:outline-none"
-    />
-  </div>
+            </div>
 
-</div>
+            {/* ── Story Type ───────────────────────────────────────────── */}
+            <div>
+              <label className="mb-1 block font-medium">
+                {language==="tet"?"Tipu Istória *":"Story Type *"}
+              </label>
+              <p className="mb-2 text-xs text-gray-500">
+                {text.storyTypeSubLabel}
+              </p>
+              <select
+                required
+                value={form.storyType}
+                onChange={(e)=>updateField("storyType",e.target.value)}
+                className="w-full rounded-lg border border-gray-300 p-3 focus:border-[#219653] focus:outline-none"
+              >
+                <option value="impact">{text.storyTypeOptions.impact}</option>
+                <option value="success">{text.storyTypeOptions.success}</option>
+                <option value="other">{text.storyTypeOptions.other}</option>
+              </select>
+            </div>
 
-{/* ── Story ────────────────────────────────────────────────── */}
-<div>
-  <label className="mb-1 block font-medium">
-    Hakerek Ita-nia Istória *
-  </label>
-  <p className="mb-2 text-xs text-gray-500">
-    Tell Us Your Story *
-  </p>
+            {/* ── Story ────────────────────────────────────────────────── */}
+            <div>
+              <label className="mb-1 block font-medium">
+                Hakerek Ita-nia Istória *
+              </label>
+              <p className="mb-2 text-xs text-gray-500">
+                Tell Us Your Story *
+              </p>
 
-  <textarea
-    required
-    rows={10}
-    value={form.storySummary}
-    onChange={(e)=>updateField("storySummary",e.target.value)}
-    className="w-full rounded-lg border border-gray-300 p-3 focus:border-[#219653] focus:outline-none"
-    placeholder="Deskreve saida mak akontese, sé mak envolve, no saida mak mudansa positivu akontese. / Describe what happened, who was involved, and what positive changes occurred."
-  />
-</div>
+              <textarea
+                required
+                rows={10}
+                value={form.storySummary}
+                onChange={(e)=>updateField("storySummary",e.target.value)}
+                className="w-full rounded-lg border border-gray-300 p-3 focus:border-[#219653] focus:outline-none"
+                placeholder="Deskreve saida mak akontese, sé mak envolve, no saida mak mudansa positivu akontese. / Describe what happened, who was involved, and what positive changes occurred."
+              />
+            </div>
 
-{/* ── Permissions ──────────────────────────────────────────── */}
-<div className="rounded-lg bg-gray-50 p-4">
-  <label className="flex items-start gap-3">
+            {/* ── Permissions ──────────────────────────────────────────── */}
+            <div className="rounded-lg bg-gray-50 p-4">
+              <label className="flex items-start gap-3">
 
-    <input
-      type="checkbox"
-      checked={form.permissionsConfirmed}
-      onChange={(e)=>updateField("permissionsConfirmed",e.target.checked)}
-      className="mt-1 h-4 w-4 rounded border-gray-300"
-    />
+                <input
+                  type="checkbox"
+                  checked={form.permissionsConfirmed}
+                  onChange={(e)=>updateField("permissionsConfirmed",e.target.checked)}
+                  className="mt-1 h-4 w-4 rounded border-gray-300"
+                />
 
-    <span className="text-sm text-gray-700">
+                <span className="text-sm text-gray-700">
 
-      <span className="block font-medium text-gray-900">
-        Ha'u konfirma katak ha'u iha permisaun atu fahe istória ne'e no komprende katak Lafaek bele edita konteúdu antes publika.
-      </span>
+                  <span className="block font-medium text-gray-900">
+                    Ha'u konfirma katak ha'u iha permisaun atu fahe istória ne'e no komprende katak Lafaek bele edita konteúdu antes publika.
+                  </span>
 
-      <span className="mt-1 block text-gray-500">
-        I confirm that I have permission to share this story and understand that Lafaek may edit the content before publication.
-      </span>
+                  <span className="mt-1 block text-gray-500">
+                    I confirm that I have permission to share this story and understand that Lafaek may edit the content before publication.
+                  </span>
 
-    </span>
+                </span>
 
-  </label>
-</div>
+              </label>
+            </div>
 
             <button
               type="submit"

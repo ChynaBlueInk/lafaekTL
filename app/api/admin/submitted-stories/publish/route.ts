@@ -1,3 +1,4 @@
+//app/api/admin/submitted-stories/publish/route.ts
 export const runtime="nodejs";
 export const dynamic="force-dynamic";
 
@@ -146,6 +147,12 @@ async function writeJson(key:string,data:any):Promise<void>{
   }));
 }
 
+// Normalise storyType — only accept known values, default to "impact"
+function normaliseStoryType(raw:any):"impact"|"success"|"other"{
+  if(raw==="success"||raw==="other")return raw;
+  return "impact";
+}
+
 export async function POST(req:Request){
   const auth=await requireAdmin();
   if(!auth.ok){
@@ -213,6 +220,9 @@ export async function POST(req:Request){
       status:"draft",
       visible:false,
       order:maxOrder+1,
+
+      // ── storyType carried through from submission ──────────────────────────
+      storyType:normaliseStoryType(submission.storyType),
 
       // ── field mapping: submission → impact ────────────────────────────────
       titleEn:
@@ -304,7 +314,7 @@ export async function POST(req:Request){
 
     console.log(
       "[api/admin/submitted-stories/publish] published submission to impact",
-      {submissionId:id,newImpactId}
+      {submissionId:id,newImpactId,storyType:newImpactItem.storyType}
     );
 
     return NextResponse.json({

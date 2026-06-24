@@ -1,3 +1,4 @@
+//app/api/impact/route.ts
 import {NextResponse} from "next/server";
 import {S3Client,GetObjectCommand} from "@aws-sdk/client-s3";
 

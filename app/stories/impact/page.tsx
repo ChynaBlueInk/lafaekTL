@@ -6,6 +6,8 @@ import Link from "next/link";
 import Image from "next/image";
 import {useLanguage} from "@/lib/LanguageContext";
 
+type StoryType="impact"|"success"|"other";
+
 type ImpactItem={
   id:string;
   titleEn:string;
@@ -18,6 +20,7 @@ type ImpactItem={
   image?:string;
   images?:string[];
   document?:string;
+  storyType?:StoryType;
   order?:number;
   visible?:boolean;
   status?:string;
@@ -57,6 +60,38 @@ function normaliseImages(raw:any){
     primaryImage,
     images:rawImages
   };
+}
+
+// ── Story type badge ──────────────────────────────────────────────────────────
+// Colour choices: impact=blue, success=purple, other=gray
+// Both En and Tet labels are bundled here to keep it self-contained.
+function StoryTypeBadge({
+  type,
+  language
+}:{
+  type?:StoryType;
+  language:string;
+}){
+  if(type==="success"){
+    return(
+      <span className="inline-flex items-center rounded-full bg-purple-100 px-2.5 py-0.5 text-xs font-semibold text-purple-800">
+        {language==="tet"?"Istória Susesu":"Success Story"}
+      </span>
+    );
+  }
+  if(type==="other"){
+    return(
+      <span className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-semibold text-gray-600">
+        {language==="tet"?"Seluk":"Other"}
+      </span>
+    );
+  }
+  // "impact" or missing — default
+  return(
+    <span className="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-semibold text-blue-800">
+      {language==="tet"?"Istória Impaktu":"Impact Story"}
+    </span>
+  );
 }
 
 export default function ImpactPage(){
@@ -171,6 +206,13 @@ export default function ImpactPage(){
 
             const order=typeof raw.order==="number"?raw.order:index+1;
 
+            // Normalise storyType — default to "impact" for legacy items
+            const rawType=raw.storyType;
+            const storyType:StoryType=
+              rawType==="success"||rawType==="other"
+                ?rawType
+                :"impact";
+
             return{
               ...raw,
               id,
@@ -185,6 +227,7 @@ export default function ImpactPage(){
               image:primaryImage,
               images,
               document,
+              storyType,
               order
             } as ImpactItem;
           })
@@ -352,7 +395,11 @@ export default function ImpactPage(){
                   )}
 
                   <div className="p-5">
-                    <div className="text-sm font-medium text-[#828282]">{item.date}</div>
+                    {/* ── Date + type badge row ───────────────────────────── */}
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium text-[#828282]">{item.date}</span>
+                      <StoryTypeBadge type={item.storyType} language={L}/>
+                    </div>
 
                     <h2 className="mt-2 text-xl font-bold text-[#333333]">{title}</h2>
 

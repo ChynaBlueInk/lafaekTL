@@ -1,7 +1,10 @@
+//app/admin/submitted-stories/page.tsx
 "use client";
 
 import {useEffect,useMemo,useState}from "react";
 import Link from "next/link";
+
+type StoryType="impact"|"success"|"other";
 
 type SubmissionStatus=
   |"new"
@@ -13,6 +16,7 @@ type SubmissionStatus=
 type Submission={
   id:string;
   status:SubmissionStatus;
+  storyType?:StoryType;
   submittedAt?:string;
   updatedAt?:string;
   fullName:string;
@@ -33,6 +37,35 @@ type Submission={
   impactId?:string;
   publishedToImpactAt?:string;
 };
+
+const STORY_TYPE_OPTIONS:{value:StoryType;label:string}[]=[
+  {value:"impact",label:"Impact Story"},
+  {value:"success",label:"Success Story"},
+  {value:"other",label:"Other"}
+];
+
+function storyTypeBadge(type?:StoryType){
+  if(type==="success"){
+    return(
+      <span className="inline-flex items-center rounded-full bg-purple-100 px-2.5 py-0.5 text-xs font-semibold text-purple-800">
+        Success Story
+      </span>
+    );
+  }
+  if(type==="other"){
+    return(
+      <span className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-semibold text-gray-700">
+        Other
+      </span>
+    );
+  }
+  // default: impact (or undefined)
+  return(
+    <span className="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-semibold text-blue-800">
+      Impact Story
+    </span>
+  );
+}
 
 export default function SubmittedStoriesAdminPage(){
 
@@ -69,9 +102,6 @@ export default function SubmittedStoriesAdminPage(){
   },[]);
 
   // ── Save Draft ─────────────────────────────────────────────────────────────
-  // Saves current items to submitted-stories.json only.
-  // Does NOT publish to Impact.
-  // Status remains new / in-review / rejected (whatever the editor set).
   async function saveDraft(silent=false):Promise<Submission[]|null>{
     try{
       setSaving(true);
@@ -100,10 +130,6 @@ export default function SubmittedStoriesAdminPage(){
   }
 
   // ── Publish to Impact ──────────────────────────────────────────────────────
-  // 1. Saves draft first (flushes any unsaved edits to S3).
-  // 2. Calls publish API which creates an Impact story (visible:false, status:draft).
-  // 3. Marks the submission as published-to-impact in submitted-stories.json.
-  // The story then appears in Impact Admin for final editing and publishing.
   async function publishToImpact(id:string){
     const item=items.find((i)=>i.id===id);
     if(!item)return;
@@ -124,14 +150,12 @@ export default function SubmittedStoriesAdminPage(){
       setPublishingId(id);
       setMessage("");
 
-      // Step 1 – flush current edits to S3
       const saved=await saveDraft(true);
       if(!saved){
         showMessage("Could not save draft before publishing. Please try again.","err");
         return;
       }
 
-      // Step 2 – publish to impact
       const res=await fetch("/api/admin/submitted-stories/publish",{
         method:"POST",
         headers:{"Content-Type":"application/json"},
@@ -141,7 +165,6 @@ export default function SubmittedStoriesAdminPage(){
       const data=await res.json();
 
       if(data?.ok){
-        // Update local state to reflect the new status
         setItems((prev)=>
           prev.map((i)=>
             i.id===id
@@ -255,7 +278,6 @@ export default function SubmittedStoriesAdminPage(){
           >
             ← Impact Admin
           </Link>
-          {/* Save Draft — saves to submitted-stories.json only, does NOT publish live */}
           <button
             onClick={()=>saveDraft()}
             disabled={saving||publishingId!==null}
@@ -332,6 +354,7 @@ export default function SubmittedStoriesAdminPage(){
                       <span className={statusBadgeClass(item.status)}>
                         {statusLabel(item.status)}
                       </span>
+                      {storyTypeBadge(item.storyType)}
                     </div>
                     <div className="mt-1 text-sm text-slate-500">
                       {item.municipality}
@@ -353,7 +376,6 @@ export default function SubmittedStoriesAdminPage(){
                   {/* Status select + action buttons */}
                   <div className="flex flex-wrap items-center gap-2">
 
-                    {/* Status selector — only for pre-publish statuses */}
                     {!alreadyPublished&&(
                       <select
                         value={item.status}
@@ -368,10 +390,6 @@ export default function SubmittedStoriesAdminPage(){
                       </select>
                     )}
 
-                    {/* ── Publish to Impact button ─────────────────────────
-                        Disabled and replaced with a badge if already
-                        published — prevents duplicate impact entries.
-                    ──────────────────────────────────────────────────────── */}
                     {alreadyPublished?(
                       <span className="rounded-lg border border-emerald-300 bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-800">
                         ✓ Already added to Impact
@@ -380,7 +398,7 @@ export default function SubmittedStoriesAdminPage(){
                       <button
                         onClick={()=>publishToImpact(item.id)}
                         disabled={isPublishing||saving}
-                        title="Saves your changes, then creates a hidden Draft in Impact Admin. You must publish from Impact Admin to make it live."
+                        title="Saves your changes, then creates a hidden Draft in Impact Admin."
                         className="rounded-lg bg-[#2F80ED] px-3 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-50"
                       >
                         {isPublishing?"Publishing…":"Publish to Impact"}
@@ -446,6 +464,25 @@ export default function SubmittedStoriesAdminPage(){
                   </p>
 
                   <div className="space-y-4">
+
+                    {/* ── Story Type selector ─────────────────────────────── */}
+                    <div>
+                      <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
+                        Story Type
+                      </label>
+                      <select
+                        value={item.storyType||"impact"}
+                        onChange={(e)=>updateField(item.id,"storyType",e.target.value as StoryType)}
+                        className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm"
+                      >
+                        {STORY_TYPE_OPTIONS.map((opt)=>(
+                          <option key={opt.value} value={opt.value}>
+                            {opt.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
                     <div className="grid gap-4 md:grid-cols-2">
                       <div>
                         <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
@@ -543,7 +580,6 @@ export default function SubmittedStoriesAdminPage(){
                 {/* ── Bottom action row ───────────────────────────────────── */}
                 <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-4">
                   <div className="flex flex-wrap gap-2">
-                    {/* Save Draft — updates submitted-stories.json only */}
                     <button
                       onClick={()=>saveDraft()}
                       disabled={saving||publishingId!==null}
@@ -552,7 +588,6 @@ export default function SubmittedStoriesAdminPage(){
                       {saving&&publishingId===null?"Saving…":"Save Draft"}
                     </button>
 
-                    {/* Publish to Impact */}
                     {alreadyPublished?(
                       <span className="rounded-lg border border-emerald-300 bg-emerald-50 px-4 py-2 text-sm font-medium text-emerald-800">
                         ✓ Already added to Impact
