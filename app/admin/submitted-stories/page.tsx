@@ -33,6 +33,14 @@ type Submission={
   bodyTet?:string;
   notes?:string;
   permissionsConfirmed?:boolean;
+  // staff submission tracking
+  isStaff?:boolean;
+  staffMember?:{
+    name:string;
+    position:string;
+    careId:string;
+    recordedAt:string;
+  };
   // set after publishing
   impactId?:string;
   publishedToImpactAt?:string;
@@ -64,6 +72,13 @@ function storyTypeBadge(type?:StoryType){
     <span className="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-semibold text-blue-800">
       Impact Story
     </span>
+  );
+}
+
+function staffBadge(){
+  return(
+    <span className="inline-flex items-center rounded-full bg-orange-100 px-2.5 py-0.5 text-xs font-semibold text-orange-800">
+      Staff</span>
   );
 }
 
@@ -278,6 +293,12 @@ export default function SubmittedStoriesAdminPage(){
           >
             ← Impact Admin
           </Link>
+          <Link
+            href="/admin/submitted-stories/report"
+            className="rounded-md border border-orange-200 bg-orange-50 px-4 py-2 text-sm font-medium text-orange-700 shadow-sm hover:bg-orange-100"
+          >
+            Staff Report
+          </Link>
           <button
             onClick={()=>saveDraft()}
             disabled={saving||publishingId!==null}
@@ -355,6 +376,7 @@ export default function SubmittedStoriesAdminPage(){
                         {statusLabel(item.status)}
                       </span>
                       {storyTypeBadge(item.storyType)}
+                      {item.isStaff&&staffBadge()}
                     </div>
                     <div className="mt-1 text-sm text-slate-500">
                       {item.municipality}
@@ -438,6 +460,37 @@ export default function SubmittedStoriesAdminPage(){
                     />
                   </div>
                 </div>
+
+                {/* ── Staff member info (read-only, internal tracking) ──────── */}
+                {item.isStaff&&item.staffMember&&(
+                  <div className="mt-4 rounded-lg border border-orange-200 bg-orange-50 p-4">
+                    <div className="mb-2 flex items-center gap-2">
+                      <span className="text-xs font-semibold uppercase tracking-wide text-orange-700">
+                        Staff Submission
+                      </span>
+                      <span className="text-xs text-orange-600">— internal tracking only, not published</span>
+                    </div>
+                    <div className="grid gap-3 text-sm md:grid-cols-3">
+                      <div>
+                        <div className="text-xs font-medium text-slate-500">Staff Name</div>
+                        <div className="mt-0.5 font-medium text-slate-800">{item.staffMember.name}</div>
+                      </div>
+                      <div>
+                        <div className="text-xs font-medium text-slate-500">Position</div>
+                        <div className="mt-0.5 text-slate-700">{item.staffMember.position}</div>
+                      </div>
+                      <div>
+                        <div className="text-xs font-medium text-slate-500">CARE ID</div>
+                        <div className="mt-0.5 font-mono text-slate-700">{item.staffMember.careId}</div>
+                      </div>
+                    </div>
+                    {item.staffMember.recordedAt&&(
+                      <div className="mt-2 text-xs text-orange-600">
+                        Recorded: {new Date(item.staffMember.recordedAt).toLocaleString()}
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 {/* ── Original submission ─────────────────────────────────── */}
                 <div className="mt-4">

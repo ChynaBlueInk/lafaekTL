@@ -1,3 +1,4 @@
+// app/api/submitted-stories/submit/route.ts
 export const runtime="nodejs";
 export const dynamic="force-dynamic";
 
@@ -103,6 +104,12 @@ function getUtcStamp(){
   return `${d.getUTCFullYear()}-${pad(d.getUTCMonth()+1)}-${pad(d.getUTCDate())}T${pad(d.getUTCHours())}${pad(d.getUTCMinutes())}${pad(d.getUTCSeconds())}Z`;
 }
 
+// Normalise storyType — only accept known values, default to "impact"
+function normaliseStoryType(raw:any):"impact"|"success"|"other"{
+  if(raw==="success"||raw==="other")return raw;
+  return "impact";
+}
+
 export async function POST(req:Request){
   try{
     const body=await req.json();
@@ -114,7 +121,15 @@ export async function POST(req:Request){
     const suco=body?.suco;
     const storySummary=body?.storySummary;
     const permissionsConfirmed=body?.permissionsConfirmed;
+    const storyType=normaliseStoryType(body?.storyType);
 
+    // ── Staff fields ──────────────────────────────────────────────────────
+    const isStaff=body?.isStaff===true;
+    const staffName=typeof body?.staffName==="string"?body.staffName.trim():"";
+    const staffPosition=typeof body?.staffPosition==="string"?body.staffPosition.trim():"";
+    const staffCareId=typeof body?.staffCareId==="string"?body.staffCareId.trim():"";
+
+    // ── Validation ────────────────────────────────────────────────────────
     if(
       !isNonEmptyString(fullName)||
       !isNonEmptyString(email)||
@@ -124,13 +139,23 @@ export async function POST(req:Request){
       permissionsConfirmed!==true
     ){
       return NextResponse.json(
-        {
-          error:"Missing required fields"
-        },
-        {
-          status:400
-        }
+        {error:"Missing required fields"},
+        {status:400}
       );
+    }
+
+    // Staff fields are required when isStaff is true
+    if(isStaff){
+      if(
+        !isNonEmptyString(staffName)||
+        !isNonEmptyString(staffPosition)||
+        !isNonEmptyString(staffCareId)
+      ){
+        return NextResponse.json(
+          {error:"Staff name, position and CARE ID are required for staff submissions"},
+          {status:400}
+        );
+      }
     }
 
     const now=new Date().toISOString();
@@ -145,16 +170,31 @@ export async function POST(req:Request){
 
       fullName:fullName.trim(),
       email:email.trim(),
-      phone:isNonEmptyString(phone)
-        ? phone.trim()
-        : "",
+      phone:isNonEmptyString(phone)?phone.trim():"",
 
       municipality:municipality.trim(),
       suco:suco.trim(),
 
+      storyType,
+
       storySummary:storySummary.trim(),
 
-      permissionsConfirmed:true
+      permissionsConfirmed:true,
+
+      // Staff attribution — only written when isStaff is true
+      ...(isStaff
+        ? {
+            isStaff:true,
+            staffMember:{
+              name:staffName,
+              position:staffPosition,
+              careId:staffCareId,
+              recordedAt:now
+            }
+          }
+        : {
+            isStaff:false
+          })
     };
 
     const raw=await readRaw();
@@ -172,10 +212,7 @@ export async function POST(req:Request){
         [submission,...raw]
       );
 
-      return NextResponse.json({
-        ok:true,
-        id:submission.id
-      });
+      return NextResponse.json({ok:true,id:submission.id});
     }
 
     if(
@@ -187,43 +224,26 @@ export async function POST(req:Request){
         SUBMITTED_STORIES_KEY,
         {
           ...(raw as any),
-          items:[
-            submission,
-            ...(raw as any).items
-          ]
+          items:[submission,...(raw as any).items]
         }
       );
 
-      return NextResponse.json({
-        ok:true,
-        id:submission.id
-      });
+      return NextResponse.json({ok:true,id:submission.id});
     }
 
-    await writeJson(
-      SUBMITTED_STORIES_KEY,
-      [submission]
-    );
+    await writeJson(SUBMITTED_STORIES_KEY,[submission]);
 
-    return NextResponse.json({
-      ok:true,
-      id:submission.id
-    });
+    return NextResponse.json({ok:true,id:submission.id});
 
   }catch(err:any){
-    console.error(
-      "[submitted-stories-submit]",
-      err
-    );
+    console.error("[submitted-stories-submit]",err);
 
     return NextResponse.json(
       {
         error:"Failed to submit story",
         details:err?.message||"Unknown error"
       },
-      {
-        status:500
-      }
+      {status:500}
     );
   }
 }
