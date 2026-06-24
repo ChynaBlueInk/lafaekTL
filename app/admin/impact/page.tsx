@@ -768,11 +768,11 @@ const[stickyHeight,setStickyHeight]=useState<number>(0);
 
   return(
     <div className="min-h-screen bg-slate-50">
-      <div className="mx-auto max-w-7xl px-4 py-8">
+      <div className="mx-auto max-w-7xl px-4 py-4">
         <div
           ref={stickyRef}
-          className="sticky top-28 z-30 -mx-4 mb-6 border-b border-slate-200 bg-white/95 px-4 py-3 backdrop-blur md:top-32">
-          <div className="mx-auto max-w-7xl px-4 py-3">
+          className="sticky top-20 z-30 -mx-4 mb-6 border-b border-slate-200 bg-white/95 px-4 py-3 backdrop-blur md:top-20">
+  <div className="mx-auto max-w-7xl px-4">
             <div className="flex flex-col justify-between gap-3 md:flex-row md:items-center">
               <div>
                 <h1 className="text-2xl font-semibold text-slate-900">Impact Stories Admin</h1>
