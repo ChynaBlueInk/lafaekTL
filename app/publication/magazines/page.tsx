@@ -7,6 +7,7 @@ import Image from "next/image"
 import Link from "next/link"
 
 import {useLanguage} from "@/lib/LanguageContext"
+import MagazineRequestModal from "@/components/MagazineRequestModal"
 
 const LAFAEK = {
   green:"#219653",
@@ -173,6 +174,7 @@ const ui = {
     noResults:"No magazines found.",
 
     read:"Read Magazine",
+    requestCopies:"Request Copies",
 
     bannerAlt:"Magazines banner",
 
@@ -208,6 +210,7 @@ const ui = {
     noResults:"La hetan revista.",
 
     read:"Lee Revista",
+    requestCopies:"Husu Kópia",
 
     bannerAlt:"Baner revista",
 
@@ -272,6 +275,9 @@ export default function MagazinesPage(){
 
   const [sortBy,setSortBy] =
     useState<SortKey>("newest")
+
+  const [requestModal,setRequestModal] =
+    useState<{code:string;title:string} | null>(null)
 
   useEffect(() => {
 
@@ -795,6 +801,15 @@ case "seriesZA": {
                     {t.read}
                   </Link>
 
+                  <button
+                    type="button"
+                    onClick={() => setRequestModal({code:m.code,title:name[language]})}
+                    className="mt-2 block w-full rounded-xl border-2 py-2.5 text-center text-sm font-semibold transition-colors hover:bg-green-50"
+                    style={{borderColor:LAFAEK.green,color:LAFAEK.green}}
+                  >
+                    {t.requestCopies}
+                  </button>
+
                 </div>
 
               </div>
@@ -814,6 +829,15 @@ case "seriesZA": {
         </div>
 
       </main>
+
+      {requestModal && (
+        <MagazineRequestModal
+          magazineCode={requestModal.code}
+          magazineTitle={requestModal.title}
+          language={language as "en" | "tet"}
+          onClose={() => setRequestModal(null)}
+        />
+      )}
 
     </div>
   )
