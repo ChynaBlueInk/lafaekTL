@@ -135,7 +135,7 @@ export default function CyberAdultsPage(){
       familyRulesTitle:"Family or classroom digital agreement — starter points",
       familyRules:[
         "Devices are used in shared spaces where possible, especially for younger children.",
-        "Ask-before-you-click: links, downloads, and ‘free’ offers need an adult or teacher check.",
+        "Ask-before-you-click: links, downloads, and 'free' offers need an adult or teacher check.",
         "Pause–Think–Tell: if a message feels urgent, secret, or threatening, show an adult.",
         "No sharing personal details such as full name, school, address, phone, or live location.",
       ],
@@ -149,7 +149,7 @@ export default function CyberAdultsPage(){
         {icon:<Router className="h-5 w-5" />,text:"Home Wi-Fi/router: family filtering and time schedules where available."},
       ],
 
-      scamsTitle:"Scams, grooming, and ‘too good to be true’ messages",
+      scamsTitle:"Scams, grooming, and 'too good to be true' messages",
       scamsPoints:[
         "Be wary of sudden money requests, codes, prizes, giveaways, or job offers. Verify through another channel.",
         "Teach children never to send private images. If pressured, threatened, or blackmailed, stop responding and tell an adult immediately.",
@@ -167,7 +167,7 @@ export default function CyberAdultsPage(){
       wifiTitle:"Public Wi-Fi — be careful",
       wifiList:[
         {icon:<WifiOff className="h-5 w-5" />,text:"Prefer mobile data hotspot for logins. Avoid banking on café Wi-Fi."},
-        {icon:<ShieldCheck className="h-5 w-5" />,text:"Log out after use and turn off auto-connect on children’s devices."},
+        {icon:<ShieldCheck className="h-5 w-5" />,text:"Log out after use and turn off auto-connect on children's devices."},
       ],
 
       reportTitle:"If something goes wrong",
@@ -204,10 +204,10 @@ export default function CyberAdultsPage(){
     tet:{
       title:"Proteje labarik sira iha Plataforma online",
       subtitle:
-        "Orientasaun prátiku ba inan-aman, mestre no manorin sira atu hamenus risku online, harii hábitu seguru, no ajuda labarik sira imediatamente bainhira buat ruma la'o Lalos.",
+        "Orientasaun prátiku ba inan-aman, kuidadór/a no manorin sira atu hamenus risku online, harii hábitu seguru, no ajuda labarik sira imediatamente bainhira buat ruma la'o Lalos.",
       heroBadge:"Inan-Aman, Kuidadór & Manorin sira",
       introLead:
-        "Labarik sira moris online lorloron. Sira aprende, halimar, ko'alia, haree, fahe, no esplora iha espasu dijitál sira. Alen de  fó oportunidade,  ida-ne’e mós fó risku ba labarik sira tamba sira nia kapasidade lato’o hodi identifika ka jere risku hirak nee",
+        "Labarik sira moris online lorloron. Sira aprende, halimar, ko'alia, haree, fahe, no esplora iha espasu dijitál sira. Alen de fó oportunidade, ida-ne'e mós fó risku ba labarik sira tamba sira nia kapasidade lato'o hodi identifika ka jere risku hirak nee",
       back:"Fila ba Siber",
       toChildren:"Labarik",
       toYouth:"Joventude",
@@ -219,11 +219,11 @@ export default function CyberAdultsPage(){
         {
           icon:<HeartHandshake className="h-6 w-6" />,
           title:"Labarik sira presiza adultu ne'ebé sira fiar",
-          desc:"Se labarik ida sente moe, hetan presaun, ka ta'uk online, nia sei nakloke liu ba adultu ne'ebé hakmatek, informadu, no fasil atu hakbesik.",
+          desc:"Se labarik ida sente moe, hetan presaun, ka ta'uk online, nia sei nakloke liu ba adultu ne'ebé kalma, informadu, no fasil atu hakbesik.",
         },
         {
           icon:<GraduationCap className="h-6 w-6" />,
-          title:"Manorin sira bele nota  sinal sira ne’e sedu",
+          title:"Manorin sira bele nota sinal sira ne'e sedu",
           desc:"Manorin sira dala barak nota intimidasaun, distraisaun, mudansa emosionál, ka fahe informasaun ne'ebé ladi'ak antes família sira nota. Manorin ne'ebé informadu bele foti asaun sedu no ho konfiansa.",
         },
         {
@@ -237,7 +237,7 @@ export default function CyberAdultsPage(){
       risksLead:
         "Labarik ida bele seguru fízikamente iha uma, maibé sei vulnerável online. Adultu sira presiza iha kompresaun oituan atu orienta, nota, no foti asaun.",
       risks:[
-        "Labarik seidauk bele la identifika (grooming), fraude/lasu (scams), ka manipulasaun to'o bainhira sira hetan ona presaun.",
+        "Labarik seidauk bele identifika (grooming), fraude/lasu (scams), ka manipulasaun to'o bainhira sira hetan ona presaun.",
         "Sira dala barak la komprende informasaun hira mak foto, vídeo, ka post ida bele fo sai.",
         "Sira bele subar problema tanba ta'uk hetan kastigu, kulpa, ka lakon asesu ba dispozitivu.",
         "Prejuízu online bele afeta konfiansa, aprendizajen, toba/deskansa, amizade, reputasaun, no seguransa iha moris loloos.",
@@ -286,7 +286,7 @@ export default function CyberAdultsPage(){
         {
           icon:<MapPin className="h-5 w-5" />,
           title:"Keta fahe lokasaun atual",
-          desc:"Keta posta labarik nia lokasaun presente , eskola ne'ebé nia ba, desportu ne'ebé nia halo, ka fatin ne'ebé nia ba beibeik. Padraun rotina bele uza hosi ema estranjeiru.",
+          desc:"Keta posta labarik nia lokasaun presente, eskola ne'ebé nia ba, desportu ne'ebé nia halo, ka fatin ne'ebé nia ba beibeik. Padraun rotina bele uza hosi ema estranjeiru.",
         },
         {
           icon:<Camera className="h-5 w-5" />,
@@ -307,7 +307,7 @@ export default function CyberAdultsPage(){
 
       familyRulesTitle:"Akordu dijitál família ka sala-aula nian — pontu inísiu",
       familyRules:[
-        " Dispozitivu sira se bele uja  iha fatin nakloke, liuliu ba labarik ki'ik sira.",
+        "Dispozitivu sira se bele uja iha fatin nakloke, liuliu ba labarik ki'ik sira.",
         "Husu-molok-klik: link, download, no oferta gratuitu sira presiza adultu ka manorin sira mak haree uluk.",
         "Pauza–Hanoin–Hatete: se mensajen ida sente urjente, segredu, ka ameasadu, hatudu kedas ba adultu ida.",
         "Labele fahe detallu pesoál hanesan naran kompletu, eskola, enderesu, telefone, ka lokasaun atual.",
@@ -325,7 +325,7 @@ export default function CyberAdultsPage(){
       scamsTitle:"Lia-bosok (scams), finje sai belun hodi lohi (grooming), no promesa sira ne'ebé la lojika.",
       scamsPoints:[
         "Keta fiar lalais pedidu osan, kódigu, prémiu, ka oferta servisu ne'ebé mai derepente. Verifika fali informasaun ne'e liuhosi dalan seluk.",
-        "Hanorin labarik sira atu keta haruka foto privadu ba ema seluk. Se ema ruma ameasa ka obriga sira, husu sira atu keta responde ona no konta kedas ba inan-aman ka ema boot ne'ebé sira fiar.",
+        "Hanorin labarik sira atu keta haruka foto privadu ba ema seluk. Se ema ruma ameasa ka obriga sira, husu sira atu keta responde ona no hato’o kedas ba inan-aman ka ema boot ne'ebé sira fiar.",
         "Rai evidénsia hanesan screenshot no link (URL). Report ka fó hatene iha aplikasaun laran, no blokeia kedas konta ne'e.",
       ],
 
@@ -345,7 +345,7 @@ export default function CyberAdultsPage(){
 
       reportTitle:"Se buat ida la'o sala",
       reportSteps:[
-        "Suporta sira uluk. kalma no fó agradese ba labarik tanba brani atu konta problema ne'e ba ita.",
+        "Suporta sira uluk. Kalma no fó agradese ba labarik tanba brani atu konta problema ne'e ba ita.",
         "Rai evidénsia ho seguru: foti screenshot, rai link (URL), naran user, no mós oras akontesimentu.",
         "Troka password kedas, ativa autentikasaun (MFA), no log out hosi kualkér fatin seluk ne'ebé ita-nia konta nakloke hela.",
         "Blokeia no relata iha aplikasaun ka plataforma.",
@@ -369,7 +369,7 @@ export default function CyberAdultsPage(){
           href:"https://www.esafety.gov.au/key-topics/esafety-guide",
         },
       ],
-      posterCta:"Download poster ka lista kontrolu ba uma nian (sei fali mai iha tempu badak).",
+      posterCta:"Download poster ka lista kontrolu ba uma nian (sei disponsivel iha tempo badak).",
       note:"Pájina ida-ne'e fó matadalan orijinál husi Lafaek no ligasaun (link) ba ACSC/eSafety hodi aprende liután.",
       linksTitle:"Saida mak tuir mai?",
     },
