@@ -30,7 +30,7 @@ type ImpactItem={
   visible?:boolean;
   externalUrl?:string;
   order?:number;
-  document?:string; // ✅ canonical PDF field
+  document?:string;
   [key:string]:any;
 };
 
@@ -90,10 +90,11 @@ export default function ImpactDetailPage(){
       try{
         setLoading(true);
         setError(undefined);
-        console.log("[stories/impact/[id]] loading item",id);
 
-        const res=await fetch("/api/admin/impact",{method:"GET"});
-        console.log("[stories/impact/[id]] /api/admin/impact status",res.status);
+        // FIX: was incorrectly calling /api/admin/impact which requires auth,
+        // causing a 401 HTML redirect for non-admin visitors → JSON parse error.
+        // The public route /api/impact returns only published/visible items.
+        const res=await fetch("/api/impact",{cache:"no-store"});
         if(!res.ok){
           throw new Error(`Failed to load impact stories: ${res.status}`);
         }
@@ -132,7 +133,6 @@ export default function ImpactDetailPage(){
             : undefined;
           const order=typeof raw.order==="number"?raw.order:index+1;
 
-          // ✅ Prefer the new field first, but support legacy fields too
           let pdfRaw=(raw.document
             ??raw.pdfKey
             ??raw.pdf
@@ -150,7 +150,7 @@ export default function ImpactDetailPage(){
 
           const document=typeof pdfRaw==="string"&&pdfRaw.trim()?pdfRaw.trim():undefined;
 
-          const item:ImpactItem={
+          return{
             ...raw,
             id:recId,
             slug,
@@ -167,8 +167,7 @@ export default function ImpactDetailPage(){
             externalUrl,
             order,
             document
-          };
-          return item;
+          } as ImpactItem;
         });
 
         const found=items.find((it)=>it.slug===id||it.id===id);
@@ -177,7 +176,6 @@ export default function ImpactDetailPage(){
           setError("Story not found.");
           setItem(undefined);
         }else{
-          console.log("[stories/impact/[id]] found item",found);
           setItem(found);
         }
       }catch(err:any){
