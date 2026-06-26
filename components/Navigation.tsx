@@ -109,6 +109,11 @@ useEffect(()=>{
                 href:"/learning",
                 description:"Learning resources and activities."
               },
+              {
+                label:"Videos",
+                href:"/revista-media",
+                description:"Short videos from the field and communities."
+              },
              ]
           },
           keepSafe:{
@@ -239,6 +244,11 @@ useEffect(()=>{
                 label:"Aprendizajen",
                 href:"/learning",
                 description:"Rekursu aprendizajen no atividade sira."
+              },
+              {
+                label:"Vídeu sira",
+                href:"/revista-media",
+                description:"Vídeu badak hosi terrenu no komunidade sira."
               },
             
             ]
