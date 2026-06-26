@@ -4,6 +4,7 @@
 import {useEffect,useMemo,useState}from "react"
 import Link from "next/link"
 import {Heart,ThumbsUp,Play,MapPin,Video}from "lucide-react"
+import {parseVideoUrl} from "@/lib/video-embed"
 import {useLanguage}from "@/lib/LanguageContext"
 
 type RevistaMediaItem={
@@ -38,13 +39,15 @@ export default function RevistaMediaPage(){
       loadError:"Could not load videos.",
       sections:[
         "All",
-        "In the Field",
-        "In the Making",
+        "Community",
+        "Children",
+        "Journalista",
+        "Learning",
         "Meet the Team",
-        "Children’s Voices",
-        "Journalistas",
-        "Learning Reels",
-        "Municipalities"
+        "In the Field",
+        "Stories",
+        "Events",
+        "Other"
       ],
     },
     tet:{
@@ -62,13 +65,15 @@ export default function RevistaMediaPage(){
       loadError:"La konsege karga vídeu sira.",
       sections:[
         "Hotu-hotu",
-        "In the Field",
-        "In the Making",
+        "Komunidade",
+        "Labarik sira",
+        "Jornalista",
+        "Aprendizajen",
         "Meet the Team",
-        "Children’s Voices",
-        "Journalistas",
-        "Learning Reels",
-        "Municipalities"
+        "Iha Terrenu",
+        "Istória sira",
+        "Eventu sira",
+        "Seluk"
       ],
     },
   }[L]
@@ -237,81 +242,79 @@ export default function RevistaMediaPage(){
             {labels.empty}
           </div>
         ):(
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             {filteredVideos.map((item)=>(
               <article
                 key={item.id}
-                className="overflow-hidden rounded-3xl border border-[#E5E7EB] bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-md"
+                className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:shadow-md flex flex-row"
               >
-                <div className="relative aspect-[9/16] bg-black">
-                  <video
-                    src={item.videoUrl}
-                    controls
-                    preload="metadata"
-                    className="h-full w-full object-cover"
-                  />
-
-                  <div className="pointer-events-none absolute left-4 right-4 top-4 flex items-center justify-between">
-                    <span className="rounded-full bg-[#219653] px-3 py-1 text-xs font-semibold text-white">
-                      {item.section}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="space-y-4 p-4">
-                  <div>
-                    <h3 className="text-lg font-bold text-[#333333]">
-                      {item.title}
-                    </h3>
-                    {item.description?(
-                      <p className="mt-2 text-sm text-[#4F4F4F]">
-                        {item.description}
-                      </p>
-                    ):null}
-                  </div>
-
-                  <div className="flex flex-wrap gap-2 text-xs text-[#4F4F4F]">
-                    <span className="inline-flex items-center gap-1 rounded-full bg-[#F3F4F6] px-3 py-1">
-                      <MapPin className="h-3.5 w-3.5" />
-                      {item.municipality}
-                    </span>
-                    <span className="inline-flex items-center gap-1 rounded-full bg-[#F3F4F6] px-3 py-1">
-                      <Video className="h-3.5 w-3.5" />
-                      {item.section}
-                    </span>
+                <div className="flex flex-row">
+                  {/* Video embed - 16:9 thumbnail on left */}
+                  <div className="relative w-32 shrink-0 bg-black sm:w-44">
+                    {(()=>{
+                      const parsed = parseVideoUrl(item.videoUrl)
+                      if(parsed){
+                        return(
+                          <iframe
+                            src={parsed.embedUrl}
+                            className="h-full w-full object-cover"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                            referrerPolicy="strict-origin-when-cross-origin"
+                            title={item.title||"Video"}
+                          />
+                        )
+                      }
+                      if(item.videoUrl){
+                        return(
+                          <video
+                            src={item.videoUrl}
+                            controls
+                            preload="metadata"
+                            className="h-full w-full object-cover"
+                          />
+                        )
+                      }
+                      return(
+                        <div className="flex aspect-video w-full items-center justify-center text-xs text-slate-400">
+                          No video
+                        </div>
+                      )
+                    })()}
                   </div>
 
-                  <div className="flex items-center justify-between text-sm text-[#4F4F4F]">
-                    <span>{labels.municipality}: {item.municipality}</span>
-                    <span>{labels.role}: {item.section}</span>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <a
-                      href={item.videoUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-[#219653] px-4 py-2.5 font-semibold text-white transition hover:bg-green-700"
-                    >
-                      <Play className="h-4 w-4 fill-current" />
-                      {labels.watch}
-                    </a>
-
-                    <button
-                      type="button"
-                      className="inline-flex items-center gap-2 rounded-lg border border-[#E5E7EB] px-3 py-2.5 text-[#4F4F4F] transition hover:bg-[#F5F5F5]"
-                    >
-                      <ThumbsUp className="h-4 w-4" />
-                      <span className="text-sm font-medium">0</span>
-                    </button>
-
-                    <button
-                      type="button"
-                      className="inline-flex items-center gap-2 rounded-lg border border-[#E5E7EB] px-3 py-2.5 text-[#EB5757] transition hover:bg-red-50"
-                    >
-                      <Heart className="h-4 w-4" />
-                      <span className="text-sm font-medium">0</span>
-                    </button>
+                  {/* Info panel */}
+                  <div className="flex flex-1 flex-col justify-between gap-3 p-4 min-h-[8rem]">
+                    <div>
+                      <div className="mb-2 flex flex-wrap items-center gap-2">
+                        <span className="rounded-full bg-[#219653]/10 px-2.5 py-0.5 text-xs font-semibold text-[#219653]">
+                          {item.section}
+                        </span>
+                        <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2.5 py-0.5 text-xs text-slate-600">
+                          <MapPin className="h-3 w-3"/>
+                          {item.municipality}
+                        </span>
+                      </div>
+                      <h3 className="text-base font-bold text-slate-900">
+                        {item.title}
+                      </h3>
+                      {item.description?(
+                        <p className="mt-1 text-sm text-slate-600 line-clamp-2">
+                          {item.description}
+                        </p>
+                      ):null}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <a
+                        href={item.videoUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-1.5 rounded-lg bg-[#219653] px-3 py-1.5 text-sm font-semibold text-white transition hover:bg-green-700"
+                      >
+                        <Play className="h-3.5 w-3.5 fill-current"/>
+                        {labels.watch}
+                      </a>
+                    </div>
                   </div>
                 </div>
               </article>

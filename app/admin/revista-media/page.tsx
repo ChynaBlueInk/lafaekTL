@@ -16,6 +16,7 @@ import {
   Archive,
   FileVideo,
 } from "lucide-react"
+import {parseVideoUrl, getVideoPlatformLabel} from "@/lib/video-embed"
 
 const S3_ORIGIN = "https://lafaek-media.s3.ap-southeast-2.amazonaws.com"
 
@@ -55,13 +56,15 @@ type PresignResponse = {
 }
 
 const sectionOptions = [
-  "In the Field",
-  "In the Making",
+  "Community",
+  "Children",
+  "Journalista",
+  "Learning",
   "Meet the Team",
-  "Children’s Voices",
-  "Journalistas",
-  "Learning Reels",
-  "Municipalities",
+  "In the Field",
+  "Stories",
+  "Events",
+  "Other",
 ]
 
 const municipalityOptions = [
@@ -88,7 +91,7 @@ const emptyItem = (): RevistaMediaItem => ({
   visible: false,
   title: "",
   description: "",
-  section: "In the Field",
+  section: "Community",
   municipality: "Dili",
   s3Key: "",
   videoUrl: "",
@@ -194,7 +197,7 @@ export default function RevistaMediaAdminPage() {
       unsaved: "Unsaved changes",
       uploadVideo: "Upload video",
       uploading: "Uploading...",
-      uploadReminder: "Uploads do not auto-save. Save Changes after uploading.",
+      uploadReminder: "Paste a YouTube or TikTok URL in the Video URL field, then click Save Changes.",
       titleRequired: "Add a title before publishing.",
       videoRequired: "Upload a video before publishing.",
       saveSuccess: "Changes saved successfully.",
@@ -229,7 +232,7 @@ export default function RevistaMediaAdminPage() {
       unsaved: "Mudansa seidauk rai",
       uploadVideo: "Upload vídeu",
       uploading: "Hein hela upload...",
-      uploadReminder: "Upload la auto-save. Rai Mudansa depois upload.",
+      uploadReminder: "Kola URL YouTube ka TikTok iha kampu Video URL, depois Rai Mudansa.",
       titleRequired: "Hatama titulu molok publika.",
       videoRequired: "Upload vídeu molok publika.",
       saveSuccess: "Mudansa sira rai ho susesu.",
@@ -278,6 +281,15 @@ export default function RevistaMediaAdminPage() {
   const [sortMode, setSortMode] = useState<"editor" | "latest" | "oldest" | "az">("editor")
 
   const [dirtyIds, setDirtyIds] = useState<Set<string>>(new Set())
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set())
+
+  const toggleExpand = (id: string) => {
+    setExpandedIds((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) { next.delete(id) } else { next.add(id) }
+      return next
+    })
+  }
 
   useEffect(() => {
     const load = async () => {
@@ -465,15 +477,16 @@ export default function RevistaMediaAdminPage() {
 
   const handleAddNewSubmit = () => {
     setItems((prev) => {
-      const maxOrder = prev.length ? Math.max(...prev.map((i) => i.order || 0)) : 0
+      // Insert at top: give new item order 1, shift everything else down
       const itemToAdd = {
         ...newItem,
         id: `revista-temp-${Date.now()}`,
         status: newItem.status || "draft",
         visible: Boolean(newItem.visible),
-        order: maxOrder + 1,
+        order: 1,
       } as RevistaMediaItem
-      return [...prev, itemToAdd]
+      const shifted = prev.map((i) => ({...i, order: (i.order || 0) + 1}))
+      return [itemToAdd, ...shifted]
     })
 
     setShowAddModal(false)
@@ -507,7 +520,7 @@ export default function RevistaMediaAdminPage() {
       setMessage(labels.titleRequired)
       return
     }
-    if (!item?.s3Key.trim()) {
+    if (!item?.videoUrl?.trim()) {
       setMessage(labels.videoRequired)
       return
     }
@@ -526,7 +539,7 @@ export default function RevistaMediaAdminPage() {
       if (index === -1) return prev
       const current = next[index]
       if (!current) return prev
-      next[index] = {...current, s3Key: "", videoUrl: "", visible: false, status: current.status === "published" ? "hidden" : current.status}
+      next[index] = {...current, videoUrl: "", visible: false, status: current.status === "published" ? "hidden" : current.status}
       return next
     })
 
@@ -945,37 +958,48 @@ export default function RevistaMediaAdminPage() {
                 const statusLabel = getStatusLabel(item.status)
                 const lastUpdated = formatLastUpdated(item)
 
+                const isExpanded = expandedIds.has(item.id)
+
                 return (
                   <div key={item.id} className="rounded-lg border border-slate-200 bg-white shadow-sm">
+
+                    {/* ── Collapsed summary row ─────────────────────── */}
+                    <button
+                      type="button"
+                      onClick={() => toggleExpand(item.id)}
+                      className="flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-slate-50"
+                    >
+                      {/* Order + arrows */}
+                      <span className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-slate-100 text-xs font-medium text-slate-700">
+                        {item.order}
+                      </span>
+                      <div className="flex shrink-0 flex-col gap-0.5">
+                        <button type="button" onClick={(e)=>{e.stopPropagation();handleReorder(item.id,-1)}} className="rounded border border-slate-300 px-1 text-[10px] leading-tight hover:bg-slate-100">↑</button>
+                        <button type="button" onClick={(e)=>{e.stopPropagation();handleReorder(item.id,1)}} className="rounded border border-slate-300 px-1 text-[10px] leading-tight hover:bg-slate-100">↓</button>
+                      </div>
+                      {/* Status badge */}
+                      <span className={`shrink-0 rounded-md border px-2 py-0.5 text-xs font-medium ${getStatusClasses(item.status)}`}>
+                        {statusLabel}
+                      </span>
+                      {/* Title + meta */}
+                      <div className="min-w-0 flex-1">
+                        <span className="block truncate text-sm font-medium text-slate-900">
+                          {item.title || <span className="italic text-slate-400">No title</span>}
+                        </span>
+                        <span className="text-xs text-slate-500">
+                          {item.section} &middot; {item.municipality}{item.videoUrl ? " • ▶ Video" : ""}
+                        </span>
+                      </div>
+                      {/* Chevron */}
+                      <span className="shrink-0 text-slate-400">{isExpanded ? "▲" : "▼"}</span>
+                    </button>
+
+                    {/* ── Expanded body ─────────────────────────────── */}
+                    {isExpanded && (
+                    <div className="border-t border-slate-100">
                     <div className="flex flex-col gap-3 p-4 md:flex-row md:items-start md:justify-between">
                       <div className="flex flex-1 flex-col gap-3">
                         <div className="flex flex-wrap items-center gap-3">
-                          <div className="inline-flex items-center gap-2">
-                            <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-slate-100 text-xs font-medium text-slate-700">
-                              {item.order}
-                            </span>
-                            <div className="flex flex-col gap-1">
-                              <button
-                                type="button"
-                                className="rounded border border-slate-300 px-1 text-[10px] leading-tight hover:bg-slate-100"
-                                onClick={() => handleReorder(item.id, -1)}
-                              >
-                                ↑
-                              </button>
-                              <button
-                                type="button"
-                                className="rounded border border-slate-300 px-1 text-[10px] leading-tight hover:bg-slate-100"
-                                onClick={() => handleReorder(item.id, 1)}
-                              >
-                                ↓
-                              </button>
-                            </div>
-                          </div>
-
-                          <span className={`rounded-md border px-2 py-1 text-xs font-medium ${getStatusClasses(item.status)}`}>
-                            {statusLabel}
-                          </span>
-
                           <label className="inline-flex items-center gap-2 text-sm text-slate-700">
                             <input
                               type="checkbox"
@@ -1078,10 +1102,10 @@ export default function RevistaMediaAdminPage() {
                       <div className="w-full space-y-4 md:w-[24rem]">
                         <div className="rounded-md border border-slate-200 bg-slate-50 p-3">
                           <div className="mb-2 flex items-center justify-between">
-                            <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">Video</span>
-                            {videoSrc && (
+                            <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">Video URL</span>
+                            {item.videoUrl && (
                               <a
-                                href={videoSrc}
+                                href={item.videoUrl}
                                 target="_blank"
                                 rel="noreferrer"
                                 className="text-xs text-blue-700 underline"
@@ -1091,44 +1115,50 @@ export default function RevistaMediaAdminPage() {
                             )}
                           </div>
 
-                          {videoSrc ? (
-                            <video
-                              controls
-                              className="mb-3 h-52 w-full rounded-md border border-slate-200 bg-black object-cover"
-                              src={videoSrc}
-                            />
-                          ) : (
-                            <div className="mb-3 flex h-52 items-center justify-center rounded-md border border-dashed border-slate-300 bg-white text-xs text-slate-400">
-                              No video uploaded
-                            </div>
-                          )}
+                          <input
+                            type="url"
+                            className="mb-3 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm placeholder:text-slate-400"
+                            placeholder="Paste YouTube or TikTok URL…"
+                            value={item.videoUrl || ""}
+                            onChange={(e) => handleFieldChange(item.id, "videoUrl", e.target.value)}
+                          />
 
-                          <div className="space-y-2">
-                            <label className="inline-flex cursor-pointer items-center gap-2 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 hover:bg-slate-100">
-                              <Upload className="h-4 w-4" />
-                              <input
-                                type="file"
-                                accept="video/*"
-                                className="hidden"
-                                onChange={(e) => handleFileInputChange(item.id, e)}
-                              />
-                              {uploadingId === item.id ? labels.uploading : labels.uploadVideo}
-                            </label>
+                          {item.videoUrl && (() => {
+                            const parsed = parseVideoUrl(item.videoUrl)
+                            const platform = getVideoPlatformLabel(item.videoUrl)
+                            if (parsed) {
+                              return (
+                                <div className="mb-3 space-y-2">
+                                  <div className="rounded-md bg-emerald-50 px-3 py-1.5 text-xs text-emerald-800">
+                                    ✓ {platform} video detected
+                                  </div>
+                                  <iframe
+                                    src={parsed.embedUrl}
+                                    className="h-52 w-full rounded-md border border-slate-200"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                    allowFullScreen
+                                    referrerPolicy="strict-origin-when-cross-origin"
+                                    title={item.title || "Video preview"}
+                                  />
+                                </div>
+                              )
+                            }
+                            return (
+                              <div className="mb-3 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
+                                URL entered but not recognised as YouTube or TikTok. Check the link and try again.
+                              </div>
+                            )
+                          })()}
 
+                          {item.videoUrl && (
                             <button
                               type="button"
                               onClick={() => handleRemoveVideo(item.id)}
                               className="rounded-md border border-red-300 bg-white px-3 py-2 text-sm text-red-700 hover:bg-red-50"
                             >
-                              Remove video
+                              Clear URL
                             </button>
-
-                            {showKeys && item.s3Key && (
-                              <div className="rounded-md bg-white px-2 py-2 text-[11px] break-all text-slate-500">
-                                {item.s3Key}
-                              </div>
-                            )}
-                          </div>
+                          )}
                         </div>
 
                         <div className="rounded-md border border-slate-200 bg-slate-50 p-3">
@@ -1146,6 +1176,8 @@ export default function RevistaMediaAdminPage() {
                         </div>
                       </div>
                     </div>
+                    </div>
+                    )}
                   </div>
                 )
               })}

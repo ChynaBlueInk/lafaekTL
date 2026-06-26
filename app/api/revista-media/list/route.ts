@@ -3,7 +3,6 @@ export const dynamic="force-dynamic"
 
 import {NextResponse}from "next/server"
 import {S3Client,GetObjectCommand}from "@aws-sdk/client-s3"
-import {getSignedUrl}from "@aws-sdk/s3-request-presigner"
 
 type RevistaStatus="draft"|"published"|"hidden"|"archived"
 
@@ -32,6 +31,7 @@ type PublicRevistaMediaItem={
   createdAt:string
   status:"published"
   videoUrl:string
+  order:number
 }
 
 const REGION=process.env.AWS_REGION||"ap-southeast-2"
@@ -106,7 +106,7 @@ async function readRecords():Promise<RevistaMediaRecord[]>{
       id:typeof item?.id==="string"&&item.id.trim()?item.id.trim():`revista-media-${index}`,
       title:typeof item?.title==="string"?item.title.trim():"",
       description:typeof item?.description==="string"?item.description.trim():"",
-      section:typeof item?.section==="string"&&item.section.trim()?item.section.trim():"In the Field",
+      section:typeof item?.section==="string"&&item.section.trim()?item.section.trim():"Community",
       municipality:typeof item?.municipality==="string"&&item.municipality.trim()?item.municipality.trim():"Dili",
       s3Key:typeof item?.s3Key==="string"?item.s3Key.trim():"",
       createdAt:typeof item?.createdAt==="string"?item.createdAt:item?.updatedAt||new Date().toISOString(),
@@ -135,11 +135,13 @@ export async function GET(){
 
     const records=await readRecords()
 
+    // Filter: published + visible + must have either a videoUrl OR an s3Key
     const publishedRecords=records
       .filter((item)=>{
         const status=normaliseStatus(item)
         const isVisible=typeof item.visible==="boolean"?item.visible:status==="published"
-        return status==="published"&&isVisible&&!!item.s3Key
+        const hasVideo=!!item.videoUrl||!!item.s3Key
+        return status==="published"&&isVisible&&hasVideo
       })
       .sort((a,b)=>{
         const ao=typeof a.order==="number"?a.order:9999
@@ -147,30 +149,30 @@ export async function GET(){
         return ao-bo
       })
 
-    const items:PublicRevistaMediaItem[]=await Promise.all(
-      publishedRecords.map(async(item)=>{
-        const command=new GetObjectCommand({
-          Bucket:BUCKET,
-          Key:item.s3Key
-        })
+    const items:PublicRevistaMediaItem[]=publishedRecords.map((item)=>{
+      // If there's a videoUrl (YouTube/TikTok), use it directly.
+      // If only s3Key, build the S3 URL (legacy entries).
+      const S3_ORIGIN=`https://${BUCKET}.s3.${REGION}.amazonaws.com`
+      const videoUrl=item.videoUrl||
+        (item.s3Key
+          ? item.s3Key.startsWith("http")
+            ? item.s3Key
+            : `${S3_ORIGIN}/${item.s3Key.replace(/^\/+/,"")}`
+          : "")
 
-        const videoUrl=await getSignedUrl(s3,command,{
-          expiresIn:60*60
-        })
-
-        return{
-          id:item.id,
-          title:item.title,
-          description:item.description||"",
-          section:item.section,
-          municipality:item.municipality,
-          s3Key:item.s3Key,
-          createdAt:item.createdAt||new Date().toISOString(),
-          status:"published",
-          videoUrl
-        }
-      })
-    )
+      return{
+        id:item.id,
+        title:item.title,
+        description:item.description||"",
+        section:item.section,
+        municipality:item.municipality,
+        s3Key:item.s3Key,
+        createdAt:item.createdAt||new Date().toISOString(),
+        status:"published",
+        videoUrl,
+        order:item.order||0
+      }
+    })
 
     return NextResponse.json({items})
   }catch(err){
