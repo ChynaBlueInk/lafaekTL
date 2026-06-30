@@ -2,7 +2,7 @@
 
 import {useState} from "react";
 import Link from "next/link";
-import {ExternalLink, Gamepad2, Lock, SearchCheck, ShieldCheck} from "lucide-react";
+import {Gamepad2, Lock, SearchCheck, ShieldCheck} from "lucide-react";
 import {useLanguage} from "@/lib/LanguageContext";
 
 type Lang="en"|"tet";
@@ -34,7 +34,7 @@ type T={
   reportSteps:string[];
   resourcesTitle:string;
   resourcesIntro:string;
-  resources:{text:string;href:string}[];
+  resources:{text:string}[];
   note:string;
   backToCyber:string;
   toChildren:string;
@@ -171,11 +171,10 @@ const TRANSLATIONS:Record<Lang,T>={
     resourcesIntro:"Original Lafaek guidance. External link provided for optional deeper learning.",
     resources:[
       {
-        text:"Understanding Cyber Security — Teens in AI",
-        href:"https://www.teensinai.com/understanding-cyber-security/",
+        text:"Teens in AI has a course called \"Understanding Cyber Security\" — search for it online if you want to learn more.",
       },
     ],
-    note:"Original Lafaek guidance. External link provided for optional deeper learning.",
+    note:"Original Lafaek guidance.",
     backToCyber:"Back to Cyber",
     toChildren:"Children",
     toAdults:"Parents & Teachers",
@@ -306,11 +305,10 @@ const TRANSLATIONS:Record<Lang,T>={
       "Se ema ameasa ita, para hatán, rai evidénsia, no buka ajuda.",
     ],
     resourcesTitle:"Aprendizajen adisional",
-    resourcesIntro:"Orientasaun original hosi Lafaek. Link esterna ida nee fornece ba aprendizajen opsional se presiza.",
+    resourcesIntro:"Orientasaun original hosi Lafaek.",
     resources:[
       {
-        text:"Understanding Cyber Security — Teens in AI",
-        href:"https://www.teensinai.com/understanding-cyber-security/",
+        text:"Teens in AI iha kursu ida naran \"Understanding Cyber Security\" — buka iha internet se ita hakarak aprende liután.",
       },
     ],
     note:"Orientasaun original hosi Lafaek. Link esterna ida nee fornece ba aprendizajen opsional se presiza.",
@@ -663,17 +661,12 @@ export default function CyberYouthPage(){
           </p>
 
           <ul className="mt-4 space-y-3">
-            {t.resources.map((resource)=>(
-              <li key={resource.href}>
-                <a
-                  href={resource.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-sm font-bold text-sky-800 underline hover:text-sky-950"
-                >
-                  {resource.text}
-                  <ExternalLink className="h-4 w-4" aria-hidden="true" />
-                </a>
+            {t.resources.map((resource,i)=>(
+              <li
+                key={i}
+                className="text-sm leading-6 text-slate-700"
+              >
+                {resource.text}
               </li>
             ))}
           </ul>

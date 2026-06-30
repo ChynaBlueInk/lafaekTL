@@ -810,7 +810,7 @@ export default function HomePage() {
               {language === "tet" ? "Ami nia Doador/Sponsor" : "Our Donors & Sponsors"}
             </h2>
             <div className="flex flex-wrap items-center justify-center gap-10">
-              <div className="relative h-16 w-40">
+              <div className="relative h-32 w-80">
                 <Image
                   src="/sponsors/logo-mfat.jpg"
                   alt="New Zealand Ministry of Foreign Affairs & Trade"
@@ -818,7 +818,7 @@ export default function HomePage() {
                   className="object-contain"
                 />
               </div>
-              <div className="relative h-16 w-40">
+              <div className="relative h-32 w-80">
                 <Image
                   src="/sponsors/timor-education.png"
                   alt="Timor-Leste Ministry of Education"
@@ -826,7 +826,7 @@ export default function HomePage() {
                   className="object-contain"
                 />
               </div>
-              <div className="relative h-16 w-40">
+              <div className="relative h-32 w-80">
                 <Image
                   src="/sponsors/logo-care.jpg"
                   alt="Care International"

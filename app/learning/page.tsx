@@ -25,7 +25,7 @@ export default function LearningPage() {
     tet: {
       heroTitle: "Aprendizajen",
       heroSubtitle:
-        "Hili asuntu ida atu haree materiál aprendizagem ne’ebé sei aumenta ba rekursu imprimível no leitúr estilo flipbook iha futuru.",
+        "Hili topiku/disiplina ida hodi bele esplora materiál aprendizajen, ne'ebé sei aumenta ba beibeik hodi sai rekursu ne'ebé bele imprime hanesan livru ho modelu flipbook.",
       browseLabel: "Haree kategoría sira",
       categoryHint: "Loke kategoría",
     },
