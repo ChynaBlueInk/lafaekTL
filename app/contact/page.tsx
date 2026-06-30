@@ -32,7 +32,7 @@ export default function ContactPage() {
       },
       contactInfo: {
         title: "Contact Information",
-        email: "info@lafaek.tl",
+        email: "info.lafaek@careint.org",
         phone: "+670 1234 5678",
         address: "Dili, Timor-Leste",
       },
@@ -58,21 +58,21 @@ export default function ContactPage() {
     tet: {
       hero: {
         title: "Kontaktu Lafaek",
-        subtitle: "Favor ida tau ami hatene",
-        description: "Hatama ita-nia pergunta, ideia ka proposta ba parceira.",
+        subtitle: "Ami kontente no hakarak rona husi belun sira",
+        description: "Hakbesik ba ami ho ita-nia perguntas, ideias, ka oportunidade ba parseria nian.",
       },
       contactInfo: {
-        title: "Informasaun Kontaktu",
-        email: "info@lafaek.tl",
+        title: "Informasaun kontaktu",
+        email: "info.lafaek@careint.org",
         phone: "+670 1234 5678",
         address: "Dili, Timor-Leste",
       },
       form: {
-        title: "Hatudu Mensajen Ba Ami",
-        nameLabel: "Ita-nia Naran",
-        emailLabel: "Ita-nia Imel",
-        inquiryTypeLabel: "Asuntu sa mak ita-nia pergunta?",
-        inquiryPlaceholder: "Hili asuntu",
+        title: "Haruka mensajen mai ami",
+        nameLabel: "Ita-nia naran",
+        emailLabel: "Ita-nia email",
+        inquiryTypeLabel: "Ita-nia pergunta kona-ba saida?",
+        inquiryPlaceholder: "Hili opsaun ida",
         inquiryOptions: [
           { value: "general", label: "Pergunta Geral" },
           { value: "magazine", label: "Subscrisaun Revista" },
@@ -80,7 +80,7 @@ export default function ContactPage() {
         ],
         subjectLabel: "Asuntu",
         messageLabel: "Mensajen",
-        submitButton: "Hatudu Mensajen",
+        submitButton: "Haruka mensajen.",
         submitting: "Hatudu hela...",
         success: "Obrigadu! Ita-nia mensajen hetan ona.",
         error: "Deskulpa! Iha problema. Bolu fali.",

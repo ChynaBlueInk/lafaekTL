@@ -1,4 +1,3 @@
-// app/our-team/team-client.tsx
 "use client";
 
 import {useMemo,useState}from "react";
@@ -104,7 +103,7 @@ export default function TeamClient({membersTet,membersEn}:Props){
   const copy=useMemo(() => ({
     en:{
       title:"Our Team",
-      subtitle:"Meet the people behind Lafaek — teams working across Timor-Leste.",
+      subtitle:"Meet the people behind Lafaek — designers, educators, writers and production teams working across Timor-Leste.",
       searchLabel:"Search team members",
       searchPlaceholder:"Search by name, role, department or bio...",
       departmentLabel:"Department",
@@ -119,14 +118,14 @@ export default function TeamClient({membersTet,membersEn}:Props){
       closeTeam:"Close team"
     },
     tet:{
-      title:"Ami-nia Ekipá",
-      subtitle:"Hasoru ema sira ne’ebé hala’o Lafaek — ekipa sira iha Timor-Leste tomak.",
+      title:"Ami-nia Ekipa",
+      subtitle:"Mai koñese Ekipa Lafaek sira — artista, edukadór, hakerek-nain, no ekipa produsaun ne'ebé serbisu iha Timor laran tomak.",
       searchLabel:"Buka membru ekipa",
       searchPlaceholder:"Buka tuir naran, kargu, departamentu ka bio...",
       departmentLabel:"Departamentu",
       allDepartments:"Departamentu hotu",
       groupLabel:"Fahe tuir departamentu",
-      noResults:"La hetan membru ekipa ne’ebé tuir buka ne’e.",
+      noResults:"La hetan membru ekipa ne'ebé tuir buka ne'e.",
       role:"Kargu",
       about:"Kona-ba",
       close:"Taka",

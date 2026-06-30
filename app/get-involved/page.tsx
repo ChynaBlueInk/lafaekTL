@@ -151,19 +151,19 @@ const { language } = useLanguage()
     },
     tet: {
       hero: {
-        title: "Partisipa",
-        subtitle: "Partisipa Ami-nia Misaun atu Hametin Timor-Leste",
+        title: "Mai hola parte",
+        subtitle: "Mai hola parte iha ami-nia Misaun atu Haforsa Edukasaun iha Timor-Leste",
         description:
-          "Ita-nia apoiu, iha forma saida de'it, ajuda ami kontinua fornese rekursu edukativu importante ba labarik no komunidade sira iha Timor-Leste tomak.",
+          "Ita-nia apoiu, iha forma saida de'it, ajuda ami kontinua fornese rekursu edukativu importante ba labarik no komunidade sira iha Timor laran tomak.",
       },
       sections: [
         {
           id: "publish",
           icon: Handshake,
           title: "Publika ho Revista Lafaek",
-          subtitle: "Fahe ita-nia koñesimentu no istoria ho públiku boot.",
+          subtitle: "Fahe ita-nia koñesimentu no istoria ho audiensia públiku.",
           description:
-            "Ita mak edukadór, eskrivan, ka espesialista ho konteúdu relevante ba labarik no joven Timor nian? Ami konvida ita atu halo parseria ho ami no publika ita-nia materiál edukativu, istoria, ka artigu iha Revista Lafaek. Hetan asesu ba leitor joven rihun ba rihun no kontribui ba dezenvolvimentu nasionál.",
+            "Ita mak edukadór, hakerek-na'in, ka espesialista ho konteúdu relevante ba labarik no joven Timor nian? Ami konvida ita atu halo parseria ho ami no publika ita-nia materiál edukativu, istoria, ka artigu iha Revista Lafaek. Hetan asesu ba joven lee-na'in rihun ba rihun no kontribui ba dezenvolvimentu nasionál.",
           cta: "Haruka Ita-nia Proposta",
           formFields: [
             { name: "name", label: "Ita-nia Naran", type: "text", required: true },
@@ -181,9 +181,9 @@ const { language } = useLanguage()
           id: "volunteer",
           icon: Users,
           title: "Voluntáriu ho Ami",
-          subtitle: "Fó ita-nia kbiit no tempu atu halo impactu diretu.",
+          subtitle: "Oferese ita-nia abilidade no tempu atu halo impaktu diretu.",
           description:
-            "Voluntáriu sira mak ami-nia operasaun nia fuan. Maski ita mak edukadór, artista, administradór, ka simplesmente paixaun kona-ba edukasaun, iha fatin ida ba ita. Partisipa ami-nia ekipa iha Dili ka kontribui husi fatin dook.",
+            "Voluntáriu sira mak sai sentru ba ami-nia servisu. Se ita mak edukadór, artista, administradór, ka simplesmente iha paixaun ba edukasaun, ami iha fatin ba ita. Bele mai servisu hamutuk ho ami-nia ekipa iha Dili ka kontribui liuhosi husi area remotas.",
           cta: "Sai Voluntáriu",
           formFields: [
             { name: "name", label: "Ita-nia Naran", type: "text", required: true },
@@ -195,10 +195,10 @@ const { language } = useLanguage()
         {
           id: "donate",
           icon: Heart,
-          title: "Halo Donasaun",
+          title: "Halo Doasaun",
           subtitle: "Ita-nia kontribuisaun finanseira hametin ami-nia programa sira.",
           description:
-            "Donasaun ida-ida, boot ka ki'ik, diretamente apoia produsaun no distribuisaun ami-nia revista edukativu, programa formasaun ba profesór sira, no inisiativa asesu komunidade. Ajuda ami hetan labarik barak liu no harii nasaun literatu ida.",
+            "Kada doasaun, boot ka ki'ik, diretamente apoia produsaun no distribuisaun ita-nia revista edukativu, programa formasaun ba manorin, no inisiativa asesu ba komunidade. Ajuda ami hetan labarik barak liu no harii nasaun literatu ida.",
           cta: "Halo Donasaun Agora",
           formFields: [
             { name: "name", label: "Ita-nia Naran", type: "text", required: true },
@@ -220,10 +220,10 @@ const { language } = useLanguage()
         {
           id: "partner",
           icon: Target,
-          title: "Parceria Korporativa",
-          subtitle: "Kolabora ho ami ba impactu sustentável.",
+          title: "Parseria Korporativa",
+          subtitle: "Kolabora ho ami ba iha impaktu sustentável.",
           description:
-            "Ami buka parseria ho organizasaun sira ne'ebé fahe ami-nia vizaun ba Timor-Leste ne'ebé literatu no hametin. Liu husi programa responsabilidade sosiál korporativa, patrocinamentu, ka inisiativa konjunta, ami bele hetan impactu kolektivu boot liu.",
+            "Ami buka parseria ho organizasaun sira ne'ebé iha vizaun hanesan ho ami, hodi haforsa edukasaun iha Timor-Leste. Liu husi programa responsabilidade sosiál korporativa, sponsor, ka inisiativa konjunta, ita bele atinji impaktu ne'ebe kolektivu.",
           cta: "Explora Parseria",
           formFields: [
             { name: "companyName", label: "Naran Kompañia", type: "text", required: true },

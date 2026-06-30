@@ -132,7 +132,7 @@ const TRANSLATIONS:Record<Lang,T>={
     heroTitle:"Sai Herói Sibernétiku! 🦸",
     heroSubtitle:"Aprende oinsá atu seguru iha internet laran — no halo ida-ne'e ho ksolok!",
     heroBadge:"Ba idade tinan 7–14 🌟",
-    gameButton:"Hahú Jogu Reinu Siber 🏰",
+    gameButton:"Klik hodi hahu Jogu Reinu Siber 🏰",
     mascotSpeech:
       "Olá! Ha'u mak Shield, ó-nia ajudante Herói Sibernétiku. Mai ita aprende kbiit super 3 hodi ó bele seguru iha internet laran!",
     backToCyber:"Fila fali ba Sibernétiku",
@@ -158,9 +158,9 @@ const TRANSLATIONS:Record<Lang,T>={
     allPowersDesc:"Ita prontu ona atu sai Herói Sibernétiku. Kontinua lee hodi aprende liután!",
 
     stopTitle:"🛑 PARA",
-    stopDesc:"Keta klik buat ruma. Para uitoan.",
+    stopDesc:"Keta klik buat ruma. Pauza lai.",
     thinkTitle:"🤔 HANOIN",
-    thinkDesc:"Ema ne'ebé ha'u koñese mak haruka mensajen ne'e? Sira husu ha'u-nia informasaun privadu ka lae?",
+    thinkDesc:"Ema ne'ebé ha'u koñese mak haruka mensajen ne'e ka lae?",
     askTitle:"🙋 HUSU",
     askDesc:"Husu ba ema boot lai antes ita halo buat ruma.",
     stopThinkAskLead:
@@ -171,7 +171,7 @@ const TRANSLATIONS:Record<Lang,T>={
       "🔐 Keta fahe ó-nia pasword ba ema ruma - nunka!",
       "📵 Keta ko'alia privadu ho ema ne'ebé ita la hatene iha moris realidade.",
       "🖼️ Uza imajen avatar ne'ebé kapas duké uza ó-nia foto loloos.",
-      "🤥 La'ós buat hotu iha online mak tebes — foto sira bele bosok!",
+      "🤥 La'ós buat hotu iha online mak realidade — foto sira bele bosok!",
       "🤝 Se halo sala, fó-hatene ba ema boot. Sira sei ajuda ita!",
     ],
 
@@ -184,7 +184,7 @@ const TRANSLATIONS:Record<Lang,T>={
 
     helpTitle:"🤝 Sé Maka Bele Ajuda Ita?",
     helpDesc:"Sira ne'e mak ita-nia erói iha mundu loloos — ita bele ba buka sira nafatin!",
-    helpPeople:["👩‍👧 Inan ka aman","👴👵 Avo sira","👩‍🏫 Manorin","🧑‍🤝‍🧑 Maun ka Mana","🏠 Ema iha uma ne'ebé ita fiar"],
+    helpPeople:["👩‍👧 Inan ka Aman","👴👵 Avó sira","👩‍🏫 Manorin","🧑‍🤝‍🧑 Maun ka Mana","🏠 Ema iha uma ne'ebé ita fiar"],
 
     gameCalloutTitle:"🏰 Prontu ona ba Reinu Siber (Cyber Kingdom)?",
     gameCalloutDesc:

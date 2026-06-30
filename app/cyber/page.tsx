@@ -204,13 +204,12 @@ const TRANSLATIONS: Record<Lang, T> = {
     togetherPoints: [
       "Fahe saida mak ita aprende ho ita-nia família, liuliu inan-aman ka avó sira ne'ebé bele seidauk hatene di'ak kona-ba ameasa dijitál.",
       "Ko'alia livre kona-ba esperiénsia online — halakon moe kona-ba sala sira, hodi nune'e fasil liu atu husu ajuda.",
-      "Eskola no fatin servisu ne'ebé harii konsiensia siberseguransa proteje ema hotu iha sira-nia rede, la'ós de'it ema.",
-      "Relata lalais fraude no konteúdu suspetu — ita-nia asaun ne'e sei proteje ema seluk ne'ebé bele simu mensajen hanesan.",
+"Eskola no fatin servisu ne'ebé harii konsiensia siberseguransa proteje ema hotu iha sira-nia rede, la'ós de'it ema individual.",
+"Relata lalais fraude no konteúdu suspetu — ita-nia asaun ne'e sei proteje ema seluk ne'ebé bele simu mensajen hanesan.",
     ],
 
     quoteText:
-      "Korente ida nia forsa depende ba nia elo ne'ebé fraku liu. Iha sosiedade ne'ebé konektadu, seguransa ema hotu nian depende ba koñesimentu husi ema hotu.",
-    quoteSource: "Prinsípiu reziliénsia siber kolektiv",
+"Korente ida sei bele forte bainhira korente ki'ik ne'ebé fragil ligado ba malu. Iha sosiedade ne'ebé konektadu, seguransa ema ida-idak depende ba koñesimentu no konsiensia ema seluk nian.",    quoteSource: "Prinsípiu reziliénsia siber kolektiva",
   },
 
   en: {

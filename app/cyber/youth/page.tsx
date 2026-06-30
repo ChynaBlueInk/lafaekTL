@@ -1,4 +1,3 @@
-// app/cyber/youth/page.tsx
 "use client";
 
 import {useState} from "react";
@@ -62,7 +61,7 @@ const TRANSLATIONS:Record<Lang,T>={
       {
         title:"Privacy Check",
         desc:"Check settings that help protect your account, photos, location, and personal information.",
-        href:"/cyber/youth/privacy",
+        href:"/cyber/youth/privacyshield",
         icon:"privacy",
       },
       {
@@ -169,7 +168,7 @@ const TRANSLATIONS:Record<Lang,T>={
       "If someone threatens you, stop replying, keep evidence, and get help.",
     ],
     resourcesTitle:"Extra learning",
-    resourcesIntro:"Free learning link for anyone who wants to go deeper.",
+    resourcesIntro:"Original Lafaek guidance. External link provided for optional deeper learning.",
     resources:[
       {
         text:"Understanding Cyber Security — Teens in AI",
@@ -184,11 +183,11 @@ const TRANSLATIONS:Record<Lang,T>={
     linksTitle:"Where to next?",
   },
   tet:{
-    title:"Youth Cyber Lab",
+    title:"Laboratóriu Siber ba Joven sira",
     subtitle:"Kbiit simples atu hela seguru liu online.",
     heroBadge:"TINAN 15–25",
     introLead:
-      "Ita-nia telemovel no laptop ajuda ita estuda, servisu, selu, ko'alia, no fahe informasaun. Pájina ida-ne'e hatudu dalan simples atu hatene bosok online, proteje konta, no cheka molok klik.",
+      "Ita-nia telemovel no laptop ajuda ita estuda, servisu, selu, ko'alia, no fahe informasaun. Pájina ida-ne'e hatudu maneira simples atu hatene (identifika) bosok online, proteje konta, no cheka molok klik.",
     learnTitle:"Hili atividade seguransa cyber",
     learnItems:[
       {
@@ -199,8 +198,8 @@ const TRANSLATIONS:Record<Lang,T>={
       },
       {
         title:"Cheka Privasidade",
-        desc:"Haree setting sira ne'ebé ajuda proteje konta, foto, lokasaun, no informasaun pesoál.",
-        href:"/cyber/youth/privacy",
+        desc:"Haree konfigurasaun sira ne'ebé ajuda proteje konta, foto, lokasaun, no informasaun pesoál.",
+        href:"/cyber/youth/privacyshield",
         icon:"privacy",
       },
       {
@@ -225,7 +224,7 @@ const TRANSLATIONS:Record<Lang,T>={
       },
       {
         title:"Cheka privasidade sosiál",
-        desc:"Limita sé mak bele haree ita-nia post, story, lista kolega, numeru telefone, no detallu pesoál.",
+        desc:"Limita sé mak bele haree ita-nia postagen, story, lista kolega, numeru telefone, no detallu pesoál.",
       },
       {
         title:"Hanoin molok posta",
@@ -257,8 +256,8 @@ const TRANSLATIONS:Record<Lang,T>={
     stopThinkCheck:[
       {
         step:"PARA",
-        text:"Para bainhira simu mensajen surpriza, prémiu, ameasa, ka pedidu urjente.",
-        confirm:"Di'ak. Para uluk fó tempu ba ita atu hanoin molok klik ka hatán.",
+        text:"Pauza lai bainhira simu mensajen surpriza, prémiu, ameasa, ka pedidu urjente.",
+        confirm:"Di'ak. Pauza lai fó tempu ba ita atu hanoin molok klik ka hatán.",
       },
       {
         step:"HANOIN",
@@ -273,10 +272,10 @@ const TRANSLATIONS:Record<Lang,T>={
     ],
     deepfakeTitle:"Sinal avizu ba imajen no vídeo AI",
     deepfakePoints:[
-      "Oin, liman, matan, sombra, ka background haree estranu.",
+      "Oin, liman, matan, sombra, ka imagen nia kotuk haree estranu.",
       "Lian ka movimentu ibun la tuir malu didi'ak.",
       "Mensajen halo ita sente tauk, kontenti demais, presa, ka moe.",
-      "Konta foun, post uitoan, ka la haree hanesan ema loos.",
+      "Konta foun, postage oituan deit, ka la haree hanesan ema loos.",
     ],
     accountsTitle:"Proteje ita-nia konta",
     accountsList:[
@@ -288,14 +287,14 @@ const TRANSLATIONS:Record<Lang,T>={
     privacyTitle:"Proteje privasidade",
     privacyList:[
       "Halo konta pesoál sai privadu.",
-      "Cheka post tuan, foto tag, no detallu perfil públiku.",
+      "Cheka postagen tuan, foto tag, no detallu perfil públiku.",
       "Subar numeru telefone no email husi perfil públiku.",
-      "Hamate precise location se ita la presiza duni.",
+      "Hamate lokasaun atual se ita la presiza duni.",
     ],
     wifiTitle:"Seguransa Wi-Fi públiku",
     wifiList:[
       {text:"Uza data telemovel ka hotspot ba banku no konta importante."},
-      {text:"Se uza Wi-Fi públiku, halo logout depois no hamate auto-connect."},
+      {text:"Se uza Wi-Fi públiku, presija log out depois no hamate auto-connect."},
     ],
     reportTitle:"Se buat ida la'o sala",
     reportSteps:[
@@ -303,21 +302,21 @@ const TRANSLATIONS:Record<Lang,T>={
       "Troka password lalais.",
       "Sai husi sesaun suspetu no liga 2FA.",
       "Relata no blokeia konta iha app.",
-      "Fó-hatene ba adultu, mentor, mestre, ka ema IT ne'ebé ita konfia.",
+      "Fó-hatene ba adultu, mentor, manorin, ka ema IT ne'ebé ita konfia.",
       "Se ema ameasa ita, para hatán, rai evidénsia, no buka ajuda.",
     ],
-    resourcesTitle:"Aprendizajen tan",
-    resourcesIntro:"Link gratuita ba ema ne'ebé hakarak aprende kle'an liután.",
+    resourcesTitle:"Aprendizajen adisional",
+    resourcesIntro:"Orientasaun original hosi Lafaek. Link esterna ida nee fornece ba aprendizajen opsional se presiza.",
     resources:[
       {
         text:"Understanding Cyber Security — Teens in AI",
         href:"https://www.teensinai.com/understanding-cyber-security/",
       },
     ],
-    note:"Orientasaun original hosi Lafaek. Link esterna ida-ne'e ba aprendizajen tan se presiza.",
+    note:"Orientasaun original hosi Lafaek. Link esterna ida nee fornece ba aprendizajen opsional se presiza.",
     backToCyber:"Fila ba Cyber",
     toChildren:"Labarik",
-    toAdults:"Inan-Aman & Mestre",
+    toAdults:"Inan-Aman & Manorin",
     protocolConfirmed:"✓ Di'ak. Ita prátika ona Para, Hanoin, Cheka.",
     linksTitle:"Depois ba ne'ebé?",
   },

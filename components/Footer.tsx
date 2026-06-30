@@ -1,4 +1,3 @@
-// components/Footer.tsx
 "use client";
 
 import Link from "next/link";
@@ -38,7 +37,6 @@ export function Footer(){
           {label:"Our Journey",href:"/our-journey"},
           {label:"Our Team",href:"/our-team"},
           {label:"About Us",href:"/about"},
-          {label:"Social Enterprise",href:"/social-enterprise"},
           {label:"Services",href:"/services"},
           {label:"Reports",href:"/reports",note:"Coming soon"}
         ],
@@ -52,14 +50,14 @@ export function Footer(){
       }
     },
     tet:{
-      description:"Apoia labarik no família sira iha Timor-Leste liuhusi edukasaun, kriatividade, no envolvimentu komunidade.",
+      description:"Apoia labarik no família sira iha Timor-Leste liuhusi edukasaun, Kriatividade, no envolvimentu komunidade.",
       programs:"Programa sira",
       about:"Kona-ba Ami",
       extras:"Tanba seluk",
       admin:"Admin",
       contactHeading:"Kontaktu",
-      contactBody:"Hakarak parseria, sponsor, ka enkuadramentu kona-ba média, favór kontaktu Ekipa Lafaek.",
-      contactCta:"Ba pajina kontaktu",
+      contactBody:"Hakarak parseria, sponsor, ka enkuadramentu konaba média, favór kontaktu Ekipa Lafaek.",
+      contactCta:"Ba iha parte Pajina kontaktu nian",
       comingSoon:"Sei mai",
       groups:{
         programs:[
@@ -74,7 +72,6 @@ export function Footer(){
           {label:"Ami-nia Viajen",href:"/our-journey"},
           {label:"Ami-nia Ekipa",href:"/our-team"},
           {label:"Kona-ba Ami",href:"/about"},
-          {label:"Empreza Sosiál",href:"/social-enterprise"},
           {label:"Servisu sira",href:"/services"},
           {label:"Relatóriu sira",href:"/reports",note:"Sei mai"}
         ],

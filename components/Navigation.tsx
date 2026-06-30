@@ -1,4 +1,3 @@
-// components/Navigation.tsx
 "use client";
 
 import {useCallback,useEffect,useMemo,useRef,useState}from "react";
@@ -162,11 +161,6 @@ useEffect(()=>{
                 description:"How Lafaek has grown over time."
               },
               {
-                label:"Social Enterprise",
-                href:"/social-enterprise",
-                description:"Our move toward sustainable education media."
-              },
-              {
                 label:"Contact",
                 href:"/contact",
                 description:"Get in touch with the Lafaek team."
@@ -226,7 +220,7 @@ useEffect(()=>{
             description:"Haree revista, istória, vídeu, livru, no rekursu aprendizajen Lafaek nian.",
             links:[
               {
-                label:"Revista",
+                label:"Jornal/Revista",
                 href:"/publication/magazines",
                 description:"Lee edisaun revista Lafaek nian."
               },
@@ -297,11 +291,6 @@ useEffect(()=>{
                 label:"Ami-nia Viajen",
                 href:"/our-journey",
                 description:"Oinsá Lafaek dezenvolve ona."
-              },
-              {
-                label:"Empreza Sosiál",
-                href:"/social-enterprise",
-                description:"Ami-nia mudansa ba média edukasaun ne'ebé sustentável."
               },
               {
                 label:"Kontaktu",

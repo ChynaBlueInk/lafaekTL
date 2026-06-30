@@ -1,4 +1,3 @@
-// app/page.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -138,7 +137,7 @@ export default function HomePage() {
     },
     tet: {
       hero: {
-        title: "Benvindu mai Lafaek Learning Media",
+        title: "Benvindu mai iha Media Lafaek Aprendizazen",
         subtitle: "Empodera Timor-Leste liuhusi Edukasaun & Istoria sira",
         supportText:
           "Ita-boot bele apoiu Lafaek liuhusi halo doasaun hodi sosa ami-nia revista no produtu sira, patrosina konteúdu edukativu, halo publisidade ho ami, ka kontrata ami-nia ekipa talentozu hosi hakerek-na'in, ilustradór, no videografu sira."
@@ -146,7 +145,7 @@ export default function HomePage() {
       news: { title: "Notísia Foun", subtitle: "Saida mak akontese iha Lafaek?", viewAll: "Haree hotu notísia" },
       socialEnterprise: {
         title: "Lafaek Enmpreza Social",
-        subtitle: "Husi Inisiativa Komunidade to'o Impaktu Organizasaun ba Timoroan.",
+        subtitle: "Husi Inisiativa Komunidade to'o Impaktu Organizasaun Timor-Oan.",
         stats: [
           { number: "25+", label: "Ninia impaktu liu tinan 25" },
           { number: "1M+", label: "Kada tinan ami distriubui Revista liu Miliaun 1" },
@@ -177,23 +176,23 @@ export default function HomePage() {
         features: [],
       },
       cta: {
-        title: "Hola parte iha ami nia misaun",
-        subtitle: "Ajuda ami kontinua hodi empodera Timor-Leste liuhosi edukasaun",
+        title: "Hamutuk ho Ami nia Misaun",
+        subtitle: "Ajuda Ami atu kontinua haforsa Timor-Leste liuhusi edukasaun.",
         volunteer: "Voluntáriu",
         donate: "Suporta Ami",
-        partner: "Sai Parceiru ho Ami",
+        partner: "Parseria ho Ami",
       },
       social: {
         title: "Tuir Lafaek iha Online",
-        facebookTitle: "Segue ami iha Facebook",
-        facebookText: "Hatudu ba ita notísia foun no eventu komunitáriu sira.",
-        facebookButton: "Vizita Facebook",
+        facebookTitle: "Akompanha ami nia pajina Facebook",
+        facebookText: "Tuir nafatin ami nia istoria foun sira no eventu komunidade.",
+        facebookButton: "Vizita ami nia pajina Facebook",
         instagramTitle: "Haree ami iha Instagram",
         instagramText: "Haree foto, istória badinas no atividade sira iha kampu.",
         instagramButton: "Vizita Instagram",
-        youtubeTitle: "Haree ami iha YouTube",
-        youtubeText: "Deskobre ami nia istória, vídeo kampu no konteúdu iha kotuk.",
-        youtubeButton: "Vizita YouTube",
+        youtubeTitle: "Bele hare ami nia YouTube",
+        youtubeText: "Deskobre ami-nia konteúdu, istória no vídeo sira husi kampu.",
+        youtubeButton: "Vizita ami nia YouTube",
         youtubeSecondary: "Haree vídeo hotu",
       },
     },

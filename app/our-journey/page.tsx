@@ -1,4 +1,3 @@
-// app/our-journey/page.tsx
 "use client";
 
 import {useLanguage}from "@/lib/LanguageContext";
@@ -41,35 +40,35 @@ export default function OurJourneyPage(){
         "Our journey continues. With the support of communities and partners, we will keep creating learning media that inspires, informs, and includes every child in Timor-Leste.",
     },
     tet:{
-      title:"Ami-nia Viajen",
+      title:"Ami-nia Jornada",
       subtitle:"Istória Lafaek nian — edukasaun, komunidade, no reziliénsia iha Timor-Leste",
       description:
-        "Dokumentáriu badak ida‐ne’e tuir Lafaek nia viajen husi inisiativa komunitária ida ba empreza sosiál ida ne’ebé Timoroan mak na’in. Ida-ne'e destaka ema sira, parseria sira, no sala-de-aula sira ne'ebé forma Lafaek nia misaun atu halo rekursu aprendizajen ho kualidade asesivel ba ema hotu.",
+        "Dokumentasaun badak ida ne'e haktuir Lafaek nia jornada hahu husi komunidade ninia inisiativa no sai ba empreza sosiál iha Timor-Leste. Ida ne'e foka liu kona-ba ema, parseria no sala aula sira ne'ebé kontribui ba Lafaek nia misaun atu halo rekursu aprendizajen ho kualidade, asesivel ba ema hotu.",
       watchCta:"Haree iha YouTube",
       videoLabel:"Dokumentáriu",
       creditsTitle:"Kona-ba filme ida-ne'e",
       creditsBody:
-        "Filma iha Timor-Leste ho ekipa Lafaek Learning Media no parseiru komunidade sira. Dokumentáriu ne'e disponivel ba públiku iha YouTube. Subtítulu sira bele ativa iha jogadór.",
+        "Filme iha Timor-Leste ho ekipa Lafaek Media Aprendizajen no parseiru komunidade sira. Dokumentáriu ne'e bele hare iha YouTube. Dokumentariu ne'e mos fornese tradusaun (subtitulu) hodi bele ajuda ita kompriende ho di'ak liutan.",
       storyTitle:"Ami nia Istória & Parseiru sira",
       storyBody:
-        "Desde inísiu tinan 2000, Lafaek serbisu hamutuk ho eskola sira, família sira, no komunidade sira hodi harii kultura lee no aprendizajen nian iha Timor-Leste. Saida maka hahú hanesan revista ida ne'ebé hetan apoiu hosi parseiru umanitáriu no dezenvolvimentu sira sai boot ba empreza sosiál ida ne'ebé maka na'in hosi Timoroan sira ne'ebé maka produz livru sira ba labarik sira, rekursu sira ba profesór sira, vídeo sira, no revista komunitária sira. Ami nia parseiru sira — inklui eskola sira, profesór sira, grupu foin-sa'e sira, autoridade lokál sira, ONG sira, no apoiante sira setór privadu nian — ajuda ami atu dezeña hamutuk konteúdu ne'ebé prátiku, relevante kulturalmente, no asesivel. Hamutuk, ami foka ba kualidade, seguransa, inkluzaun, no modelu pozitivu sira atu nune'e labarik hotu-hotu bele haree sira-nia an iha ami nia pájina sira no iha ami nia ekran sira.",
+        "Hahú husi tinan 2000, ekipa Lafaek serbisu hamutuk ho eskola, família, no komunidade sira hodi kria kultura lee no aprendizajen iha Timor-Leste. Hahú husi kriasaun revista Lafaek ida-ne'ebé hetan suporta husi parseiru umanitáriu no dezenvolvimentu sira, sei sai empreza sosiál ida-ne'ebé prodús livru ba labarik, rekursu ba manorin, vídeo, no revista komunidade sira. Ami nia parseiru sira — inklui eskola, manorin, grupu foin-sa'e, autoridade lokál, NGO, no apoiante setór privadu nian — ajuda ami atu dezeña hamutuk konteúdu ne'ebé prátikal, relevante ho kultural no asesivel. Hamutuk, ami foka ba kualidade, seguransa, inkluzaun, no modelu pozitivu sira atu nune'e labarik hotu-hotu bele haree sira-nia an iha ami-nia pájina no iha sira-nia ekran.",
       partnersBullets:[
-        "Eskola sira & Profesór sira — kria hamutuk rekursu sira ba klase no fasilita formasaun ba profesór sira.",
-        "Inan-Aman & Komunidade sira — orienta tópiku sira ne'ebé importante liu ba labarik sira iha uma.",
-        "Foin-sa'e sira & Voluntáriu sira — fó forsa ba ami nia programa sira Jornalista Junior no Ativista Junior nian.",
-        "Instituisaun Públika sira — aliña konteúdu ho prioridade no kurríkulu nasionál sira.",
-        "Setór Privadu — patrosina pilotu sira impresaun, distribuisaun no inovasaun nian.",
+        "Eskola & Manorin — ami servisu hamutuk hodi kria rekursu material ba aprendijajen utiliza iha klase laran no fasilita formasaun ba manorin sira.",
+        "Inan-Aman & Komunidade — reforsa matadalan kona-ba tópiku sira ne'ebé importante liu ba labarik sira atu aprende iha uma.",
+        "Foin-sa'e & Voluntáriu — haforsa ami-nia programa sira hanesan Jornalista Foin-sa'e no Jornalista Ativista ba joven sira.",
+        "Instituisaun Públika — aliña konteúdu ho prioridade kurríkulu nasionál.",
+        "Setór Privadu — imprimi sponsor sira-nia konteudu halo distribuisaun, no inovasaun ba simulasaun sira.",
       ],
-      timelineTitle:"Marku sira",
+      timelineTitle:"Etapa Importante Sira",
       timeline:[
-        {year:"2001–2002",text:"Revista Lafaek lansa atu apoia alfabetizasaun no informasaun públika iha loron dahuluk sira harii nasaun nian."},
-        {year:"2006–2015",text:"Konteúdu habelar ba labarik sira, mestre sira, no edisaun komunidade nian; parseria sira buras ho eskola sira no ONG sira."},
-        {year:"2016–2020",text:"Pilotu dijitál sira, konta istória ho vídeo, no kapasitasaun lokál aumenta ho kriadór timoroan sira."},
-        {year:"2021–2023",text:"Planeamentu tranzisaun ba empreza sosiál ida ne'ebé maka na'in ba Timoroan sira; foku maka’as liu ba sustentabilidade no impaktu."},
-        {year:"2024–Ohin",text:"Lafaek Learning Media hala'o operasaun hanesan empreza ida ne'ebé maka na'in ba Timoroan sira ne'ebé maka entrega revista sira, livru sira, no multimédia iha nasaun tomak."},
+        {year:"2001–2002",text:"Revista Lafaek lansa dahuluk hodi suporta literasia no informasaun públika iha era bainhira ukun rasik-an."},
+        {year:"2006–2015",text:"Habelar konteúdu edisaun ba labarik, manorin, no komunidade; parseria komesa dezenvolve ho eskola no NGO sira."},
+        {year:"2016–2020",text:"Simulasaun dijitál, konta istória liuhusi vídeo, no kapasita lokál Timoroan sira-ne'ebe sai hanesan kriador ba konteúdu sira."},
+        {year:"2021–2023",text:"Etapa planu tranzisaun atu sai hanesan empreza sosiál lidera husi Timoroan; ne'ebé foka liu ba garante sustentabilidade no impaktu sira."},
+        {year:"2024–Ohin",text:"Lafaek Media Aprendizajen hala'o operasaun hanesan empreza sosiál ne'ebé lidera husi Timoroan sira hodi fahe revista, livru, no multimédia iha teritoriu laran tomak."},
       ],
       finalNote:
-        "Ami nia viajen kontinua. Ho apoiu husi komunidade no parseiru sira, ami sei kontinua kria meiu aprendizajen ne’ebé inspira, informa, no inklui labarik ida‐idak iha Timor-Leste.",
+        "Ami-nia jornada kontinua. Ho apoiu husi komunidade no parseiru sira, ami sei kontinua kria meiu aprendizajen ne'ebé fo inspirasaun, informasaun, no inklui labarik sira iha teritoriu laran tomak.",
     },
   }as const;
 

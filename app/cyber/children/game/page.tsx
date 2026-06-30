@@ -44,7 +44,7 @@ const BADGE_MAP:Record<Exclude<Module,"map"|"avatar">,Badge>={
 const XP_PER_BADGE=150;
 
 function defaultHero():Hero{
-  return{headIdx:0,outfitIdx:0,colorIdx:0,name:"Cyber Hero"};
+  return{headIdx:0,outfitIdx:0,colorIdx:0,name:"Heroi siber"};
 }
 
 function loadFromStorage<T>(key:string,fallback:T):T{
@@ -123,18 +123,18 @@ function HeroAvatar({
 
 function getRank(badges:Badge[]):{label:string;emoji:string;nextAt:number}{
   const n=badges.length;
-  if(n===0) return{label:"Recruit",emoji:"🌱",nextAt:1};
-  if(n===1) return{label:"Cadet",emoji:"⭐",nextAt:2};
-  if(n===2) return{label:"Agent",emoji:"🌟",nextAt:3};
-  if(n===3) return{label:"Specialist",emoji:"💫",nextAt:4};
-  return{label:"Cyber Hero!",emoji:"🏆",nextAt:4};
+  if(n===0) return{label:"Rekruta",emoji:"🌱",nextAt:1};
+  if(n===1) return{label:"Kadete",emoji:"⭐",nextAt:2};
+  if(n===2) return{label:"Ajente",emoji:"🌟",nextAt:3};
+  if(n===3) return{label:"Espesialista",emoji:"💫",nextAt:4};
+  return{label:"Heroi Siber!",emoji:"🏆",nextAt:4};
 }
 
 const MAP_ZONES:{id:Exclude<Module,"map"|"avatar">;label:string;emoji:string;color:string;desc:string;x:number;y:number}[]=[
-  {id:"password",label:"Password Peak",emoji:"🔐",color:"#4A90D9",desc:"Build super-strong passwords!",x:20,y:25},
-  {id:"phishing",label:"Phishing Pond",emoji:"🎣",color:"#E86060",desc:"Spot the sneaky trick messages!",x:65,y:20},
-  {id:"social",label:"Social Swamp",emoji:"📱",color:"#219653",desc:"Sort safe posts from unsafe ones!",x:20,y:65},
-  {id:"trustedadult",label:"Help Headquarters",emoji:"🤝",color:"#9B59B6",desc:"Learn who you can always trust!",x:65,y:65},
+  {id:"password",label:"Liafuan Segredu ne'ebe Forte",emoji:"🔐",color:"#4A90D9",desc:"Kria liafuan segredu ne'ebe forte!",x:20,y:25},
+  {id:"phishing",label:"Fraude Online",emoji:"🎣",color:"#E86060",desc:"Identifika mensajen ne'ebe mak bosok/lasu!",x:65,y:20},
+  {id:"social",label:"Problema Ambiente Sosial",emoji:"📱",color:"#219653",desc:"Separa postajen ne'ebé seguru ho la seguru!",x:20,y:65},
+  {id:"trustedadult",label:"Sede Ajuda",emoji:"🤝",color:"#9B59B6",desc:"Aprende atu hatene se mak ita sempre fiar!",x:65,y:65},
 ];
 
 function GameMap({
@@ -170,7 +170,7 @@ function GameMap({
             {rank.emoji} {rank.label}
           </div>
           <div style={{color:"rgba(255,255,255,0.8)",fontSize:"0.85rem",marginTop:2}}>
-            {earnedBadges.length} of {MAP_ZONES.length} badges collected · {earnedBadges.length*XP_PER_BADGE} XP
+            {earnedBadges.length} husi {MAP_ZONES.length} badge sira · {earnedBadges.length*XP_PER_BADGE} XP
           </div>
           <div style={{marginTop:6,display:"flex",gap:8,flexWrap:"wrap"}}>
             {MAP_ZONES.map((z)=>(
@@ -205,9 +205,9 @@ function GameMap({
           }}
         >
           <div style={{fontSize:"2.5rem"}}>🏆</div>
-          <div style={{fontWeight:800,fontSize:"1.2rem",color:"#333"}}>You are a Cyber Hero!</div>
+          <div style={{fontWeight:800,fontSize:"1.2rem",color:"#333"}}>Ita mak Heroi Siber!</div>
           <div style={{color:"#555",marginTop:4,fontSize:"0.9rem"}}>
-            All missions complete. Go back and share what you learned!
+            Misaun hotu kompleta ona. Fila fali no fahe saida mak ita aprende!
           </div>
         </motion.div>
       )}
@@ -273,7 +273,7 @@ function MapImage({
                     letterSpacing:"0.08em",
                   }}
                 >
-                  ✓ DONE
+                  ✓ Kompleta ona
                 </div>
               )}
               <div style={{fontSize:"3rem",marginBottom:8}}>{zone.emoji}</div>
@@ -308,7 +308,7 @@ function MapImage({
                   fontWeight:700,
                 }}
               >
-                {done?"Play again":"Start mission →"}
+                {done?"Halimar fila-fali":"Hahu misaun →"}
               </div>
             </motion.button>
           );
@@ -330,7 +330,7 @@ function MapImage({
     >
       <img
         src="/cyber/children/cyber-map.png"
-        alt="Cyber Kingdom map — tap a location to start a mission"
+        alt="Mapa Reinu Siber — klik fatin ida atu hahu misaun"
         onError={()=>setImgError(true)}
         style={{
           width:"100%",
@@ -376,7 +376,7 @@ return(
       zIndex:10,
       transition:"box-shadow 0.18s ease, background 0.18s ease",
     }}
-    aria-label={`${zone.label}${done?" — completed":" — tap to play"}`}
+    aria-label={`${zone.label}${done?" — kompleta ona":" — klik hodi halimar"}`}
   >
     {!done&&(
       <motion.span
@@ -477,7 +477,7 @@ return(
                   fontWeight:700,
                 }}
               >
-                {done?"✓ Completed — play again":"Tap to start →"}
+                {done?"✓ Kompleta ona — halimar fila-fali":"Klik hodi hahu →"}
               </div>
             </motion.div>
           );
@@ -525,8 +525,8 @@ function PasswordMission({onComplete,hero}:{onComplete:()=>void;hero:Hero}){
         <div style={{display:"flex",alignItems:"center",gap:"0.75rem",marginBottom:"1rem"}}>
           <HeroAvatar hero={hero} size="sm" />
           <div>
-            <h2 style={{margin:0,fontSize:"1.4rem",fontWeight:800,color:"#333"}}>🔐 Password Peak</h2>
-            <p style={{margin:0,fontSize:"0.85rem",color:"#666"}}>Build a super-strong password!</p>
+            <h2 style={{margin:0,fontSize:"1.4rem",fontWeight:800,color:"#333"}}>🔐 Liafuan Segredu ne'ebe Forte</h2>
+            <p style={{margin:0,fontSize:"0.85rem",color:"#666"}}>Kria liafuan segredu ne'ebe forte!</p>
           </div>
         </div>
 
@@ -536,7 +536,7 @@ function PasswordMission({onComplete,hero}:{onComplete:()=>void;hero:Hero}){
           type="text"
           value={password}
           onChange={(e)=>setPassword(e.target.value)}
-          placeholder="Type a practice password..."
+          placeholder="Hakerek liafuan segredu prátika..."
           style={{
             width:"100%",
             boxSizing:"border-box",
@@ -559,10 +559,10 @@ function PasswordMission({onComplete,hero}:{onComplete:()=>void;hero:Hero}){
 
         <div style={{marginTop:"1rem",display:"grid",gridTemplateColumns:"1fr 1fr",gap:"0.5rem"}}>
           {[
-            {label:"8+ characters",ok:checks.length},
-            {label:"Capital letter (A-Z)",ok:checks.upper},
-            {label:"Number (0-9)",ok:checks.number},
-            {label:"Symbol (!@#...)",ok:checks.special},
+            {label:"Karakter 8+",ok:checks.length},
+            {label:"Letra kapital (A-Z)",ok:checks.upper},
+            {label:"Numeru (0-9)",ok:checks.number},
+            {label:"Simbolu (!@#...)",ok:checks.special},
           ].map((c)=>(
             <div
               key={c.label}
@@ -604,7 +604,7 @@ function PasswordMission({onComplete,hero}:{onComplete:()=>void;hero:Hero}){
                 cursor:"pointer",
               }}
             >
-              🏅 Collect Badge!
+              🏅 Simu Badge!
             </motion.button>
           )}
           {collected&&(
@@ -622,7 +622,7 @@ function PasswordMission({onComplete,hero}:{onComplete:()=>void;hero:Hero}){
                 color:"#219653",
               }}
             >
-              🎉 Badge earned! Heading back to the map…
+              🎉 Badge manán ona! Fila fali ba mapa…
             </motion.div>
           )}
         </AnimatePresence>
@@ -638,7 +638,7 @@ function PasswordMission({onComplete,hero}:{onComplete:()=>void;hero:Hero}){
             lineHeight:1.5,
           }}
         >
-          💡 <strong>Remember:</strong> Never use your real name or birthday in a password. This is just practice — don't use passwords you'll actually use!
+          👉 <strong>Atensaun:</strong> Keta uza ita nia naran ka loron moris ba kodigu segredu. Ida ne'e prátika deit — keta uza kodigu segredu ne'ebé ita sei uza hela!
         </div>
       </div>
     </div>
@@ -648,38 +648,38 @@ function PasswordMission({onComplete,hero}:{onComplete:()=>void;hero:Hero}){
 const PHISHING_QUESTIONS=[
   {
     scenario:"📧 Email",
-    text:"You get an email saying you won a MILLION dollars! Click here to claim your prize!!!",
-    hint:"Would someone really give away that much money to a stranger?",
+    text:"Ita simu email ida hatetenk katak ita manaan dolár MILIAUN ida! Klik iha ne'e atu simu ita nia prémiu!!!",
+    hint:"Hanoin didiak: Loos ka? Se ema ruma fó osan barak hanesan nee ba ema ne'ebé nia la konese?",
     options:[
-      {text:"Click the link to get my prize! 💰",correct:false,feedback:"Oh no! This is a trap. Prizes that sound too good to be true usually are."},
-      {text:"Delete it. It's way too good to be true. 🗑️",correct:true,feedback:"Great thinking! If it sounds too good to be true, it probably is a scam."},
+      {text:"Klik iha link ida nee atu simu hau nia prémiu! 💰",correct:false,feedback:"La loos! Ida ne'e mak lasu. Prémiu sira ne'ebé suena di'ak liu normalmente mak fraude."},
+      {text:"Apaga agora. Ida ne'e sei la akontese. 🗑️",correct:true,feedback:"Di'ak tebes! Se suena di'ak liu atu loos, normalmente mak fraude ida."},
     ],
   },
   {
-    scenario:"🎮 Game chat",
-    text:"A stranger in your game says: 'Give me your password and I'll give you 1000 free gems!'",
-    hint:"Real game companies NEVER ask for your password.",
+    scenario:"🎮 Jogu online",
+    text:"Husi ita boot nia jogu, ema estranhu ida hatete: 'Fó ita boot nia Kodigu segredu mai hau no ha'u sei fó premiu 1,000 ba ita ho gratuita.'",
+    hint:"Hanoin didik: Kompania jogu nebe legitimu NUNKA husu ita nia Kodigu segredu.",
     options:[
-      {text:"Never give my password to anyone! 🚫",correct:true,feedback:"Exactly! Your password is YOUR secret — never share it, not even for free gems."},
-      {text:"It's worth it for 1000 gems! 💎",correct:false,feedback:"Oops! They just want to steal your account. Real games never ask for passwords."},
+      {text:"Nunka fó ita boot nia Kodigu segredu ba ema ruma! 🚫",correct:true,feedback:"Loos! Ita nia liafuan segredu mak SEGREDU ITA MAK HATENE — keta fahe, maski ba premiu sira."},
+      {text:"Merese simu premiu 1,000! 💎",correct:false,feedback:"La loos! Sira hakarak de'it atu na'ok ita nia konta. Jogu sira loloos la husu nunka liafuan segredu."},
     ],
   },
   {
-    scenario:"📱 Message",
-    text:"Your friend's account sends you a link but the message just says 'lol look at this'.",
-    hint:"Even friends' accounts can get hacked.",
+    scenario:"📱 Mensajen",
+    text:"Husi ita nia kolega nia konta, haruka link ida, maibé iha mensajen dehan de'it: 'haree ida ne'e'.",
+    hint:"Hanoin didiak: Maski ita nia maluk sira nia konta mos bele hetan naok.",
     options:[
-      {text:"Click it — my friend sent it!",correct:false,feedback:"Careful! Your friend's account might have been hacked. Always check first."},
-      {text:"Message them another way to ask if they really sent it. 🤔",correct:true,feedback:"Smart! Always double-check weird links, even from friends."},
+      {text:"Klik deit — Kolega mak haruka!",correct:false,feedback:"Kuidadu! Ita nia kolega nia konta bele hetan naok. Konfirma uluk nafatin."},
+      {text:"Mensajen ba sira ho dalan seluk atu konfirma los ka lae se sira mak haruka duni. 🤔",correct:true,feedback:"Di'ak tebes! Sempre konfirma link ne'ebé estrañu, maski husi kolega sira."},
     ],
   },
   {
     scenario:"🌐 Website",
-    text:"A website says 'URGENT: Your device has a virus! Call this number NOW!'",
-    hint:"Websites can't tell if your device has a virus.",
+    text:"Website ida hatete: 'URJENTE: Ita nia aparellu hetan virus! Kontaktu numeru ida ne'e agora!'",
+    hint:"Hanoin didiak: Website ne'ebe legitimu sei la bele identifika se ita nia aparellu hetan virus.",
     options:[
-      {text:"Call the number straight away! 📞",correct:false,feedback:"This is a scam! Websites can't detect viruses. Tell a trusted adult instead."},
-      {text:"Close the tab and tell a trusted adult. ✅",correct:true,feedback:"Perfect! Scary pop-ups like this are usually fake. A trusted adult can help."},
+      {text:"Liga diretamente ba numeru ne'e! 📞",correct:false,feedback:"Ida ne'e mak fraude! Website sira la bele deteta virus. Husu ajuda ba ema boot ne'ebé ita fiar."},
+      {text:"Taka deit pájina ne'e no husu ajuda ba ema adultu ne'ebé ita fiar. ✅",correct:true,feedback:"Di'ak tebes! Pop-up sira ne'ebé halo ita tauk hanesan ida ne'e normalmente mak bosok. Ema boot ida bele ajuda."},
     ],
   },
 ];
@@ -713,8 +713,6 @@ function PhishingMission({onComplete,hero}:{onComplete:()=>void;hero:Hero}){
     setDone(false);
   }
 
-  if(!q) return null;
-
   return(
     <div style={{maxWidth:600,margin:"0 auto"}}>
       <div
@@ -729,8 +727,8 @@ function PhishingMission({onComplete,hero}:{onComplete:()=>void;hero:Hero}){
         <div style={{display:"flex",alignItems:"center",gap:"0.75rem",marginBottom:"1.25rem"}}>
           <HeroAvatar hero={hero} size="sm" />
           <div>
-            <h2 style={{margin:0,fontSize:"1.4rem",fontWeight:800,color:"#333"}}>🎣 Phishing Pond</h2>
-            <p style={{margin:0,fontSize:"0.85rem",color:"#666"}}>Question {current+1} of {PHISHING_QUESTIONS.length}</p>
+            <h2 style={{margin:0,fontSize:"1.4rem",fontWeight:800,color:"#333"}}>🎣 Fraude Online</h2>
+            <p style={{margin:0,fontSize:"0.85rem",color:"#666"}}>Pergunta {current+1} husi {PHISHING_QUESTIONS.length}</p>
           </div>
         </div>
 
@@ -749,7 +747,7 @@ function PhishingMission({onComplete,hero}:{onComplete:()=>void;hero:Hero}){
           ))}
         </div>
 
-        {!done?(
+        {!done&&q?(
           <AnimatePresence mode="wait">
             <motion.div
               key={current}
@@ -799,7 +797,7 @@ function PhishingMission({onComplete,hero}:{onComplete:()=>void;hero:Hero}){
                   color:"#7a5000",
                 }}
               >
-                💡 Hint: {q.hint}
+                💡 {q.hint}
               </div>
 
               <div style={{display:"flex",flexDirection:"column",gap:"0.6rem"}}>
@@ -859,14 +857,14 @@ function PhishingMission({onComplete,hero}:{onComplete:()=>void;hero:Hero}){
           <motion.div initial={{opacity:0}} animate={{opacity:1}} style={{textAlign:"center"}}>
             <div style={{fontSize:"4rem"}}>{score>=3?"🌟":"👍"}</div>
             <h3 style={{margin:"0.5rem 0",fontSize:"1.3rem",fontWeight:800,color:"#333"}}>
-              {score} out of {PHISHING_QUESTIONS.length} correct!
+              {score} husi {PHISHING_QUESTIONS.length} loos!
             </h3>
             <p style={{color:"#666",fontSize:"0.9rem"}}>
               {score===PHISHING_QUESTIONS.length
-                ?"Perfect! You're a scam-spotting superstar!"
+                ?"Di'ak tebes! Ita mak super espesialista ba haree fraude online!"
                 :score>=3
-                  ?"Great work! You caught most of the scams."
-                  :"Good try! Scams can be tricky. Practice makes perfect."}
+                  ?"Di'ak tebes! Ita haree liu fraude barak."
+                  :"Prova di'ak! Fraude sira bele susar. Prátika halo di'ak."}
             </p>
 
             {score>=3?(
@@ -886,7 +884,7 @@ function PhishingMission({onComplete,hero}:{onComplete:()=>void;hero:Hero}){
                   cursor:"pointer",
                 }}
               >
-                🏅 Claim Scam Spotter Badge!
+                🏅 Simu Badge Fraude Online!
               </motion.button>
             ):(
               <button
@@ -903,7 +901,7 @@ function PhishingMission({onComplete,hero}:{onComplete:()=>void;hero:Hero}){
                   cursor:"pointer",
                 }}
               >
-                Try again — you've got this! 💪
+                Koko fali — ita bele! 💪
               </button>
             )}
           </motion.div>
@@ -914,12 +912,12 @@ function PhishingMission({onComplete,hero}:{onComplete:()=>void;hero:Hero}){
 }
 
 const SOCIAL_POSTS=[
-  {id:1,user:"TravelKid99",avatar:"🧒",text:"Going on holiday tomorrow! Our house will be empty for 2 weeks 🏠✈️",safe:false,why:"Telling strangers your house is empty is dangerous!"},
-  {id:2,user:"GamerPro2025",avatar:"🎮",text:"Just beat the final boss! This game is SO hard 😤🎮",safe:true,why:"Totally fine — just sharing about a game."},
-  {id:3,user:"NewFriend99",avatar:"😊",text:"Hey! What's your home address? I want to send you a surprise gift 🎁",safe:false,why:"Never share your address with strangers online!"},
-  {id:4,user:"SchoolBuddy",avatar:"🎒",text:"Our school is St Mary's on Main Street. Who else goes there?",safe:false,why:"Sharing your school name and location online isn't safe."},
-  {id:5,user:"Bestie_Mia",avatar:"💖",text:"Happy birthday to the best person ever!! 🎂🎉",safe:true,why:"A kind birthday message — perfectly safe."},
-  {id:6,user:"CoolArtist",avatar:"🎨",text:"Just finished my drawing! What do you think? 🖼️",safe:true,why:"Sharing creative work is totally fine."},
+  {id:1,user:"TravelKid99",avatar:"🧒",text:"Aban ami sei ba feriadu! Durante semana rua ami-nia uma sei mamuk 🏠✈️",safe:false,why:"Hatete ba estranjeiru katak ita-nia uma mamuk mak perigozu!"},
+  {id:2,user:"GamerPro2025",avatar:"🎮",text:"Foin manaan bos ikus! Jogu ida ne'e SUSAR tebes 😤🎮",safe:true,why:"Loos deit — fahe kona-ba jogu ida."},
+  {id:3,user:"NewFriend99",avatar:"😊",text:"Ola! Ita nia uma iha ne'ebe? Ha'u hakarak haruka prejente ba ita 🎁",safe:false,why:"Keta fahe ita-nia hela-fatin ba estranjeiru online!"},
+  {id:4,user:"SchoolBuddy",avatar:"🎒",text:"Ami nia eskola mak Santa Maria iha dalan bo'ot. Se se mak eskola iha ne'eba?",safe:false,why:"Fahe ita nia eskola naran no hela-fatin online la seguru."},
+  {id:5,user:"Bestie_Mia",avatar:"💖",text:"Ksolok tinan ba ema ne'ebe diak liu iha mundu 🎂🎉",safe:true,why:"Mensajen parabéns di'ak — seguru."},
+  {id:6,user:"CoolArtist",avatar:"🎨",text:"Hau foin finaliza hau nia pintura. Ita nia hanoin oinsa? 🖼️",safe:true,why:"Fahe servisu kriativu mak loos deit."},
 ] as const;
 
 type PostId=typeof SOCIAL_POSTS[number]["id"];
@@ -965,9 +963,9 @@ function SocialWallMission({onComplete,hero}:{onComplete:()=>void;hero:Hero}){
         <div style={{display:"flex",alignItems:"center",gap:"0.75rem",marginBottom:"0.5rem"}}>
           <HeroAvatar hero={hero} size="sm" />
           <div>
-            <h2 style={{margin:0,fontSize:"1.4rem",fontWeight:800,color:"#333"}}>📱 Social Swamp</h2>
+            <h2 style={{margin:0,fontSize:"1.4rem",fontWeight:800,color:"#333"}}>📱 Problema Ambiente Sosial</h2>
             <p style={{margin:0,fontSize:"0.85rem",color:"#666"}}>
-              Is each post safe or unsafe? Mark them all, then check your answers.
+              Kada postajen seguru ka lae? Marka hotu, depois verifika ita nia resposta.
             </p>
           </div>
         </div>
@@ -1027,7 +1025,7 @@ function SocialWallMission({onComplete,hero}:{onComplete:()=>void;hero:Hero}){
                           cursor:"pointer",
                         }}
                       >
-                        ✅ Safe
+                        ✅ Seguru
                       </button>
                       <button
                         onClick={()=>decide(post.id,"unsafe")}
@@ -1043,7 +1041,7 @@ function SocialWallMission({onComplete,hero}:{onComplete:()=>void;hero:Hero}){
                           cursor:"pointer",
                         }}
                       >
-                        🚩 Unsafe
+                        🚩 La Seguru
                       </button>
                     </div>
                   </div>
@@ -1052,7 +1050,7 @@ function SocialWallMission({onComplete,hero}:{onComplete:()=>void;hero:Hero}){
             </div>
 
             <div style={{marginTop:"1rem",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-              <span style={{fontSize:"0.85rem",color:"#888"}}>{decisions.size} of {SOCIAL_POSTS.length} marked</span>
+              <span style={{fontSize:"0.85rem",color:"#888"}}>Marka husi {decisions.size} to'o {SOCIAL_POSTS.length}</span>
               <button
                 onClick={checkAnswers}
                 disabled={!allAnswered}
@@ -1067,7 +1065,7 @@ function SocialWallMission({onComplete,hero}:{onComplete:()=>void;hero:Hero}){
                   cursor:allAnswered?"pointer":"not-allowed",
                 }}
               >
-                Check my answers →
+                Verifika hau nia resposta →
               </button>
             </div>
           </>
@@ -1076,7 +1074,7 @@ function SocialWallMission({onComplete,hero}:{onComplete:()=>void;hero:Hero}){
             <div style={{textAlign:"center",marginBottom:"1rem"}}>
               <div style={{fontSize:"3.5rem"}}>{passed?"🌟":"🤔"}</div>
               <h3 style={{margin:"0.5rem 0",fontSize:"1.3rem",fontWeight:800,color:"#333"}}>
-                {correctCount} out of {SOCIAL_POSTS.length} correct!
+                {correctCount} husi {SOCIAL_POSTS.length} loos!
               </h3>
             </div>
 
@@ -1109,7 +1107,7 @@ function SocialWallMission({onComplete,hero}:{onComplete:()=>void;hero:Hero}){
                         color:correct?"#1a6636":"#B42318",
                       }}
                     >
-                      {post.safe?"✅ Safe":"🚩 Unsafe"} — {post.why}
+                      {post.safe?"✅ Seguru":"🚩 La Seguru"} — {post.why}
                     </div>
                   </div>
                 );
@@ -1133,7 +1131,7 @@ function SocialWallMission({onComplete,hero}:{onComplete:()=>void;hero:Hero}){
                     cursor:"pointer",
                   }}
                 >
-                  🏅 Claim Safe Poster Badge!
+                  🏅 Simu Badge Postajen Seguru!
                 </motion.button>
               ):(
                 <button
@@ -1149,7 +1147,7 @@ function SocialWallMission({onComplete,hero}:{onComplete:()=>void;hero:Hero}){
                     cursor:"pointer",
                   }}
                 >
-                  Try again 💪
+                  Koko fali 💪
                 </button>
               )}
             </div>
@@ -1162,31 +1160,31 @@ function SocialWallMission({onComplete,hero}:{onComplete:()=>void;hero:Hero}){
 
 const TRUSTED_SCENARIOS=[
   {
-    situation:"Someone online is making you feel scared or uncomfortable.",
-    question:"What should you do?",
+    situation:"Ema ida online halo ita sente tauk ka la konfortavel.",
+    question:"Saida mak ita tenke halo?",
     options:[
-      {text:"Stop talking to them and tell a trusted adult straight away.",correct:true},
-      {text:"Keep it secret so you don't get in trouble.",correct:false},
+      {text:"Para ko'alia ho nia no fo hatene kedas ba ema adultu ne'ebé ita fiar.",correct:true},
+      {text:"Rai hanesan segredu de'it atu ita la hetan problema.",correct:false},
     ],
-    lesson:"You will NEVER be in trouble for telling a trusted adult. That's what they're there for!",
+    lesson:"Ita sei la iha PROBLEMA bainhira fó-hatene ba ema boot ne'ebé ita fiar. Ne'e mak sira iha hodi ajuda!",
   },
   {
-    situation:"You accidentally clicked a scary link and weird things appeared on screen.",
-    question:"What's the best first step?",
+    situation:"Ita klik link ne'ebé halo ita tauk, no buat estrañu sira mosu iha ita nia aparellu oin.",
+    question:"Pasu saida mak ita tenki halo uluk?",
     options:[
-      {text:"Close the browser and pretend it didn't happen.",correct:false},
-      {text:"Tell a trusted adult so they can help check your device.",correct:true},
+      {text:"Taka browser no finje ida ne'e la akontese.",correct:false},
+      {text:"Fo hatene ba ema adultu ne'ebé ita fiar atu sira bele ajuda verifika ita nia aparellu.",correct:true},
     ],
-    lesson:"Mistakes happen to everyone. Telling an adult quickly stops problems getting bigger.",
+    lesson:"Sala akontese ba ema hotu. Fó-hatene ba ema boot lalais hodi prevene problema boot liu.",
   },
   {
-    situation:"Someone online asks you to keep your conversation secret from your parents.",
-    question:"What does this tell you?",
+    situation:"Ema ida online husu ita atu rai segredu ita nia konversaun husi ita nia inan-aman.",
+    question:"Ida ne'e hatudu saida ba ita?",
     options:[
-      {text:"It means they're trying to be your special friend.",correct:false},
-      {text:"It's a warning sign — safe people don't ask children to keep secrets from parents.",correct:true},
+      {text:"Ne'e hatudu katak sira hakarak sai ita nia belun espesiál.",correct:false},
+      {text:"Nee sinál perigozu ida — ema ne'ebé laran diak la husu labarik atu rai segredu husi apa ho ama.",correct:true},
     ],
-    lesson:"Safe adults never ask children to keep secrets from parents. This is always a red flag.",
+    lesson:"Ema boot sira ne'ebé seguru la husu labarik atu rai segredu husi apa ho ama. Ida ne'e mak sinál risku nafatin.",
   },
 ];
 
@@ -1219,9 +1217,7 @@ function TrustedAdultMission({onComplete,hero}:{onComplete:()=>void;hero:Hero}){
     setTimeout(onComplete,1200);
   }
 
-  if(!q) return null;
-
-  const trustedPeople=["👩‍👧 Mum / Dad","👴 Grandparent","👩‍🏫 Teacher","🧑‍🤝‍🧑 Older sibling","🏠 Carer at home"];
+  const trustedPeople=["👩‍👧 Inan ka Aman","👴 Avó sira","👩‍🏫 Manorin","🧑‍🤝‍🧑 Maun ka Mana","🏠 Kuidadór iha uma"];
 
   return(
     <div style={{maxWidth:600,margin:"0 auto"}}>
@@ -1237,12 +1233,12 @@ function TrustedAdultMission({onComplete,hero}:{onComplete:()=>void;hero:Hero}){
         <div style={{display:"flex",alignItems:"center",gap:"0.75rem",marginBottom:"1.25rem"}}>
           <HeroAvatar hero={hero} size="sm" />
           <div>
-            <h2 style={{margin:0,fontSize:"1.4rem",fontWeight:800,color:"#333"}}>🤝 Help Headquarters</h2>
-            <p style={{margin:0,fontSize:"0.85rem",color:"#666"}}>Learn who to trust and when to ask for help.</p>
+            <h2 style={{margin:0,fontSize:"1.4rem",fontWeight:800,color:"#333"}}>🤝 Sede Ajuda</h2>
+            <p style={{margin:0,fontSize:"0.85rem",color:"#666"}}>Aprende se mak ita bele fiar no bainhira mak ita tenke husu ajuda.</p>
           </div>
         </div>
 
-        {!allDone?(
+        {!allDone&&q?(
           <AnimatePresence mode="wait">
             <motion.div
               key={current}
@@ -1282,7 +1278,7 @@ function TrustedAdultMission({onComplete,hero}:{onComplete:()=>void;hero:Hero}){
                     marginBottom:4,
                   }}
                 >
-                  Situation {current+1}
+                  Situasaun {current+1}
                 </div>
                 <p style={{margin:0,fontWeight:700,fontSize:"1.05rem",color:"#333",lineHeight:1.5}}>
                   {q.situation}
@@ -1343,7 +1339,7 @@ function TrustedAdultMission({onComplete,hero}:{onComplete:()=>void;hero:Hero}){
           <motion.div initial={{opacity:0}} animate={{opacity:1}} style={{textAlign:"center"}}>
             <div style={{fontSize:"3.5rem",marginBottom:"0.5rem"}}>🤝</div>
             <h3 style={{margin:"0 0 0.5rem",fontSize:"1.3rem",fontWeight:800,color:"#333"}}>
-              You know who to trust!
+              Ita hatene ona se mak ita bele fiar!
             </h3>
             <div
               style={{
@@ -1355,7 +1351,7 @@ function TrustedAdultMission({onComplete,hero}:{onComplete:()=>void;hero:Hero}){
               }}
             >
               <div style={{fontWeight:700,fontSize:"0.9rem",color:"#4A1A8C",marginBottom:"0.5rem"}}>
-                Your trusted adults:
+                Ema boot sira ne'ebé ita fiar:
               </div>
               <div style={{display:"flex",flexWrap:"wrap",gap:"0.4rem"}}>
                 {trustedPeople.map((p)=>(
@@ -1376,7 +1372,7 @@ function TrustedAdultMission({onComplete,hero}:{onComplete:()=>void;hero:Hero}){
               </div>
             </div>
             <p style={{color:"#666",fontSize:"0.9rem",marginBottom:"1rem"}}>
-              Remember: you will <strong>never</strong> get in trouble for telling a trusted adult something that worried you online.
+              Hanoin: ita sei <strong>la iha</strong> problema bainhira fó-hatene ba ema boot ne'ebé ita fiar kona-ba buat ruma ne'ebé halo ita preokupa online.
             </p>
             {!collected?(
               <motion.button
@@ -1394,10 +1390,10 @@ function TrustedAdultMission({onComplete,hero}:{onComplete:()=>void;hero:Hero}){
                   cursor:"pointer",
                 }}
               >
-                🏅 Claim Help Seeker Badge!
+                🏅 Simu Badge Husu Ajuda!
               </motion.button>
             ):(
-              <div style={{color:"#219653",fontWeight:800}}>🎉 Badge earned! Heading back…</div>
+              <div style={{color:"#219653",fontWeight:800}}>🎉 Badge manán ona! Fila fali…</div>
             )}
           </motion.div>
         )}
@@ -1410,7 +1406,7 @@ function AvatarCreator({initial,onSave}:{initial:Hero;onSave:(h:Hero)=>void}){
   const [headIdx,setHeadIdx]=useState(initial.headIdx);
   const [outfitIdx,setOutfitIdx]=useState(initial.outfitIdx);
   const [colorIdx,setColorIdx]=useState(initial.colorIdx);
-  const [name,setName]=useState(initial.name||"Cyber Hero");
+  const [name,setName]=useState(initial.name||"Heroi siber");
   const [saved,setSaved]=useState(false);
 
   const preview:Hero={headIdx,outfitIdx,colorIdx,name};
@@ -1432,10 +1428,10 @@ function AvatarCreator({initial,onSave}:{initial:Hero;onSave:(h:Hero)=>void}){
         }}
       >
         <h2 style={{margin:"0 0 0.4rem",fontSize:"1.4rem",fontWeight:800,color:"#333"}}>
-          🦸 Create Your Cyber Hero
+          🦸 Kria Ita-nia Heroi Siber
         </h2>
         <p style={{margin:"0 0 1.5rem",fontSize:"0.85rem",color:"#666"}}>
-          Tip: use a fun avatar in games instead of your real photo — it keeps your identity private!
+          Sujestaun: uza avatar kapas iha jogu sira iha fatin foto loloos — ida ne'e proteje ita-nia identidade!
         </p>
 
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1.5rem"}}>
@@ -1466,14 +1462,14 @@ function AvatarCreator({initial,onSave}:{initial:Hero;onSave:(h:Hero)=>void}){
                 fontWeight:700,
               }}
             >
-              {OUTFIT_LABELS[outfitIdx]} outfit
+              {OUTFIT_LABELS[outfitIdx]} roupa
             </div>
             <input
               type="text"
               value={name}
               onChange={(e)=>setName(e.target.value.slice(0,20))}
               maxLength={20}
-              placeholder="Hero name..."
+              placeholder="Naran herói..."
               style={{
                 width:"100%",
                 boxSizing:"border-box",
@@ -1486,13 +1482,13 @@ function AvatarCreator({initial,onSave}:{initial:Hero;onSave:(h:Hero)=>void}){
                 outline:"none",
               }}
             />
-            <div style={{fontSize:"0.75rem",color:"#888"}}>Don't use your real name!</div>
+            <div style={{fontSize:"0.75rem",color:"#888"}}>Keta uza ita-nia naran loloos!</div>
           </div>
 
           <div style={{display:"flex",flexDirection:"column",gap:"1rem"}}>
             <div>
               <div style={{fontWeight:700,fontSize:"0.88rem",color:"#333",marginBottom:"0.4rem"}}>
-                Choose Head
+                Hili Ulun
               </div>
               <div style={{display:"flex",flexWrap:"wrap",gap:"0.4rem"}}>
                 {HEADS.map((h,i)=>(
@@ -1508,7 +1504,7 @@ function AvatarCreator({initial,onSave}:{initial:Hero;onSave:(h:Hero)=>void}){
                       cursor:"pointer",
                       lineHeight:1,
                     }}
-                    aria-label={`Head option ${i+1}`}
+                    aria-label={`Opsiun ulun ${i+1}`}
                   >
                     {h}
                   </button>
@@ -1518,7 +1514,7 @@ function AvatarCreator({initial,onSave}:{initial:Hero;onSave:(h:Hero)=>void}){
 
             <div>
               <div style={{fontWeight:700,fontSize:"0.88rem",color:"#333",marginBottom:"0.4rem"}}>
-                Choose Outfit Colour
+                Hili Kór Roupa
               </div>
               <div style={{display:"flex",gap:"0.4rem"}}>
                 {OUTFIT_LABELS.map((label,i)=>(
@@ -1544,7 +1540,7 @@ function AvatarCreator({initial,onSave}:{initial:Hero;onSave:(h:Hero)=>void}){
 
             <div>
               <div style={{fontWeight:700,fontSize:"0.88rem",color:"#333",marginBottom:"0.4rem"}}>
-                Choose Background
+                Hili Fundu
               </div>
               <div style={{display:"flex",gap:"0.4rem",flexWrap:"wrap"}}>
                 {HERO_COLORS.map((c,i)=>(
@@ -1585,7 +1581,7 @@ function AvatarCreator({initial,onSave}:{initial:Hero;onSave:(h:Hero)=>void}){
             cursor:saved||!name.trim()?"default":"pointer",
           }}
         >
-          {saved?"🎉 Hero saved! Heading back…":"Save Hero & Return to Map ✅"}
+          {saved?"🎉 Herói gravadu ona! Fila fali ba mapa…":"Grava Herói & Fila ba Mapa ✅"}
         </button>
       </div>
     </div>
@@ -1593,12 +1589,12 @@ function AvatarCreator({initial,onSave}:{initial:Hero;onSave:(h:Hero)=>void}){
 }
 
 const BOT_MESSAGES:Record<Module,string>={
-  map:"Tap a zone to start your mission! Try Password Peak first — it's a great warm-up.",
-  password:"Strong passwords are like castle walls 🏰 Add capitals, numbers, and symbols!",
-  phishing:"Scammers try to trick you. Read every message carefully before you click! 🎣",
-  social:"Think before you post. Once something is online, it's hard to take back! 📱",
-  avatar:"Your avatar protects your identity. Don't use your real name or photo! 🦸",
-  trustedadult:"If something feels wrong online, ALWAYS tell a trusted adult. You won't be in trouble! 🤝",
+  map:"Klik zona ida atu hahu ita nia misaun! Koko Liafuan Segredu ne'ebe Forte uluk — di'ak hanesan inísiu.",
+  password:"Liafuan segredu forte hanesan muralha kástelu 🏰 Aumenta letra kapital, numeru, no simbolu sira!",
+  phishing:"Fraudador sira koko halo ita halo sala. Lee mensajen hotu-hotu ho kuidadu molok klik! 🎣",
+  social:"Hanoin uluk molok posta. Bainhira buat ruma iha online, susar atu foti fila! 📱",
+  avatar:"Ita nia avatar proteje ita-nia identidade. Keta uza ita nia naran loloos ka foto! 🦸",
+  trustedadult:"Se buat ruma sente la loos online, NAFATIN fó-hatene ba ema boot ne'ebé ita fiar. Ita sei la iha problema! 🤝",
 };
 
 function CyberBot({activeModule}:{activeModule:Module}){
@@ -1645,7 +1641,7 @@ function CyberBot({activeModule}:{activeModule:Module}){
               pointerEvents:"auto",
             }}
           >
-            <div style={{fontWeight:800,fontSize:"0.85rem",color:"#333",marginBottom:4}}>🤖 CyberBot</div>
+            <div style={{fontWeight:800,fontSize:"0.85rem",color:"#333",marginBottom:4}}>🤖 Robó Siber</div>
             <div style={{fontSize:"0.85rem",color:"#555",lineHeight:1.45}}>{msg}</div>
           </motion.div>
         )}
@@ -1668,7 +1664,7 @@ function CyberBot({activeModule}:{activeModule:Module}){
           justifyContent:"center",
           pointerEvents:"auto",
         }}
-        aria-label="Toggle CyberBot tip"
+        aria-label="Hatudu/taka sujestaun Robó Siber"
       >
         🤖
       </button>
@@ -1704,7 +1700,7 @@ export default function CyberChildrenGamePage(){
   }
 
   function handleReset(){
-    if(!window.confirm("Reset everything? Your badges and hero will be cleared.")) return;
+    if(!window.confirm("Halo fila fali hotu? Ita-nia badge sira no herói sei lakon.")) return;
     setActiveModule("map");
     setEarnedBadges([]);
     setHero(defaultHero());
@@ -1751,10 +1747,10 @@ export default function CyberChildrenGamePage(){
                 cursor:"pointer",
               }}
             >
-              🏰 Cyber Kingdom
+              🏰 Reinu Siber
             </button>
             <Link href="/cyber/children" style={{fontSize:"0.82rem",color:"#888",textDecoration:"none"}}>
-              ← Back to tips
+              ← Fila-fali ba sujestaun
             </Link>
           </div>
 
@@ -1811,7 +1807,7 @@ export default function CyberChildrenGamePage(){
                 return(
                   <span
                     key={z.id}
-                    title={earned?`${BADGE_MAP[z.id].label} earned!`:`${z.label} — not yet earned`}
+                    title={earned?`${BADGE_MAP[z.id].label} manán ona!`:`${z.label} — seidauk manán`}
                     style={{fontSize:"1.3rem",filter:earned?"none":"grayscale(1) opacity(0.3)"}}
                   >
                     {BADGE_MAP[z.id].emoji}
@@ -1833,7 +1829,7 @@ export default function CyberChildrenGamePage(){
                 cursor:"pointer",
               }}
             >
-              Reset
+              Halo fila fali
             </button>
           </div>
         </div>

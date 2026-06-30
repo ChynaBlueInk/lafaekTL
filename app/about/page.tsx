@@ -1,4 +1,3 @@
-// app/about/page.tsx
 "use client"
 
 import Link from "next/link"
@@ -54,21 +53,21 @@ export default function AboutPage(){
     },
     tet:{
       hero:{
-        title:"Konaba Lafaek Learning Media",
-        subtitle:"Ita-nia Viajen Hakbiit Timor-Leste Liuhosi Edukasaun",
+        title:"Kona-ba Lafaek Media Aprendizajen",
+        subtitle:"Ita-nia prezensa atu hakbiit Edukasaun iha Timor-Leste",
         image:"/placeholder.svg?height=400&width=800",
       },
       mission:{
-        title:"Deklarasaun Misaun Lafaek",
+        title:"Misaun Lafaek nian",
         description:
-          "Lafaek Media Aprendizajen dedika aan ba haburas literasia (lee no hakerek), numerasia (kona-ba númeru), pensamentu krítiku, no envolvimentu síviku entre labarik no foin-sa’e sira iha Timor-Leste. Ami kria materiál edukativu ho kualidade aas, relevante kulturalmente iha dalen Tetum no Portugés, hodi fó kbiit ba jerasaun tuirmai atu harii futuru ne’ebé nabilan liu ba nasaun.",
+          "Lafaek Media Aprendizajen dedika an atu hadia literasia, numerasia, hanoin krítiku, no atu hanorin labarik no foin-sa'e sira sai sidadaun di'ak no envolve an iha sira-nia komunidade iha Timor-Leste. Ami kria materiál edukativu ho kualidade di'ak, relevante ho kultura Timor nian iha dalen Tetun no Portugés, hodi hakbiit jerasaun tuirmai atu harii futuru ne'ebé nabilan liu ba nasaun ida-ne'e.",
       },
       history:{
-        title:"Ita-nia Istória",
+        title:"Ami-nia Istória",
         paragraphs:[
-          "Ami-nia viajen husi inisiativa ki’ik ida to’o sai organizasaun ida-ne’ebé halo impaktu nasionál.",
-          "Harii iha tinan 2001 nu’udar inisiativa edukasionál ida, Lafaek Media Aprendizajen hahú ho objetivu simples: atu fornese konteúdu edukasionál ne’ebé asesivel no involve ba labarik Timoroan sira. Buat ne’ebé hahú hanesan ekipa ki’ik ida ne’ebé produz revista ida de’it, ohin loron sai ona hanesan empreza sosiál ida ne’ebé importante.",
-          "Iha tinan hirak nia laran, ami habelar ami-nia alkanse, diversifika ami-nia konteúdu, no harii parseria forte ho Governu Timor-Leste (GoTL), komunidade lokál sira, edukadór sira, no organizasaun internasionál sira. Iha 2018, ami halo tranzisaun ho orgullu atu sai organizasaun ida ne'ebé kompletamente na'in no operadu hosi Timor-oan sira, nu’udar testamenu ida ba ami-nia kompromisu ba empoderamentu lokál no sustentabilidade.",
+          "Ami hahu husi inisiativa ki'ik ida no to'o agora sai organizasaun ne'ebé fó impaktu iha nivel nasionál.",
+          "Harii iha tinan 2001 ho inisiativa atu kontribui ba edukasaun, Lafaek Media Aprendizajen hahú ho objetivu simples: atu fornese konteúdu edukativu ne'ebé asesivel no atrativu ba labarik Timoroan sira. Ami hahú husi ekipa ki'ik ida hodi prodús revista Lafaek, ohin loron sai hanesan empreza sosiál ida.",
+          "Iha tinan barak-nia laran, ami habelar ona ami-nia atinjimentu, diversifika konteúdu, no halo parseria ne'ebé forte ho Governu Timor-Leste (GoTL), komunidade lokál, edukadór/a, no organizasaun internasionál sira. Iha tinan 2018, ho orgullu ami halo tranzisaun hodi sai hanesan organizasaun ida-ne'ebé maioria jere husi Timor-oan, hanesan kompromisu ida atu empodera no garantia sustentabilidade.",
         ],
       },
       values:{
@@ -77,35 +76,35 @@ export default function AboutPage(){
           {
             icon:Lightbulb,
             title:"Edukasaun ba ema hotu",
-            description:"Prinsípiu sira-ne'ebé orienta ami-nia serbisu no ami-nia ekipa.",
+            description:"Atu garante labarik hotu-hotu bele asesu ba aprendizajen ne'ebé ho kualidade.",
           },
           {
             icon:Users,
             title:"Hakbiit Komunidade",
-            description:"Harii kapasidade lokál no haburas auto-konfiansa.",
+            description:"Atu kapasita komunidade lokál hodi bele sustenta an rasik.",
           },
           {
             icon:Globe,
             title:"Relevánsia Kulturál",
-            description:"Kria konteúdu ne’ebé rezoan ho identidade Timor nian.",
+            description:"Kria konteúdu ne'ebé relevante ho identidade Timor nian.",
           },
           {
             icon:Handshake,
             title:"Kolaborasaun",
-            description:"Serbisu hamutuk ba impaktu ne'ebé boot liu.",
+            description:"Serbisu hamutuk atu atinji impaktu ne'ebé boot liután.",
           },
         ],
       },
       team:{
         title:"Ami-nia Ekipa",
         description:
-          "Ami mak ekipa ida ne'ebé paixaun ho edukadór, eskrivan, artista, no espesialista dezenvolvimentu komunidade, hotu-hotu komprometidu ba futuru Timor-Leste nian. Ami-nia ekipa maioria Timor-oan, lori koñesimentu lokál no dedikasaun valiozu ba ami-nia servisu.",
+          "Ami ekipa ne'ebé iha paixaun hanesan edukador, hakerek-nain, artista no espesialista iha dezenvolvimentu komunitáriu, ami hotu-hotu iha komitmentu ba futuru Timor-Leste nian. Ami-nia ekipa maioria Timoroan, ne'ebé lori koñesimentu lokál no dedikasaun tomak ne'ebé signifikante ba ami-nia servisu.",
         image:"/team/LLM-05582 1.jpg?height=300&width=500",
       },
       future:{
-        title:"Vizaun Ami-Nian Ba Futuru",
+        title:"Ami-nia Vizaun ba Futuru",
         description:
-          "Ami iha vizaun ida ba Timor-Leste ida ne'ebé kada labarik bele lee no hakerek (literate), kuriozu, no hetan kbiit (empowered) atu hamosu sira-nia destinu rasik no fó kontribuisaun ba nasaun ne'ebé pás no prósperu. Ami sei kontinua halo inovasaun, halo luan ami-nia servisu, no halo kle'an ami-nia impaktu, atu garante katak Lafaek sei nafatin sai nu’udar lakan (beacon) ba aprendizajen ba jerasaun sira ne’ebé sei mai.",
+          "Ami iha vizaun ba labarik sira hotu iha Timor-Leste atu bele lee no hakerek, iha kuriozidade hodi determina sira-nia futuru no kontribui ba nasaun nia pás no prósperiedade. Ami sei kontinua halo inovasaun, habelar ami-nia alkansa, no hametin ami-nia impaktu, hodi garante katak Lafaek sei sai nafatin naroman ba aprendizajen sira ba jerasaun sira ne'ebé sei mai.",
       },
     },
   }as const
@@ -156,7 +155,7 @@ export default function AboutPage(){
               <p className="text-xl text-gray-600">
                 {language==="en"
                   ? "Our journey from a small initiative to a national impact organization."
-                  : "Ami-nia viajen husi inisiativa ki’ik ida to’o sai organizasaun ida ne’ebé halo impaktu nasionál."}
+                  : "Ami hahu husi inisiativa ki'ik ida no to'o agora sai organizasaun ne'ebé fó impaktu iha nivel nasionál."}
               </p>
             </div>
             <div className="max-w-4xl mx-auto space-y-6 text-lg text-gray-700 leading-relaxed">

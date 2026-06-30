@@ -345,7 +345,7 @@ export default function CyberAdultsPage(){
 
       reportTitle:"Se buat ida la'o sala",
       reportSteps:[
-        "Suporta sira uluk. Kalma no fó agradese ba labarik tanba brani atu konta problema ne'e ba ita.",
+"Suporta sira uluk. Hakalma an no fó agradese ba labarik tanba brani atu konta problema ne'e ba ita.",
         "Rai evidénsia ho seguru: foti screenshot, rai link (URL), naran user, no mós oras akontesimentu.",
         "Troka password kedas, ativa autentikasaun (MFA), no log out hosi kualkér fatin seluk ne'ebé ita-nia konta nakloke hela.",
         "Blokeia no relata iha aplikasaun ka plataforma.",
