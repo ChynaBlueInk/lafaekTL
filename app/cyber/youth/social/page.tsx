@@ -1,4 +1,3 @@
-// app/cyber/youth/social/page.tsx
 "use client";
 
 import Link from "next/link";
@@ -122,7 +121,7 @@ const TRANSLATIONS:Record<Lang,UI>={
   },
   tet:{
     title:"Fraude & Bosok Online",
-    subtitle:"Prátika atu haree presaun, mensajen falsu, pedidu urjente, no truque sira ne'ebé koko halo ita atua lalais demais.",
+    subtitle:"Prátika atu identifika presaun husi ema seluk, mensajen falsu sira, pedidu urjente, no asaun sira ne'ebe ema haruka ita atu halo hodi foti desizaun lalais.",
     backGuide:"Fila ba Youth Cyber Lab",
     backGame:"Fila ba jogu",
     scenario:"Senáriu",
@@ -132,7 +131,7 @@ const TRANSLATIONS:Record<Lang,UI>={
     warningSigns:"Sinal avizu",
     saferMove:"Dalan seguru liu",
     chooseAction:"Ita sei halo saida?",
-    good:"Hili di'ak",
+    good:"Hili didi'ak",
     risky:"Hili risku",
     next:"Senáriu tuir mai",
     showClues:"Hatudu pista",
@@ -155,14 +154,14 @@ const TRANSLATIONS:Record<Lang,UI>={
     resultMid:"Haree Risku",
     resultStart:"Cyber Aware",
     confidenceRightHigh:"Ita konfiansa no resposta loos. Di'ak tebes.",
-    confidenceRightLow:"Ita kuidadu no resposta loos nafatin. Ida-ne'e hábitu di'ak.",
+    confidenceRightLow:"Ita kuidadu nafatin hodi fo resposta ne'ebe los. Ida-ne'e hábitu ne'ebe di'ak.",
     confidenceWrongHigh:"Ita konfiansa, maibé resposta ne'e risku. Tuir mai para uluk.",
     confidenceWrongLow:"Ita seidauk certeza, ne'e di'ak liu duké halo lalais. Agora haree sinal avizu.",
     confidence:"Ita sente konfiansa hira?",
     lowConfidence:"La certeza",
     highConfidence:"Certeza tebes",
-    reminderTitle:"Hanoin nafatin",
-    reminderText:"Fraudador sira dala barak koko halo ita sente presa, tauk, moe, kontenti demais, ka sala. Se ita sente presaun, para uluk molok hatán.",
+    reminderTitle:"Hanoin hetan",
+    reminderText:"Fraudador sira dala barak koko halo ita sente presa, tauk, moe, kontenti demais, ka sala. Se ita sente presaun, para lai molok hatán.",
     clueHiddenText:"Koko hatán uluk, ka uza “Hatudu pista” se ita hakarak ajuda.",
   },
 };
@@ -176,7 +175,7 @@ const SCENARIOS:Scenario[]=[
     },
     description:{
       en:"You receive a message from a friend’s account: “I’m stuck and lost my wallet. Can you send $50 now? I’ll pay you back tomorrow.”",
-      tet:"Ita simu mensajen hosi konta kolega ida: “Hau stuck no lakon carteira. Bele haruka $50 agora? Aban hau sei selu fila fali.”",
+      tet:"Ita simu mensajen ida husi ita nia kolega ninia social media dehan katak: “Ha'u araska los no hau nia karteira lakon. Ita bele haruka $50 mai hau agora? Aban ha'u sei selu filafali.”",
     },
     tags:{
       en:["Urgency","Money request","Possible hacked account"],
@@ -300,7 +299,7 @@ const SCENARIOS:Scenario[]=[
         correct:true,
         feedback:{
           en:"Correct. Go to the real app or website yourself instead of trusting a link.",
-          tet:"Loos. Tama ba app ka website loos rasik, keta fiar link de'it.",
+          tet:"Koretu. Tama ba app ka sitiu ne'ebe registradu, keta fiar link de'it.",
         },
       },
       {

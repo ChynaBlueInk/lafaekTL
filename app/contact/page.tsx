@@ -58,11 +58,11 @@ export default function ContactPage() {
     tet: {
       hero: {
         title: "Kontaktu Lafaek",
-        subtitle: "Ami kontente no hakarak rona husi belun sira",
-        description: "Hakbesik ba ami ho ita-nia perguntas, ideias, ka oportunidade ba parseria nian.",
+        subtitle: "Ami kontente atu rona husi ita boot sira",
+        description: "Bele hato'o ita boot sira nia perguntas, ideias ka oportunidade ba servisu parseria.",
       },
       contactInfo: {
-        title: "Informasaun kontaktu",
+        title: "Atu hatene informasaun klaru bele kontaktu liuhusi:",
         email: "info.lafaek@careint.org",
         phone: "+670 1234 5678",
         address: "Dili, Timor-Leste",
@@ -71,7 +71,7 @@ export default function ContactPage() {
         title: "Haruka mensajen mai ami",
         nameLabel: "Ita-nia naran",
         emailLabel: "Ita-nia email",
-        inquiryTypeLabel: "Ita-nia pergunta kona-ba saida?",
+        inquiryTypeLabel: "Asuntu Saida mak ita presija husi ami?",
         inquiryPlaceholder: "Hili opsaun ida",
         inquiryOptions: [
           { value: "general", label: "Pergunta Geral" },

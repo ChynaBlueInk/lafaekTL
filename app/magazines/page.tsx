@@ -1,4 +1,3 @@
-//app/magazines/page.tsx
 "use client";
 
 import {useEffect,useMemo,useState}from "react";
@@ -84,7 +83,7 @@ const ui={
   },
   tet:{
     title:"Revista Lafaek sira",
-    intro:"Explora Lafaek Ki’ik, Lafaek Prima, Manorin, no Komunidade. Lee revista públiku online, haree pájina amostra, ka aplika atu hetan asesu kompletu bainhira presiza aprovasaun.",
+    intro:"Explora Lafaek Ki'ik, Lafaek Prima, Manorin, no Komunidade. Lee revista públiku online, haree pájina amostra, ka aplika atu hetan asesu kompletu bainhira presiza aprovasaun.",
     sampleButton:"Haree pájina amostra",
     applyButton:"Aplika hodi asesu kompletu",
     archiveButton:"Haree lista kompletu",
@@ -119,10 +118,10 @@ const seriesInfo:Record<
         "Lafaek Kiik helps young learners build early reading, counting, thinking, and social skills through simple Tetun stories, illustrations, games, and activities.",
     },
     tet:{
-      title:"Lafaek Kiik",
+      title:"Lafaek Ki'ik",
       body:
         "Audiénsia: Pré-eskolár to'o Tinan 2.\n\n" +
-        "Lafaek Kiik ajuda labarik sira atu aprende lee, sura, hanoin, no abilidade sosiál liuhosi istória Tetun simples, ilustrasaun, joga, no atividade sira.",
+        "Lafaek Ki'ik ajuda labarik sira atu aprende lee, sura, hanoin, no abilidade sosiál liuhosi istória Tetun simples, ilustrasaun, joga, no atividade sira.",
     },
   },
   LP:{
@@ -147,10 +146,10 @@ const seriesInfo:Record<
         "Lafaek Manorin gives teachers practical classroom ideas, activities, lesson support, and strategies for literacy, numeracy, science, and inclusive education.",
     },
     tet:{
-      title:"Lafaek Manorin",
+      title:"Lafaek ba Manorin",
       body:
         "Audiénsia: Profesór sira.\n\n" +
-        "Lafaek Manorin fó ideia prátiku ba klase, atividade, apoiu lisaun, no estratéjia ba alfabetizasaun, numerasia, siénsia, no edukasaun inkluzivu.",
+        "Lafaek ba Manorin fó ideia prátiku ba klase, atividade, apoiu lisaun, no estratéjia ba alfabetizasaun, numerasia, siénsia, no edukasaun inkluzivu.",
     },
   },
   LBK:{
@@ -158,13 +157,13 @@ const seriesInfo:Record<
       title:"Lafaek Komunidade",
       body:
         "Audience: Parents, caregivers, and community members.\n\n" +
-        "Lafaek Komunidade supports families with practical information about children’s learning, wellbeing, health, school attendance, and community life.",
+        "Lafaek Komunidade supports families with practical information about children's learning, wellbeing, health, school attendance, and community life.",
     },
     tet:{
-      title:"Lafaek Komunidade",
+      title:"Lafaek ba Komnidade",
       body:
         "Audiénsia: Inan-aman, kuidadu-na'in, no komunidade.\n\n" +
-        "Lafaek Komunidade suporta família sira ho informasaun prátiku kona-ba labarik nia aprendizajen, moris-di'ak, saúde, prezensa iha eskola, no moris komunidade.",
+        "Lafaek ba Komnidade suporta família sira ho informasaun prátiku kona-ba labarik nia aprendizajen, moris-di'ak, saúde, prezensa iha eskola, no moris komunidade.",
     },
   },
 };
@@ -189,14 +188,14 @@ function seriesLabel(series:Series){
   }
 
   if(series==="LBM"){
-    return{en:"Manorin",tet:"Manorin"};
+    return{en:"Manorin",tet:"Lafaek ba Manorin"};
   }
 
   if(series==="LBK"){
-    return{en:"Lafaek Komunidade",tet:"Lafaek Komunidade"};
+    return{en:"Lafaek Komunidade",tet:"Lafaek ba Komnidade"};
   }
 
-  return{en:"Lafaek Kiik",tet:"Lafaek Kiik"};
+  return{en:"Lafaek Kiik",tet:"Lafaek Ki'ik"};
 }
 
 function buildFileUrl(src?:string):string{
@@ -386,7 +385,7 @@ export default function MagazinesLandingPage(){
             const issue=String(raw.issue??"").trim();
 
             const isMonth=series==="LBK";
-            const when=isMonth?monthName(issue):{en:`Issue ${issue}`,tet:`Numeru ${issue}`};
+            const when=isMonth?monthName(issue):{en:`Issue ${issue}`,tet:`Edisaun ${issue}`};
             const label=seriesLabel(series);
 
             const titleEn=raw.titleEn
@@ -395,7 +394,7 @@ export default function MagazinesLandingPage(){
 
             const titleTet=raw.titleTet
               ? String(raw.titleTet)
-              : `${label.tet} ${when.tet} ${year}`.trim();
+              : `${label.tet} ${when.tet}/${year}`.trim();
 
             const cover=raw.coverImage
               ? buildFileUrl(String(raw.coverImage))

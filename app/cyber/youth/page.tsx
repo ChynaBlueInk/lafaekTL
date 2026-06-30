@@ -294,7 +294,7 @@ const TRANSLATIONS:Record<Lang,T>={
     wifiTitle:"Seguransa Wi-Fi públiku",
     wifiList:[
       {text:"Uza data telemovel ka hotspot ba banku no konta importante."},
-      {text:"Se uza Wi-Fi públiku, presija log out depois no hamate auto-connect."},
+      {text:"Depois de uza Wi-Fi públiku, presija log out no hamate auto-connect."},
     ],
     reportTitle:"Se buat ida la'o sala",
     reportSteps:[

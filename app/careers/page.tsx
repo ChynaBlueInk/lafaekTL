@@ -1,4 +1,3 @@
-//app/careers/page.tsx
 "use client";
 
 import {useEffect,useMemo,useRef,useState} from "react";
@@ -166,7 +165,7 @@ const TRANSLATIONS:Record<Lang,Translations>={
     disclaimerBody:
       "CARE la simu responsabilidade ba anúnsiu servisu, prosesu rekrutamentu, ka validade hosi lista servisu husi entidade seluk. Ami halo kuidadu atu fahe oportunidade ne'ebé haree hanesan loos, maibé kandidatu sira presiza halo verifikasaun rasik antes aplika ka fó informasaun pesoál.",
     search:"Buka servisu, organizasaun, tag ka fatin…",
-    filtersTitle:"Filtra oportunidade sira",
+    filtersTitle:"Deskobre oportunidade sira",
     loading:"Karga oportunidade sira hela...",
     loadErrorTitle:"La konsege karga oportunidade sira",
     loadErrorBody:"Iha problema ida bainhira karga lista karreira publika sira.",

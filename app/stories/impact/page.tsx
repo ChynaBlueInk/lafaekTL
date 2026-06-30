@@ -1,4 +1,3 @@
-//app/stories/impact/page.tsx
 "use client";
 
 import {useEffect,useMemo,useState} from "react";
@@ -124,7 +123,7 @@ export default function ImpactPage(){
     },
     tet:{
       heading:"Istória Impaktu no Susesu",
-      intro:"Lee istória kona-ba mudansa positivu, suksesu edukasaun, impaktu iha komunidade no viajen pesoál husi rai-laran Timor-Leste.",
+      intro:"Lee istória kona-ba mudansa pozitivu, susesu iha edukasaun, impaktu iha komunidade no viajen pesoál iha Timor-Leste.",
       readMore:"Lee liu tan",
       viewPdf:"Haree PDF",
       shareStory:"Fahe Ita-nia Istória",

@@ -217,7 +217,7 @@ useEffect(()=>{
         groups:{
           programs:{
             title:"Programa sira",
-            description:"Haree revista, istória, vídeu, livru, no rekursu aprendizajen Lafaek nian.",
+            description:"Haree revista, istória, vídeo, livru, no rekursu aprendizajen Lafaek nian.",
             links:[
               {
                 label:"Jornal/Revista",

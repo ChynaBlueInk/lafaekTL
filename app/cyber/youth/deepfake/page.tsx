@@ -92,7 +92,7 @@ export default function DeepfakePage(){
       tips:[
         "Oin ka kulit ne'ebé suave liu ka perfeitu liu",
         "Matan, blink, ka refleksaun ne'ebé sente la loos",
-        "Fuuk, brincu, ókulus, ka kotuk imajen ne'ebé blur ka muda estranho",
+        "Fuuk, brincu, ókulus, ka imajen nia kotuk ne'ebé ladun mos ka muda",
         "Vídeo ka imajen ne'ebé hakarak kria pániku, raiva, ta'uk, ka urjénsia",
       ],
       panelTitle:"Análize imajen",
@@ -105,12 +105,12 @@ export default function DeepfakePage(){
       otherSignsList:[
         "Liman no liman-fuan bele haree naklees, la hanesan, ka númeru liman-fuan la loos.",
         "Liafuan iha sinal, poster, label, ka roupa bele blur ka hakerek sala.",
-        "Buat iha kotuk imajen bele repete, naklees, namlele, ka la tuir sena.",
+        "Imajen nia kotuk bele repete, naklees, namlele, ka la tuir sena.",
         "Ema ida bele haree perfeitu demais, suave demais, ka editadu demais.",
       ],
-      reminderTitle:"Lembrete simples",
+      reminderTitle:"Fo hanoin simples",
       reminderBody:
-        "Se mensajen halo ita sente presa, tauk, hirus, kontenti demais, ka moe, para uluk. Emosaun forte dala barak uza atu para ema hanoin klaru.",
+        "Se mensajen ida ne'e halo ita sente presaun, tauk, hirus, kontenti demais, ka moe, pauja lai. Dala barak emosaun ne'ebe forte bele hapara ema atu hanoin ho klaru.",
     },
   }[lang];
 
@@ -184,7 +184,7 @@ export default function DeepfakePage(){
       id:"background",
       label:{
         en:"Blurred background",
-        tet:"Kotuk imajen muda ka torce",
+        tet:"Imajen nia kotuk muda ka torce",
       },
       description:{
         en:"A blurred background can look professional, but it can also hide mistakes. Check for repeated shapes, strange edges, or objects that do not make sense.",
@@ -343,7 +343,7 @@ export default function DeepfakePage(){
       },
       saferAction:{
         en:"Do not assume the image is real just because it looks polished. Check the account, look at other posts, and compare details carefully.",
-        tet:"Keta hanoin imajen ne'e loos de'it tanba haree di'ak. Cheka konta, haree post seluk, no kompara detallu sira ho kuidadu.",
+        tet:"Keta hanoin imajen ne'e loos de'it tanba haree di'ak. Cheka konta, haree postagen seluk, no kompara detallu sira ho kuidadu.",
       },
     },
   ];
