@@ -35,8 +35,8 @@ export default function LearningPage() {
     { slug: "stories", titleEn: "Stories", titleTet: "Istória sira", image: "/learning/icons/stories.png" },
     { slug: "natural-science", titleEn: "Natural Science", titleTet: "Siénsia Naturál", image: "/learning/icons/naturalscience.png" },
     { slug: "social-science", titleEn: "Social Science", titleTet: "Siénsia Sosial", image: "/learning/icons/socialscience.png" },
-    { slug: "physical-education", titleEn: "Physical Education", titleTet: "Edukação Físika", image: "/learning/icons/history1.png" },
-    { slug: "literacy", titleEn: "Literacy", titleTet: "Leitura & Hakerek", image: "/learning/icons/literacy.png" },
+    { slug: "physical-education", titleEn: "Physical Education", titleTet: "Edukação Físika", image: "/learning/icons/Sports.png" },
+    { slug: "literacy", titleEn: "Literacy", titleTet: "Leitura & Hakerek", image: "/learning/icons/Literacy.png" },
     { slug: "mathematics", titleEn: "Mathematics", titleTet: "Matemátika", image: "/learning/icons/maths.png" },
     { slug: "health", titleEn: "Health", titleTet: "Saúde", image: "/learning/icons/health.png" },
     { slug: "games", titleEn: "Games", titleTet: "Jogu sira", image: "/learning/icons/games1.png" },
@@ -76,7 +76,7 @@ export default function LearningPage() {
                   href={`/learning/${s.slug}`}
                   className="group relative overflow-hidden rounded-2xl bg-black/10 shadow-lg focus:outline-none focus:ring-2 focus:ring-white/70"
                 >
-                  <div className="relative h-44 sm:h-52 md:h-56">
+                  <div className="relative aspect-[4/5]">
                     <Image
                       src={s.image}
                       alt={language === "tet" ? s.titleTet : s.titleEn}
