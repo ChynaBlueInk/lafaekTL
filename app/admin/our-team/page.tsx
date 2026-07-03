@@ -2,6 +2,7 @@
 "use client"
 
 import {useEffect,useMemo,useRef,useState,ChangeEvent} from "react"
+import {adminFetchJson,SessionExpiredError,buildLoginUrl} from "@/lib/adminFetch"
 
 type TeamMember={
   id?:string
@@ -150,6 +151,7 @@ export default function OurTeamAdminPage(){
   const [message,setMessage]=useState<string>("")
   const [uploading,setUploading]=useState<boolean>(false)
   const [hasChanges,setHasChanges]=useState<boolean>(false)
+  const [sessionExpired,setSessionExpired]=useState<boolean>(false)
 
   const [isModalOpen,setIsModalOpen]=useState(false)
   const [modalMode,setModalMode]=useState<ModalMode>("view")
@@ -184,18 +186,13 @@ export default function OurTeamAdminPage(){
       try{
         setStatus("loading")
         setError(undefined)
+        setSessionExpired(false)
         setMessage("")
 
-        const res=await fetch("/api/admin/our-team",{
-          method:"GET",
-          cache:"no-store"
-        })
-
-        if(!res.ok){
-          throw new Error(`Failed to load team data (${res.status})`)
-        }
-
-        const data=await res.json()
+        const data=await adminFetchJson<{members:TeamMember[]}>(
+          "/api/admin/our-team",
+          {method:"GET",cache:"no-store"}
+        )
 
         if(!data||!Array.isArray(data.members)){
           throw new Error("Invalid response format from /api/admin/our-team")
@@ -210,7 +207,14 @@ export default function OurTeamAdminPage(){
         setHasChanges(false)
       }catch(err:any){
         console.error("Error loading team members",err)
-        setError(err?.message??"Unknown error loading team members")
+
+        if(err instanceof SessionExpiredError){
+          setSessionExpired(true)
+          setError(err.message)
+        }else{
+          setError(err?.message??"Unknown error loading team members")
+        }
+
         setStatus("error")
       }
     }
@@ -302,6 +306,7 @@ export default function OurTeamAdminPage(){
     try{
       setStatus("saving")
       setError(undefined)
+      setSessionExpired(false)
       setMessage("")
 
       const cleanedMembers=sortMembers(members.map((member,index)=>{
@@ -326,16 +331,17 @@ export default function OurTeamAdminPage(){
 
       const payload={members:cleanedMembers}
 
-      const res=await fetch("/api/admin/our-team",{
-        method:"PUT",
-        headers:{"Content-Type":"application/json"},
-        body:JSON.stringify(payload)
-      })
+      const data=await adminFetchJson<{success:boolean;error?:string}>(
+        "/api/admin/our-team",
+        {
+          method:"PUT",
+          headers:{"Content-Type":"application/json"},
+          body:JSON.stringify(payload)
+        }
+      )
 
-      if(!res.ok){
-        const body=await res.json().catch(()=>undefined)
-        const msg=body?.error||`Failed to save changes (${res.status})`
-        throw new Error(msg)
+      if(!data?.success){
+        throw new Error(data?.error||"Failed to save changes")
       }
 
       setMembers(cleanedMembers)
@@ -353,7 +359,20 @@ export default function OurTeamAdminPage(){
       },1500)
     }catch(err:any){
       console.error("Error saving team members",err)
-      setError(err?.message??"Unknown error saving changes")
+
+      if(err instanceof SessionExpiredError){
+        setSessionExpired(true)
+        setError(err.message)
+        // IMPORTANT: unlike a normal failed save, an expired-session save
+        // may or may not have been applied server-side depending on exactly
+        // when the token lapsed — but since middleware rejects the request
+        // before it reaches the route handler at all, it was NOT saved.
+        // hasChanges stays true on purpose so nothing is silently lost:
+        // logging back in and clicking Save Changes again will retry it.
+      }else{
+        setError(err?.message??"Unknown error saving changes")
+      }
+
       setStatus("error")
     }
   }
@@ -709,7 +728,21 @@ if(!cleanUrl){
           </div>
         )}
 
-        {status==="error"&&error&&(
+        {sessionExpired&&(
+          <div className="mb-4 flex flex-col gap-2 rounded-md border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900 sm:flex-row sm:items-center sm:justify-between">
+            <span>
+              Your session has expired{hasChanges?" — your changes are still here and haven't been lost, but they haven't saved yet":""}.
+            </span>
+            <a
+              href={buildLoginUrl()}
+              className="inline-flex shrink-0 items-center justify-center rounded-md bg-amber-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-amber-700"
+            >
+              Log in again
+            </a>
+          </div>
+        )}
+
+        {status==="error"&&error&&!sessionExpired&&(
           <div className="mb-4 rounded-md bg-red-50 px-4 py-3 text-sm text-red-800">
             {error}
           </div>
@@ -1299,4 +1332,4 @@ if(!cleanUrl){
       )}
     </div>
   )
-}
+} 

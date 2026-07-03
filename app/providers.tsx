@@ -2,7 +2,7 @@
 "use client"
 
 import type {ReactNode}from "react"
-import {useEffect}from "react"
+import {useEffect,useState}from "react"
 import {AuthProvider,useAuth}from "react-oidc-context"
 
 const authority=process.env.NEXT_PUBLIC_COGNITO_AUTHORITY||""
@@ -17,51 +17,112 @@ function resolveOrigin(){
 
 function SessionSync(){
   const auth=useAuth()
+  const [renewalWarning,setRenewalWarning]=useState<string|null>(null)
 
+  // Keep the server-side cookie in sync with whatever token the OIDC client
+  // currently holds — including after a silent renewal updates auth.user.
+  //
+  // IMPORTANT — this effect only ever SETS the cookie, it never clears it.
+  // On every mount/reload (and apparently during some renewal attempts too),
+  // react-oidc-context passes through a transient isAuthenticated:false tick
+  // before the real state settles. Reactively deleting the cookie on that
+  // tick is fundamentally unsafe: there is no reliable way to distinguish
+  // "genuinely signed out" from "just hasn't finished loading yet" from
+  // inside this effect. An AbortController can cancel a request that's
+  // still in flight, but on a fast localhost round-trip the DELETE can
+  // complete (and the cookie be gone) before the next render even happens
+  // to trigger the abort — so cancellation alone doesn't fully solve it.
+  // The only safe fix is to never fire the delete reactively at all.
+  // Clearing the cookie belongs in an explicit sign-out action (see the
+  // "Sign out" button's handler) which should call
+  // `fetch("/api/auth/session", {method:"DELETE"})` directly, alongside
+  // whatever it already does with auth.removeUser()/auth.signoutRedirect().
   useEffect(() => {
-    let cancelled=false
-
-    async function syncSession(){
-      if(auth.isLoading){
-        return
-      }
-
-      try{
-        const idToken=auth.user?.id_token
-
-        if(auth.isAuthenticated && idToken){
-          await fetch("/api/auth/session",{
-            method:"POST",
-            headers:{
-              "Content-Type":"application/json",
-            },
-            body:JSON.stringify({idToken}),
-            credentials:"include",
-            cache:"no-store",
-          })
-          return
-        }
-
-        if(!cancelled){
-          await fetch("/api/auth/session",{
-            method:"DELETE",
-            credentials:"include",
-            cache:"no-store",
-          })
-        }
-      }catch{
-        // Avoid breaking the app if cookie sync fails
-      }
+    if(auth.isLoading){
+      return
     }
 
-    syncSession()
+    const idToken=auth.user?.id_token
+
+    if(!auth.isAuthenticated||!idToken){
+      return
+    }
+
+    const controller=new AbortController()
+
+    fetch("/api/auth/session",{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json",
+      },
+      body:JSON.stringify({idToken}),
+      credentials:"include",
+      cache:"no-store",
+      signal:controller.signal,
+    }).catch((err:any)=>{
+      if(err?.name!=="AbortError"){
+        console.error("[auth] session cookie sync failed",err)
+      }
+    })
 
     return () => {
-      cancelled=true
+      controller.abort()
     }
   },[auth.isAuthenticated,auth.isLoading,auth.user])
 
-  return null
+  // Surface renewal problems instead of letting them fail silently.
+  // If these fire, it means automaticSilentRenew attempted a refresh and it
+  // didn't work (expired/invalid refresh token, misconfigured app client,
+  // network issue, etc.) — the cookie will go stale and the next admin
+  // action will bounce to /auth with no warning unless we say something here.
+  useEffect(() => {
+    const events=auth.events
+
+    const onSilentRenewError=(err:Error)=>{
+      console.error("[auth] silent renew failed",err)
+      setRenewalWarning(
+        "Your sign-in couldn't refresh automatically. Please save any work and log in again soon to avoid losing changes."
+      )
+    }
+
+    const onAccessTokenExpiring=()=>{
+      console.log("[auth] access token expiring — automatic renewal should fire now")
+    }
+
+    const onAccessTokenExpired=()=>{
+      console.warn("[auth] access token expired — if you don't see a renewal request in the network tab, automatic renewal is not working")
+      setRenewalWarning(
+        "Your sign-in has expired. Please save any work and log in again."
+      )
+    }
+
+    events.addSilentRenewError(onSilentRenewError)
+    events.addAccessTokenExpiring(onAccessTokenExpiring)
+    events.addAccessTokenExpired(onAccessTokenExpired)
+
+    return () => {
+      events.removeSilentRenewError(onSilentRenewError)
+      events.removeAccessTokenExpiring(onAccessTokenExpiring)
+      events.removeAccessTokenExpired(onAccessTokenExpired)
+    }
+  },[auth.events])
+
+  if(!renewalWarning){
+    return null
+  }
+
+  return(
+    <div className="fixed inset-x-0 top-0 z-[10000] flex items-center justify-between gap-3 bg-amber-500 px-4 py-2 text-sm font-medium text-white shadow">
+      <span>{renewalWarning}</span>
+      <button
+        type="button"
+        onClick={()=>setRenewalWarning(null)}
+        className="rounded px-2 py-1 text-xs font-semibold hover:bg-amber-600"
+      >
+        Dismiss
+      </button>
+    </div>
+  )
 }
 
 export default function Providers({children}:{children:ReactNode}){
@@ -102,6 +163,12 @@ export default function Providers({children}:{children:ReactNode}){
     post_logout_redirect_uri:postLogoutRedirectUri,
     response_type:"code",
     scope:"openid email profile",
+    // Explicit rather than relying on the library default, so this is
+    // self-documenting and doesn't silently change behaviour on a library
+    // upgrade. This is what triggers a background refresh-token exchange
+    // shortly before the access token expires, *if* Cognito issued a
+    // refresh_token for this app client.
+    automaticSilentRenew:true,
   }
 
   return(
