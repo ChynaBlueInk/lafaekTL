@@ -33,7 +33,7 @@ type NewsItemRecord={
   images?:string[];
   order?:number;
   visible?:boolean;
-  document?:string; // NEW
+  document?:string;
   externalUrl?:string;
   [key:string]:any;
 };
@@ -60,6 +60,45 @@ function normaliseDocument(raw:any):string|undefined{
   if(typeof d!=="string"){return undefined;}
   const clean=d.trim();
   return clean?clean:undefined;
+}
+
+// Keep in sync with the slugify used in app/api/news/route.ts
+function slugify(input:string):string{
+  return input
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g,"")
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g,"-")
+    .replace(/^-+|-+$/g,"")
+    .slice(0,80);
+}
+
+// Ensures every record has a non-empty, collision-free slug. Called both when
+// reading (so the admin UI always shows a real slug) and when writing (so the
+// slug is permanently saved and public article links never break).
+function ensureUniqueSlugs(records:NewsItemRecord[]):NewsItemRecord[]{
+  const used=new Set<string>();
+
+  return records.map((rec)=>{
+    let slug=typeof rec.slug==="string"?rec.slug.trim():"";
+    slug=slugify(slug||rec.titleEn||"");
+
+    if(!slug){
+      const idSuffix=rec.id.replace(/[^a-z0-9]/gi,"").slice(-6);
+      slug=idSuffix||`news-${Math.random().toString(36).slice(2,8)}`;
+    }
+
+    let finalSlug=slug;
+    let counter=2;
+    while(used.has(finalSlug)){
+      finalSlug=`${slug}-${counter}`;
+      counter+=1;
+    }
+    used.add(finalSlug);
+
+    return{...rec,slug:finalSlug};
+  });
 }
 
 async function readNewsJsonFromS3():Promise<NewsItemRecord[]>{
@@ -152,8 +191,9 @@ async function readNewsJsonFromS3():Promise<NewsItemRecord[]>{
     };
   });
 
-  records.sort((a,b)=>(a.order||0)-(b.order||0));
-  return records;
+  const withSlugs=ensureUniqueSlugs(records);
+  withSlugs.sort((a,b)=>(a.order||0)-(b.order||0));
+  return withSlugs;
 }
 
 async function writeNewsJsonToS3(items:NewsItemRecord[]):Promise<void>{
@@ -231,9 +271,11 @@ export async function PUT(req:Request){
       };
     });
 
-    await writeNewsJsonToS3(cleaned);
+    const withSlugs=ensureUniqueSlugs(cleaned);
 
-    return NextResponse.json({ok:true,items:cleaned});
+    await writeNewsJsonToS3(withSlugs);
+
+    return NextResponse.json({ok:true,items:withSlugs});
   }catch(err:any){
     console.error("[api/admin/news] PUT error",err);
     return NextResponse.json(

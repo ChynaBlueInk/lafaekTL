@@ -9,6 +9,7 @@ const ACTION_BAR_TOP=96; // adjust if your site navbar is taller/shorter
 
 type NewsItem={
   id:string;
+  slug:string;
   order:number;
   visible:boolean;
   titleEn:string;
@@ -69,8 +70,22 @@ const safeArray=(v:any)=>{
   return cleaned.length?cleaned:undefined;
 };
 
+// Mirrors the slugify used server-side in app/api/admin/news/route.ts and
+// app/api/news/route.ts, so the preview shown here matches what gets saved.
+const slugify=(input:string)=>{
+  return input
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g,"")
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g,"-")
+    .replace(/^-+|-+$/g,"")
+    .slice(0,80);
+};
+
 const emptyItem=():NewsItem=>({
   id:`temp-${Date.now()}`,
+  slug:"",
   order:0,
   visible:false,
   titleEn:"",
@@ -183,6 +198,7 @@ export default function NewsAdminPage(){
 
           const item:NewsItem={
             id:rawId||`item-${index}`,
+            slug:(typeof raw.slug==="string"?raw.slug.trim():"")||"",
             order:typeof raw.order==="number"?raw.order:index+1,
             visible:typeof raw.visible==="boolean"?raw.visible:true,
             titleEn:(raw.titleEn as string)||"",
@@ -281,6 +297,10 @@ export default function NewsAdminPage(){
       const itemToAdd={
         ...newItem,
         id:`temp-${Date.now()}`,
+        // If left blank, the API will auto-generate this from the English
+        // title when saved. We also derive a live preview here so the admin
+        // can see (and override) what the link will look like before saving.
+        slug:newItem.slug.trim()||slugify(newItem.titleEn),
         order:maxOrder+1
       } as NewsItem;
       return[...prev,itemToAdd];
@@ -366,6 +386,19 @@ export default function NewsAdminPage(){
       if(!data.ok){
         throw new Error(data.error||"Unknown error from API");
       }
+
+      // The API is the source of truth for slugs (it de-duplicates them), so
+      // pull the saved items back in rather than trusting local state.
+      if(Array.isArray(data.items)){
+        setItems((prev)=>{
+          const byId=new Map(data.items.map((it:any)=>[it.id,it]));
+          return prev.map((it)=>{
+            const saved=byId.get(it.id);
+            return saved?{...it,...saved}:it;
+          });
+        });
+      }
+
       setHasChanges(false);
       setDirtyIds(new Set());
       setMessage("Changes saved successfully.");
@@ -841,6 +874,7 @@ export default function NewsAdminPage(){
 
               const missingCover=item.visible && !coverSrc;
               const lastUpdatedLabel=formatLastUpdated(item);
+              const effectiveSlug=item.slug.trim()||slugify(item.titleEn)||"(auto-generated on save)";
 
               return(
                 <div key={item.id} className="rounded-lg border border-slate-200 bg-white shadow-sm">
@@ -927,6 +961,38 @@ export default function NewsAdminPage(){
                         </div>
                       </div>
 
+                      <div>
+                        <label className="mb-1 block text-xs font-medium text-slate-700">
+                          URL slug
+                        </label>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-slate-400">/stories/news/</span>
+                          <input
+                            type="text"
+                            className="flex-1 rounded border border-slate-300 px-2 py-2 font-mono text-xs"
+                            placeholder={slugify(item.titleEn)||"auto-generated-from-title"}
+                            value={item.slug}
+                            onChange={(e)=>handleFieldChange(item.id,"slug",e.target.value)}
+                          />
+                          <button
+                            type="button"
+                            className="rounded border border-slate-300 px-2 py-2 text-xs text-slate-600 hover:bg-slate-100"
+                            onClick={()=>handleFieldChange(item.id,"slug",slugify(item.titleEn))}
+                            title="Regenerate from title"
+                          >
+                            Auto
+                          </button>
+                        </div>
+                        <div className="mt-1 text-[11px] text-slate-500">
+                          Leave blank to auto-generate from the English title on save. This is what makes the
+                          "Read more" link on the public News page work — changing it later will break any links
+                          already shared.
+                        </div>
+                        <div className="mt-1 text-[11px] text-slate-400">
+                          Will save as: <span className="font-mono">/stories/news/{effectiveSlug}</span>
+                        </div>
+                      </div>
+
                       <details className="rounded-md border border-slate-200 bg-slate-50">
                         <summary className="cursor-pointer select-none px-3 py-2 text-sm font-medium text-slate-800">
                           Edit news text (Excerpts + Bodies)
@@ -978,6 +1044,7 @@ export default function NewsAdminPage(){
                       {showKeys&&(
                         <div className="rounded-md border border-slate-200 bg-white px-3 py-2 text-xs text-slate-600">
                           <div className="break-all"><span className="font-semibold">ID:</span> {item.id}</div>
+                          <div className="break-all"><span className="font-semibold">Slug:</span> {effectiveSlug}</div>
                           {(item.image||item.imageUrl)&&(
                             <div className="break-all">
                               <span className="font-semibold">Cover key:</span> {(item.image||item.imageUrl)||""}
@@ -1204,6 +1271,17 @@ export default function NewsAdminPage(){
                     className="w-full rounded border border-slate-300 px-2 py-1 text-xs"
                     value={newItem.titleTet}
                     onChange={(e)=>setNewItem({...newItem,titleTet:e.target.value})}
+                  />
+
+                  <label className="block text-xs font-medium text-slate-700">
+                    URL slug (optional — auto-generated from title if blank)
+                  </label>
+                  <input
+                    type="text"
+                    className="w-full rounded border border-slate-300 px-2 py-1 font-mono text-xs"
+                    placeholder={slugify(newItem.titleEn)||"auto-generated-from-title"}
+                    value={newItem.slug}
+                    onChange={(e)=>setNewItem({...newItem,slug:e.target.value})}
                   />
 
                   <label className="block text-xs font-medium text-slate-700">

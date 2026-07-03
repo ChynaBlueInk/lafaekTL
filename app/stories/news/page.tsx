@@ -148,7 +148,13 @@ export default function NewsPage(){
 
             const{primaryImage,images}=normaliseImages(raw);
 
-            const slug=typeof raw.slug==="string"&&raw.slug.trim()?raw.slug.trim():undefined;
+            // The API (app/api/news/route.ts) now guarantees a non-empty,
+            // unique slug on every item, but we still fall back to id here
+            // as a last line of defence so a link is never missing.
+            const slug=typeof raw.slug==="string"&&raw.slug.trim()
+              ? raw.slug.trim()
+              : id;
+
             const externalUrl=typeof raw.externalUrl==="string"&&raw.externalUrl.trim()
               ? raw.externalUrl.trim()
               : undefined;
@@ -309,13 +315,20 @@ export default function NewsPage(){
                 .map((img)=>toAssetUrl(img))
                 .filter(Boolean) as string[];
 
-              const extraPhotoCount=Math.max(galleryImages.length-1,0);
+              // Don't double-count the cover image if it also appears in the
+              // gallery array (regardless of its position in that array).
+              const extraPhotoCount=galleryImages.filter((url)=>url!==primaryImageUrl).length;
+
               const pdfUrl=toAssetUrl(item.document);
+
+              // externalUrl (if set) takes priority; otherwise every item now
+              // always has a slug (guaranteed by the API), so this is never
+              // undefined and "Read more" always renders.
               const articleHref=item.externalUrl
                 ? item.externalUrl
-                : item.slug
-                ? `/stories/news/${item.slug}`
-                : undefined;
+                : `/stories/news/${item.slug||item.id}`;
+
+              const isExternal=!!item.externalUrl;
 
               return(
                 <article
@@ -323,35 +336,41 @@ export default function NewsPage(){
                   className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-md"
                 >
                   {primaryImageUrl&&(
-                    <div className="relative h-56 w-full bg-gray-100">
-                      <Image
-                        src={primaryImageUrl}
-                        alt={title}
-                        fill
-                        className="object-cover"
-                        sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
-                      />
-                    </div>
+                    <Link href={articleHref} target={isExternal?"_blank":undefined} rel={isExternal?"noopener noreferrer":undefined}>
+                      <div className="relative h-56 w-full bg-gray-100">
+                        <Image
+                          src={primaryImageUrl}
+                          alt={title}
+                          fill
+                          className="object-cover"
+                          sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
+                        />
+                      </div>
+                    </Link>
                   )}
 
                   <div className="p-5">
                     <div className="text-sm font-medium text-[#828282]">{item.date}</div>
 
-                    <h2 className="mt-2 text-xl font-bold text-[#333333]">{title}</h2>
+                    <h2 className="mt-2 text-xl font-bold text-[#333333]">
+                      <Link href={articleHref} target={isExternal?"_blank":undefined} rel={isExternal?"noopener noreferrer":undefined} className="hover:text-[#219653]">
+                        {title}
+                      </Link>
+                    </h2>
 
                     {excerpt&&(
                       <p className="mt-3 text-sm leading-6 text-[#4F4F4F]">{excerpt}</p>
                     )}
 
                     <div className="mt-5 flex flex-wrap gap-3">
-                      {articleHref&&(
-                        <Link
-                          href={articleHref}
-                          className="rounded-lg bg-[#219653] px-4 py-2 text-sm font-semibold text-white hover:bg-[#1b7f45]"
-                        >
-                          {labels.readMore}
-                        </Link>
-                      )}
+                      <Link
+                        href={articleHref}
+                        target={isExternal?"_blank":undefined}
+                        rel={isExternal?"noopener noreferrer":undefined}
+                        className="rounded-lg bg-[#219653] px-4 py-2 text-sm font-semibold text-white hover:bg-[#1b7f45]"
+                      >
+                        {labels.readMore}
+                      </Link>
 
                       {pdfUrl&&(
                         <a
@@ -366,9 +385,14 @@ export default function NewsPage(){
                     </div>
 
                     {extraPhotoCount>0&&(
-                      <div className="mt-4 text-xs font-medium text-[#828282]">
+                      <Link
+                        href={articleHref}
+                        target={isExternal?"_blank":undefined}
+                        rel={isExternal?"noopener noreferrer":undefined}
+                        className="mt-4 block text-xs font-medium text-[#828282] hover:text-[#2F80ED] hover:underline"
+                      >
                         {labels.morePhotos(extraPhotoCount)}
-                      </div>
+                      </Link>
                     )}
                   </div>
                 </article>

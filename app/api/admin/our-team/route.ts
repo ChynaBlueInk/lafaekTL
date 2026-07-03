@@ -6,12 +6,24 @@ import {DynamoDBDocumentClient,ScanCommand,PutCommand}from "@aws-sdk/lib-dynamod
 
 export const dynamic = "force-dynamic"
 export const revalidate = 0
+// Belt-and-suspenders alongside the header below: this tells Next.js itself
+// never to reuse a cached fetch/Data Cache entry for this route, on top of
+// the explicit Cache-Control header we set on the response (which is what
+// actually stops Vercel's Edge Network / any browser from reusing a stale
+// response after a save).
+export const fetchCache = "force-no-store"
 
 const REGION=process.env.AWS_REGION||"ap-southeast-2"
 const TABLE_NAME="LafaekTeam"
 
 const dynamoClient=new DynamoDBClient({region:REGION})
 const docClient=DynamoDBDocumentClient.from(dynamoClient)
+
+const NO_STORE_HEADERS={
+  "Cache-Control":"no-store, no-cache, must-revalidate, proxy-revalidate",
+  "Pragma":"no-cache",
+  "Expires":"0"
+}
 
 export interface TeamMemberRecord{
   id:string
@@ -68,21 +80,27 @@ function cleanMember(member:any,index:number):TeamMemberRecord{
 export async function GET(){
   try{
     const result=await docClient.send(
-      new ScanCommand({TableName:TABLE_NAME})
+      new ScanCommand({
+        TableName:TABLE_NAME,
+        // Scan defaults to eventually-consistent reads. Not the main bug
+        // here, but cheap insurance against a read racing a very recent
+        // write.
+        ConsistentRead:true
+      })
     )
-
-    // ADD THIS
-    console.log("[team-admin] raw items:", JSON.stringify(result.Items?.slice(0,2), null, 2))
 
     const members=(result.Items||[]).map(migrateMember)
     members.sort((a,b)=>(a.order||0)-(b.order||0))
 
-    return NextResponse.json({success:true,members})
+    return NextResponse.json(
+      {success:true,members},
+      {headers:NO_STORE_HEADERS}
+    )
   }catch(err){
     console.error("[team-admin] GET failed",err)
     return NextResponse.json(
       {success:false,error:"Failed to load team members"},
-      {status:500}
+      {status:500,headers:NO_STORE_HEADERS}
     )
   }
 }
@@ -96,7 +114,7 @@ export async function PUT(req:NextRequest){
     if(!Array.isArray(incomingMembers)){
       return NextResponse.json(
         {success:false,error:"Invalid members payload"},
-        {status:400}
+        {status:400,headers:NO_STORE_HEADERS}
       )
     }
 
@@ -113,12 +131,15 @@ export async function PUT(req:NextRequest){
       )
     }
 
-    return NextResponse.json({success:true,count:cleaned.length})
+    return NextResponse.json(
+      {success:true,count:cleaned.length},
+      {headers:NO_STORE_HEADERS}
+    )
   }catch(err){
     console.error("[team-admin] PUT failed",err)
     return NextResponse.json(
       {success:false,error:"Failed to save team members"},
-      {status:500}
+      {status:500,headers:NO_STORE_HEADERS}
     )
   }
 }

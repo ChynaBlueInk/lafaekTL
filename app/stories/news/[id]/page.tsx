@@ -120,7 +120,12 @@ export default function NewsDetailPage(){
         setLoading(true);
         setError(undefined);
 
-        const res=await fetch("/api/admin/news",{method:"GET",cache:"no-store"});
+        // IMPORTANT: this must stay pointed at the public /api/news endpoint,
+        // not /api/admin/news. The admin endpoint returns hidden/unpublished
+        // items too and has no auth check of its own — using it here would
+        // leak draft content to every visitor before the client-side
+        // visibility filter ever runs.
+        const res=await fetch("/api/news",{method:"GET",cache:"no-store"});
         if(!res.ok){
           throw new Error(`Failed to load news: ${res.status}`);
         }
@@ -153,6 +158,8 @@ export default function NewsDetailPage(){
             ? raw.document.trim()
             : undefined;
 
+          // /api/news already only returns visible items, but we keep this
+          // as a defensive default in case that ever changes upstream.
           const visible=raw.visible!==false;
 
           const externalUrl=typeof raw.externalUrl==="string"&&raw.externalUrl.trim()
