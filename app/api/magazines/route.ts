@@ -4,6 +4,7 @@ export const dynamic="force-dynamic";
 
 import {NextResponse}from "next/server";
 import {S3Client,GetObjectCommand}from "@aws-sdk/client-s3";
+import { unstable_cache } from "next/cache";
 
 const REGION=
   process.env.AWS_REGION||
@@ -242,9 +243,8 @@ async function readJsonFromS3():Promise<any>{
   }
 }
 
-export async function GET(){
-
-  try{
+const getPublicMagazines = unstable_cache(
+  async (): Promise<PublicMagazine[]> => {
 
     const parsed=
       await readJsonFromS3();
@@ -256,30 +256,15 @@ export async function GET(){
         ? parsed.items
         : [];
 
-    console.log(
-      "RAW MAGAZINES:",
-      arr.length
-    );
-
     const cleaned:PublicMagazine[]=
       (arr||[])
         .map((raw:any,index:number)=>{
-
-          console.log(
-            "PROCESSING:",
-            raw?.code
-          );
 
           const code=
             String(raw?.code??"")
               .trim();
 
           if(!code){
-
-            console.log(
-              "SKIPPED: missing code"
-            );
-
             return null;
           }
 
@@ -306,12 +291,6 @@ export async function GET(){
               ""
             ).trim();
 
-          // FIXED:
-          // supports:
-          // true
-          // "true"
-          // undefined
-
           const visible=
             raw?.visible===false||
             raw?.visible==="false"
@@ -319,19 +298,8 @@ export async function GET(){
               : true;
 
           if(!visible){
-
-            console.log(
-              "SKIPPED: hidden",
-              code
-            );
-
             return null;
           }
-
-          // BACKWARDS COMPATIBILITY
-          // supports:
-          // pageImageUrls
-          // samplePages
 
           const rawPages=
             Array.isArray(raw?.pageImageUrls)
@@ -417,11 +385,6 @@ export async function GET(){
           ):m is PublicMagazine=>!!m
         );
 
-    console.log(
-      "FINAL MAGAZINES:",
-      cleaned.length
-    );
-
     cleaned.sort((a,b)=>{
 
       const ay=
@@ -438,6 +401,18 @@ export async function GET(){
         b.code
       );
     });
+
+    return cleaned;
+  },
+  ["public-magazines"],
+  { revalidate: 300, tags: ["magazines-public"] }
+);
+
+export async function GET(){
+
+  try{
+
+    const cleaned = await getPublicMagazines();
 
     return NextResponse.json({
       ok:true,
