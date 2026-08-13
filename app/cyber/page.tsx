@@ -410,7 +410,7 @@ export default function CyberLandingPage() {
 
   return (
     <>
-      <style>{`
+      <style dangerouslySetInnerHTML={{__html: `
         @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500;600&display=swap');
 
         .cl-page {
@@ -876,7 +876,7 @@ export default function CyberLandingPage() {
           .what-grid { grid-template-columns: 1fr 1fr; }
           .cons-grid { grid-template-columns: 1fr; }
         }
-      `}</style>
+      `}} />
 
       <div className="cl-page">
 

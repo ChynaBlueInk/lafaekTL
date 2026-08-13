@@ -87,15 +87,15 @@ export default function NewsPage(){
       errorTitle:"Could not load news."
     },
     tet:{
-      heading:"Notísia & Istória",
-      intro:"Hatudu informasaun foun no istória inspirativu hosi ami-nia servisu iha Timor-Leste.",
+      heading:"Notísia & Istória sira",
+      intro:"Nafatin atualizadu ho notísia foun no istória inspiradór sira husi ami-nia servisu iha Timor-Leste laran tomak.",
       readMore:"Lee liu tan",
       viewPdf:"Haree PDF",
       searchPlaceholder:"Buka notísia...",
       sortLabel:"Ordena tuir",
       sortLatest:"Foun liu ba leten",
       sortAZ:"Titulu A–Z",
-      sortCustom:"Ordem editor (artigu destakadu leten)",
+      sortCustom:"Orden editór (artigu destakadu leten)",
       morePhotos:(n:number)=>`+ foto seluk ${n}`,
       noItems:"Seidauk iha notísia disponivel.",
       loading:"Hein hela notísia sira...",
@@ -333,7 +333,7 @@ export default function NewsPage(){
               return(
                 <article
                   key={item.id}
-                  className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-md"
+                  className="flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-md"
                 >
                   {primaryImageUrl&&(
                     <Link href={articleHref} target={isExternal?"_blank":undefined} rel={isExternal?"noopener noreferrer":undefined}>
@@ -349,51 +349,53 @@ export default function NewsPage(){
                     </Link>
                   )}
 
-                  <div className="p-5">
+                  <div className="flex flex-1 flex-col p-5">
                     <div className="text-sm font-medium text-[#828282]">{item.date}</div>
 
-                    <h2 className="mt-2 text-xl font-bold text-[#333333]">
+                    <h2 className="mt-2 line-clamp-2 text-xl font-bold text-[#333333]">
                       <Link href={articleHref} target={isExternal?"_blank":undefined} rel={isExternal?"noopener noreferrer":undefined} className="hover:text-[#219653]">
                         {title}
                       </Link>
                     </h2>
 
                     {excerpt&&(
-                      <p className="mt-3 text-sm leading-6 text-[#4F4F4F]">{excerpt}</p>
+                      <p className="mt-3 line-clamp-3 text-sm leading-6 text-[#4F4F4F]">{excerpt}</p>
                     )}
 
-                    <div className="mt-5 flex flex-wrap gap-3">
-                      <Link
-                        href={articleHref}
-                        target={isExternal?"_blank":undefined}
-                        rel={isExternal?"noopener noreferrer":undefined}
-                        className="rounded-lg bg-[#219653] px-4 py-2 text-sm font-semibold text-white hover:bg-[#1b7f45]"
-                      >
-                        {labels.readMore}
-                      </Link>
-
-                      {pdfUrl&&(
-                        <a
-                          href={pdfUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="rounded-lg border border-[#2F80ED] px-4 py-2 text-sm font-semibold text-[#2F80ED] hover:bg-blue-50"
+                    <div className="mt-auto pt-5">
+                      <div className="flex flex-wrap gap-3">
+                        <Link
+                          href={articleHref}
+                          target={isExternal?"_blank":undefined}
+                          rel={isExternal?"noopener noreferrer":undefined}
+                          className="rounded-lg bg-[#219653] px-4 py-2 text-sm font-semibold text-white hover:bg-[#1b7f45]"
                         >
-                          {labels.viewPdf}
-                        </a>
+                          {labels.readMore}
+                        </Link>
+
+                        {pdfUrl&&(
+                          <a
+                            href={pdfUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="rounded-lg border border-[#2F80ED] px-4 py-2 text-sm font-semibold text-[#2F80ED] hover:bg-blue-50"
+                          >
+                            {labels.viewPdf}
+                          </a>
+                        )}
+                      </div>
+
+                      {extraPhotoCount>0&&(
+                        <Link
+                          href={articleHref}
+                          target={isExternal?"_blank":undefined}
+                          rel={isExternal?"noopener noreferrer":undefined}
+                          className="mt-4 block text-xs font-medium text-[#828282] hover:text-[#2F80ED] hover:underline"
+                        >
+                          {labels.morePhotos(extraPhotoCount)}
+                        </Link>
                       )}
                     </div>
-
-                    {extraPhotoCount>0&&(
-                      <Link
-                        href={articleHref}
-                        target={isExternal?"_blank":undefined}
-                        rel={isExternal?"noopener noreferrer":undefined}
-                        className="mt-4 block text-xs font-medium text-[#828282] hover:text-[#2F80ED] hover:underline"
-                      >
-                        {labels.morePhotos(extraPhotoCount)}
-                      </Link>
-                    )}
                   </div>
                 </article>
               );

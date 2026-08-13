@@ -23,10 +23,10 @@ export default function LearningPage() {
       categoryHint: "Open category",
     },
     tet: {
-      heroTitle: "Aprendizajen",
+      heroTitle: "Revista Lafaek",
       heroSubtitle:
-        "Hili topiku/disiplina ida hodi bele esplora materiál aprendizajen, ne'ebé sei aumenta ba beibeik hodi sai rekursu ne'ebé bele imprime hanesan livru ho modelu flipbook.",
-      browseLabel: "Haree kategoría sira",
+        "Hametin kanorin, manorin no komunidade sira liuhusi edukasaun iha Timor-Leste.",
+      browseLabel: "Haree kategoria sira",
       categoryHint: "Loke kategoría",
     },
   }[language];
@@ -62,7 +62,7 @@ export default function LearningPage() {
               </p>
               <p className="mt-2 text-sm text-[#4F4F4F]">
                 {language === "tet"
-                  ? "Kada kategoría sei iha nia página rasik no bele simu tan kontentu foun husi admin iha tempu oin mai."
+                  ? "Kada kategoria sei iha nia pájina rasik no bele simu tan konteúdu foun husi admin iha tempu oin mai."
                   : "Each category will have its own page and can receive more content from the admin side over time."}
               </p>
             </div>
@@ -86,7 +86,7 @@ export default function LearningPage() {
                       priority={s.slug === "stories"}
                     />
 
-                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/65 via-black/25 to-transparent p-4">
+                    <div className="absolute inset-x-0 top-0 bg-gradient-to-b from-black/65 via-black/25 to-transparent p-4">
                       <h2 className="text-center text-lg font-extrabold leading-snug text-white drop-shadow sm:text-xl md:text-2xl">
                         {language === "tet" ? s.titleTet : s.titleEn}
                       </h2>

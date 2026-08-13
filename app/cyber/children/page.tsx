@@ -1,3 +1,4 @@
+//app/cyber/children/page.tsx
 "use client";
 
 import {useState} from "react";
@@ -249,7 +250,7 @@ export default function CyberChildrenPage(){
 
   return(
     <>
-      <style>{`
+      <style dangerouslySetInnerHTML={{__html: `
         @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap');
 
         .cyber-page {
@@ -749,7 +750,7 @@ export default function CyberChildrenPage(){
           .powers-grid { grid-template-columns: 1fr; }
           .sta-grid { grid-template-columns: 1fr; }
         }
-      `}</style>
+      `}} />
 
       <div className="cyber-page">
         <div className="nav-links">

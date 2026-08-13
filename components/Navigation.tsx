@@ -102,7 +102,7 @@ useEffect(()=>{
                 href:"/stories/news",
                 description:"Updates and announcements from Lafaek."
               },
-              
+
               {
                 label:"Learning",
                 href:"/learning",
@@ -165,7 +165,7 @@ useEffect(()=>{
                 href:"/contact",
                 description:"Get in touch with the Lafaek team."
               },
-             
+
             ]
           },
           extras:{
@@ -177,7 +177,7 @@ useEffect(()=>{
                 href:"/services",
                 description:"Work with the Lafaek creative team."
               },
-              
+
               {
                 label:"Careers",
                 href:"/careers",
@@ -244,7 +244,7 @@ useEffect(()=>{
                 href:"/revista-media",
                 description:"Vídeu badak hosi terrenu no komunidade sira."
               },
-            
+
             ]
           },
           keepSafe:{
@@ -275,7 +275,7 @@ useEffect(()=>{
           },
           about:{
             title:"Kona-ba Ami",
-            description:"Hatene kona-ba Lafaek nia viajen, ekipa, objetivu, no planu ba futuru.",
+            description:"Hatene kona-ba Revista Lafaek nia jornada, ekipa, vizaun-misaun, no planu ba futuru.",
             links:[
               {
                 label:"Kona-ba Ami",
@@ -288,28 +288,28 @@ useEffect(()=>{
                 description:"Conhece ema sira ne'ebé halo servisu Lafaek."
               },
               {
-                label:"Ami-nia Viajen",
+                label:"Ami-nia Jornada",
                 href:"/our-journey",
-                description:"Oinsá Lafaek dezenvolve ona."
+                description:"Revista Lafaek nia jornada husi tempu ba tempu."
               },
               {
                 label:"Kontaktu",
                 href:"/contact",
-                description:"Kontaktu ho ekipa Lafaek."
+                description:"Kontaktu ho ekipa Revista Lafaek."
               },
-            
+
             ]
           },
           extras:{
-            title:"Tanba seluk",
-            description:"Oportunidade, apoiu, no dalan atu konekta ho Lafaek.",
+            title:"No seluk tan",
+            description:"Oportunidade, apoiu, no maneira atu kontaktu ho Revista Lafaek.",
             links:[
               {
                 label:"Servisu sira",
                 href:"/services",
                 description:"Servisu hamutuk ho ekipa kriativu Lafaek."
               },
-            
+
               {
                 label:"Karreira",
                 href:"/careers",

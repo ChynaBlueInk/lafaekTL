@@ -122,8 +122,8 @@ export default function ImpactPage(){
       errorTitle:"Could not load impact & success stories."
     },
     tet:{
-      heading:"Istória Impaktu no Susesu",
-      intro:"Lee istória kona-ba mudansa pozitivu, susesu iha edukasaun, impaktu iha komunidade no viajen pesoál iha Timor-Leste.",
+      heading:"Istória kona-ba ami-nia Impaktu",
+      intro:"Revista Lafaek ninia impaktu ba kanorin, manorin no komunidade sira.",
       readMore:"Lee liu tan",
       viewPdf:"Haree PDF",
       shareStory:"Fahe Ita-nia Istória",
@@ -131,7 +131,7 @@ export default function ImpactPage(){
       sortLabel:"Ordena tuir",
       sortLatest:"Foun liu ba leten",
       sortAZ:"Titulu A–Z",
-      sortCustom:"Ordem editor (artigu destakadu leten)",
+      sortCustom:"Orden editór (artigu destakadu leten)",
       morePhotos:(n:number)=>`+ foto seluk ${n}`,
       noItems:"Seidauk iha istória impaktu ka suksesu disponivel.",
       loading:"Hein hela istória impaktu no suksesu sira...",
@@ -379,7 +379,7 @@ export default function ImpactPage(){
               return(
                 <article
                   key={item.id}
-                  className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-md"
+                  className="flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-md"
                 >
                   {primaryImageUrl&&(
                     <div className="relative h-56 w-full bg-gray-100">
@@ -393,7 +393,7 @@ export default function ImpactPage(){
                     </div>
                   )}
 
-                  <div className="p-5">
+                  <div className="flex flex-1 flex-col p-5">
                     {/* ── Date + type badge row ───────────────────────────── */}
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-medium text-[#828282]">{item.date}</span>
@@ -403,34 +403,36 @@ export default function ImpactPage(){
                     <h2 className="mt-2 text-xl font-bold text-[#333333]">{title}</h2>
 
                     {excerpt&&(
-                      <p className="mt-3 text-sm leading-6 text-[#4F4F4F]">{excerpt}</p>
+                      <p className="mt-3 line-clamp-3 text-sm leading-6 text-[#4F4F4F]">{excerpt}</p>
                     )}
 
-                    <div className="mt-5 flex flex-wrap gap-3">
-                      <Link
-                        href={`/stories/impact/${item.id}`}
-                        className="rounded-lg bg-[#2F80ED] px-4 py-2 text-sm font-semibold text-white hover:opacity-90"
-                      >
-                        {labels.readMore}
-                      </Link>
-
-                      {pdfUrl&&(
-                        <a
-                          href={pdfUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="rounded-lg bg-[#219653] px-4 py-2 text-sm font-semibold text-white hover:bg-[#1b7f45]"
+                    <div className="mt-auto pt-5">
+                      <div className="flex flex-wrap gap-3">
+                        <Link
+                          href={`/stories/impact/${item.id}`}
+                          className="rounded-lg bg-[#2F80ED] px-4 py-2 text-sm font-semibold text-white hover:opacity-90"
                         >
-                          {labels.viewPdf}
-                        </a>
+                          {labels.readMore}
+                        </Link>
+
+                        {pdfUrl&&(
+                          <a
+                            href={pdfUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="rounded-lg bg-[#219653] px-4 py-2 text-sm font-semibold text-white hover:bg-[#1b7f45]"
+                          >
+                            {labels.viewPdf}
+                          </a>
+                        )}
+                      </div>
+
+                      {extraPhotoCount>0&&(
+                        <div className="mt-4 text-xs font-medium text-[#828282]">
+                          {labels.morePhotos(extraPhotoCount)}
+                        </div>
                       )}
                     </div>
-
-                    {extraPhotoCount>0&&(
-                      <div className="mt-4 text-xs font-medium text-[#828282]">
-                        {labels.morePhotos(extraPhotoCount)}
-                      </div>
-                    )}
                   </div>
                 </article>
               );

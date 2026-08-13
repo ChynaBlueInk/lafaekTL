@@ -1,3 +1,4 @@
+//app/page.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -137,19 +138,19 @@ export default function HomePage() {
     },
     tet: {
       hero: {
-        title: "Benvindu mai iha Media Lafaek Aprendizazen",
-        subtitle: "Empodera Timor-Leste liuhusi Edukasaun & Istoria sira",
+        title: "Benvindu mai Revista LAFAEK Learning Media",
+        subtitle: "Hametin edukasaun no inspirasaun iha Timor-Leste liuhusi istória no rekursu aprendizajen sira",
         supportText:
-          "Ita-boot bele apoiu Lafaek liuhusi halo doasaun hodi sosa ami-nia revista no produtu sira, patrosina konteúdu edukativu, halo publisidade ho ami, ka kontrata ami-nia ekipa talentozu hosi hakerek-na'in, ilustradór, no videografu sira."
+          "Revista LAFAEK loke espasu ba ema hotu atu partisipa, fó apoiu no harii kolaborasaun hamutuk. Ita-boot bele kontribui ba distribuisaun revista no materiál edukativu sira, apoiu dezenvolvimentu konteúdu, harii parseria ba komunikasaun no promosaun, no kolabora ho ami-nia ekipa kreativa, inklui hakerek-na'in, ilustradór no videógrafu sira."
           },
       news: { title: "Notísia Foun", subtitle: "Saida mak akontese iha Lafaek?", viewAll: "Haree hotu notísia" },
       socialEnterprise: {
-        title: "Lafaek Enmpreza Social",
-        subtitle: "Husi Inisiativa Komunidade to'o Impaktu Organizasaun Timor-Oan.",
+        title: "LAFAEK Empreza Sosiál",
+        subtitle: "Hamutuk ho komunidade, hamosu impaktu sustentável ba Timor-Oan.",
         stats: [
           { number: "25+", label: "Ninia impaktu liu tinan 25" },
-          { number: "1M+", label: "Kada tinan ami distriubui Revista liu Miliaun 1" },
-          { number: "1,500+", label: "Suporta Eskola liu 1500 iha Timor-Leste laran tomak." },
+          { number: "1M+", label: "Kada tinan ami distribui Revista liu Miliaun 1" },
+          { number: "1,500+", label: "Suporta Eskola liu 1500 iha territóriu Timor-Leste." },
           { number: "100%", label: "100% Timor Oan mak na'in" },
         ],
       },
@@ -164,8 +165,8 @@ export default function HomePage() {
         ],
       },
       impact: {
-        title: "Istória Impaktu Ami",
-        subtitle: "Mudansa real iha komunidade Timorense sira",
+        title: "Istória Impaktu no Susesu",
+        subtitle: "Istória kona-ba servisu Revista Lafaek ho kanorin, manorin no komunidade sira iha Timór.",
         readMore: "Lee liu tan",
         viewAll: "Haree hotu istória impaktu",
         empty: "Seidauk iha istória impaktu atu hatudu. Favor fila fali mai depois.",
@@ -176,21 +177,21 @@ export default function HomePage() {
         features: [],
       },
       cta: {
-        title: "Hamutuk ho Ami nia Misaun",
-        subtitle: "Ajuda Ami atu kontinua haforsa Timor-Leste liuhusi edukasaun.",
+        title: "Hamutuk hala'o Ami-nia Misaun",
+        subtitle: "Partisipa ho ami atu kontinua hametin Timor-Leste liuhusi edukasaun.",
         volunteer: "Voluntáriu",
         donate: "Suporta Ami",
         partner: "Parseria ho Ami",
       },
       social: {
-        title: "Tuir Lafaek iha Online",
-        facebookTitle: "Akompanha ami nia pajina Facebook",
+        title: "Tuir Revista Lafaek iha Online",
+        facebookTitle: "Revista Lafaek iha Facebook",
         facebookText: "Tuir nafatin ami nia istoria foun sira no eventu komunidade.",
         facebookButton: "Vizita ami nia pajina Facebook",
-        instagramTitle: "Haree ami iha Instagram",
+        instagramTitle: "Revista Lafaek iha Instagram",
         instagramText: "Haree foto, istória badinas no atividade sira iha kampu.",
         instagramButton: "Vizita Instagram",
-        youtubeTitle: "Bele hare ami nia YouTube",
+        youtubeTitle: "Revista Lafaek iha YouTube",
         youtubeText: "Deskobre ami-nia konteúdu, istória no vídeo sira husi kampu.",
         youtubeButton: "Vizita ami nia YouTube",
         youtubeSecondary: "Haree vídeo hotu",
@@ -375,7 +376,7 @@ export default function HomePage() {
             {/* Dropdown navigation */}
             <div className="mb-8 rounded-xl bg-gray-50 p-6 shadow-sm">
               <h2 className="mb-3 text-2xl font-bold text-[#219653]">
-                {L === "tet" ? "Saida mak ita boot sira hakarak atu buka hatene ohin loron?" : "What are you looking for today?"}
+                {L === "tet" ? "Saida mak ita hakarak atu buka-hatene ohin loron?" : "What are you looking for today?"}
               </h2>
 
               <select
@@ -800,15 +801,8 @@ export default function HomePage() {
         {/* Sponsors */}
         <section
           className="border-t border-gray-200 bg-gray-50 py-12"
-          aria-labelledby="sponsors"
         >
           <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
-            <h2
-              id="sponsors"
-              className="mb-8 text-4xl font-bold text-[#219653]"
-            >
-              {language === "tet" ? "Ami nia Doador/Sponsor" : "Our Donors & Sponsors"}
-            </h2>
             <div className="flex flex-wrap items-center justify-center gap-10">
               <div className="relative h-32 w-80">
                 <Image
