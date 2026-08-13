@@ -291,7 +291,7 @@ export default async function MagazineReaderPage({
   </p>
 
   <p className="mt-1 text-sm text-green-700">
-    📖 Klik iha kapa revista atu loke. Klik iha kantu pájina ka desliza liman atu muda ba pájina tuir mai.
+    📖 Klik iha kapa revista atu loke. Klik iha kantu pájina ka desliza liman atu muda ba pájina tuirmai.
   </p>
 
 </div>

@@ -273,7 +273,7 @@ const { language } = useLanguage()
         messageLabel: "Ita-nia Mensajen",
         submitButton: "Haruka Mensajen",
         submitting: "Haruka...",
-        success: "Mensajen haruka ho susesu! Ami sei kontaktu ita lalais.",
+        success: "Mensajen haruka ho susesu! Ami sei kontaktu ita lailais.",
         error: "La konsege haruka mensajen. Favór koko fali ikus mai.",
       },
     },

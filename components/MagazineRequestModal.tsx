@@ -43,7 +43,7 @@ export default function MagazineRequestModal({
     cancel:      isTet ? "Kansela" : "Cancel",
     successTitle: isTet ? "Pedidu Haruka Ona!" : "Request Sent!",
     successMsg:  isTet
-      ? "Obrigadu! Ekipa Lafaek sei kontaktu ita lalais."
+      ? "Obrigadu! Ekipa Lafaek sei kontaktu ita lailais."
       : "Thank you! The Lafaek team will be in touch with you soon.",
     close:       isTet ? "Taka" : "Close",
     required:    isTet ? "Obrigatóriu" : "Required fields",

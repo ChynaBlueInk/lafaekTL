@@ -70,30 +70,30 @@ const TRANSLATIONS: Record<Lang, T> = {
     heroTitle: "Internét",
     heroTitle2: "ba ema hotu.",
     heroSubtitle:
-      "Nune’e mos responsabilidade atu utiliza technologia ho seguru. Seguransa sibernétika la'ós de'it ba ema espesialista sira — ida-ne'e mos bele proteje família, komunidade, no Timor-Leste nia futuru.",
+      "Nune'e mós responsabilidade atu utiliza teknolojia ho seguru. Seguransa Sibernétika la'ós de'it ba ema espesialista sira — ida-ne'e mós bele proteje família, komunidade, no Timor-Leste nia futuru.",
 
-    whatTitle: "Saida mak Siberseguransa?",
+    whatTitle: "Saida mak Seguransa Sibernétika?",
     whatLead:
-      "Seguransa sibernétika mak oinsá ita proteje ita-nia an, ita-nia informasaun, no ita-nia sasán teknolojia sira husi perigu iha mundu dijitál laran. Nia kobre buat hotu hahu husi  kria password forte to'o hatene bainhira ema ida hakarak halu ka manipula ita.",
+      "Seguransa Sibernétika mak oinsá ita proteje ita-nia an, ita-nia informasaun, no ita-nia sasán teknolojia sira husi perigu iha mundu dijitál nia laran. Nia kobre buat hotu-hotu hahú husi kria password forte to'o hatene bainhira ema ida hakarak lasu ka manipula ita.",
     whatCards: [
       {
         icon: "shield",
         title: "Proteje ita-nia identidade",
-        desc: "Ita-nia naran, foto, hela-fatin, no dokumentu pesoál sira mak valiozu. Siberseguransa ajuda asegura ita nia informasaun sira nee protegido no seguro.",
+        desc: "Ita-nia naran, foto, hela-fatin, no dokumentu pesoál sira-ne'ebé maka iha valór. Seguransa Sibernétika ajuda asegura ita-nia informasaun sira-ne'e protejidu no seguru.",
       },
       {
         icon: "globe",
-        title: "Nafatin seguru iha plataforma sira",
-        desc: "Rede sosiál, app mensajen, no website sira bele ekspoze ita ba fraude, konteúdu aat, no ema ho intensaun aat.",
+        title: "Seguru iha plataforma dijitál sira",
+        desc: "Média sosiál, aplikasaun mensajen, no website sira bele ekspoze ita ba fraude, konteúdu ladi'ak, no ema ho intensaun aat.",
       },
       {
         icon: "lock",
-        title: "Asegura ita nia konta sira",
-        desc: "Email, banku, plataforma eskola nian, no servisu governu nian, sira hotu presiza protezaun. Kria  password fraku bele lori risku ba ita nia seguransa no bele facilita ema seluk atu asesu ba ita informasaun privadu.",
+        title: "Proteje ita-nia konta sira",
+        desc: "Email, servisu bankáriu, plataforma eskola no servisu governu hotu-hotu presiza protesaun - password ida-ne'ebé fraku bele loke asesu ba buat hotu.",
       },
       {
         icon: "phone",
-        title: "Uza dispozitivu ho matenek",
+        title: "Uza aparellu ho matenek",
         desc: "Telemovel no laptop sira rai dadus pesoál ne'ebé barak tebes. Hatene oinsá atu proteje ekipamentu sira-ne'e, katak Ita mós proteje Ita-nia moris tomak.",
       },
     ],
@@ -104,112 +104,112 @@ const TRANSLATIONS: Record<Lang, T> = {
     whyPoints: [
       {
         stat: "3.4B",
-        label: "Informasaun falsu (phising)  sira haruka ba ita nia email loron-loron.",
-        desc: "Mensajen hirak ne’e haruka ba nasaun hotu-hotu no tama ita nia email  liu husi  inbox.  ",
+        label: "Email falsu (phishing) ne'ebé ema manda loroloron",
+        desc: "Mensajen hirak-ne'e haruka ba nasaun hotu-hotu no tama ita-nia email liu husi inbox.",
       },
       {
         stat: "95%",
-        label: "Atake ligado ho erro humano.",
-        desc: "Barak liu akontese tamba klik iha sítio phishing, simu mensajen husi ema deskonhesidu, fahe password, ka fiar ema sala hodi asesu ita nia informasaun.",
+        label: "Ataka ligadu ho erru umanu",
+        desc: "Barakliu atake sira akontese tanba ema klik sala iha website falsu (phishing), simu mensajen husi ema deskoñesidu, fahe password, ka tau fiar ba ema ne'ebé sala hodi asesu ba ita-nia informasaun.",
       },
       {
         stat: "↑62%",
-        label: "Numero fraude liu husi  kanal sira hanesan  telemovel aumenta loron ba loron.",
-        desc: "Atake liu husi kanal telemovel aumneta lalais liu kompara ho kanal  sira hanesan  Komputador no  ita hatene katak ema barak liu iha Timor-Leste mak utilija  telemóvel hodi asesu ba internet.",
+        label: "fraude liuhusi telemovel aumenta ba beibeik",
+        desc: "Atake liuhusi telemovel aumenta lailais liu kompara ho aparellu komputadór no ita hatene katak ema barakliu iha Timor-Leste mak utiliza telemovel hodi asesu ba internét.",
       },
     ],
 
-    nationTitle: "Tamba Saida Mak Ida Ne'e Importante ba Timor-Leste",
+    nationTitle: "Tanbasá ida-ne'e Importante ba Timor-Leste",
     nationLead:
-      "Nu'udar nasaun ida ne'ebé foin  sa'e iha mundu,  Timor-Leste, foin mak kria nia  futuru dijitál. Ne’e  ajuda loke oportunidade barak  ba nasaun  maibé mos aumenta risku no vulnerabilidade. ",
+      "Nu'udar nasaun ida-ne'ebé foun liu iha mundu, Timor-Leste agora dadaun harii nia futuru dijitál. Ida-ne'e kria oportunidade reál - no vulnerabilidade mós.",
     nationPoints: [
-      "Numero  utilizasaun   internet liu husi telemovel aumenta lalais tebes. No ema barak mak foin uja primeira vez ho nune laiha konhesimentu konaba seguransa digital.",
-      "Servisu Governu nian, banku, no negósiu sira agora uza ona sistema dijitál—tanba ne'e, importante tebes ba ita atu aprende oinsá uza teknolojia ho seguru hodi bele partisipa iha dezenvolvimentu ekonómiku.",
-      "Joventude representa maioria husi ita nia  populasaun, Sira-nia lala'ok iha mundu dijitál ohin loron nian sei fó influénsia ba Timor-Leste nia kultura teknolojia ba jerasaun foun tuir mai.",
-      "Nasaun ki'ik sira bele sai targetu tanba sira iha rekursu ba seguransa sibernétika ne'ebé uitoan no mós konsiénsia públiku nian ne'ebé sei menus.",
-      "Informasaun Lalos sira no manipulasaun bele espalla lalais iha komunidade sira ne’ebé besik malu iha ekosistema informasaun ne'ebé ki'ik.",
-      "Atake boot ida de'it ba sistema ne'ebé importante—hanesan saúde, finansa, ka infrastruktura—sei fó impaktu ne'ebé boot tebes ba ita-nia populasaun ne'ebé ki'ik.",
+      "Uzu internet móvel aumenta lailais, lori ema millaun sira ba internet dahuluk, maske sira barak seidauk iha edukasaun ba seguransa dijitál.",
+      "Servisu sira governu nian, banku no negósiu sira sai modernu no dijitál liután – halo prátika seguru sira sai elementu esensiál ba partisipasaun ekonómika.",
+      "Foin-sa'e sira maka reprezenta maioria populasaun. Sira-nia ábitu dijitál sira agora sei forma nasaun nia kultura sibernétika ba jerasaun oin mai.",
+      "Nasaun ki'ik sira bele sai alvu espesífiku tanba iha rekursu seguransa sibernétika ne'ebé limitadu no konsiénsia públika ki'ik liu.",
+      "Kampaña dezinformasaun no manipulasaun bele espalla lailais iha komunidade sira ne'ebé iha relasaun besik malu no ekosistema informasaun ne'ebé limitadu.",
+      "Violasaun boot ida de'it ba sistema krítiku ida - saúde, finansas ka infraestrutura - bele hamosu impaktu ne'ebé boot tebes ba populasaun ki'ik ida.",
     ],
     nationClosing:
-      "Seguransa siber la’ós de’it desizaun pesoál. Iha Timor-Leste maibe hanesan responsabilidade komunidade no parte importante atu hametin reziliénsia nasaun.",
+      "Seguransa sibernétika la'ós de'it opsaun pesoál. Iha Timor-Leste, ida-ne'e nu'udar responsabilidade komunidade nian no forma husi reziliénsia nasionál ida.",
 
-    consequencesTitle: "Konsekuénsia nee real.",
+    consequencesTitle: "Konsekuénsia Reál Sira",
     consequencesLead:
-      "Bainhira ita la fó atensaun ba Seguransa sibernétika, ninia rezultadu negativu .   ne'e reál tebes—ba ita-nia an, família, instituisaun sira, no ba nasaun tomak.",
+      "Bainhira ita la fó atensaun ba Seguransa sibernétika, ninia rezultadu negativu ne'e reál tebes — ba ema, família, instituisaun sira, no ba nasaun tomak.",
     consequences: [
       {
         label: "Na'ok identidade",
-        desc: "Dokumentu pesoál, konta banku, no identidade online sira ema na'ok no uza sala—dala ruma durante tinan barak mak vítima foin hatene.",
+        desc: "Dokumentu pesoál, konta bankária no identidade online sira bele na'ok no uza sala - dala ruma durante tinan barak maka vítima foin hatene.",
         severity: "critical",
       },
       {
-        label: "Lakon Finanseiru",
-        desc: "Lasu (scam), oferese serbisu falsu, fraude iha sitema bankaria banku nian bele hamoos ita-nia osan ne'ebé rai hela. Ba família sira ne'ebé kbiit-laek, atake ida de'it bele lori sira ba situasaun ne'ebé susar tebes.",
+        label: "Prejuízu finanseiru",
+        desc: "Lasu (scam), oferese serbisu falsu, fraude iha sistema bankária banku nian bele hamoos ita-nia osan ne'ebé rai hela. Ba família sira-ne'ebé kbiit-laek, atake ida de'it bele lori sira ba situasaun ne'ebé susar tebes.",
         severity: "critical",
       },
       {
-        label: "Asediu no abuzu online",
-        desc: "Imajen ka mensajen privadu sira utiliza   hodi ameasa,  bosok ka kontrola vítima  barak liu targeta joven sira.",
+        label: "Asédiu no abuzu online",
+        desc: "Imajen ka mensajen privadu sira utiliza hodi ameasa, bosok ka kontrola vítima barakliu tarjeta joven sira.",
         severity: "high",
       },
       {
-        label: "Espalla informasaun falsu sira",
-        desc: "Informasaun falsu sira  ligadu ho  saúde, polítika, ka seguransa espalla iha komunidade laran, sei  harahun konfiansa no lori mós perigu ba ita hotu.",
+        label: "Espalla informasaun falsu",
+        desc: "Informasaun falsu sira ligadu ho saúde, polítika, ka seguransa espalla iha komunidade, sei harahun konfiansa no lori mós perigu ba ita hotu.",
         severity: "high",
       },
       {
-        label: "Estragu instituisionál",
+        label: "Estragu instituisonál",
         desc: "Eskola, ospitál, no eskritóriu governu ne'ebé hetan atake bele lakon sira-nia dadus no mós kapasidade operasionál, sei fó impaktu ba komunidade tomak.",
         severity: "critical",
       },
       {
-        label: "Lakon fiar",
-        desc: "Bainhira ema la fiar ona ba sistema dijitál sira, sira sei hadook an ida-ne'e sei hametin dezenvolvimentu ekonómiku no prevene ita-nia asesu ba servisu sira ne'ebé importante.",
+        label: "Lakon konfiansa",
+        desc: "Bainhira ema la fiar ona ba sistema dijitál sira, sira sei hadook an ida-ne'e - sei hametin dezenvolvimentu ekonómiku no prevene ita-nia asesu ba servisu sira-ne'ebé importante.",
         severity: "medium",
       },
     ],
 
-    audienceTitle: "Hili Ita-nia Dalan",
-    audienceSubtitle: "Seguransa online la hanesan kada etapa iha ita nia  moris laran tomak . Hili dalan ne’ebé diak liu ba ita an.",
+    audienceTitle: "Buka Ita-nia Dalan",
+    audienceSubtitle: "Seguransa sibernétika iha nesesidade diferente iha etapa moris ida-idak. Hili matadalan ne'ebé tuir ita-nia situasaun.",
     audiences: [
       {
         href: "/cyber/children",
         age: "Tinan 7–14",
-        title: "Esploradór Foin-sa'e",
-        desc: "Aventura divertidu no interativu ne'ebé hanorin fundamentu ba labarik sira atu nafatin seguru online — liu husi jogu, karakter, no regra simples.",
-        cta: "Hahu aventura",
+        title: "Esploradór Ki'ik",
+        desc: "Aventura interativu no divertidu ne'ebé hanorin labarik sira kona-ba fundasaun seguransa online - liuhusi jogu, personajen no regra simples.",
+        cta: "Hahú aventura",
         theme: "children",
       },
       {
         href: "/cyber/youth",
         age: "Tinan 15–25",
-        title: "Salva guarda Siber",
-        desc: "Kbiit prátiku ba rede sosiál, jogu, estudu, no servisu — identifika fraude, proteje konta, no kuidadu privasidade.",
-        cta: "Tama misaun",
+        title: "Vanguarda Sibernétika",
+        desc: "Abilidade prátika ba media sosiál, jogu, estudu no servisu inisiál - atu identifika fraude, proteje konta no privasidade.",
+        cta: "Tama ba misaun",
         theme: "youth",
       },
       {
         href: "/cyber/adults",
-        age: "Adultu no Família",
-        title: "Protesaun Komunidade",
-        desc: "Orientasaun ba inan-aman, profisionál, no membru komunidade — proteje família, servisu, finansa, no ema sira iha ita-nia sorin.",
-        cta: "Harii protesaun",
+        age: "Adultu no família sira",
+        title: "Protetór Komunidade",
+        desc: "Orientasaun ba inan-aman, profisionál no membru komunidade sira - atu proteje família, servisu, finansas no ema sira iha ita-nia sorin.",
+        cta: "Harii ita-nia protetór",
         theme: "adults",
       },
     ],
 
-    togetherTitle: "Seguransa mak responsabilidade kolectivu  iha komunidade",
+    togetherTitle: "Seguransa maka responsabilidade koletivu iha Komunidade",
     togetherLead:
-      "Konsiensia individuál importante — maibé forsa ne'ebé loos mosu bainhira família, eskola, no komunidade hotu prátika hábitu seguru hamutuk.",
+      "Konsiénsia individuál importante — maibé forsa ne'ebé lolos mosu bainhira família, eskola, no komunidade hotu prátika ábitu seguru hamutuk.",
     togetherPoints: [
-      "Fahe saida mak ita aprende ho ita-nia família, liuliu inan-aman ka avó sira ne'ebé bele seidauk hatene di'ak kona-ba ameasa dijitál.",
-      "Ko'alia livre kona-ba esperiénsia online — halakon moe kona-ba sala sira, hodi nune'e fasil liu atu husu ajuda.",
-"Eskola no fatin servisu ne'ebé harii konsiensia siberseguransa proteje ema hotu iha sira-nia rede, la'ós de'it ema individual.",
-"Relata lalais fraude no konteúdu suspetu — ita-nia asaun ne'e sei proteje ema seluk ne'ebé bele simu mensajen hanesan.",
+      "Fahe saida mak ita aprende ho ita-nia família, liuliu inan-aman ka avó sira-ne'ebé seidauk hatene didi'ak kona-ba ameasa dijitál.",
+      "Ko'alia nakloke kona-ba esperiénsia online - halakon moe kona-ba sala sira, hodi nune'e fasil liu atu husu ajuda.",
+"Eskola no fatin servisu ne'ebé promove konsiénsia seguransa sibernétika proteje ema hotu husi sira-nia rede, la'ós de'it ema individuál.",
+"Hato'o relatoriu kona-ba fraude no konteúdu suspeitu - ita-nia asaun proteje ema seluk ne'ebé bele simu mensajen hanesan.",
     ],
 
     quoteText:
-"Korente ida sei bele forte bainhira korente ki'ik ne'ebé fragil ligado ba malu. Iha sosiedade ne'ebé konektadu, seguransa ema ida-idak depende ba koñesimentu no konsiensia ema seluk nian.",    quoteSource: "Prinsípiu reziliénsia siber kolektiva",
+"Korente ida sei bele forte bainhira korente ki'ik ne'ebé frajil liga ba malu. Iha sosiedade ida-ne'ebé iha ligasaun, seguransa ema ida-idak depende ba koñesimentu no konsiénsia ema seluk nian.",    quoteSource: "Prinsípiu reziliénsia sibernétika koletiva",
   },
 
   en: {
@@ -900,21 +900,21 @@ export default function CyberLandingPage() {
         href="/cyber/children"
         className="rounded-full bg-[#FF6B6B] px-4 py-2 font-semibold text-white hover:opacity-90"
       >
-        {lang==="tet"?"Labarik":"Children"}
+        {lang==="tet"?"Labarik sira":"Children"}
       </Link>
 
       <Link
         href="/cyber/youth"
         className="rounded-full bg-[#00FFC8] px-4 py-2 font-semibold text-[#0F1923] hover:opacity-90"
       >
-        {lang==="tet"?"Joventude":"Youth"}
+        {lang==="tet"?"Foin-sa'e sira":"Youth"}
       </Link>
 
       <Link
         href="/cyber/adults"
         className="rounded-full bg-[#219653] px-4 py-2 font-semibold text-white hover:opacity-90"
       >
-        {lang==="tet"?"Adultu & Família":"Parents & Teachers"}
+        {lang==="tet"?"Inan-aman no Manorin sira":"Parents & Teachers"}
       </Link>
     </div>
 
@@ -928,7 +928,7 @@ export default function CyberLandingPage() {
         <section className="cl-section">
           <div className="cl-eyebrow">
             <BookOpen style={{ width: 14, height: 14 }} aria-hidden="true" />
-            {lang === "en" ? "The basics" : "Báziku sira"}
+            {lang === "en" ? "The basics" : "Fundamentu sira"}
           </div>
           <h2 className="cl-h2">{t.whatTitle}</h2>
           <p className="cl-lead">{t.whatLead}</p>
@@ -955,7 +955,7 @@ export default function CyberLandingPage() {
           <div className="stats-inner">
             <div className="cl-eyebrow" style={{ color: "#F2C94C" }}>
               <TrendingUp style={{ width: 14, height: 14 }} aria-hidden="true" />
-              {lang === "en" ? "The scale of the problem" : "Eskala problema nian"}
+              {lang === "en" ? "The scale of the problem" : "Problema nia eskala"}
             </div>
             <h2 className="cl-h2" style={{ color: "white" }}>{t.whyTitle}</h2>
             <p className="cl-lead" style={{ color: "rgba(255,255,255,0.55)" }}>{t.whyLead}</p>
@@ -977,7 +977,7 @@ export default function CyberLandingPage() {
             <div>
               <div className="cl-eyebrow">
                 <Globe style={{ width: 14, height: 14 }} aria-hidden="true" />
-                {lang === "en" ? "Our context" : "Ita-nia kontestu"}
+                {lang === "en" ? "Our context" : "Ita-nia kontextu"}
               </div>
               <h2 className="cl-h2">{t.nationTitle}</h2>
               <p className="cl-lead" style={{ marginBottom: 0 }}>{t.nationLead}</p>
@@ -1000,7 +1000,7 @@ export default function CyberLandingPage() {
         <section className="cl-section">
           <div className="cl-eyebrow">
             <AlertTriangle style={{ width: 14, height: 14 }} aria-hidden="true" />
-            {lang === "en" ? "What's at stake" : "Risku saida mak iha"}
+            {lang === "en" ? "What's at stake" : "Saida mak iha risku"}
           </div>
           <h2 className="cl-h2">{t.consequencesTitle}</h2>
           <p className="cl-lead">{t.consequencesLead}</p>
@@ -1031,7 +1031,7 @@ export default function CyberLandingPage() {
           <div className="audience-inner">
             <div className="cl-eyebrow" style={{ color: "#F2C94C" }}>
               <Users style={{ width: 14, height: 14 }} aria-hidden="true" />
-              {lang === "en" ? "Choose your guide" : "Hili ita-nia guia"}
+              {lang === "en" ? "Choose your guide" : "Hili matadalan ba ita"}
             </div>
             <h2 className="cl-h2" style={{ color: "white" }}>{t.audienceTitle}</h2>
             <p className="cl-lead" style={{ color: "rgba(255,255,255,0.55)" }}>{t.audienceSubtitle}</p>

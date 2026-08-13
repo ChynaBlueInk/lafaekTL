@@ -213,7 +213,7 @@ export default function GuardiansInteractivePage(){
       key:"hidePhoneEmail" as const,
       title:language==="tet"?"Subar telefone/email":"Hide phone/email",
       desc:language==="tet"?"Labele hatudu iha perfil publiku.":"Don't show it publicly in profiles.",
-      risk:language==="tet"?"Telefone/email publiku = spam/scam la'o lalais.":"Public contact details invite scams/spam.",
+      risk:language==="tet"?"Telefone/email publiku = spam/scam la'o lailais.":"Public contact details invite scams/spam.",
     },
     {
       key:"disablePreciseLocation" as const,
@@ -570,7 +570,7 @@ export default function GuardiansInteractivePage(){
                       }}
                       className="px-4 py-2 rounded-lg bg-[#2F80ED] hover:bg-[#1C6ED6] text-white font-semibold transition"
                     >
-                      {language==="tet"?"Senáriu tuir mai →":"Next scenario →"}
+                      {language==="tet"?"Senáriu tuirmai →":"Next scenario →"}
                     </button>
                   </div>
                 </div>
@@ -725,7 +725,7 @@ function getGuardianScenarios({language}:{language:"en"|"tet"}):Scenario[]{
           "Haruka kódigu tanba dehan suportu.",
           "Para. Nunca fahe OTP. Verifika liu husi app ofisiál ka site loos.",
           "Haruka pasword atu prova ita nia konta.",
-          "Klik link atu resolve lalais.",
+          "Klik link atu resolve lailais.",
         ],
         correct:1,
         explain:"OTP la bele fahe. Ema bosokteen uza atu tama iha ita nia konta. Verifika de'it liu husi kanál ofisiál.",

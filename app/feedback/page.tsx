@@ -303,7 +303,7 @@ export default function FeedbackPage() {
             so the next form will be pre-filled for you.
             <br /><br />
             <em>Ita-boot nia resposta rejistadu ona. Naran no detallu aparelhu salva ona
-            hodi preenxe formuláriu tuir mai automatikamente.</em>
+            hodi preenxe formuláriu tuirmai automatikamente.</em>
           </p>
           <button
             onClick={resetForNextPage}

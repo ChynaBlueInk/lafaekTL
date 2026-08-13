@@ -29,7 +29,7 @@ export default function ComingSoon({
       <div className="max-w-3xl mx-auto px-4 text-center">
         <div className="inline-flex items-center gap-2 bg-[#F2C94C] text-[#4F4F4F] px-3 py-1 rounded-full text-xs font-semibold mb-4">
           <span>•</span>
-          <span>{L === "tet" ? "Tuir mai" : "Coming Soon"}</span>
+          <span>{L === "tet" ? "Tuirmai" : "Coming Soon"}</span>
         </div>
         <h1 className="text-4xl font-extrabold text-[#219653] mb-4">
           {title[L] ?? title.en}

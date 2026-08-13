@@ -351,7 +351,7 @@ const TRANSLATIONS: Record<Lang, Translations> = {
           "Rai formatu simples — tabela ka koluna bele la'o sala.",
           "Pájina ida ka rua másimu. Hili ho kuidadu.",
         ],
-        tip: "Empregadór sira beibeik gasta menus hosi segundu 30 iha leitura primeiru. Ita-nia naran, kargu atual, no realizasaun boot tenke haree lalais.",
+        tip: "Empregadór sira beibeik gasta menus hosi segundu 30 iha leitura primeiru. Ita-nia naran, kargu atual, no realizasaun boot tenke haree lailais.",
         templateLabel: "Kopia templatu abertura CV",
         templateText:
           "Hau mak profisionál [kargu/área] ho esperiénsia [tinan X] iha [área kbiit]. Hau mak ema ne'ebé [forsa], no hau buka kargu ne'ebé hau bele [objetivu]. Hau nia servisu resénte inklui [realizasaun ida ne'ebé badak].",
@@ -456,7 +456,7 @@ const TRANSLATIONS: Record<Lang, Translations> = {
     ],
     quizTitle: "Iha Ne'ebé Ita Tenke Foka?",
     quizSubtitle:
-      "Responde pergunta 4 lalais no hetan planu asaun personalizadu tuir ita-nia situasaun.",
+      "Responde pergunta 4 lailais no hetan planu asaun personalizadu tuir ita-nia situasaun.",
     quizStart: "Hahu avaliasaun →",
     quizQuestions: [
       {

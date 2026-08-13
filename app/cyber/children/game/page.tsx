@@ -1175,7 +1175,7 @@ const TRUSTED_SCENARIOS=[
       {text:"Taka browser no finje ida ne'e la akontese.",correct:false},
       {text:"Fo hatene ba ema adultu ne'ebé ita fiar atu sira bele ajuda verifika ita nia aparellu.",correct:true},
     ],
-    lesson:"Sala akontese ba ema hotu. Fó-hatene ba ema boot lalais hodi prevene problema boot liu.",
+    lesson:"Sala akontese ba ema hotu. Fó-hatene ba ema boot lailais hodi prevene problema boot liu.",
   },
   {
     situation:"Ema ida online husu ita atu rai segredu ita nia konversaun husi ita nia inan-aman.",

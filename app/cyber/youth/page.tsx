@@ -231,7 +231,7 @@ const TRANSLATIONS:Record<Lang,T>={
       },
       {
         title:"Kuidadu ho mensajen urjente",
-        desc:"Kuidadu ho pedidu osan, prémiu, mensajen romanse, ka mensajen ne'ebé obriga ita atu halo lalais.",
+        desc:"Kuidadu ho pedidu osan, prémiu, mensajen romanse, ka mensajen ne'ebé obriga ita atu halo lailais.",
       },
       {
         title:"Cheka molok klik",
@@ -261,7 +261,7 @@ const TRANSLATIONS:Record<Lang,T>={
       {
         step:"HANOIN",
         text:"Husu: sira hakarak saida husi ha'u? Osan, kódigu, foto, password, ka informasaun pesoál?",
-        confirm:"Di'ak. Fraudador sira hakarak ita halo lalais. Hanoin ajuda ita atu la halo tuir pániku.",
+        confirm:"Di'ak. Fraudador sira hakarak ita halo lailais. Hanoin ajuda ita atu la halo tuir pániku.",
       },
       {
         step:"CHEKA",
@@ -298,7 +298,7 @@ const TRANSLATIONS:Record<Lang,T>={
     reportTitle:"Se buat ida la'o sala",
     reportSteps:[
       "Halo screenshot no rai evidénsia.",
-      "Troka password lalais.",
+      "Troka password lailais.",
       "Sai husi sesaun suspetu no liga 2FA.",
       "Relata no blokeia konta iha app.",
       "Fó-hatene ba adultu, mentor, manorin, ka ema IT ne'ebé ita konfia.",

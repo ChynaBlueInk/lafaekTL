@@ -175,7 +175,7 @@ const TRANSLATIONS:Record<Lang,T>={
       "🤝 Se halo sala, fó-hatene ba ema boot. Sira sei ajuda ita!",
     ],
 
-    quizTitle:"⚡ Kuis Lalais!",
+    quizTitle:"⚡ Kuis lailais!",
     quizQ:"Ema ne'ebé ó la koñese husu ó-nia hela-fatin. Saida mak ó sei halo?",
     quizA:["Fó de'it ba sira 😬","Husu ba ema boot kedas! 🙋","Ignora de'it"],
     quizCorrect:1,

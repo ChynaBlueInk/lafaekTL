@@ -1,3 +1,4 @@
+//app/cyber/youth/deepfake
 "use client";
 
 import {useState} from "react";
@@ -77,40 +78,40 @@ export default function DeepfakePage(){
         "If the message makes you feel rushed, scared, angry, excited, or embarrassed, pause first. Strong emotion is often used to stop people thinking clearly.",
     },
     tet:{
-      title:"Unidade Deteksaun Deepfake",
-      subtitle:"Investiga imajen ida-ne'e no aprende tanba sa média ne'ebé AI halo bele uza atu bosok ema.",
-      back:"Fila ba Youth Hub",
-      gameBack:"Fila ba jogu",
-      placeholder:"Klik marka ida atu hahu ita-nia investigasaun.",
+      title:"Verifikasaun Imajen AI",
+      subtitle:"Aprende oinsá atu observa ho kuidadu fotografia, vídeo no mensajen lian (voice) molok ita fiar ka fahe.",
+      back:"Filafali ba Laboratóriu Sibernétiku ba Foin-sa'e",
+      gameBack:"Filafali ba jogu",
+      placeholder:"Hili marka ida atu hahú ita-nia verifikasaun.",
       imageAlt:"Amostra AI ba deteksaun",
-      whyTitle:"Tanba sa mak ida-ne'e importante agora",
+      whyTitle:"Tanbasá ida-ne'e importante",
       whyBody1:
-        "Agora dadaun, ferramenta AI sira bele kria foto falsu, vídeo falsu, no voz falsu ne'ebé bele haree convincente tebes. Ema balu uza sira atu halo buat kreativu no responsavel, maibé ema seluk uza atu bosok, moe, scam, manipula, ka espalha lia sala.",
+        "Ferramenta (tools) AI bele kria fotografia falsu, vídeo falsu no lian falsu. Ema balun uza sira ba divertimentu ka servisu kriativu, maibé ema seluk uza sira atu halo fraude, hatun ema ka halo moe, ameasa ka lohi ema.",
       whyBody2:
-        "Ne'e signifika katak agora ita tenke kuidadu liu tan bainhira haree foto no vídeo online. Foto ka vídeo ida de'it la'ós prova suficiente. Ita tenke para, haree didi'ak, no husu hosi ne'ebé mak mai, sé mak fahe, no se nia faz sentidu ka lae.",
-      tipsTitle:"Saida mak tenke haree",
+        "Fotografia ka vídeo la'ós evidénsia sufisiénte. Molok ita fahe, responde, selu ka sai pániku, hakmatek lai no verifika informasaun ne'e.",
+      tipsTitle:"Verifikasaun lailais: Para, Haree, Husu",
       tips:[
-        "Oin ka kulit ne'ebé suave liu ka perfeitu liu",
-        "Matan, blink, ka refleksaun ne'ebé sente la loos",
-        "Fuuk, brincu, ókulus, ka imajen nia kotuk ne'ebé ladun mos ka muda",
-        "Vídeo ka imajen ne'ebé hakarak kria pániku, raiva, ta'uk, ka urjénsia",
+        "Para lai molok fahe buat ruma ne'ebé halo xoke, hatun ema ka hamoe ka urjenti.",
+        "Haree didi'ak oin ho momos, roupa no detallu iha background.",
+        "Husu: sé mak publika ida-ne'e, tanbásá agora, no ha'u bele verifika liuhusi dalan seluk?",
+        "Karik seidauk fiar labele fahe. Husu uluk ba ema ne'ebé ita fiar.",
       ],
-      panelTitle:"Análize imajen",
-      panelIntro:"Klik marka sira iha imajen atu haree sinal sira ne'ebé bele hatudu katak AI halo ka manipula.",
-      examplesTitle:"Ezemplu prátika tan",
-      examplesIntro:"Hili ezemplu ida no haree saida mak risku molok lee resposta.",
-      signsTitle:"Sinal avizu",
-      saferActionTitle:"Asaun seguru liu",
-      otherSignsTitle:"Sinal seluk atu haree",
+      panelTitle:"Atividade verifikasaun imajen",
+      panelIntro:"Klik iha marka sira iha imajen atu pratika no verifika fotografia ida ne'ebé haree hanesan loloos tebes. Imajen AI ne'ebé di'ak karik la iha sala ne'ebé fasil atu detekta.",
+      examplesTitle:"Ezemplu adisionál ba prátika",
+      examplesIntro:"Hili ezemplu ida no haree saida haree sinál risku molok lee resposta.",
+      signsTitle:"Sinál alerta sira",
+      saferActionTitle:"Asaun ne'ebé seguru liu",
+      otherSignsTitle:"Sinál seluk ne'ebé presiza buka",
       otherSignsList:[
-        "Liman no liman-fuan bele haree naklees, la hanesan, ka númeru liman-fuan la loos.",
-        "Liafuan iha sinal, poster, label, ka roupa bele blur ka hakerek sala.",
-        "Imajen nia kotuk bele repete, naklees, namlele, ka la tuir sena.",
-        "Ema ida bele haree perfeitu demais, suave demais, ka editadu demais.",
+        "Liman no liman-fuan bele haree kleuk, la hanesan, ka iha númeru liman-fuan ne'ebé sala.",
+        "Testu iha roupa, label ka marka haree la klaru ka hakerek sala.",
+        "Parte balun iha background repete ka kleuk.",
+        "Ema ida bele haree mós, kaber, ka perfeitu liu.",
       ],
-      reminderTitle:"Fo hanoin simples",
+      reminderTitle:"Lembrete simples",
       reminderBody:
-        "Se mensajen ida ne'e halo ita sente presaun, tauk, hirus, kontenti demais, ka moe, pauja lai. Dala barak emosaun ne'ebe forte bele hapara ema atu hanoin ho klaru.",
+        "Se mensajen halo ita sente pániku, tauk, hirus, kontente liu ka moe, tenke para lai. Ema dala barak uza emosaun maka'as atu hapara ema hodi hanoin klaru.",
     },
   }[lang];
 
@@ -123,7 +124,7 @@ export default function DeepfakePage(){
       },
       description:{
         en:"AI can make teeth look very white, even, or too perfect. This image looks convincing, so the question is not ‘is it fake?’, but ‘does the smile look naturally detailed?’",
-        tet:"AI bele halo nehan haree mutin demais, hanesan liu, ka perfeitu demais. Imajen ida-ne'e haree konvinsente, tanba ne'e pergunta la'ós ‘ida-ne'e falsu ka lae?’, maibé ‘hamnasa ne'e haree natural ho detallu ka lae?’",
+        tet:"AI bele halo nehan sai mutin tebes, estrutura hanesan, ka perfeitu liu. Imajen ida-ne'e haree konvense, tanba ne'e mosu kestaun 'ida-ne'e falsu ka lae?', maibé 'hamnasa ne'e haree naturál loos?'",
       },
       x:"31%",
       y:"45%",
@@ -132,11 +133,11 @@ export default function DeepfakePage(){
       id:"eyes",
       label:{
         en:"Eyes and reflections",
-        tet:"Blink la natural / Refleksaun iha matan",
+        tet:"Matan no Reflesaun",
       },
       description:{
         en:"Check both people’s eyes. In real photos, eyes often catch light in a natural way. In AI images, reflections can look too perfect, uneven, or slightly strange.",
-        tet:"Dala ruma oin ne’ebé AI halo iha refleksaun estranho iha matan ka blink ne’ebé la sente natural.",
+        tet:"Verifika ema ruma nia matan. Iha foto reál matan sira dalabarak haree naroman iha maneira naturál. Iha AI nia imajen, reflesaun sira bele haree perfetu liu, la hanesan, ka estrañu.",
       },
       x:"35%",
       y:"35%",
@@ -145,11 +146,11 @@ export default function DeepfakePage(){
       id:"skin",
       label:{
         en:"Skin texture",
-        tet:"Kulit suave liu",
+        tet:"Testura Kulit nian",
       },
       description:{
         en:"Look at the skin. AI images often make faces look too smooth, with fewer small marks, lines, pores, or natural differences than a real photo.",
-        tet:"Kulit bele haree perfeitu liu hanesan plastik. Kulit loos iha textura no detallu ki'ik sira.",
+        tet:"Haree ba kulit, imajen sira iha AI nian dalabarak halo oin sira sai mós (halus) liu, ho marka ki'ik, liña ho pori-pori, diferensia natural kompara ho foto reál.",
       },
       x:"33%",
       y:"28%",
@@ -162,7 +163,7 @@ export default function DeepfakePage(){
       },
       description:{
         en:"Sometimes the clue is not one obvious mistake. The whole image may look too polished, too balanced, or like a perfect advertisement. That does not prove it is AI, but it means you should check the source.",
-        tet:"Dala ruma pista la'ós erru boot ida. Imajen tomak bele haree perfeitu demais, balansu demais, ka hanesan reklame perfeita. Ida-ne'e la prova katak AI, maibé hatudu ita tenke cheka fonte.",
+        tet:"Dala ruma pista (clue) la'ós sala ida ne'ebé klaru. Imajen tomak bele haree perfeitu liu, ekilibriu, ka hanesan publisidade ida-ne'ebé perfeita. Ida-ne'e la prova katak AI, maibé hatudu ita tenke verifika nia fonte.",
       },
       x:"58%",
       y:"42%",
@@ -171,11 +172,11 @@ export default function DeepfakePage(){
       id:"clothing",
       label:{
         en:"Clothing edges",
-        tet:"Beira roupa",
+        tet:"Roupa nia ninin sira",
       },
       description:{
         en:"Look where clothing folds, overlaps, or meets the body. AI may create fabric that blends strangely, has odd seams, or looks too neat.",
-        tet:"Haree fatin roupa dobra, taka malu, ka kona ho isin. AI bele kria tein roupa ne'ebé mistura estranu, iha linha kostura la normal, ka haree loos demais.",
+        tet:"Haree iha ne'ebé maka roupa sira dobradu, taka malu, ka kona ho isin. AI bele kria hena ne'ebé mistura ho estrañu, iha linha kostura la ne'ebé ladún di'ak, ka haree mós liu.",
       },
       x:"61%",
       y:"69%",
@@ -184,11 +185,11 @@ export default function DeepfakePage(){
       id:"background",
       label:{
         en:"Blurred background",
-        tet:"Imajen nia kotuk muda ka torce",
+        tet:"Background ne'ebé la klaru",
       },
       description:{
         en:"A blurred background can look professional, but it can also hide mistakes. Check for repeated shapes, strange edges, or objects that do not make sense.",
-        tet:"Haree didi'ak liu iha beira sira. AI dala barak halo kotuk imajen torce ka muda badak.",
+        tet:"Background la klaru bele haree hanesan profisionál, maibé bele mós subar sala sira. Verifika forma sira-ne'ebé repete, ninin sira ne'ebé estrañu, ka objetu sira ne'ebé la iha sentidu.",
       },
       x:"86%",
       y:"31%",
@@ -215,15 +216,15 @@ export default function DeepfakePage(){
           "It asks for personal details, payment, or a code.",
         ],
         tet:[
-          "Mensajen dehan ita tenke halo lalais.",
-          "Prémiu rona fasil demais ka di'ak demais.",
-          "Logo ka liafuan bele haree estranu.",
-          "Husu detallu pesoál, pagamentu, ka kódigu.",
+          "Mensajen dehan katak ita tenke atua lailais.",
+          "Prémiu ne'e parese fasil liu ka di'ak liu atu sai loos.",
+          "Logo ka testu karik haree estrañu.",
+          "Mensajen husu informasaun pesoál, pagamentu ka kódigu.",
         ],
       },
       saferAction:{
         en:"Do not click the link. Check the organisation’s real page or ask a trusted adult, teacher, or friend.",
-        tet:"Keta klik link. Cheka pájina loos hosi organizasaun ka husu ba adultu, mestre, ka kolega ne'ebé ita konfia.",
+        tet:"Keta klik link ne'e. Verifika organizasaun nia pájina ofisiál ka husu ba adultu, manorin ka belun ne'ebé ita fiar.",
       },
     },
     {
@@ -245,22 +246,22 @@ export default function DeepfakePage(){
           "The name is similar to someone real, but not exactly right.",
         ],
         tet:[
-          "Konta foun ka iha post uitoan de'it.",
-          "Foto perfil haree perfeitu demais.",
-          "Ema ne'e lalais husu chat privadu, osan, foto, ka kódigu.",
-          "Naran hanesan ema loos, maibé la loos tomak.",
+          "Konta ne'e foin kria ka postajen menus tebes.",
+          "Foto perfíl nian haree perfeitu loos",
+          "Ema ne'e muda ba chat ka hakarak ko'alia kona-ba asuntu privadu, osan, foto ka kódigu.",
+          "Naran ne'e hanesan ho ema ne'ebé reál, maibé la serteza.",
         ],
       },
       saferAction:{
         en:"Check with the real person another way before accepting or replying.",
-        tet:"Cheka ho ema loos liu husi dalan seluk molok simu ka hatán.",
+        tet:"Verifika ho ema reál molok aseita no hatán.",
       },
     },
     {
       id:"deepfakeVideo",
       title:{
         en:"Fake video of a public person",
-        tet:"Vídeo falsu hosi ema públiku",
+        tet:"Vídeo falsu kona-ba figura públika",
       },
       image:"/cyber/youth/examples/fake-video.png",
       alt:{
@@ -275,22 +276,22 @@ export default function DeepfakePage(){
           "Other trusted pages are not reporting it.",
         ],
         tet:[
-          "Movimentu ibun la tuir lian.",
-          "Mensajen halo ema hakfodak ka emosional.",
-          "Vídeo la iha fonte klaru.",
-          "Pájina konfiavel seluk la relata buat ida-ne'e.",
+          "Movimentu ibun nian la tuir lian.",
+          "Mensajen ne'e halo ema hakfodak ka provoka emosaun forte.",
+          "Vídeo ne'e la iha fonte ne'ebé klaru.",
+          "Pájina seluk ne'ebé konfiável la relata informasaun ne'e.",
         ],
       },
       saferAction:{
         en:"Do not share it straight away. Check trusted sources and official pages first.",
-        tet:"Keta fahe kedas. Cheka uluk fonte konfiavel no pájina ofisiál.",
+        tet:"Labele fahe kedas. Verifika uluk fonte sira ne'ebé konfiável no pájina ofisiál sira.",
       },
     },
     {
       id:"voiceMessage",
       title:{
         en:"Fake voice message",
-        tet:"Mensajen lian falsu",
+        tet:"Mensajen lian (voice) falsu",
       },
       image:"/cyber/youth/examples/fake-voice.png",
       alt:{
@@ -305,22 +306,22 @@ export default function DeepfakePage(){
           "The message tries to make you panic.",
         ],
         tet:[
-          "Lian rona hanesan ema ne'ebé ita koñese, maibé pedidu la normal.",
-          "Mensajen husu osan, kódigu, ka ajuda urjente.",
-          "Ema ne'e la hatán bainhira ita bolu liu husi dalan seluk.",
-          "Mensajen koko halo ita pániku.",
+          "Lian (voice) ne'e rona hanesan ema ida-ne'ebé ita koñese, maibé pedidu ne'e ladún hanesan.",
+          "Mensajen ne'e husu osan, kódigu sira ka ajuda urjente.",
+          "Ema ne'e la responde bainhira ita telefone liuhusi maneira seluk.",
+          "Mensajen ne'e koko halo ita sai pániku.",
         ],
       },
       saferAction:{
         en:"Call the person using a number you already know. Do not send money or codes from one voice message.",
-        tet:"Bolu ema ne'e ho numeru ne'ebé ita hatene ona. Keta haruka osan ka kódigu tanba mensajen lian ida de'it.",
+        tet:"Telefone ba ema ne'e uza númeru ne'ebé ita hatene ona. Labele haruka osan ka kódigu husi mensajen lian (voice) ida.",
       },
     },
     {
       id:"editedSelfie",
       title:{
         en:"Edited selfie post",
-        tet:"Post selfie editadu",
+        tet:"Publikasaun selfie ne'ebé editadu",
       },
       image:"/cyber/youth/examples/fake-selfie.png",
       alt:{
@@ -335,15 +336,15 @@ export default function DeepfakePage(){
           "Parts of the background look repeated or bent.",
         ],
         tet:[
-          "Liman-fuan ka liman haree estranu ka forma la loos.",
-          "Liafuan iha roupa, sinal, ka label haree blur ka hakerek sala.",
-          "Oin no kulit haree suave demais ka perfeitu demais.",
-          "Parte balu iha kotuk imajen haree repete ka naklees.",
+          "Liman-fuan ka liman, haree estrañu ka iha forma ne'ebé sala.",
+          "Testu iha roupa, label ka marka haree la klaru ka hakerek sala.",
+          "Oin no kulit haree mós liu ka perfeitu liu.",
+          "Parte balun iha background repete ka kleuk.",
         ],
       },
       saferAction:{
         en:"Do not assume the image is real just because it looks polished. Check the account, look at other posts, and compare details carefully.",
-        tet:"Keta hanoin imajen ne'e loos de'it tanba haree di'ak. Cheka konta, haree postagen seluk, no kompara detallu sira ho kuidadu.",
+        tet:"Keta assume katak imajen ne'e reál tanba de'it nia haree furak no profisional. Verifika account, haree ba publikasaun seluk no kompara detallu sira ho kuidadu.",
       },
     },
   ];
@@ -400,7 +401,7 @@ export default function DeepfakePage(){
           <div className="max-w-3xl">
             <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-bold text-sky-900 shadow-sm">
               <SearchCheck className="h-4 w-4" aria-hidden="true" />
-              {lang==="tet"?"Atividade juventude":"Youth activity"}
+              {lang==="tet"?"Atividade ba foin-sa'e":"Youth activity"}
             </div>
 
             <h1 className="text-4xl font-black tracking-tight text-slate-950 md:text-6xl">

@@ -121,32 +121,32 @@ const TRANSLATIONS:Record<Lang,UI>={
   },
   tet:{
     title:"Fraude & Bosok Online",
-    subtitle:"Prátika atu identifika presaun husi ema seluk, mensajen falsu sira, pedidu urjente, no asaun sira ne'ebe ema haruka ita atu halo hodi foti desizaun lalais.",
+    subtitle:"Prátika atu identifika presaun husi ema seluk, mensajen falsu sira, pedidu urjente, no asaun sira-ne'ebé ema haruka ita atu halo hodi foti desizaun lailais.",
     backGuide:"Fila ba Youth Cyber Lab",
     backGame:"Fila ba jogu",
     scenario:"Senáriu",
     score:"Pontu",
     streak:"Seguidu",
     reset:"Hahu fali",
-    warningSigns:"Sinal avizu",
+    warningSigns:"Sinál avizu",
     saferMove:"Dalan seguru liu",
     chooseAction:"Ita sei halo saida?",
     good:"Hili didi'ak",
     risky:"Hili risku",
-    next:"Senáriu tuir mai",
+    next:"Senáriu tuirmai",
     showClues:"Hatudu pista",
     hideClues:"Subar pista",
     simpleRuleTitle:"Regra simples",
-    simpleRule:"Se ema husu osan, kódigu, foto privadu, password, ka segredu, para uluk no cheka liu husi dalan seluk.",
-    pressureTitle:"Truque komún tolu",
+    simpleRule:"Se ema ruma husu osan, kódigu, foto privadu, password, ka segredu, para kedas no haree liuhusi dalan seluk.",
+    pressureTitle:"Trik komún tolu",
     pressureItems:[
-      "Urjénsia: “Halo agora ka buat aat sei akontese.”",
-      "Fiar: “Hau mak ita-nia kolega, keta husu pergunta.”",
-      "Prémiu: “Ita manán ona, klik ka selu lalais.”",
+      "Urjénsia: “Halo kedas agora ka buat ne'ebé aat sei akontese.”",
+      "Konfiansa: “Ne'e ha'u, ó-nia belun, keta husu pergunta sira.”",
+      "Prémiu: “Ita-boot manán buat ruma, klik ka selu lailais.”",
     ],
-    sentenceTitle:"Sentensa ida ne'ebé ajuda",
-    sentenceText:"“Hau la fahe kódigu, osan, ka detallu privadu online.”",
-    sentenceDesc:"Depois screenshot, blokeia, relata, no fó-hatene ba ema ne'ebé ita konfia.",
+    sentenceTitle:"Fraze ida-ne'ebé bele ajuda",
+    sentenceText:"“Ha'u la fahe kódigu sira, osan, ka informasaun privadu sira iha online.”",
+    sentenceDesc:"Depois screenshot, blokeia, relata, no fó-hatene ba ema ne'ebé ita konfia ka ita fiar.",
     completeTitle:"Atividade remata",
     completeIntro:"Ita kompleta ona senáriu prátika sira.",
     restart:"Hahu fali atividade",
@@ -154,14 +154,14 @@ const TRANSLATIONS:Record<Lang,UI>={
     resultMid:"Haree Risku",
     resultStart:"Cyber Aware",
     confidenceRightHigh:"Ita konfiansa no resposta loos. Di'ak tebes.",
-    confidenceRightLow:"Ita kuidadu nafatin hodi fo resposta ne'ebe los. Ida-ne'e hábitu ne'ebe di'ak.",
-    confidenceWrongHigh:"Ita konfiansa, maibé resposta ne'e risku. Tuir mai para uluk.",
-    confidenceWrongLow:"Ita seidauk certeza, ne'e di'ak liu duké halo lalais. Agora haree sinal avizu.",
+    confidenceRightLow:"Ita kuidadu nafatin hodi fó resposta ne'ebé loos. Ida-ne'e ábitu ne'ebé di'ak.",
+    confidenceWrongHigh:"Ita konfiansa, maibé resposta ne'e risku. Tuirmai para uluk.",
+    confidenceWrongLow:"Ita seidauk serteza, ne'e di'ak liu duké halo ho lailais. Agora haree sinál avizu.",
     confidence:"Ita sente konfiansa hira?",
-    lowConfidence:"La certeza",
-    highConfidence:"Certeza tebes",
+    lowConfidence:"La serteza",
+    highConfidence:"serteza tebes",
     reminderTitle:"Hanoin hetan",
-    reminderText:"Fraudador sira dala barak koko halo ita sente presa, tauk, moe, kontenti demais, ka sala. Se ita sente presaun, para lai molok hatán.",
+    reminderText:"Bosok-teen (Fraudador) sira dala barak koko halo ita sente ansi, ta'uk, moe, kontente demais, ka sala. Se ita sente presaun, para kedas molok hatán.",
     clueHiddenText:"Koko hatán uluk, ka uza “Hatudu pista” se ita hakarak ajuda.",
   },
 };
@@ -175,11 +175,11 @@ const SCENARIOS:Scenario[]=[
     },
     description:{
       en:"You receive a message from a friend’s account: “I’m stuck and lost my wallet. Can you send $50 now? I’ll pay you back tomorrow.”",
-      tet:"Ita simu mensajen ida husi ita nia kolega ninia social media dehan katak: “Ha'u araska los no hau nia karteira lakon. Ita bele haruka $50 mai hau agora? Aban ha'u sei selu filafali.”",
+      tet:"Ita simu mensajen ida husi ita-nia kolega ninia sosiál média dehan katak: “Ha'u arraska loos no ha'u-nia karteira lakon. Ita bele haruka $50 mai ha'u agora? Aban ha'u sei selu filafali.”",
     },
     tags:{
       en:["Urgency","Money request","Possible hacked account"],
-      tet:["Urjénsia","Pedidu osan","Konta bele hacked"],
+      tet:["Urjénsia","Pedidu osan","Posibilidade account bele hetan hacked"],
     },
     warningSigns:{
       en:[
@@ -188,9 +188,9 @@ const SCENARIOS:Scenario[]=[
         "It comes through chat only, not a phone call or in-person request.",
       ],
       tet:[
-        "Mensajen husu osan lalais.",
-        "Situasaun halo ita sente pániku ka kulpa.",
-        "Mai liu husi chat de'it, la'ós telefonema ka hasoru malu.",
+        "Mensajen husu osan ho urjénsia no presa.",
+        "Situasaun ne'e halo ita sente pániku, tauk ka kulpa.",
+        "Komunikasaun akontese liuhusi chat de'it, la'ós liuhusi telefone ka hasoru malu direta.",
       ],
     },
     saferMove:{
@@ -200,43 +200,43 @@ const SCENARIOS:Scenario[]=[
         "Do not send money until you verify another way.",
       ],
       tet:[
-        "Bolu kolega ho numeru ne'ebé ita hatene ona.",
-        "Husu pergunta ne'ebé ema loos de'it bele hatene.",
-        "Keta haruka osan molok verifika liu husi dalan seluk.",
+        "Telefone kolega ne'ebé ita hatene ona nia númeru.",
+        "Husu pergunta sira-ne'ebé ema loos de'it maka bele hatene.",
+        "Keta haruka osan molok ita verifika informasaun ne'e liuhusi dalan seluk.",
       ],
     },
     options:[
       {
         text:{
           en:"Send the money immediately.",
-          tet:"Haruka osan kedas.",
+          tet:"Haruka kedas osan.",
         },
         correct:false,
         feedback:{
           en:"Risky. If the account is hacked, you are talking to the scammer.",
-          tet:"Risku. Se konta ne'e hacked, ita ko'alia hela ho fraudador.",
+          tet:"Risku. Se konta ne'e hacked, ita ko'alia hela ho bosok-teen (fraudador).",
         },
       },
       {
         text:{
           en:"Call your friend another way before sending anything.",
-          tet:"Bolu kolega liu husi dalan seluk molok haruka buat ida.",
+          tet:"Telefone kolega liuhusi dalan seluk molok haruka buat ruma.",
         },
         correct:true,
         feedback:{
           en:"Correct. Checking through another channel is the safest move.",
-          tet:"Loos. Cheka liu husi dalan seluk mak dalan seguru liu.",
+          tet:"Korretu. Verifika liuhusi dalan seluk maka dalan seguru liu.",
         },
       },
       {
         text:{
           en:"Ask for bank details instead.",
-          tet:"Husu detallu banku de'it.",
+          tet:"Husu informasaun kona-ba banku.",
         },
         correct:false,
         feedback:{
           en:"Still risky. The scammer may still be controlling the account.",
-          tet:"Sei risku nafatin. Fraudador karik sei kontrola hela konta ne'e.",
+          tet:"Sei risku nafatin. Bosok-teen (Fraudador) karik sei kontrola hela account ne'e.",
         },
       },
     ],
@@ -245,15 +245,15 @@ const SCENARIOS:Scenario[]=[
     id:2,
     title:{
       en:"Fake account warning",
-      tet:"Avizu konta falsu",
+      tet:"Avizu kona-ba account falsu",
     },
     description:{
       en:"You receive an email saying: “Your account will be deleted in 24 hours. Click here to appeal.”",
-      tet:"Ita simu email ne'ebé dehan: “Ita-nia konta sei apaga iha oras 24. Klik iha ne'e atu apela.”",
+      tet:"Ita simu email ne'ebé dehan: “Ita-nia account sei apaga (delete) iha oras 24. Klik iha ne'e atu apela.”",
     },
     tags:{
       en:["Fear","Fake link","Urgency"],
-      tet:["Tauk","Link falsu","Urjénsia"],
+      tet:["Ta'uk","Link falsu","Urjénsia"],
     },
     warningSigns:{
       en:[
@@ -263,8 +263,8 @@ const SCENARIOS:Scenario[]=[
       ],
       tet:[
         "Nia ameasa ita ho tempu badak.",
-        "Nia dudu ita atu klik link.",
-        "Naran remetente bele haree ofisiál, maibé email address bele sala.",
+        "Nia dudu ita atu klik iha link.",
+        "Naran ne'ebé haruka bele haree hanesan ofisiál, maibé email address bele sala.",
       ],
     },
     saferMove:{
@@ -275,31 +275,31 @@ const SCENARIOS:Scenario[]=[
       ],
       tet:[
         "Keta klik link iha email.",
-        "Loke app ka website loos rasik.",
-        "Cheka notifikasaun iha konta loos.",
+        "Loke aplikasaun ka website reál rasik.",
+        "Verifika notifikasaun iha account reál nia laran.",
       ],
     },
     options:[
       {
         text:{
           en:"Click the link quickly because the account may be deleted.",
-          tet:"Klik link lalais tanba konta bele apaga.",
+          tet:"Klik link lailais tanba account bele apaga (delete).",
         },
         correct:false,
         feedback:{
           en:"Risky. Fear and urgency are common phishing tricks.",
-          tet:"Risku. Tauk no urjénsia mak truque phishing komún.",
+          tet:"Risku. Ta'uk no urjénsia maka hanesan trik (truque phishing) komún.",
         },
       },
       {
         text:{
           en:"Ignore the link and check inside the real app.",
-          tet:"Ignora link no cheka iha app loos.",
+          tet:"Ignora link no verifika iha aplikasaun ne'ebé reál.",
         },
         correct:true,
         feedback:{
           en:"Correct. Go to the real app or website yourself instead of trusting a link.",
-          tet:"Koretu. Tama ba app ka sitiu ne'ebe registradu, keta fiar link de'it.",
+          tet:"Korretu. Tama ba aplikasaun ka sitiu ne'ebé rejistradu, keta fiar link de'it.",
         },
       },
       {
@@ -319,7 +319,7 @@ const SCENARIOS:Scenario[]=[
     id:3,
     title:{
       en:"Verification code request",
-      tet:"Pedidu kódigu verifikasaun",
+      tet:"Pedidu verifikasaun kódigu",
     },
     description:{
       en:"Someone says they accidentally sent a code to your phone and asks you to send it back to them.",
@@ -336,9 +336,9 @@ const SCENARIOS:Scenario[]=[
         "The request sounds simple, but it can give away your account.",
       ],
       tet:[
-        "Kódigu verifikasaun uza atu tama ba konta.",
+        "Kódigu verifikasaun uza atu tama ba account.",
         "Ekipa suporta loos la tenke husu ita-nia kódigu.",
-        "Pedidu haree simples, maibé bele fó ita-nia konta ba ema seluk.",
+        "Pedidu ne'e simples, maibé bele fó ita-nia account ba ema seluk.",
       ],
     },
     saferMove:{
@@ -348,9 +348,9 @@ const SCENARIOS:Scenario[]=[
         "Turn on 2FA and check active sessions.",
       ],
       tet:[
-        "Keta fahe kódigu.",
+        "Keta fahe ita-nia kódigu.",
         "Troka password se ita fahe ona.",
-        "Ativa 2FA no cheka sesaun ativu.",
+        "Ativa 2FA no verifika kona-ba sesaun ativa.",
       ],
     },
     options:[
@@ -362,7 +362,7 @@ const SCENARIOS:Scenario[]=[
         correct:false,
         feedback:{
           en:"Risky. If the code came to your phone, it is protecting your account or number.",
-          tet:"Risku. Se kódigu mai ba ita-nia telefone, nia proteje ita-nia konta ka numeru.",
+          tet:"Risku. Se kódigu mai ba ita-nia telefone, nia proteje ita-nia konta ka númeru.",
         },
       },
       {
@@ -373,7 +373,7 @@ const SCENARIOS:Scenario[]=[
         correct:true,
         feedback:{
           en:"Correct. Codes should stay private.",
-          tet:"Loos. Kódigu tenke hela privadu.",
+          tet:"Korretu. Kódigu tenke hela privadu.",
         },
       },
       {
@@ -397,11 +397,11 @@ const SCENARIOS:Scenario[]=[
     },
     description:{
       en:"Someone you like asks for a private photo and says, “If you trust me, you’ll send it. I promise no one else will see.”",
-      tet:"Ema ne'ebé ita gosta husu foto privadu no dehan, “Se ita fiar hau, ita sei haruka. Hau promete ema seluk sei la haree.”",
+      tet:"Ema ne'ebé ita gosta husu foto privadu no dehan, “Se ita fiar ha'u, ita sei haruka. Ha'u promete ema seluk sei la haree.”",
     },
     tags:{
       en:["Pressure","Private photos","Trust trick"],
-      tet:["Presaun","Foto privadu","Truque fiar"],
+      tet:["Presaun","Foto privadu","Fiar iha konfiansa"],
     },
     warningSigns:{
       en:[
@@ -410,9 +410,9 @@ const SCENARIOS:Scenario[]=[
         "Once an image is sent, you lose control of where it goes.",
       ],
       tet:[
-        "Sira liga fiar ho haruka buat privadu.",
-        "Sira pressiona ita duké respeita ita-nia lae.",
-        "Se imajen haruka ona, ita lakon kontrolu ba nia laloran.",
+        "Sira uza konfiansa atu husu informasaun privadu.",
+        "Sira obriga ita atu halo buat ne'ebé ita la hakarak.",
+        "Hafoin haruka imajen, ita labele kontrola tan ema ne'ebé simu ka fahe imajen ne'e.",
       ],
     },
     saferMove:{
@@ -424,41 +424,41 @@ const SCENARIOS:Scenario[]=[
       tet:[
         "Dehan lae ho klaru.",
         "Keta esplika barak demais ka diskute kleur.",
-        "Screenshot ameasa no buka ajuda se sira pressiona ita.",
+        "Screenshot ameasa no buka ajuda se sira obriga ita.",
       ],
     },
     options:[
       {
         text:{
           en:"Send it because they promised to keep it private.",
-          tet:"Haruka tanba sira promete atu rai privadu.",
+          tet:"Haruka ba tanba sira promete atu rai hanesan privadu.",
         },
         correct:false,
         feedback:{
           en:"Risky. A promise does not give you control once the image leaves your phone.",
-          tet:"Risku. Promesa la fó kontrolu ba ita bainhira imajen sai hosi ita-nia telefone ona.",
+          tet:"Risku. Ita la bele kontrola ita-nia promesa bainhira imajen haruka sai ona husi ita-nia telemovel.",
         },
       },
       {
         text:{
           en:"Say no and stop replying if they keep pushing.",
-          tet:"Dehan lae no para hatán se sira kontinua pressiona.",
+          tet:"Dehan lae no para hatán se sira kontinua ezije.",
         },
         correct:true,
         feedback:{
           en:"Correct. Pressure is a warning sign, not proof of love or trust.",
-          tet:"Loos. Presaun mak sinal avizu, la'ós prova domin ka fiar.",
+          tet:"Korretu. Presaun maka sinál avizu, la'ós prova domin ka fiar.",
         },
       },
       {
         text:{
           en:"Send a photo but hide your face.",
-          tet:"Haruka foto maibé subar ita-nia oin.",
+          tet:"Haruka foto maibé subar tiha ita-nia oin.",
         },
         correct:false,
         feedback:{
           en:"Still risky. Images can still be shared, saved, edited, or used to pressure you.",
-          tet:"Sei risku. Imajen bele fahe, rai, edita, ka uza atu pressiona ita.",
+          tet:"Sei risku. Imajen bele fahe, rai, edita, ka uza atu obriga ita.",
         },
       },
     ],
@@ -467,11 +467,11 @@ const SCENARIOS:Scenario[]=[
     id:5,
     title:{
       en:"Marketplace deposit",
-      tet:"Depózitu marketplace",
+      tet:"Depózitu iha merkadu",
     },
     description:{
       en:"A seller says many people want the item. They ask you to pay a small deposit now to hold it.",
-      tet:"Faan-na'in dehan ema barak hakarak sasán ne'e. Nia husu ita selu depózitu ki'ik agora atu rai ba ita.",
+      tet:"Fa'an na'in dehan ema barak hakarak sasán ne'e. Nia husu ita selu depózitu ki'ik agora atu rai ba ita.",
     },
     tags:{
       en:["Online buying","Deposit","Urgency"],
@@ -484,9 +484,9 @@ const SCENARIOS:Scenario[]=[
         "The profile may be new or have little information.",
       ],
       tet:[
-        "Sira kria presaun ho dehan ema seluk hein hela.",
-        "Sira husu osan molok ita bele verifika sasán.",
-        "Perfil bele foun ka iha informasaun uitoan de'it.",
+        "Sira kria presaun hodi dehan ema seluk hein hela atu hola.",
+        "Sira husu osan molok ita bele verifika sasán ne'e.",
+        "Perfil ne'e bele foun ka iha informasaun uitoan de'it.",
       ],
     },
     saferMove:{
@@ -496,21 +496,21 @@ const SCENARIOS:Scenario[]=[
         "Use a safe payment method or meet safely in a public place.",
       ],
       tet:[
-        "Cheka perfil no istória hosi faan-na'in.",
-        "Husu foto ka vídeo foun hosi sasán.",
-        "Uza dalan selu seguru ka hasoru iha fatin públiku ne'ebé seguru.",
+        "Verifika perfil no istória hosi fa'an-na'in.",
+        "Husu foto ka vídeo foun husi sasán.",
+        "Uza métodu pagamentu ne'ebé seguru ka hasoru malu ho seguru iha fatin públiku.",
       ],
     },
     options:[
       {
         text:{
           en:"Pay the deposit quickly so you do not miss out.",
-          tet:"Selu depózitu lalais atu keta lakon oportunidade.",
+          tet:"Selu depózitu lailais atu keta lakon oportunidade.",
         },
         correct:false,
         feedback:{
           en:"Risky. Pressure plus early payment is a warning sign.",
-          tet:"Risku. Presaun ho pagamentu sedu mak sinal avizu.",
+          tet:"Risku. Presaun ho pagamentu sedu maka sinál avizu.",
         },
       },
       {
@@ -521,7 +521,7 @@ const SCENARIOS:Scenario[]=[
         correct:true,
         feedback:{
           en:"Correct. Verify the item and seller before paying.",
-          tet:"Loos. Verifika sasán no faan-na'in molok selu.",
+          tet:"Korretu. Verifika sasán no fa'an-na'in molok selu.",
         },
       },
       {
@@ -532,7 +532,7 @@ const SCENARIOS:Scenario[]=[
         correct:false,
         feedback:{
           en:"Still risky. Sending less money does not prove the seller is real.",
-          tet:"Sei risku. Haruka osan menus la prova katak faan-na'in ne'e loos.",
+          tet:"Sei risku. Haruka osan menus la prova katak fa'an-na'in ne'e loos.",
         },
       },
     ],

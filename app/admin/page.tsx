@@ -319,7 +319,7 @@ export default function AdminHubPage() {
         ],
         tipsTet: [
           "Uza titulu relatóriu ne’ebé klaru atu vizitante hatene saida mak sira sei loke.",
-          "Halo deskrisaun badak no fasil atu lee lalais.",
+          "Halo deskrisaun badak no fasil atu lee lailais.",
           "Delete relatóriu husi lista seidauk delete PDF husi S3.",
         ],
       },
@@ -431,7 +431,7 @@ export default function AdminHubPage() {
     },
     tet: {
       heading: "Hub Upload Admin",
-      intro: "Link lalais atu atualiza kontentu. Uza butaun instrusaun atu orienta staf.",
+      intro: "Link lailais atu atualiza kontentu. Uza butaun instrusaun atu orienta staf.",
       instructions: "Instrusaun",
       open: "Loke pájina",
       close: "Taka",

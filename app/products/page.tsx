@@ -18,7 +18,7 @@ export default function ProductsPage() {
       title: "Produtu Ami",
       subtitle: "Rekursu edukativu kria hodi fó impaktu",
       description:
-        "Iha ne'e ita bele haree variedade produtu Lafaek, inklui livru ba labarik sira, poster hanorin, animasaun, vídeu, no revista. Pájina ida ne'e mak placeholder — detallu barak liu no lista produtu sei mai lalais.",
+        "Iha ne'e ita bele haree variedade produtu Lafaek, inklui livru ba labarik sira, poster hanorin, animasaun, vídeu, no revista. Pájina ida ne'e mak placeholder — detallu barak liu no lista produtu sei mai lailais.",
     },
   } as const;
 

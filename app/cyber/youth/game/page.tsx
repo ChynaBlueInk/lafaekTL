@@ -192,10 +192,10 @@ const TRANSLATIONS:Record<Lang,T>={
     checksLabel:"Verifikasaun kompleta",
     commandLabel:"Oinsá jogu ida-ne'e ajuda",
     commandHint:
-      "Ne'e atividade prátika lalais. Hakerek komandú badak, lee pista sira, no aprende atu para uluk molok fiar mensajen ida.",
+      "Ne'e atividade prátika lailais. Hakerek komandú badak, lee pista sira, no aprende atu para uluk molok fiar mensajen ida.",
     quickGoals:[
       "Hatene tanba sa OTP labele fahe",
-      "Haree bainhira ema uza presaun atu halo ita lalais",
+      "Haree bainhira ema uza presaun atu halo ita lailais",
       "Cheka short link no mensajen marketplace molok halo buat ida",
     ],
     openActivity:"Loke atividade",

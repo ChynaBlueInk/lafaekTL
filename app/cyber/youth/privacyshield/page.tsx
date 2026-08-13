@@ -145,7 +145,7 @@ const TRANSLATIONS:Record<Lang,UI>={
     safer:"SEGURU",
     openDetails:"Klik atu haree detallu",
     hideDetails:"Subar detallu",
-    quickTitle:"Lista lalais ba hadia",
+    quickTitle:"Lista lailais ba hadia",
     quickItems:[
       "Halo rede sosiál privadu.",
       "Hamate precise location.",

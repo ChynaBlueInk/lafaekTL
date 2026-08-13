@@ -23,7 +23,7 @@ Adults cyber translations
   rows: 89
   keys matched in file: 89/89
   UNCERTAIN Tetun (?): 1
-    - linksTitle: "Saida mak tuir mai?"
+    - linksTitle: "Saida mak tuirmai?"
 
 ============================================================
 Adults interactive guide

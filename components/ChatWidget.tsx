@@ -328,7 +328,7 @@ const copy={
     hide:"Subar",
     hideToTop:"Subar ba leten",
     title:"Lafaek Chat",
-    subtitle:"Mensajen lalais ba ami nia equipa",
+    subtitle:"Mensajen lailais ba ami nia equipa",
     avatarAlt:"Avatar karakter Lafaek",
     name:"Naran",
     namePh:"hanesan: Ana",
