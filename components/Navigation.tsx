@@ -202,9 +202,9 @@ useEffect(()=>{
         brand:"Revista Lafaek",
         logoAlt:"Lafaek Learning Media",
         programs:"Programa sira",
-        keepSafe:"Uza internet ho Seguro, manten seguransa iha online",
+        keepSafe:"Manten seguransa iha online",
         about:"Kona-ba",
-        extras:"Tanba seluk",
+        extras:"Adisionál",
         admin:"Admin",
         signIn:"Tama / Rejistu",
         signOut:"Sai",
@@ -248,11 +248,11 @@ useEffect(()=>{
             ]
           },
           keepSafe:{
-            title:"Uza internet ho Seguro, manten seguransa iha online",
+            title:"Manten seguransa iha online",
             description:"Matadalan kona-ba seguransa online ba labarik, joven, inan-aman, manorin, no komunidade.",
             links:[
               {
-                label:"Uza internet ho Seguro, manten seguransa iha online",
+                label:"Manten seguransa iha online",
                 href:"/cyber",
                 description:"Hahu iha ne'e ba matadalan seguransa online Lafaek nian."
               },
