@@ -1,4 +1,3 @@
-//app/page.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -51,8 +50,11 @@ const buildImageUrl = (src?: string) => {
   return `${S3_ORIGIN}/${clean}`;
 };
 
+// Matches "Latest first" on /stories/impact: the story date set in the admin
+// editor decides the order. updatedAt is not used because every admin save
+// stamps all stories with the same updatedAt.
 const getImpactTimestamp = (item: ImpactItem) => {
-  const possibleDates = [item.updatedAt, item.createdAt, item.date];
+  const possibleDates = [item.date, item.createdAt];
 
   for (const value of possibleDates) {
     if (!value) {
@@ -211,7 +213,8 @@ export default function HomePage() {
       try {
         setImpactError(undefined);
 
-        const endpoints = ["/api/impact", "/api/stories/impact", "/api/admin/impact"];
+        // Public endpoint only: it already hides drafts, hidden and archived stories.
+        const endpoints = ["/api/impact"];
 
         let data: ImpactApiResponse | null = null;
         let lastError = "Could not load impact stories.";

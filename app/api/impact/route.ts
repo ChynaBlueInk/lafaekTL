@@ -3,7 +3,11 @@ import {NextResponse} from "next/server";
 import {S3Client,GetObjectCommand} from "@aws-sdk/client-s3";
 
 export const dynamic="force-dynamic";
+export const revalidate=0;
+export const fetchCache="force-no-store";
 export const runtime="nodejs";
+
+const NO_STORE={"Cache-Control":"no-store, no-cache, must-revalidate, max-age=0"};
 
 const REGION=process.env.AWS_REGION||"ap-southeast-2";
 const BUCKET=process.env.AWS_S3_BUCKET||"";
@@ -33,7 +37,7 @@ export async function GET(){
     if(!BUCKET){
       return NextResponse.json(
         {ok:false,error:"Missing AWS_S3_BUCKET in environment variables"},
-        {status:500}
+        {status:500,headers:NO_STORE}
       );
     }
 
@@ -94,13 +98,13 @@ export async function GET(){
         return oa-ob;
       });
 
-    return NextResponse.json({ok:true,items},{status:200});
+    return NextResponse.json({ok:true,items},{status:200,headers:NO_STORE});
   }catch(error:any){
     console.error("[api/impact] GET error",error);
 
     return NextResponse.json(
       {ok:false,error:error?.message||"Failed to load public impact stories"},
-      {status:500}
+      {status:500,headers:NO_STORE}
     );
   }
 }

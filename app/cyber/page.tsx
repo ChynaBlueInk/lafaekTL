@@ -68,7 +68,7 @@ const TRANSLATIONS: Record<Lang, T> = {
   tet: {
     heroLabel: "SEGURANSA DIJITÁL LAFAEK",
     heroTitle: "Internét",
-    heroTitle2: "ba ema hotu.",
+    heroTitle2: "ba Ema Hotu.",
     heroSubtitle:
       "Nune'e mós responsabilidade atu utiliza teknolojia ho seguru. Seguransa Sibernétika la'ós de'it ba ema espesialista sira — ida-ne'e mós bele proteje família, komunidade, no Timor-Leste nia futuru.",
 
@@ -98,12 +98,12 @@ const TRANSLATIONS: Record<Lang, T> = {
       },
     ],
 
-    whyTitle: "Tamba saida presija tau Atensaun agora.",
+    whyTitle: "Tanba saida mak presiza tau Atensaun agora.",
     whyLead:
-      "Ameasa dijitál la'ós buat ne'ebé imajináriu de'it — sira afeta bain bain loron-loron. Bainhira Timor-Leste sai konektadu, risku sira mós boot liu.",
+      "Ameasa dijitál sira la'ós buat abstratu - loroloron sira afeta ba ema reál. Nu'udar nasaun ida-ne'ebé foin-sa'e liu iha mundu, Timor-Leste harii hela ninia futuru dijitál. Ne'e kria oportunidade - no vulnerabilidade reál.",
     whyPoints: [
       {
-        stat: "3.4B",
+        stat: "3,4 biliaun",
         label: "Email falsu (phishing) ne'ebé ema manda loroloron",
         desc: "Mensajen hirak-ne'e haruka ba nasaun hotu-hotu no tama ita-nia email liu husi inbox.",
       },
@@ -158,7 +158,7 @@ const TRANSLATIONS: Record<Lang, T> = {
         severity: "high",
       },
       {
-        label: "Estragu instituisonál",
+        label: "Estragu institusionál",
         desc: "Eskola, ospitál, no eskritóriu governu ne'ebé hetan atake bele lakon sira-nia dadus no mós kapasidade operasionál, sei fó impaktu ba komunidade tomak.",
         severity: "critical",
       },
@@ -175,7 +175,7 @@ const TRANSLATIONS: Record<Lang, T> = {
       {
         href: "/cyber/children",
         age: "Tinan 7–14",
-        title: "Esploradór Ki'ik",
+        title: "Esploradór/a Ki'ik",
         desc: "Aventura interativu no divertidu ne'ebé hanorin labarik sira kona-ba fundasaun seguransa online - liuhusi jogu, personajen no regra simples.",
         cta: "Hahú aventura",
         theme: "children",
@@ -191,7 +191,7 @@ const TRANSLATIONS: Record<Lang, T> = {
       {
         href: "/cyber/adults",
         age: "Adultu no família sira",
-        title: "Protetór Komunidade",
+        title: "Protetór/a Komunidade",
         desc: "Orientasaun ba inan-aman, profisionál no membru komunidade sira - atu proteje família, servisu, finansas no ema sira iha ita-nia sorin.",
         cta: "Harii ita-nia protetór",
         theme: "adults",
@@ -200,7 +200,7 @@ const TRANSLATIONS: Record<Lang, T> = {
 
     togetherTitle: "Seguransa maka responsabilidade koletivu iha Komunidade",
     togetherLead:
-      "Konsiénsia individuál importante — maibé forsa ne'ebé lolos mosu bainhira família, eskola, no komunidade hotu prátika ábitu seguru hamutuk.",
+      "Konsiénsia individuál importante — maibé forsa ne'ebé loloos mosu bainhira família, eskola, no komunidade hotu prátika ábitu seguru hamutuk.",
     togetherPoints: [
       "Fahe saida mak ita aprende ho ita-nia família, liuliu inan-aman ka avó sira-ne'ebé seidauk hatene didi'ak kona-ba ameasa dijitál.",
       "Ko'alia nakloke kona-ba esperiénsia online - halakon moe kona-ba sala sira, hodi nune'e fasil liu atu husu ajuda.",
