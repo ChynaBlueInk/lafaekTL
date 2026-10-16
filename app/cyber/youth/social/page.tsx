@@ -160,7 +160,7 @@ const TRANSLATIONS:Record<Lang,UI>={
     confidenceWrongLow:"Ita seidauk serteza, ne'e di'ak liu duké halo ho lailais. Agora haree sinál avizu.",
     confidence:"Ita sente konfiansa hira?",
     lowConfidence:"La serteza",
-    highConfidence:"serteza tebes",
+    highConfidence:"Serteza tebes",
     reminderTitle:"Hanoin hetan",
     reminderText:"Bosok-teen (Fraudador) sira dala barak koko halo ita sente ansi, ta'uk, moe, kontente demais, ka sala. Se ita sente presaun, para kedas molok hatán.",
     clueHiddenText:"Koko hatán uluk, ka uza “Hatudu pista” se ita hakarak ajuda.",

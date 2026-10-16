@@ -78,11 +78,23 @@ export default function HomePage() {
 
   const content = {
     en: {
-      hero: {
-        title: "Welcome to Lafaek Learning Media",
-        subtitle: "Supporting Timor-Leste through Education & Stories",
-        supportText:
-          "You can help support Lafaek by purchasing our magazines and products, sponsoring educational content, advertising with us, or hiring our talented team of writers, illustrators, and videographers.",
+      intro: {
+        eyebrow: "About LAFAEK",
+        lead:
+          "LAFAEK Learning Media is an educational initiative of CARE in Timor-Leste. It was developed in 2000 and distributed its first magazine in 2001. LAFAEK provides quality learning materials in Tetun for children, students, teachers, families and communities, especially in rural and remote areas.",
+        body:
+          "Through the magazines Lafaek Ki'ik, Lafaek Prima, Lafaek ba Manorin, Lafaek ba Komunidade and its digital content, LAFAEK promotes literacy, numeracy, gender equality, social inclusion, health and practical knowledge. Together with the Ministry of Education and its partners, LAFAEK connects learning across schools, families and communities.",
+        magazinesTitle: "Our magazines",
+        magazinesLink: "Browse the magazines →",
+        focusTitle: "What we promote",
+        focus: [
+          "Literacy",
+          "Numeracy",
+          "Gender equality",
+          "Social inclusion",
+          "Health",
+          "Practical knowledge",
+        ],
       },
       news: { title: "Latest News", subtitle: "What's happening at Lafaek?", viewAll: "View all news" },
       socialEnterprise: {
@@ -121,7 +133,6 @@ export default function HomePage() {
         title: "Join Our Mission",
         subtitle: "Help us continue empowering Timor-Leste through education",
         volunteer: "Volunteer",
-        donate: "Support Us",
         partner: "Partner With Us",
       },
       social: {
@@ -139,12 +150,24 @@ export default function HomePage() {
       },
     },
     tet: {
-      hero: {
-        title: "Benvindu mai Revista LAFAEK Learning Media",
-        subtitle: "Hametin edukasaun no inspirasaun iha Timor-Leste liuhusi istória no rekursu aprendizajen sira",
-        supportText:
-          "Revista LAFAEK loke espasu ba ema hotu atu partisipa, fó apoiu no harii kolaborasaun hamutuk. Ita-boot bele kontribui ba distribuisaun revista no materiál edukativu sira, apoiu dezenvolvimentu konteúdu, harii parseria ba komunikasaun no promosaun, no kolabora ho ami-nia ekipa kreativa, inklui hakerek-na'in, ilustradór no videógrafu sira."
-          },
+      intro: {
+        eyebrow: "Kona-ba LAFAEK",
+        lead:
+          "LAFAEK Learning Media mak inisiativa edukasionál husi CARE iha Timor-Leste, ne’ebé dezenvolve iha tinan 2000 no hahú fahe revista dahuluk iha 2001. LAFAEK fornese materiál aprendizajen ho kualidade iha lian Tetun ba labarik, estudante, manorin, família no komunidade, liuliu iha área rurál no remota.",
+        body:
+          "Liuhosi revista Lafaek Ki’ik, Lafaek Prima, Lafaek ba Manorin, Lafaek ba Komunidade no kontéudu dijitál, LAFAEK promove literasia, numerasia, igualdade jéneru, inkluzaun sosial, saúde no koñesimentu prátiku. Hamutuk ho Ministériu Edukasaun no parseiru sira, LAFAEK liga aprendizajen entre eskola, família no komunidade.",
+        magazinesTitle: "Ami-nia revista",
+        magazinesLink: "Haree revista sira →",
+        focusTitle: "Saida mak ami promove",
+        focus: [
+          "Literasia",
+          "Numerasia",
+          "Igualdade jéneru",
+          "Inkluzaun sosiál",
+          "Saúde",
+          "Koñesimentu prátiku",
+        ],
+      },
       news: { title: "Notísia Foun", subtitle: "Saida mak akontese iha Lafaek?", viewAll: "Haree hotu notísia" },
       socialEnterprise: {
         title: "LAFAEK Empreza Sosiál",
@@ -182,7 +205,6 @@ export default function HomePage() {
         title: "Hamutuk hala'o Ami-nia Misaun",
         subtitle: "Partisipa ho ami atu kontinua hametin Timor-Leste liuhusi edukasaun.",
         volunteer: "Voluntáriu",
-        donate: "Suporta Ami",
         partner: "Parseria ho Ami",
       },
       social: {
@@ -371,6 +393,105 @@ export default function HomePage() {
     <div className="flex min-h-screen flex-col bg-white">
       <main className="flex-1">
         <Carousel />
+
+        {/* About LAFAEK: full welcome text from the carousel */}
+        <section
+          id="about-lafaek"
+          className="scroll-mt-20 bg-white px-4 py-14 md:py-20"
+          aria-labelledby="about-lafaek-heading"
+        >
+          <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-12 lg:gap-14">
+            {/* Story */}
+            <div className="lg:col-span-7">
+              <div className="mb-5 flex items-center gap-3">
+                <span className="flex gap-1" aria-hidden="true">
+                  <span className="h-2 w-6 rounded-full bg-[#219653]" />
+                  <span className="h-2 w-6 rounded-full bg-[#2F80ED]" />
+                  <span className="h-2 w-6 rounded-full bg-[#F2C94C]" />
+                  <span className="h-2 w-6 rounded-full bg-[#EB5757]" />
+                </span>
+                <h2
+                  id="about-lafaek-heading"
+                  className="text-sm font-bold uppercase tracking-widest text-[#219653]"
+                >
+                  {t.intro.eyebrow}
+                </h2>
+              </div>
+
+              <p className="text-xl font-semibold leading-relaxed text-[#333333] md:text-2xl md:leading-relaxed">
+                {t.intro.lead}
+              </p>
+
+              <p className="mt-6 text-base leading-8 text-gray-700 md:text-lg md:leading-8">
+                {t.intro.body}
+              </p>
+
+              <div className="mt-8">
+                <h3 className="mb-3 text-sm font-bold uppercase tracking-widest text-gray-500">
+                  {t.intro.focusTitle}
+                </h3>
+                <ul className="flex flex-wrap gap-2">
+                  {t.intro.focus.map((item, i) => {
+                    const pillColours = [
+                      "bg-green-50 text-[#219653] ring-green-200",
+                      "bg-blue-50 text-[#2F80ED] ring-blue-200",
+                      "bg-yellow-50 text-[#8a6d00] ring-yellow-200",
+                      "bg-red-50 text-[#C0392B] ring-red-200",
+                    ];
+
+                    return (
+                      <li
+                        key={item}
+                        className={`rounded-full px-4 py-1.5 text-sm font-semibold ring-1 ${
+                          pillColours[i % pillColours.length]
+                        }`}
+                      >
+                        {item}
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            </div>
+
+            {/* Magazine family */}
+            <aside className="lg:col-span-5">
+              <div className="rounded-3xl bg-gradient-to-br from-green-50 to-blue-50 p-6 shadow-sm md:p-8">
+                <h3 className="mb-5 text-2xl font-bold text-[#219653]">
+                  {t.intro.magazinesTitle}
+                </h3>
+
+                <ul className="space-y-3">
+                  {[
+                    { code: "LK", name: "Lafaek Ki'ik", colour: "bg-[#F2C94C] text-[#333333]" },
+                    { code: "LP", name: "Lafaek Prima", colour: "bg-[#2F80ED] text-white" },
+                    { code: "LBM", name: "Lafaek ba Manorin", colour: "bg-[#219653] text-white" },
+                    { code: "LBK", name: "Lafaek ba Komunidade", colour: "bg-[#EB5757] text-white" },
+                  ].map((mag) => (
+                    <li
+                      key={mag.code}
+                      className="flex items-center gap-4 rounded-2xl bg-white p-3 shadow-sm"
+                    >
+                      <span
+                        className={`flex h-12 w-14 shrink-0 items-center justify-center rounded-xl text-sm font-black ${mag.colour}`}
+                      >
+                        {mag.code}
+                      </span>
+                      <span className="font-semibold text-[#333333]">{mag.name}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                <Link
+                  href="/publication/magazines"
+                  className="mt-6 inline-block font-semibold text-[#219653] hover:underline"
+                >
+                  {t.intro.magazinesLink}
+                </Link>
+              </div>
+            </aside>
+          </div>
+        </section>
 
         {/* Dropdown nav + Latest Magazines */}
         <section className="bg-white px-4 py-8">
@@ -651,12 +772,6 @@ export default function HomePage() {
                     className="inline-flex items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-bold text-[#219653] transition-colors hover:bg-gray-100"
                   >
                     {t.cta.volunteer}
-                  </Link>
-                  <Link
-                    href="/get-involved#donate"
-                    className="inline-flex items-center justify-center rounded-full border-2 border-white px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-white hover:text-[#2F80ED]"
-                  >
-                    {t.cta.donate}
                   </Link>
                   <Link
                     href="/get-involved#partner"
