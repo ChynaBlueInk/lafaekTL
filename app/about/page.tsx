@@ -311,7 +311,7 @@ const content: Record<Lang, AboutContent> = {
       paragraphs: [
         "To continue this work in the long term, CARE has set out a plan to transform LAFAEK into a social enterprise. Under the proposed model, LAFAEK would generate its own revenue to complement donor support and reduce its dependence on external funding.",
         "The main commitment is to keep providing free materials to schools and communities in the most remote and disadvantaged areas. For this reason, the proposed model combines LAFAEK's own revenue with donor subsidies, so that financial sustainability continues to support LAFAEK's social objectives.",
-        "The original plan set out a five-year transition, from 2020 to 2024, moving management from CARE to the LAFAEK Social Enterprise as a local organisation governed and managed by Timorese people.",
+        "The original plan set out a five-year transition, from 2020 to 2024, moving management from CARE to the LAFAEK Social Enterprise as a local organisation governed and managed by Timorese people. Although the original timeline was delayed by the COVID-19 pandemic, CARE and the LAFAEK team remain committed to achieving this vision and establishing a sustainable, locally managed social enterprise for the future.",
       ],
       visionTitle: "Vision",
       vision: "To be a leader in media and communication that promotes social change in Timor-Leste.",
@@ -544,7 +544,7 @@ const content: Record<Lang, AboutContent> = {
       paragraphs: [
         "Atu kontinua servisu ne’e ba tempu naruk, CARE define planu atu transforma LAFAEK ba empreza sosiál ida. Modelu ne’e propoin atu jere reseita própria hodi komplementa apoiu husi doadór sira no hamenus dependénsia ba finansiamentu esternu.",
         "Kompromisu prinsipál mak kontinua fó materiál gratuitamente ba eskola no komunidade iha área remota liu no ho kondisaun desfavoresida. Tanba ne’e, modelu propostu kombina reseita própria ho subsídiu husi doadór sira, atu sustentabilidade finanseira bele kontinua apoia LAFAEK nia objetivu sosial.",
-        "Planu orijinál preve tranzisaun jestaun husi CARE ba Empreza Sosiál LAFAEK, nu’udar organizasaun lokál ho governasaun no jestaun timoroan, durante períodu tinan lima, husi 2020 to’o 2024.",
+        "Planu orijinál preve tranzisaun jestaun husi CARE ba Empreza Sosiál LAFAEK, nu’udar organizasaun lokál ho governasaun no jestaun timoroan, durante períodu tinan lima, husi 2020 to’o 2024. Maski kalendáriu tranzisaun ne'ebé planeadu labele realiza tuir tempo tanba pandemia COVID-19, CARE no ekipa LAFAEK kontinua comprometidu atu realiza visaun ida-ne'e no estabelese empreza sosiál sustentável ida ne'ebé jere no lidera husi Timoroan sira rasik ba futuru.",
       ],
       visionTitle: "Vizaun",
       vision: "Sai lider iha área mídia no komunikasaun atu promove mudansa sosiál iha Timor-Leste.",
