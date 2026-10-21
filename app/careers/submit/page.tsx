@@ -90,10 +90,14 @@ const JOB_CATEGORIES: JobCategory[] = [
   "Other",
 ];
 
-const IMAGE_MAX_BYTES = 5 * 1024 * 1024;
+// Vercel rejects request bodies over 4.5 MB before the API route runs,
+// so the image and attachment together must stay under this limit.
+const UPLOAD_TOTAL_MAX_BYTES = 4 * 1024 * 1024;
+
+const IMAGE_MAX_BYTES = 4 * 1024 * 1024;
 const IMAGE_ACCEPT = ["image/jpeg", "image/png", "image/webp"];
 
-const ATTACHMENT_MAX_BYTES = 10 * 1024 * 1024;
+const ATTACHMENT_MAX_BYTES = 4 * 1024 * 1024;
 const ATTACHMENT_ACCEPT = [
   "application/pdf",
   "application/msword",
@@ -175,6 +179,7 @@ type Translations = {
     imageSize: string;
     attachmentType: string;
     attachmentSize: string;
+    uploadTooLarge: string;
   };
   successTitle: string;
   successBody: string;
@@ -221,9 +226,9 @@ const TRANSLATIONS: Record<Lang, Translations> = {
       sourceNoteHelp:
         "For example: Shared by organisation directly, from official Facebook page, from HR team",
       heroImage: "Banner image",
-      heroImageHelp: "Optional. JPEG, PNG or WebP, max 5 MB. Shown at the top of the job card.",
+      heroImageHelp: "Optional. JPEG, PNG or WebP, max 4 MB. Shown at the top of the job card.",
       attachment: "Attachment",
-      attachmentHelp: "Optional. PDF, DOC or DOCX, max 10 MB. Useful for job descriptions or terms of reference.",
+      attachmentHelp: "Optional. PDF, DOC or DOCX, max 4 MB. The image and attachment together must be under 4 MB.",
     },
     placeholders: {
       title: "e.g. Graphic Designer",
@@ -259,9 +264,10 @@ const TRANSLATIONS: Record<Lang, Translations> = {
       summaryLength: "Please add both English and Tetun summaries (at least 20 characters each).",
       deadlinePast: "The deadline must be today or a future date.",
       imageType: "Please upload a JPEG, PNG, or WebP image.",
-      imageSize: "The image must be 5 MB or smaller.",
+      imageSize: "The image must be 4 MB or smaller.",
       attachmentType: "Please upload a PDF, DOC, or DOCX file.",
-      attachmentSize: "The attachment must be 10 MB or smaller.",
+      attachmentSize: "The attachment must be 4 MB or smaller.",
+      uploadTooLarge: "The image and attachment together must be under 4 MB. Please use smaller files.",
     },
     successTitle: "Job submitted",
     successBody: "Thanks. Your job listing has been sent for review and is not public yet.",
@@ -306,9 +312,9 @@ const TRANSLATIONS: Record<Lang, Translations> = {
       sourceNoteHelp:
         "Hanesan: Organizasaun mak fahe direto, husi pájina Facebook ofisiál, husi ekipa HR",
       heroImage: "Imajen banner",
-      heroImageHelp: "Opsionál. JPEG, PNG ka WebP, másimu 5 MB. Hatudu iha leten kartaun servisu.",
+      heroImageHelp: "Opsionál. JPEG, PNG ka WebP, másimu 4 MB. Hatudu iha leten kartaun servisu.",
       attachment: "Dokumentu",
-      attachmentHelp: "Opsionál. PDF, DOC ka DOCX, másimu 10 MB. Di'ak atu tau job description ka terms of reference.",
+      attachmentHelp: "Opsionál. PDF, DOC ka DOCX, másimu 4 MB. Imajen no dokumentu hamutuk tenke ki'ik liu 4 MB.",
     },
     placeholders: {
       title: "ez. Graphic Designer",
@@ -344,9 +350,10 @@ const TRANSLATIONS: Record<Lang, Translations> = {
       summaryLength: "Favór hatama rezumu iha Inglés no Tetun (karakter 20 ka liu).",
       deadlinePast: "Data remata tenke ohin ka futuru.",
       imageType: "Favór karrega imajen JPEG, PNG ka WebP.",
-      imageSize: "Imajen tenke ki'ik liu 5 MB.",
+      imageSize: "Imajen tenke ki'ik liu 4 MB.",
       attachmentType: "Favór karrega ficheiru PDF, DOC ka DOCX.",
-      attachmentSize: "Ficheiru tenke ki'ik liu 10 MB.",
+      attachmentSize: "Ficheiru tenke ki'ik liu 4 MB.",
+      uploadTooLarge: "Imajen no dokumentu hamutuk tenke ki'ik liu 4 MB. Favór uza ficheiru ki'ik liu.",
     },
     successTitle: "Vaga submete ona",
     successBody: "Obrigadu. Ita-nia lista vaga haruka ona ba revisaun no seidauk sai públiku.",
@@ -730,6 +737,7 @@ export default function CareersSubmitPage() {
     if (form.deadline < todayISO()) return v.deadlinePast;
     if (imageError) return imageError;
     if (attachmentError) return attachmentError;
+    if ((imageFile?.size ?? 0) + (attachmentFile?.size ?? 0) > UPLOAD_TOTAL_MAX_BYTES) return v.uploadTooLarge;
 
     return "";
   }
@@ -779,15 +787,24 @@ export default function CareersSubmitPage() {
       if (attachmentFile) fd.append("jobAttachment", attachmentFile, attachmentFile.name);
 
       const res = await fetch("/api/careers/submit", { method: "POST", body: fd });
-      if (!res.ok) throw new Error("Submit failed");
+
+      let data: { ok?: boolean; error?: string } | null = null;
+      try {
+        data = await res.json();
+      } catch {
+        data = null;
+      }
+
+      if (res.status === 413) throw new Error(text.validation.uploadTooLarge);
+      if (!res.ok || !data?.ok) throw new Error(data?.error || text.errorBody);
 
       setSuccess(text.successBody);
       setForm(INITIAL_FORM);
       handleImageChange(null);
       handleAttachmentChange(null);
       setTimeout(() => successRef.current?.focus(), 50);
-    } catch {
-      setFormError(text.errorBody);
+    } catch (error: any) {
+      setFormError(error?.message || text.errorBody);
       setTimeout(() => errorRef.current?.focus(), 50);
     } finally {
       setSubmitting(false);

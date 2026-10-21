@@ -1,5 +1,6 @@
 export const runtime="nodejs";
 export const dynamic="force-dynamic";
+export const fetchCache="force-no-store";
 
 import {NextRequest,NextResponse} from "next/server";
 import {cookies} from "next/headers";
@@ -67,8 +68,9 @@ const RAW_BASE_PATH=process.env.AWS_S3_BASE_PATH||"uploads";
 const BASE_PATH=RAW_BASE_PATH.replace(/^\/+/,"").replace(/\/+$/,"");
 const CAREERS_INDEX_KEY=`${BASE_PATH}/careers/submissions.json`;
 
-const USER_POOL_ID=process.env.COGNITO_USER_POOL_ID||process.env.NEXT_PUBLIC_COGNITO_USER_POOL_ID;
+const USER_POOL_ID=process.env.COGNITO_USER_POOL_ID||process.env.NEXT_PUBLIC_COGNITO_USER_POOL_ID||"ap-southeast-2_a70kol0sr";
 const COOKIE_NAME="lafaek_id_token";
+const NO_STORE={"Cache-Control":"no-store, max-age=0"};
 
 const VALID_STATUSES=new Set<CareerSubmissionStatus>([
   "pending",
@@ -107,9 +109,11 @@ const VALID_CATEGORIES=new Set<JobCategory>([
 ]);
 
 const ADMIN_GROUPS=new Set([
+  "superadmin",
   "admin",
-  "magazineadmin",
   "contenteditor",
+  "magazineadmin",
+  "careers",
 ]);
 
 const s3=new S3Client({
@@ -120,28 +124,16 @@ const s3=new S3Client({
   },
 });
 
-function getIssuer(){
-  if(!USER_POOL_ID){
-    return "";
-  }
-  return `https://cognito-idp.${REGION}.amazonaws.com/${USER_POOL_ID}`;
-}
-
-function getJwks(){
-  const issuer=getIssuer();
-  if(!issuer){
-    return null;
-  }
-  return createRemoteJWKSet(new URL(`${issuer}/.well-known/jwks.json`));
-}
+const ISSUER=`https://cognito-idp.${REGION}.amazonaws.com/${USER_POOL_ID}`;
+const JWKS=createRemoteJWKSet(new URL(`${ISSUER}/.well-known/jwks.json`));
 
 function normaliseGroups(groups:string[]|string|undefined){
   if(Array.isArray(groups)){
-    return groups.map((item)=>item.toLowerCase());
+    return groups.map((item)=>String(item).trim().toLowerCase()).filter(Boolean);
   }
 
   if(typeof groups==="string"&&groups.trim()){
-    return [groups.toLowerCase()];
+    return groups.split(",").map((item)=>item.trim().toLowerCase()).filter(Boolean);
   }
 
   return [];
@@ -155,20 +147,13 @@ async function getVerifiedToken(){
     return null;
   }
 
-  const issuer=getIssuer();
-  const jwks=getJwks();
-
-  if(!issuer||!jwks){
-    throw new Error("Missing Cognito configuration");
+  try{
+    const verified=await jwtVerify(token,JWKS,{issuer:ISSUER});
+    return verified as JWTVerifyResult<TokenPayload>;
+  }catch(error){
+    console.warn("admin careers token verification failed",error);
+    return null;
   }
-
-  const verified=await jwtVerify(
-    token,
-    jwks,
-    {issuer}
-  );
-
-  return verified as JWTVerifyResult<TokenPayload>;
 }
 
 async function requireAdmin(){
@@ -178,8 +163,8 @@ async function requireAdmin(){
     return {
       ok:false as const,
       response:NextResponse.json(
-        {ok:false,error:"Unauthorized"},
-        {status:401}
+        {ok:false,error:"Your session has expired. Please sign in again."},
+        {status:401,headers:NO_STORE}
       ),
     };
   }
@@ -192,8 +177,8 @@ async function requireAdmin(){
     return {
       ok:false as const,
       response:NextResponse.json(
-        {ok:false,error:"Forbidden"},
-        {status:403}
+        {ok:false,error:"You do not have access to manage careers."},
+        {status:403,headers:NO_STORE}
       ),
     };
   }
@@ -420,7 +405,7 @@ export async function GET(
     if(!BUCKET){
       return NextResponse.json(
         {ok:false,error:"Server is missing S3 bucket configuration."},
-        {status:500}
+        {status:500,headers:NO_STORE}
       );
     }
 
@@ -437,19 +422,19 @@ export async function GET(
     if(!record){
       return NextResponse.json(
         {ok:false,error:"Career submission not found."},
-        {status:404}
+        {status:404,headers:NO_STORE}
       );
     }
 
     return NextResponse.json(
       {ok:true,record},
-      {status:200}
+      {status:200,headers:NO_STORE}
     );
   }catch(error){
     console.error("admin careers GET by id error",error);
     return NextResponse.json(
       {ok:false,error:"Failed to load career submission."},
-      {status:500}
+      {status:500,headers:NO_STORE}
     );
   }
 }
@@ -462,7 +447,7 @@ export async function PATCH(
     if(!BUCKET){
       return NextResponse.json(
         {ok:false,error:"Server is missing S3 bucket configuration."},
-        {status:500}
+        {status:500,headers:NO_STORE}
       );
     }
 
@@ -481,7 +466,7 @@ export async function PATCH(
     if(!existing){
       return NextResponse.json(
         {ok:false,error:"Career submission not found."},
-        {status:404}
+        {status:404,headers:NO_STORE}
       );
     }
 
@@ -513,42 +498,42 @@ export async function PATCH(
     if(nextStatus!==undefined&&!VALID_STATUSES.has(nextStatus)){
       return NextResponse.json(
         {ok:false,error:"Invalid status value."},
-        {status:400}
+        {status:400,headers:NO_STORE}
       );
     }
 
     if(!VALID_ORG_TYPES.has(nextOrg)){
       return NextResponse.json(
         {ok:false,error:"Invalid organisation type."},
-        {status:400}
+        {status:400,headers:NO_STORE}
       );
     }
 
     if(!VALID_JOB_TYPES.has(nextType)){
       return NextResponse.json(
         {ok:false,error:"Invalid job type."},
-        {status:400}
+        {status:400,headers:NO_STORE}
       );
     }
 
     if(!VALID_CATEGORIES.has(nextCategory)){
       return NextResponse.json(
         {ok:false,error:"Invalid category."},
-        {status:400}
+        {status:400,headers:NO_STORE}
       );
     }
 
     if(!nextTitle||!nextOrganizationName||!nextLocation||!nextDeadline||!nextSummaryEN||!nextSummaryTET||!nextContactName||!nextContactEmail){
       return NextResponse.json(
         {ok:false,error:"Required fields cannot be blank."},
-        {status:400}
+        {status:400,headers:NO_STORE}
       );
     }
 
     if(nextSummaryEN.length<20||nextSummaryTET.length<20){
       return NextResponse.json(
         {ok:false,error:"Both summaries must be at least 20 characters."},
-        {status:400}
+        {status:400,headers:NO_STORE}
       );
     }
 
@@ -556,35 +541,35 @@ export async function PATCH(
     if(nextDeadline<today){
       return NextResponse.json(
         {ok:false,error:"Deadline must be today or in the future."},
-        {status:400}
+        {status:400,headers:NO_STORE}
       );
     }
 
     if(!nextApplyUrl&&!nextApplyEmail){
       return NextResponse.json(
         {ok:false,error:"Provide either an apply URL or an apply email."},
-        {status:400}
+        {status:400,headers:NO_STORE}
       );
     }
 
     if(nextApplyUrl&&!isValidUrl(nextApplyUrl)){
       return NextResponse.json(
         {ok:false,error:"Apply URL must be a valid http or https link."},
-        {status:400}
+        {status:400,headers:NO_STORE}
       );
     }
 
     if(nextApplyEmail&&!isValidEmail(nextApplyEmail)){
       return NextResponse.json(
         {ok:false,error:"Apply email is not valid."},
-        {status:400}
+        {status:400,headers:NO_STORE}
       );
     }
 
     if(!isValidEmail(nextContactEmail)){
       return NextResponse.json(
         {ok:false,error:"Contact email is not valid."},
-        {status:400}
+        {status:400,headers:NO_STORE}
       );
     }
 
@@ -617,7 +602,7 @@ export async function PATCH(
     if(!validateRecordShape(updated)){
       return NextResponse.json(
         {ok:false,error:"Updated record failed validation."},
-        {status:400}
+        {status:400,headers:NO_STORE}
       );
     }
 
@@ -642,13 +627,13 @@ export async function PATCH(
 
     return NextResponse.json(
       {ok:true,record:updated},
-      {status:200}
+      {status:200,headers:NO_STORE}
     );
   }catch(error){
     console.error("admin careers PATCH error",error);
     return NextResponse.json(
       {ok:false,error:"Failed to update career submission."},
-      {status:500}
+      {status:500,headers:NO_STORE}
     );
   }
 }
@@ -661,7 +646,7 @@ export async function DELETE(
     if(!BUCKET){
       return NextResponse.json(
         {ok:false,error:"Server is missing S3 bucket configuration."},
-        {status:500}
+        {status:500,headers:NO_STORE}
       );
     }
 
@@ -678,7 +663,7 @@ export async function DELETE(
     if(!existing){
       return NextResponse.json(
         {ok:false,error:"Career submission not found."},
-        {status:404}
+        {status:404,headers:NO_STORE}
       );
     }
 
@@ -703,13 +688,13 @@ export async function DELETE(
 
     return NextResponse.json(
       {ok:true,id},
-      {status:200}
+      {status:200,headers:NO_STORE}
     );
   }catch(error){
     console.error("admin careers DELETE error",error);
     return NextResponse.json(
       {ok:false,error:"Failed to delete career submission."},
-      {status:500}
+      {status:500,headers:NO_STORE}
     );
   }
 }
