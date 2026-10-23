@@ -103,8 +103,12 @@ export default function ContactPage() {
     e.preventDefault()
     setFormStatus("submitting")
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1500))
-      console.log("Form Data Submitted:", formData)
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...formData, language }),
+      })
+      if (!res.ok) throw new Error("Server error")
       setFormStatus("success")
       setFormData({ name: "", email: "", subject: "", message: "", inquiryType: "" })
     } catch (error) {
@@ -139,7 +143,7 @@ export default function ContactPage() {
                 <MapPin className="h-6 w-6 text-purple-600" /><span>{t.contactInfo.address}</span>
               </div>
               <div className="mt-8">
-                <Image src="/placeholder.svg" alt="Lafaek Office" width={500} height={300} className="rounded-lg shadow-lg" priority />
+                <Image src="/care.png" alt="Lafaek Office" width={500} height={300} className="rounded-lg shadow-lg" priority />
               </div>
             </div>
 
