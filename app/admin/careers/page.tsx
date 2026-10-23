@@ -3,6 +3,7 @@
 
 import {useEffect,useMemo,useState} from "react";
 import Link from "next/link";
+import {createPortal} from "react-dom";
 import {useLanguage} from "@/lib/LanguageContext";
 import {
   ArrowLeft,
@@ -375,6 +376,22 @@ export default function AdminCareersPage(){
     [records,activeId]
   );
 
+  useEffect(()=>{
+    if(!activeRecord) return;
+
+    function onKey(e:KeyboardEvent){
+      if(e.key==="Escape") setActiveId(null);
+    }
+
+    document.addEventListener("keydown",onKey);
+    document.body.style.overflow="hidden";
+
+    return()=>{
+      document.removeEventListener("keydown",onKey);
+      document.body.style.overflow="";
+    };
+  },[activeRecord]);
+
   const filterCountMap:Record<StatusFilter,number>={
     all:counts.total,
     pending:counts.pending,
@@ -661,7 +678,7 @@ export default function AdminCareersPage(){
               >
                 {record.heroImage?(
                   <div
-                    className="h-44 bg-cover bg-center"
+                    className="h-44 bg-[#F5F5F5] bg-contain bg-center bg-no-repeat"
                     style={{backgroundImage:`url("${record.heroImage}")`}}
                   />
                 ):(
@@ -781,30 +798,38 @@ export default function AdminCareersPage(){
         )}
       </main>
 
-      {activeRecord&&(
+      {activeRecord&&createPortal(
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+          className="fixed inset-0 z-[10050] flex items-center justify-center bg-black/60 p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-label={activeRecord.title}
           onClick={()=>setActiveId(null)}
         >
           <div
             className="relative max-h-[90vh] w-full max-w-4xl overflow-y-auto rounded-2xl bg-white shadow-2xl"
             onClick={(e)=>e.stopPropagation()}
           >
-            {activeRecord.heroImage&&(
-              <div
-                className="h-56 bg-cover bg-center"
-                style={{backgroundImage:`url("${activeRecord.heroImage}")`}}
-              />
-            )}
+            <div className="sticky top-0 z-20 flex h-0 justify-end">
+              <button
+                type="button"
+                onClick={()=>setActiveId(null)}
+                className="mr-4 mt-4 h-fit rounded-full bg-white p-2 shadow hover:bg-gray-100"
+                aria-label={text.modal.close}
+              >
+                <X className="h-5 w-5 text-[#4F4F4F]" />
+              </button>
+            </div>
 
-            <button
-              type="button"
-              onClick={()=>setActiveId(null)}
-              className="absolute right-4 top-4 rounded-full bg-white p-2 shadow hover:bg-gray-100"
-              aria-label={text.modal.close}
-            >
-              <X className="h-5 w-5 text-[#4F4F4F]" />
-            </button>
+            {activeRecord.heroImage&&(
+              <div className="flex w-full justify-center bg-[#F5F5F5]">
+                <img
+                  src={activeRecord.heroImage}
+                  alt={`${activeRecord.title} banner`}
+                  className="h-auto max-h-[60vh] w-full object-contain"
+                />
+              </div>
+            )}
 
             <div className="grid gap-0 md:grid-cols-5">
               <aside className="border-r border-gray-200 bg-[#F9F9F9] p-6 md:col-span-2">
@@ -952,7 +977,8 @@ export default function AdminCareersPage(){
               </section>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

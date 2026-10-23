@@ -3,6 +3,7 @@
 import {useEffect,useMemo,useRef,useState} from "react";
 import Image from "next/image";
 import Link from "next/link";
+import {createPortal} from "react-dom";
 import {useLanguage} from "@/lib/LanguageContext";
 import {
   Briefcase,
@@ -327,9 +328,9 @@ function JobModal({
 
   const summary=lang==="tet"?job.summaryTET:job.summaryEN;
 
-  return(
+  return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+      className="fixed inset-0 z-[10050] flex items-center justify-center bg-black/60 p-4"
       role="dialog"
       aria-modal="true"
       aria-label={job.title}
@@ -341,13 +342,14 @@ function JobModal({
         onClick={(e)=>e.stopPropagation()}
       >
         {job.heroImage&&(
-          <div className="relative h-44 w-full overflow-hidden">
+          <div className="flex w-full justify-center bg-[#F5F5F5]">
             <Image
               src={job.heroImage}
               alt={`${job.title} — hero image`}
-              fill
-              sizes="100vw"
-              className="object-cover"
+              width={1600}
+              height={900}
+              sizes="(max-width:896px) 100vw, 896px"
+              className="h-auto max-h-[60vh] w-full object-contain"
             />
           </div>
         )}
@@ -444,7 +446,8 @@ function JobModal({
           </section>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 
@@ -466,13 +469,13 @@ function JobCard({
   return(
     <article className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition hover:shadow-md">
       {job.heroImage?(
-        <div className="relative h-44 w-full">
+        <div className="relative h-44 w-full bg-[#F5F5F5]">
           <Image
             src={job.heroImage}
             alt={`${job.title} — banner`}
             fill
             sizes="(max-width:768px) 100vw, 33vw"
-            className="object-cover"
+            className="object-contain"
           />
         </div>
       ):(
