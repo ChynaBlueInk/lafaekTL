@@ -38,9 +38,9 @@ export default function LearningPage() {
     { slug: "physical-education", titleEn: "Physical Education", titleTet: "Edukação Físika", image: "/learning/icons/Sports.png" },
     { slug: "literacy", titleEn: "Literacy", titleTet: "Leitura & Hakerek", image: "/learning/icons/Literacy.png" },
     { slug: "mathematics", titleEn: "Mathematics", titleTet: "Matemátika", image: "/learning/icons/maths.png" },
-    { slug: "health", titleEn: "Health", titleTet: "Saúde", image: "/learning/icons/health.png" },
+    { slug: "health", titleEn: "Health", titleTet: "Saúde", image: "/learning/icons/Health.png" },
     { slug: "games", titleEn: "Games", titleTet: "Jogu sira", image: "/learning/icons/games1.png" },
-    { slug: "creativity", titleEn: "Creativity", titleTet: "Kreatividade", image: "/learning/icons/creativity.png" },
+    { slug: "creativity", titleEn: "Creativity", titleTet: "Kreatividade", image: "/learning/icons/Creativity.png" },
   ];
 
   return (
