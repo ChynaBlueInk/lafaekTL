@@ -530,7 +530,7 @@ case "seriesZA": {
       <div className="relative h-60 w-full md:h-80">
 
         <Image
-          src="/products.JPG"
+          src="/products.jpg"
           alt={t.bannerAlt}
           fill
           className="object-cover"
