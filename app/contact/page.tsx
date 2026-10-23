@@ -64,7 +64,7 @@ export default function ContactPage() {
       contactInfo: {
         title: "Atu hatene informasaun klaru bele kontaktu liuhusi:",
         email: "info.lafaek@careint.org",
-        phone: "+670 1234 5678",
+        phone: "+670 7825 5553",
         address: "Dili, Timor-Leste",
       },
       form: {
