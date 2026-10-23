@@ -33,7 +33,7 @@ export default function ContactPage() {
       contactInfo: {
         title: "Contact Information",
         email: "info.lafaek@careint.org",
-        phone: "+670 1234 5678",
+        phone: "+670 7825 5553",
         address: "Dili, Timor-Leste",
       },
       form: {
