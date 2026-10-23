@@ -254,7 +254,7 @@ export default function AdminCareersPage(){
         org:"Organizasaun",
         submittedBy:"Submete hosi",
         source:"Nota fonte",
-        view:"Haree detalhu",
+        view:"Haree detallu",
         attachment:"Dokumentu",
         noAttachment:"La iha dokumentu",
       },

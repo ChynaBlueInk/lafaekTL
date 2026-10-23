@@ -432,7 +432,7 @@ const TRANSLATIONS: Record<Lang, Translations> = {
         icon: "standout",
         title: "Sai Diferente hosi Aplikante Sira Seluk",
         intro:
-          "Bainhira kompetisaun boot, detalhu ki'ik sira mak importante. Hábitu sira-ne'e separa kandidatu sira forte hosi sira seluk.",
+          "Bainhira kompetisaun boot, detallu ki'ik sira mak importante. Hábitu sira-ne'e separa kandidatu sira forte hosi sira seluk.",
         bullets: [
           "Tuir instrusaun aplikasaun hotu ho loos — se sira husu PDF, haruka PDF.",
           "Hadia CV no cover letter ba kargu ida-idak.",

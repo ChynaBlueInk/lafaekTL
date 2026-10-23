@@ -376,7 +376,7 @@ export default function AdminHubPage() {
         ],
         tipsTet: [
           "Pájina ida ne’e workflow aksaun imediatu, la’ós pájina save hamutuk.",
-          "Uza formulariu edit ba detalhu vaga tomak.",
+          "Uza formulariu edit ba detallu vaga tomak.",
         ],
       },
       users: {

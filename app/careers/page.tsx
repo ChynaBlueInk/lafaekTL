@@ -190,7 +190,7 @@ const TRANSLATIONS:Record<Lang,Translations>={
       apply:"Aplika agora",
       applyByEmail:"Aplika liu hosi email",
       close:"Taka",
-      details:"Detalhu",
+      details:"Detallu",
     },
     empty:"Seidauk iha oportunidade ne'ebé tuir ho ita-nia filtru sira. Kokorek hamoos filtru ka buka fali.",
     stats:{available:"Lista atual sira"},
